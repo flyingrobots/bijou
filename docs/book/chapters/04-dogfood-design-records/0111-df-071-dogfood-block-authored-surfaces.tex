@@ -1,0 +1,153 @@
+\chapter{DF-071 - DOGFOOD Block-Authored Surfaces}\label{record-111}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-071-dogfood-block-authored-surfaces.md}\par}\smallskip
+
+Linked legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DF-dogfood-field-guide.md}{DF - DOGFOOD Field Guide}
+
+\section{Sponsor Human}\label{record-111-sponsor-human}
+
+DOGFOOD should increasingly feel like an app authored from semantic Blocks, not an app that has a Blocks documentation page on the side.
+
+\section{Sponsor Agent}\label{record-111-sponsor-agent}
+
+An agent should be able to inspect DOGFOOD's product surfaces and understand which Block owns each semantic region without executing provider lifecycle, hidden registries, or view mutation paths.
+
+\section{Hill}\label{record-111-hill}
+
+DOGFOOD uses Blocks for visible app semantics across shell, docs, preview, settings, and workbench surfaces while preserving the existing component layer as the leaf rendering vocabulary.
+
+DF-071 is not a visual redesign. It is a product-boundary pass: more visible DOGFOOD surfaces should be described, rendered, and verified through Blocks where the Block boundary is already stable.
+
+\section{Core Rule}\label{record-111-core-rule}
+
+Blocks own product semantics.
+
+Components own leaf rendering.
+
+Runtime and provider systems own lifecycle.
+
+Localization owns text lookup through a port.
+
+DF-071 may connect these layers, but it must not collapse them.
+
+\section{Fifteen-Slice Plan}\label{record-111-fifteen-slice-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Refresh BEARING after DF-070 landed.
+\item
+  Land this design checkpoint.
+\item
+  Add missing block-authored surface coverage for shell footer/status hints.
+\item
+  Route docs footer hint text through the footer/status Block.
+\item
+  Add block-authored landing/title behavior proof.
+\item
+  Route the landing DOGFOOD panel through \texttt{T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} data.
+\item
+  Add a registry-backed DOGFOOD surface Block inventory page.
+\item
+  Add block-authored search surface coverage.
+\item
+  Route search chrome title text through the search Block seam without changing search mechanics.
+\item
+  Add block-authored notification center coverage.
+\item
+  Add block-authored performance HUD coverage.
+\item
+  Add block-authored keyboard help coverage.
+\item
+  Add block-authored command palette coverage.
+\item
+  Update docs and changelog with the shipped public DOGFOOD surface posture.
+\item
+  Run full validation, push, and open a PR.
+\end{enumerate}
+
+The plan can adapt if the code reveals a cleaner seam, but each slice must keep the same separation of concerns.
+
+\section{Adaptation Note}\label{record-111-adaptation-note}
+
+The top navigation seam is owned by the generic \texttt{A\allowbreak{}p\allowbreak{}p\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} tab renderer. DF-071 therefore did not fork tab rendering inside DOGFOOD. Instead, it covered the frame-owned surfaces that already have stable semantic boundaries:
+
+\begin{itemize}
+\tightlist
+\item
+  footer hints
+\item
+  search title
+\item
+  notifications
+\item
+  performance HUD
+\item
+  keyboard help
+\item
+  command palette
+\end{itemize}
+
+The actual overlay renderers remain in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}. DOGFOOD now publishes local block contracts for those surfaces so the app can be inspected as a block-authored product without duplicating frame runtime behavior.
+
+\section{Non-Goals}\label{record-111-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  no new provider lifecycle system
+\item
+  no command dispatch rewrite
+\item
+  no hidden global block registry
+\item
+  no localization runtime rewrite
+\item
+  no conversion of leaf components into Blocks
+\item
+  no broad visual redesign
+\item
+  no metadata-only tests standing in for rendered behavior
+\end{itemize}
+
+\section{Tests To Write First}\label{record-111-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  behavior tests proving routed surfaces render the user-visible text they claim to own
+\item
+  behavior tests proving block registries expose the new semantic surfaces without discovery-time rendering
+\item
+  behavior tests proving routed surfaces still preserve lowered-mode behavior
+\item
+  behavior tests proving localization access stays behind the existing port
+\end{itemize}
+
+\section{Retrospective}\label{record-111-retrospective}
+
+DF-071 landed the first broad pass over DOGFOOD block-authored product surfaces. It added or routed:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}H\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{S\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}l\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}C\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{P\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}H\allowbreak{}u\allowbreak{}d\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{H\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k}
+\item
+  \texttt{T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n\allowbreak{}B\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k} landing title data
+\item
+  a registry-backed DOGFOOD surface inventory page
+\end{itemize}
+
+The key restraint held: frame runtime surfaces remain rendered by \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}, while DOGFOOD owns the semantic block contracts, data requirements, command intents, and visible documentation inventory.
+

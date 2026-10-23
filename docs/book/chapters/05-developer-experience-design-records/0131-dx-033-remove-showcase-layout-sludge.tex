@@ -1,0 +1,144 @@
+\chapter{DX-033 Remove showcase layout sludge}\label{record-131}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DX-033-remove-showcase-layout-sludge.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-033 Remove showcase layout sludge
+legend: DX
+lane: design
+priority: medium
+keywords:
+  - examples
+  - layout
+  - scrolling
+  - strings
+  - debt
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-131-framing}
+
+The old component showcase predates DOGFOOD's \texttt{C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y} substrate and the v6 storybook workstation. It remains useful as a compact tri-mode example, but it should not keep carrying hand-rolled layout and typing debt now that the primary docs lane has moved elsewhere.
+
+This cycle removes the concrete sludge called out in the v6 bad-code note: \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} no longer defaults to \texttt{a\allowbreak{}n\allowbreak{}y}, the showcase sidebar no longer does local scroll slicing in the view renderer, and the welcome panel drops its \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}4} sizing shortcut. The full registry rewrite is intentionally not in scope; DOGFOOD and the storybook workstation are now the canonical teaching surfaces for new work.
+
+\section{Sponsored Users}\label{record-131-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Builders copying examples who should not inherit \texttt{a\allowbreak{}n\allowbreak{}y} defaults or bespoke list clipping.
+\item
+  Maintainers keeping the legacy showcase aligned with shared TUI primitives.
+\item
+  Agents auditing v6 layout work and checking that old examples no longer contradict the runtime layout direction.
+\end{itemize}
+
+\section{Hills}\label{record-131-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder reading \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} types sees \texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n} as the default message payload instead of silent \texttt{a\allowbreak{}n\allowbreak{}y}.
+\item
+  A maintainer reading the showcase sidebar sees \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} own the visible row window and scrollbar.
+\item
+  A release reviewer can verify the remaining showcase role is secondary to DOGFOOD/storybook instead of a second canonical docs product.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-131-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} default to \texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n}?
+\item
+  Does the showcase sidebar render through the shared browsable-list surface?
+\item
+  Is manual \texttt{i\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}s\allowbreak{}.\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}Y\allowbreak{},\allowbreak{} \allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}Y\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}v\allowbreak{}i\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{})} gone from the app view renderer?
+\item
+  Is the welcome panel no longer using the hardcoded \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}t\allowbreak{}h\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}4} shortcut?
+\item
+  Do docs explain that DOGFOOD/storybook are the primary teaching lane?
+\item
+  Does the v6 lane point at the closed design cycle?
+\end{itemize}
+
+\section{Requirements}\label{record-131-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Change \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}<\allowbreak{}M\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y\allowbreak{}>} to \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}<\allowbreak{}M\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}>}.
+\item
+  Add a type-level regression for that default.
+\item
+  Replace showcase sidebar local slicing/string assembly with \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+\item
+  Preserve standalone tier marking in the sidebar.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/}.
+\item
+  Update the v6 lane and DX legend.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-131-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}3\allowbreak{}3\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}m\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}h\allowbreak{}o\allowbreak{}w\allowbreak{}c\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}l\allowbreak{}u\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test verifies the \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} default and type-level regression.
+\item
+  The test verifies showcase sidebar rendering uses \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+\item
+  The test verifies the old local slice expression is gone.
+\item
+  The test verifies the showcase docs point readers to DOGFOOD/storybook for primary docs work.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-131-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Tighten \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} to default its message type to \texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n}.
+\item
+  Add the \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}T\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}O\allowbreak{}f} regression in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Render the showcase sidebar through \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} with the existing tier marker preserved.
+\item
+  Update showcase and legend docs to reflect the secondary showcase posture.
+\item
+  Move the backlog item into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update v6 pointers.
+\end{enumerate}
+
+\section{Drift Check}\label{record-131-drift-check}
+
+The old registry still contains string-first examples. That is acceptable for this cycle because the showcase is now a secondary example surface and many entries intentionally demonstrate string-returning core components.
+
+The key fix is ownership: scroll clipping moves back to the shared list/viewport primitive, and the primary story/doc tooling now lives in DOGFOOD and \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k} / \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}b\allowbreak{}o\allowbreak{}o\allowbreak{}k\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x}.
+
+\section{Playback}\label{record-131-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: DX-033 existed only as a v6 backlog note, \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} defaulted to \texttt{a\allowbreak{}n\allowbreak{}y}, and the showcase sidebar locally sliced visible rows.
+\item
+  GREEN: \texttt{S\allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}t\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}O\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} defaults to \texttt{u\allowbreak{}n\allowbreak{}k\allowbreak{}n\allowbreak{}o\allowbreak{}w\allowbreak{}n} and has a type-level test.
+\item
+  The showcase sidebar renders through \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} with a scrollbar instead of local slice/count footer logic.
+\item
+  The welcome panel sizing no longer subtracts four cells by hand.
+\item
+  The showcase README documents its legacy/secondary role relative to DOGFOOD and the text-first storybook workstation.
+\end{itemize}
+
+\section{Retrospective}\label{record-131-retrospective}
+
+This closes the debt without pretending the legacy showcase should become the new story platform. The right direction is to keep old examples honest while new tooling composes around DOGFOOD stories and shared layout primitives.
+

@@ -1,0 +1,428 @@
+\chapter{Low-Allocation Renderer}\label{record-052}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/low-allocation-renderer.md}\par}\smallskip
+
+\emph{Design note for reusable framebuffers and a low-garbage hot render path}
+
+\section{Why this exists}\label{record-052-why-this-exists}
+
+The DOGFOOD title screen made a real renderer truth visible:
+
+\begin{itemize}
+\tightlist
+\item
+  app-side title-screen work was slow enough to optimize
+\item
+  terminal paint cost still dominates at very large window sizes
+\item
+  even after the title-screen perf pass, the core runtime and surface stack still generate a lot of temporary garbage every frame
+\end{itemize}
+
+That means the next performance step is not another one-off screen optimization. It is renderer architecture.
+
+The question is not:
+
+\begin{quote}
+``Can we make this one shader faster?''
+\end{quote}
+
+The real question is:
+
+\begin{quote}
+``Can the Bijou runtime render rich full-screen surfaces without allocating a storm of temporary objects every frame?''
+\end{quote}
+
+The answer is:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{we can get much closer}
+\item
+  \textbf{but not with the current runtime/surface hot path}
+\end{itemize}
+
+\section{Evidence}\label{record-052-evidence}
+
+\subsection{DOGFOOD title-screen benchmark}\label{record-052-dogfood-title-screen-benchmark}
+
+At \texttt{2\allowbreak{}2\allowbreak{}0\allowbreak{}x\allowbreak{}5\allowbreak{}8}, the optimized DOGFOOD title screen now benchmarks at:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{3\allowbreak{}.\allowbreak{}3\allowbreak{}9\allowbreak{} \allowbreak{}m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} for update + view + normalize
+\item
+  \texttt{3\allowbreak{}.\allowbreak{}9\allowbreak{}8\allowbreak{} \allowbreak{}m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} for update + view + normalize + diff/write into test IO
+\end{itemize}
+
+That is a major improvement over the earlier path:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{1\allowbreak{}2\allowbreak{}.\allowbreak{}2\allowbreak{}7\allowbreak{} \allowbreak{}m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} before for update + view + normalize
+\item
+  \texttt{1\allowbreak{}1\allowbreak{}.\allowbreak{}8\allowbreak{}1\allowbreak{} \allowbreak{}m\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} before for update + view + normalize + diff/write
+\end{itemize}
+
+So there was real waste in the title screen itself, and it was worth removing.
+
+\subsection{Allocation profile}\label{record-052-allocation-profile}
+
+The remaining problem is not retained memory. It is temporary churn.
+
+Measured over \texttt{6\allowbreak{}0\allowbreak{}0} DOGFOOD landing frames at \texttt{2\allowbreak{}2\allowbreak{}0\allowbreak{}x\allowbreak{}5\allowbreak{}8}:
+
+\begin{itemize}
+\tightlist
+\item
+  transient heap delta: about \texttt{6\allowbreak{}.\allowbreak{}6\allowbreak{} \allowbreak{}M\allowbreak{}B}
+\item
+  retained heap delta after forced GC: about \texttt{2\allowbreak{}1\allowbreak{}3\allowbreak{} \allowbreak{}K\allowbreak{}B}
+\end{itemize}
+
+So this is \textbf{not a leak}. It is \textbf{temporary garbage production}.
+
+\subsection{GC behavior}\label{record-052-gc-behavior}
+
+The trace confirms that the runtime is feeding the collector frequently:
+
+\begin{itemize}
+\tightlist
+\item
+  repeated minor scavenges
+\item
+  at least one old-space mark-compact pause around \texttt{2\allowbreak{}4\allowbreak{} \allowbreak{}m\allowbreak{}s}
+\end{itemize}
+
+That is enough to matter for animation smoothness and pacing.
+
+\section{The current bottlenecks}\label{record-052-the-current-bottlenecks}
+
+\subsection{\texorpdfstring{1. \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} is object-heavy by design}{1.  is object-heavy by design}}\label{record-052-surface-is-object-heavy-by-design}
+
+The current \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} API is ergonomic, but not cheap:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} returns masked cell copies
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{})} writes through \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}s\allowbreak{}k\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}, which returns a fresh \texttt{C\allowbreak{}e\allowbreak{}l\allowbreak{}l}
+\item
+  \texttt{c\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}(\allowbreak{})} replaces every cell object
+\item
+  \texttt{c\allowbreak{}l\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})} deep-copies the whole surface
+\item
+  \texttt{g\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}o\allowbreak{}w\allowbreak{}(\allowbreak{})} allocates both arrays and masked cell copies
+\end{itemize}
+
+This is fine for a friendly public API. It is not fine for a hot renderer.
+
+\subsection{2. The runtime allocates a fresh target surface every frame}\label{record-052-the-runtime-allocates-a-fresh-target-surface-every-frame}
+
+Today the runtime:
+
+\begin{itemize}
+\tightlist
+\item
+  allocates a new \texttt{t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} for every render
+\item
+  diffs it against \texttt{c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  then clones the target into \texttt{c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\end{itemize}
+
+That means the frame loop is paying for:
+
+\begin{itemize}
+\tightlist
+\item
+  one full-surface allocation
+\item
+  one full-surface clone
+\end{itemize}
+
+on every frame, even before terminal paint cost is considered.
+
+\subsection{3. The diff path allocates while reading cells}\label{record-052-the-diff-path-allocates-while-reading-cells}
+
+\texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} currently walks the grid through \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}.
+
+That means the diff hot loop allocates just to inspect cells. It also:
+
+\begin{itemize}
+\tightlist
+\item
+  builds temporary token objects
+\item
+  builds \texttt{b\allowbreak{}a\allowbreak{}t\allowbreak{}c\allowbreak{}h\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t} strings
+\item
+  builds a growing \texttt{o\allowbreak{}u\allowbreak{}t\allowbreak{}p\allowbreak{}u\allowbreak{}t} string
+\end{itemize}
+
+Some string allocation is unavoidable in an ANSI renderer. The per-cell object churn is not.
+
+\subsection{4. The style layer is string-oriented}\label{record-052-the-style-layer-is-string-oriented}
+
+The Node style adapter ultimately produces styled strings. That is expected, but it means the final bridge to the terminal will never be literally zero-allocation.
+
+So the goal should be:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{near-zero-allocation in the hot render loop}
+\item
+  not a fantasy of zero allocation everywhere
+\end{itemize}
+
+\section{The decision}\label{record-052-the-decision}
+
+Bijou should pursue a \textbf{low-allocation renderer}, not promise a literally zero-allocation runtime.
+
+The design decision is:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  keep the current \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} API as the ergonomic public composition model
+\item
+  stop treating that API as the final hot-path framebuffer contract
+\item
+  introduce reusable framebuffers and direct-cell diffing in the runtime
+\item
+  move toward a dedicated internal mutable render buffer if the first stage proves worthwhile
+\end{enumerate}
+
+In short:
+
+\begin{quote}
+\texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} remains the authoring/composition type.\\
+The runtime grows a lower-allocation framebuffer path underneath it.
+\end{quote}
+
+\section{Non-goals}\label{record-052-non-goals}
+
+This effort does \textbf{not} mean:
+
+\begin{itemize}
+\tightlist
+\item
+  rewriting the whole design system around typed arrays immediately
+\item
+  removing all object allocation from every part of Bijou
+\item
+  breaking the public \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} API in the first slice
+\item
+  optimizing away terminal-emulator paint costs that live outside Bijou
+\end{itemize}
+
+Those would blur the work and make it much riskier than it needs to be.
+
+\section{Principles}\label{record-052-principles}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Fix the hot path first} We should remove runtime/framebuffer churn before inventing a whole new render substrate.
+\item
+  \textbf{Preserve public ergonomics} App authors should not need to think in framebuffers just to build normal components.
+\item
+  \textbf{Make each step benchmarkable} Every stage should have before/after benchmarks and GC observations.
+\item
+  \textbf{Tests are the spec} Runtime, diff, and resize behavior must stay covered while the internals change.
+\item
+  \textbf{Avoid premature big-bang rewrites} The first slice should be a contained runtime improvement, not a wholesale new rendering engine.
+\end{enumerate}
+
+\section{Proposed architecture}\label{record-052-proposed-architecture}
+
+\subsection{Stage 1 --- Runtime framebuffer reuse}\label{record-052-stage-1-runtime-framebuffer-reuse}
+
+Replace the current per-frame target allocation and post-diff clone with a double-buffer model:
+
+\begin{itemize}
+\tightlist
+\item
+  allocate \texttt{f\allowbreak{}r\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r} once per viewport size
+\item
+  allocate \texttt{b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r} once per viewport size
+\item
+  render into the back buffer
+\item
+  diff front vs back
+\item
+  swap references
+\end{itemize}
+
+This removes the largest guaranteed per-frame allocations without changing public component APIs.
+
+\subsection{Stage 2 --- Direct-cell diff fast path}\label{record-052-stage-2-direct-cell-diff-fast-path}
+
+Teach \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}D\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} to read cells directly from \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}s} in the hot loop instead of calling \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}.
+
+That should eliminate:
+
+\begin{itemize}
+\tightlist
+\item
+  masked read allocations
+\item
+  extra per-cell object copying during diff
+\end{itemize}
+
+It also creates a clearer path to style-run caching later.
+
+\subsection{Stage 3 --- Mutable/internal render buffer}\label{record-052-stage-3-mutableinternal-render-buffer}
+
+If stages 1 and 2 are not enough, add an internal runtime type such as:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{M\allowbreak{}u\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\item
+  or \texttt{R\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\end{itemize}
+
+This type should:
+
+\begin{itemize}
+\tightlist
+\item
+  mutate cells in place
+\item
+  support clear/fill/blit without per-cell object replacement
+\item
+  expose direct array access for diffing
+\end{itemize}
+
+This is the likely bridge between the public \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} model and a truly lean renderer.
+
+\subsection{Stage 4 --- Packed style and glyph data}\label{record-052-stage-4-packed-style-and-glyph-data}
+
+Longer-term, the renderer can move toward:
+
+\begin{itemize}
+\tightlist
+\item
+  compact style ids
+\item
+  bitflags for modifiers
+\item
+  glyph/string lookup tables
+\item
+  packed arrays instead of per-cell object shapes
+\end{itemize}
+
+This is where the renderer starts behaving more like a real framebuffer instead of a grid of JS objects.
+
+\subsection{Stage 5 --- ANSI emission optimization}\label{record-052-stage-5-ansi-emission-optimization}
+
+Once the buffer model is leaner, improve the terminal bridge itself:
+
+\begin{itemize}
+\tightlist
+\item
+  cache style runs
+\item
+  reduce repeated SGR construction
+\item
+  avoid unnecessary string concatenation churn
+\item
+  write larger coherent chunks
+\end{itemize}
+
+That still will not be literal zero-allocation, but it will be much closer to the practical lower bound for ANSI output.
+
+\section{Scope for the next implementation slice}\label{record-052-scope-for-the-next-implementation-slice}
+
+\subsection{In scope}\label{record-052-in-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  reusable front/back surfaces in the runtime
+\item
+  no per-frame \texttt{t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  no per-frame \texttt{c\allowbreak{}u\allowbreak{}r\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}t\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}c\allowbreak{}l\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  direct-buffer swap on successful output
+\item
+  benchmarks and runtime tests proving equivalence
+\end{itemize}
+
+\subsection{Out of scope}\label{record-052-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  a new public \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} API
+\item
+  packed typed-array cells
+\item
+  changing component authoring patterns
+\item
+  redesigning the style port
+\item
+  terminal-specific output throttling or adaptive quality logic
+\end{itemize}
+
+\section{Acceptance criteria}\label{record-052-acceptance-criteria}
+
+The first slice should be considered successful if:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  runtime behavior is unchanged from the app author's point of view
+\item
+  framebuffers are reused across steady-state renders
+\item
+  the per-frame allocation profile improves materially
+\item
+  render benchmarks and smoke suites stay green
+\item
+  resize behavior still replaces buffers correctly when dimensions change
+\end{enumerate}
+
+\section{Open questions}\label{record-052-open-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Should the reusable back buffer be fully cleared each frame, or should some middleware rely on an already-empty surface contract that needs stronger enforcement?
+\item
+  Should the diff fast path be added to the existing \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} implementation, or should it be introduced only after a dedicated internal framebuffer exists?
+\item
+  How far can we push runtime reuse before the \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} object model itself becomes the dominant remaining cost?
+\end{enumerate}
+
+\section{Recommendation}\label{record-052-recommendation}
+
+Proceed immediately with \textbf{Stage 1: runtime framebuffer reuse}.
+
+It is the highest-leverage improvement because:
+
+\begin{itemize}
+\tightlist
+\item
+  it removes unavoidable per-frame allocations already visible in the runtime
+\item
+  it does not require a public API break
+\item
+  it sets up every later optimization
+\item
+  it is easy to validate with benchmarks and tests
+\end{itemize}
+
+After that, take \textbf{Stage 2: direct-cell diff fast path} before deciding whether Stage 3 needs a new internal buffer type.
+

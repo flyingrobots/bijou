@@ -1,0 +1,17 @@
+\chapter{Upstream edge-overlay scrollbars and BCSS overflow handling}\label{record-354}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/HT_upstream-edge-overlay-scrollbars-and-bcss-overflow-handling.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "Upstream edge-overlay scrollbars and BCSS overflow handling"
+legend: HT
+lane: v5.0.0
+
+\end{RecordMeta}
+
+GitHub Issue \#54. Upstream edge-overlay scrollbar and BCSS overflow handling from XYPH into @flyingrobots/bijou-tui. Current viewport/focusArea/pager primitives require apps to hand-roll scrollbar overlay rendering, visibility fade states, and width-safe body composition. Requested: (A) overflow/scroll primitive with overlay vs gutter mode, visibility levels, BCSS-addressable track/thumb/arrows, composable with existing viewport/pager/focusArea; and/or (B) a pane-shell primitive owning header, body, optional right-edge rail, and width-safe chrome that doesn't reflow when the rail hides. Acceptance: edge-overlay scrollbar without dead gutter, ANSI-safe, BCSS-targetable, existing primitives stable unless new mode requested. XYPH has a working local implementation proving the pattern. See https://github.com/flyingrobots/bijou/issues/54 for full details.
+
+\section{Completed (2026-04-14)}\label{record-354-completed-2026-04-14}
+
+The upstreamed solution landed through Option A. \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} and \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} now support explicit gutter versus overlay scrollbar ownership, so the rail can paint over the pane edge without reserving a dead width column. \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}(\allowbreak{})} and \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} now thread that mode through their string and surface paths, preserving previous gutter behavior by default and only switching when overlay mode is explicitly requested. \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a} also exposes BCSS-targetable thumb and track identities so shell-owned panes can style overflow chrome without hand-rolling ANSI-aware replacement logic in app code.
+

@@ -8,15 +8,12 @@ import {
 
 function releaseDocsSnapshot(
   milestone: string,
-  options: { readonly releasePacketExists?: boolean; readonly staleDocs?: boolean } = {},
+  options: { readonly releasePacketExists?: boolean } = {},
 ): ReleaseReadinessDocsSnapshot {
   const version = milestone.replace(/^v/, '');
-  const milestoneText = options.staleDocs === true ? 'v0.0.0' : milestone;
   return {
-    roadmap: `ROADMAP ${milestoneText}`,
-    bearing: `BEARING ${milestoneText}`,
     changelog: `## [Unreleased]\n\n## [${version}]`,
-    releaseGuide: `release:readiness ${milestoneText} release-dry-run`,
+    releaseGuide: `release:readiness ${milestone} release-dry-run`,
     releasePacketExists: options.releasePacketExists ?? true,
   };
 }
@@ -123,7 +120,6 @@ describe('release-readiness', () => {
       expect(report.checks.map((check) => `${check.label}:${check.status}`)).toEqual([
         'tracker-open-items:pass',
         'tracker-wip-labels:pass',
-        'docs-roadmap-bearing:pass',
         'docs-changelog:pass',
         'release-packet:pass',
         'package-smoke:pass',

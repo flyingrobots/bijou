@@ -10,11 +10,12 @@ import {
   KEY_ENTER,
   keyMsg,
   normalizeViewOutput,
-  readFileSync,
   runScript,
   TOKEN_DOCTRINE_PATH,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
+
+import { readDocumentationFile } from './documentation-corpus.js';
 
 type DocsFrame = Parameters<typeof frameText>[0];
 
@@ -27,8 +28,8 @@ function last(frames: readonly DocsFrame[]): DocsFrame {
 describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
 
-  it('documents every built-in token with usage guidance and Sapphire Noir posture', () => {
-    const doctrine = readFileSync(TOKEN_DOCTRINE_PATH, 'utf8');
+  it('documents every built-in token with usage guidance and dark/light UX posture', () => {
+    const doctrine = readDocumentationFile(TOKEN_DOCTRINE_PATH, 'utf8');
     const requiredRows = [
       'semantic.primary',
       'semantic.muted',
@@ -68,7 +69,7 @@ describe('docs preview app', () => {
     ];
 
     expect(doctrine).toContain('## Per-Token Library Reference');
-    expect(doctrine).toContain('## Sapphire Noir First-Party Defaults');
+    expect(doctrine).toContain('## Default Dark/Light UX Audit');
     expect(doctrine).toContain('## Theme Debugger And Lab');
     expect(doctrine).toContain('Use when');
     expect(doctrine).toContain('Do not use when');

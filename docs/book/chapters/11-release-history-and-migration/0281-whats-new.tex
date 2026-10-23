@@ -1,0 +1,84 @@
+\chapter{What's New in Bijou 7.0.0}\label{record-281}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/7.0.0/whats-new.md}\par}\smallskip
+
+Bijou 7.0.0 ships the V6 layout floor and the V7 Product Truth lane as one release boundary. The short version: frame geometry, standard Blocks, DOGFOOD docs truth, localization posture, release proof, and notification polish now live on firmer public contracts instead of scattered demo-specific wiring.
+
+\section{Product Truth Is Block-Owned}\label{record-281-product-truth-is-block-owned}
+
+DOGFOOD now routes its release-facing docs surface through named Block contracts. The docs workspace, navigation, documentation article, guide inspector, settings menu, BlockLab workbench, title screen, footer hints, frame search, notifications, performance HUD, keyboard help, command palette, and surface inventory all have inspectable semantic contracts.
+
+That matters because product behavior is no longer only visible as pixels. A reviewer or agent can inspect metadata, schema-bound inputs, command intents, lower-mode facts, and rendered output for the same surface.
+
+\section{The Standard Block Catalog Is Broader}\label{record-281-the-standard-block-catalog-is-broader}
+
+The release expands first-party Blocks across the DOGFOOD component families:
+
+\begin{itemize}
+\tightlist
+\item
+  grouping, explainability, document, destination, divider, and text-entry Blocks
+\item
+  single-choice, multiple-choice, binary-decision, peer-navigation, progressive-disclosure, and path-progress Blocks
+\item
+  brand-emphasis, mode-aware primitive, dense comparison, hierarchy, exploration-list, and temporal-dependency Blocks
+\item
+  status and feedback Blocks for inline status, in-flow status, transient overlays, activity streams, shortcut cues, and progress indicators
+\end{itemize}
+
+Each family lands with public metadata, schema adapters, command-intent posture, visual/static rendering, lower-mode output, and stable semantic facts.
+
+\section{Layout, Tables, And Selection Got Stricter}\label{record-281-layout-tables-and-selection-got-stricter}
+
+The V6 floor brings pure layout envelope primitives to \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}: immutable constraints, preferences, assigned rectangles, direction, fit policy, content measurement seams, parent-owned assignment, minimal stack/place resolution, and explanation facts.
+
+Table rendering also moves to a more honest bounded-width model:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} fits human-mode output to the available terminal width by default
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} matches that bounded-width posture for surface rendering
+\item
+  wrapped cells preserve word boundaries when possible
+\item
+  intrinsic layout remains available as an explicit opt-in
+\item
+  pipe lowerings now cover TSV, CSV, Markdown, and ASCII grid
+\end{itemize}
+
+Selection and copy are now pure retained-geometry primitives: selection owners, viewport-aware ranges, semantic prose/surface/table extraction, mixed-region ordering, blocker arbitration, terminal-native fallback, and clipboard-effect records without hidden OS clipboard side effects.
+
+\section{Localization And DOGFOOD Are More Honest}\label{record-281-localization-and-dogfood-are-more-honest}
+
+\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n} now exposes a structured localization port with immutable localized objects, fallback and missing metadata, issue facts, and explicit resource/data behavior. DOGFOOD routes ordinary docs text lookup through that port, persists locale preference through host-owned storage, and keeps catalog completeness under local and CI gates.
+
+The DOGFOOD app also gained a release identity and release-title proof surface for V7 Product Truth, plus clearer package, philosophy, architecture, doctrine, guide, and release documentation inside the terminal docs reader.
+
+\section{Runtime And Workflow Proof Tightened}\label{record-281-runtime-and-workflow-proof-tightened}
+
+This release hardens operator-facing surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  command backpressure diagnostics and async render middleware diagnostics are exposed in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}
+\item
+  DOGFOOD and docs smoke paths have tighter non-interactive guardrails
+\item
+  CI can skip expensive DOGFOOD-only gates for unrelated pull-request paths while still running the full proof path on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} and tags
+\item
+  GitHub comment workflow docs now require file-backed Markdown comments so commands, backticks, and tables survive review automation
+\end{itemize}
+
+\section{Notification Text Wraps Like Human Prose}\label{record-281-notification-text-wraps-like-human-prose}
+
+The live \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} notification stack now wraps title, body, and action rows at word boundaries when possible instead of splitting ordinary words in the overlay. Long unbroken words still hard-wrap so notifications cannot exceed their assigned width.
+
+This is the fix Jedit needs for normal-mode runtime feedback: the notification surface stays readable without giving up bounded terminal layout.
+
+\section{Compatibility}\label{record-281-compatibility}
+
+Bijou 7.0.0 is a major release because it publishes a broader product-truth surface and tighter runtime contracts. Apps using the documented public APIs should see the upgrade mostly as new capability, but maintainers should read the migration guide before bumping because table fitting, Block exports, and release-proof DOGFOOD behavior are intentionally stricter than the 5.0.0 line.
+

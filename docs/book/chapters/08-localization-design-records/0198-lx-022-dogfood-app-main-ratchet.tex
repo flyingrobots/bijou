@@ -1,0 +1,256 @@
+\chapter{LX-022 DOGFOOD App Main Ratchet}\label{record-198}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/LX-022-dogfood-app-main-ratchet.md}\par}\smallskip
+
+\section{Status}\label{record-198-status}
+
+Implemented.
+
+\section{Tracker}\label{record-198-tracker}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \href{https://github.com/flyingrobots/bijou/issues/417}{\#417}
+\item
+  Pull Request: \href{https://github.com/flyingrobots/bijou/pull/418}{\#418}
+\end{itemize}
+
+\section{Legend}\label{record-198-legend}
+
+\begin{itemize}
+\tightlist
+\item
+  Linked legend: LX, Localization and Bidirectionality
+\item
+  Sponsor human: James Ross
+\item
+  Sponsor agent: Codex
+\end{itemize}
+
+\section{Hill}\label{record-198-hill}
+
+DOGFOOD must stop hiding its primary application surface inside one giant module. This cycle starts breaking up \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} while removing a material Code Dojo slice from the same file.
+
+\section{Current Truth}\label{record-198-current-truth}
+
+Live counts on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{d\allowbreak{}1\allowbreak{}e\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}d\allowbreak{}7}:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{9\allowbreak{}1\allowbreak{}0}
+\item
+  next aggregate Code Dojo target: \texttt{8\allowbreak{}6\allowbreak{}0} or lower
+\item
+  ESLint findings: \texttt{5\allowbreak{}0\allowbreak{}2}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} ESLint findings: \texttt{1\allowbreak{}1\allowbreak{}8}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} file-context baseline: \texttt{5\allowbreak{},\allowbreak{}7\allowbreak{}9\allowbreak{}4} lines and \texttt{2\allowbreak{}0\allowbreak{}3\allowbreak{},\allowbreak{}0\allowbreak{}9\allowbreak{}3} bytes
+\item
+  DOGFOOD raw-string debt: \texttt{2\allowbreak{},\allowbreak{}6\allowbreak{}5\allowbreak{}6}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p} raw-string debt: \texttt{2\allowbreak{}5\allowbreak{}8}
+\item
+  missing Markdown localizations: \texttt{7\allowbreak{}8}
+\end{itemize}
+
+Implemented counts on this branch before review:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{7\allowbreak{}9\allowbreak{}2}
+\item
+  next aggregate Code Dojo target: \texttt{7\allowbreak{}4\allowbreak{}2} or lower
+\item
+  ESLint findings: \texttt{3\allowbreak{}8\allowbreak{}4}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} ESLint findings: \texttt{0}
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} file-context baseline: \texttt{5\allowbreak{},\allowbreak{}7\allowbreak{}9\allowbreak{}3} lines and \texttt{2\allowbreak{}0\allowbreak{}1\allowbreak{},\allowbreak{}9\allowbreak{}8\allowbreak{}2} bytes
+\item
+  DOGFOOD raw-string debt: \texttt{2\allowbreak{},\allowbreak{}6\allowbreak{}5\allowbreak{}4}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p} raw-string debt: \texttt{2\allowbreak{}5\allowbreak{}6}
+\item
+  missing Markdown localizations: \texttt{7\allowbreak{}8}
+\end{itemize}
+
+Target for this cycle:
+
+\begin{itemize}
+\tightlist
+\item
+  remove at least \texttt{5\allowbreak{}0} counted Code Dojo violations
+\item
+  lower the aggregate Code Dojo baseline to \texttt{8\allowbreak{}6\allowbreak{}0} or lower
+\item
+  shrink \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} in both lines and bytes
+\item
+  keep every new extracted file under normal file/context limits
+\item
+  keep DOGFOOD raw-string debt flat or lower
+\end{itemize}
+
+\section{Scope}\label{record-198-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Extract a coherent DOGFOOD app slice from \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} into small modules.
+\item
+  Clean the extracted path so it does not carry unsafe casts, \texttt{a\allowbreak{}n\allowbreak{}y}, or other current ESLint debt into the new files.
+\item
+  Fix adjacent \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} lint findings when they support the same decomposition.
+\item
+  Ratchet \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} only after measured lower counts prove the new values.
+\item
+  Update \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} with the landed counts.
+\end{itemize}
+
+\section{Non-Goals}\label{record-198-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No full DOGFOOD app rewrite.
+\item
+  No broad theme-lab, landing-page, or navigation redesign.
+\item
+  No placeholder localization rows.
+\item
+  No Code Dojo baseline increases.
+\item
+  No release-version scope.
+\item
+  No rebase, amend, force push, or draft PR.
+\end{itemize}
+
+\section{Playback Questions}\label{record-198-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Did aggregate Code Dojo debt fall to \texttt{8\allowbreak{}6\allowbreak{}0} or lower?
+\item
+  Did \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} shrink in both lines and bytes?
+\item
+  Did every new extracted module stay below \texttt{1\allowbreak{}5\allowbreak{}0} lines and \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes?
+\item
+  Did DOGFOOD raw-string debt stay flat or lower?
+\item
+  Did the touched DOGFOOD surface still pass focused smoke or preview tests?
+\end{enumerate}
+
+\section{User Experience Contract}\label{record-198-user-experience-contract}
+
+The DOGFOOD app must render the same visible product behavior after the split. Navigation rows, guide rows, landing behavior, theme selection, and preview panes must preserve their current semantics unless this design explicitly says otherwise.
+
+\section{Localization And Directionality Posture}\label{record-198-localization-and-directionality-posture}
+
+Any visible string converted during this slice must use the existing DOGFOOD localization port and catalog workflow. Moving raw strings to a new module is not a debt reduction unless the raw-string inventory proves the total count went down.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-198-agent-inspectability-and-explainability-posture}
+
+The split should create named modules that reveal responsibility from their file names. Reviewers should be able to tell which code owns app row rendering, standard block preview data, or other extracted behavior without scrolling through the full DOGFOOD app file.
+
+\section{Linked Invariants}\label{record-198-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  TypeScript standards: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}s\allowbreak{}-\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  Code Dojo exception ledger: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  file/context baseline: \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  ESLint baseline: \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  DOGFOOD i18n debt baseline: \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\end{itemize}
+
+\section{Implementation Outline}\label{record-198-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Extract the app row formatter path from \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} and remove unsafe token casts.
+\item
+  Extract one additional coherent app slice if needed to meet the 50-violation goalpost without creating over-limit files.
+\item
+  Run focused ESLint and \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}d} on the touched slice.
+\item
+  Run DOGFOOD i18n debt checks to prove raw strings were not shifted.
+\item
+  Ratchet baselines and update the exception ledger after live counts prove lower values.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-198-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  The regression proof for the row-format path is the current ESLint failure cluster in \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s}; after extraction those findings must be absent from focused ESLint.
+\item
+  Add behavioral tests only if the extraction changes a runtime boundary.
+\end{itemize}
+
+\section{Validation Plan}\label{record-198-validation-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}x\allowbreak{} \allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}<\allowbreak{}n\allowbreak{}e\allowbreak{}w\allowbreak{} \allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}>}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}
+\item
+  focused DOGFOOD smoke or preview tests for touched surfaces
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}
+\end{itemize}
+
+Implemented validation:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}x\allowbreak{} \allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}-\allowbreak{}f\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{} \allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}k\allowbreak{}d\allowbreak{}o\allowbreak{}w\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-198-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt is \texttt{8\allowbreak{}6\allowbreak{}0} or lower.
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} has fewer than \texttt{5\allowbreak{},\allowbreak{}7\allowbreak{}9\allowbreak{}4} lines and fewer than \texttt{2\allowbreak{}0\allowbreak{}3\allowbreak{},\allowbreak{}0\allowbreak{}9\allowbreak{}3} bytes.
+\item
+  New extracted files are below normal file/context limits.
+\item
+  DOGFOOD raw-string debt is \texttt{2\allowbreak{},\allowbreak{}6\allowbreak{}5\allowbreak{}6} or lower.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p} raw-string debt is \texttt{2\allowbreak{}5\allowbreak{}8} or lower.
+\item
+  Missing Markdown localization debt remains \texttt{7\allowbreak{}8} or lower.
+\item
+  Issue \#417 and the pull request are cross-linked.
+\end{itemize}
+

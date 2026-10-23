@@ -1,0 +1,173 @@
+\chapter{WF-148 Respecting the Dojo Ratchet To 1268}\label{record-230}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-148-respecting-dojo-ratchet-1268.md}\par}\smallskip
+
+\section{Status}\label{record-230-status}
+
+Implemented.
+
+\section{Tracker}\label{record-230-tracker}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \href{https://github.com/flyingrobots/bijou/issues/401}{\#401}
+\item
+  Pull Request: \href{https://github.com/flyingrobots/bijou/pull/402}{\#402}
+\end{itemize}
+
+\section{Intent}\label{record-230-intent}
+
+Continue the Respecting the Dojo burndown by removing at least 50 counted standards violations from the landed \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} ceiling.
+
+The current goalpost is not a release version. It is:
+
+\begin{CodeBlock}
+Respectful Repo: Enter the Code Dojo
+\end{CodeBlock}
+
+\section{Current Truth}\label{record-230-current-truth}
+
+Live counts on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{c\allowbreak{}9\allowbreak{}1\allowbreak{}1\allowbreak{}b\allowbreak{}1\allowbreak{}5\allowbreak{}f}:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{1\allowbreak{},\allowbreak{}3\allowbreak{}1\allowbreak{}8}
+\item
+  ESLint findings: \texttt{9\allowbreak{}0\allowbreak{}9}
+\item
+  file/context baseline: \texttt{3\allowbreak{}3\allowbreak{}2}
+\item
+  mock-ban baseline: \texttt{2\allowbreak{}2}
+\item
+  code-size baseline: \texttt{5\allowbreak{}5}, including \texttt{4} legacy hard-limit files
+\item
+  DOGFOOD raw-string debt: \texttt{2\allowbreak{},\allowbreak{}7\allowbreak{}6\allowbreak{}6}
+\item
+  next aggregate target: \texttt{1\allowbreak{},\allowbreak{}2\allowbreak{}6\allowbreak{}8} or lower
+\end{itemize}
+
+Selected cleanup slice:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}g\allowbreak{}u\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}o\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}f\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}b\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}k\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}h\allowbreak{}q\allowbreak{}l\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}u\allowbreak{}t\allowbreak{}i\allowbreak{}l\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\end{itemize}
+
+Implemented counts on this branch before review:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{1\allowbreak{},\allowbreak{}2\allowbreak{}6\allowbreak{}6}
+\item
+  ESLint findings: \texttt{8\allowbreak{}5\allowbreak{}7}
+\item
+  file/context baseline: \texttt{3\allowbreak{}3\allowbreak{}2}
+\item
+  mock-ban baseline: \texttt{2\allowbreak{}2}
+\item
+  code-size baseline: \texttt{5\allowbreak{}5}, including \texttt{4} legacy hard-limit files
+\item
+  DOGFOOD raw-string debt: \texttt{2\allowbreak{},\allowbreak{}7\allowbreak{}6\allowbreak{}6}
+\item
+  next aggregate target: \texttt{1\allowbreak{},\allowbreak{}2\allowbreak{}1\allowbreak{}6} or lower
+\end{itemize}
+
+\section{Scope}\label{record-230-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Select a focused cleanup slice from current ESLint or Code Dojo offenders.
+\item
+  Prefer real type and control-flow fixes over local suppressions or baseline churn.
+\item
+  Keep touched file/context, mock-ban, code-size, and DOGFOOD localization ratchets flat or lower.
+\item
+  Update \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} after the live count is proven lower.
+\end{itemize}
+
+\section{Non-Goals}\label{record-230-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No baseline increases.
+\item
+  No release-version scope.
+\item
+  No broad feature work.
+\item
+  No rebase, amend, force push, or draft PR.
+\end{itemize}
+
+\section{Playback Questions}\label{record-230-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Is aggregate Code Dojo debt at \texttt{1\allowbreak{},\allowbreak{}2\allowbreak{}6\allowbreak{}8} or lower?
+\item
+  Did the implementation remove at least \texttt{5\allowbreak{}0} real counted violations?
+\item
+  Did touched file/context, mock-ban, code-size, and DOGFOOD localization ceilings stay flat or lower?
+\item
+  Did focused tests for touched behavior pass?
+\end{enumerate}
+
+\section{Validation Plan}\label{record-230-validation-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  Probe candidate files with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{}o\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}s}.
+\item
+  Run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}<\allowbreak{}t\allowbreak{}o\allowbreak{}u\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}T\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{} \allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}>}.
+\item
+  Run focused behavior tests for touched surfaces.
+\item
+  Check aggregate debt with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}.
+\item
+  Confirm standards gates with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}.
+\item
+  Validate documentation inventory with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}.
+\item
+  Run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} and \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-230-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  The selected touched files reduce live findings by at least \texttt{5\allowbreak{}0}.
+\item
+  Aggregate Code Dojo debt is \texttt{1\allowbreak{},\allowbreak{}2\allowbreak{}6\allowbreak{}8} or lower.
+\item
+  The ESLint baseline records the lower live count.
+\item
+  The Code Dojo exception ledger and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} report the lower ceiling.
+\item
+  The next ratchet target is documented as \texttt{1\allowbreak{},\allowbreak{}2\allowbreak{}1\allowbreak{}8} or lower.
+\end{itemize}
+

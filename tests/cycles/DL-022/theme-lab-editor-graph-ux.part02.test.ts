@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readDocumentationFile as readFileSync } from '../../../scripts/documentation-corpus.js';
 import { resolve } from 'node:path';
 import { BIJOU_DARK } from '../../../packages/bijou/src/index.js';
 import { themeLabGraphNodes } from '../../../examples/docs/app-theme-lab-graph.js';

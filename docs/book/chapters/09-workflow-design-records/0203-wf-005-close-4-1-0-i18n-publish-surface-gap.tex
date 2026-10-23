@@ -1,0 +1,260 @@
+\chapter{WF-005 --- Close 4.1.0 i18n Publish-Surface Gap}\label{record-203}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-005-close-4-1-0-i18n-publish-surface-gap.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+
+\section{Sponsor human}\label{record-203-sponsor-human}
+
+A maintainer preparing the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release and needing the release automation, release docs, and public package story to agree.
+
+\section{Sponsor agent}\label{record-203-sponsor-agent}
+
+An agent that must answer, from repo artifacts alone:
+
+\begin{itemize}
+\tightlist
+\item
+  which packages \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} will actually publish
+\item
+  whether the i18n packages are release artifacts or just workspace code
+\item
+  which workflows prove that answer
+\end{itemize}
+
+\section{Hill}\label{record-203-hill}
+
+The \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} i18n package story is no longer ambiguous.
+
+The publish workflow, release dry-run workflow, release docs, and workflow signposts all agree that the four i18n packages are part of the automated \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release surface.
+
+\section{Why this cycle exists}\label{record-203-why-this-cycle-exists}
+
+\href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-004-shape-the-next-release.md}{WF-004} made \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} an explicit, inspectable release decision, but it also surfaced a real contradiction:
+
+\begin{itemize}
+\tightlist
+\item
+  the workspace and long-form release docs already treated the i18n packages as part of the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} story
+\item
+  the automated publish workflows still only packed and published the older five-package surface
+\end{itemize}
+
+That meant the repo could not honestly answer a simple question:
+
+Are the i18n packages part of the public \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release or not?
+
+This cycle exists to close that gap in code, docs, and tests.
+
+\section{Human users}\label{record-203-human-users}
+
+\subsection{Primary human user}\label{record-203-primary-human-user}
+
+A maintainer executing or reviewing the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release.
+
+\subsection{Human hill}\label{record-203-human-hill}
+
+A maintainer can inspect the workflows and release docs and see the same nine-package public release surface everywhere.
+
+\section{Agent users}\label{record-203-agent-users}
+
+\subsection{Primary agent user}\label{record-203-primary-agent-user}
+
+A coding or release agent preparing release notes, running dry-runs, or answering publication questions.
+
+\subsection{Agent hill}\label{record-203-agent-hill}
+
+An agent can recover the intended \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} npm publish surface from repo artifacts alone without guessing which workspace packages are ``really'' part of the release.
+
+\section{Playback questions}\label{record-203-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Do the publish and release-dry-run workflows both include the four i18n packages in their pack verification and npm publish matrices?
+\item
+  Can a maintainer point to repo evidence that the i18n packages pass local \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}d\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}n} and \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}p\allowbreak{}u\allowbreak{}b\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}d\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}n} checks?
+\item
+  Do the release docs and signposts stop describing the i18n publish-surface decision as unresolved?
+\item
+  Is \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}5} no longer sitting in the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} blocker lane once the workflow and docs truth are aligned?
+\end{enumerate}
+
+\section{Accessibility / assistive reading posture}\label{record-203-accessibility-assistive-reading-posture}
+
+This cycle is documentation and workflow shaped. The decision must stay legible in plain markdown and raw YAML without depending on a GitHub UI view.
+
+\section{Localization / directionality posture}\label{record-203-localization-directionality-posture}
+
+This cycle directly affects the localization story. The repo must not claim first-class i18n packages while quietly excluding them from the release path.
+
+\section{Agent inspectability / explainability posture}\label{record-203-agent-inspectability-explainability-posture}
+
+The public \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} package surface must be discoverable through:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}u\allowbreak{}b\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l}
+\item
+  \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}P\allowbreak{}L\allowbreak{}A\allowbreak{}N\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}
+\item
+  cycle tests
+\end{itemize}
+
+\section{Non-goals}\label{record-203-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  cutting the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} tag
+\item
+  choosing the exact changelog wording for the final release cut
+\item
+  changing package versions before release execution
+\item
+  solving the remaining \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} blocker captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-006-cut-clean-4-1-0-release-boundary.md}{WF-006}
+\end{itemize}
+
+\section{Evidence}\label{record-203-evidence}
+
+\subsection{Before this cycle}\label{record-203-before-this-cycle}
+
+The release workflows only packed and published:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p}
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p}
+\end{itemize}
+
+But the workspace also contained these public packages:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n}
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s}
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e}
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}-\allowbreak{}x\allowbreak{}l\allowbreak{}s\allowbreak{}x}
+\end{itemize}
+
+\subsection{Local validation witness}\label{record-203-local-validation-witness}
+
+These commands all passed locally during this cycle:
+
+\begin{CodeBlock}
+cd packages/bijou-i18n && npm pack --dry-run
+cd packages/bijou-i18n-tools && npm pack --dry-run
+cd packages/bijou-i18n-tools-node && npm pack --dry-run
+cd packages/bijou-i18n-tools-xlsx && npm pack --dry-run
+
+cd packages/bijou-i18n && npm publish --dry-run --access public --tag dry-run
+cd packages/bijou-i18n-tools && npm publish --dry-run --access public --tag dry-run
+cd packages/bijou-i18n-tools-node && npm publish --dry-run --access public --tag dry-run
+cd packages/bijou-i18n-tools-xlsx && npm publish --dry-run --access public --tag dry-run
+\end{CodeBlock}
+
+That includes the XLSX adapter package, which means the blocker was a workflow/docs mismatch rather than a packaging failure.
+
+\section{Decision}\label{record-203-decision}
+
+The four i18n packages are part of the planned public \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release.
+
+Bijou should therefore:
+
+\begin{itemize}
+\tightlist
+\item
+  pack them in the tag publish verification workflow
+\item
+  dry-run publish them in the release dry-run workflow
+\item
+  publish them from the real tag-driven npm workflow
+\item
+  describe them as real \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release artifacts in repo docs
+\end{itemize}
+
+\section{Implementation outline}\label{record-203-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Expand \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}/\allowbreak{}p\allowbreak{}u\allowbreak{}b\allowbreak{}l\allowbreak{}i\allowbreak{}s\allowbreak{}h\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l} pack verification and npm publish matrices to include all four i18n packages.
+\item
+  Expand \texttt{.\allowbreak{}g\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}u\allowbreak{}b\allowbreak{}/\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}r\allowbreak{}y\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}.\allowbreak{}y\allowbreak{}m\allowbreak{}l} pack verification and npm publish dry-run matrices to include the same packages.
+\item
+  Update release docs and signposts so they stop describing the i18n publish surface as unresolved.
+\item
+  Promote this backlog item into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and narrow the \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}g\allowbreak{}r\allowbreak{}a\allowbreak{}v\allowbreak{}e\allowbreak{}y\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}/\allowbreak{}l\allowbreak{}e\allowbreak{}g\allowbreak{}a\allowbreak{}c\allowbreak{}y\allowbreak{}-\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} lane to the remaining blocker.
+\item
+  Add tests that lock the workflow matrices and cycle placement to the chosen answer.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-203-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  a cycle test proving the \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}5} design doc exists
+\item
+  a cycle test proving both release workflows include the i18n packages
+\item
+  a cycle test proving \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}5} no longer remains in the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} blocker lane
+\end{itemize}
+
+\section{Retrospective}\label{record-203-retrospective}
+
+\subsection{What landed}\label{record-203-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  the tag publish workflow now packs and publishes the i18n packages
+\item
+  the release dry-run workflow now packs and dry-runs the i18n packages
+\item
+  release docs and signposts now describe one consistent nine-package \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release surface
+\item
+  the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0\allowbreak{}/} blocker lane is narrower and more honest
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-203-drift-from-ideal}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}6} still has to cut the final \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release boundary in \texttt{C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} and release-facing summaries
+\item
+  local release readiness still relies on the GitHub dry-run workflow as the authoritative packaging gate
+\end{itemize}
+
+\subsection{Debt spawned}\label{record-203-debt-spawned}
+
+\begin{itemize}
+\tightlist
+\item
+  no new follow-on debt beyond the already-shaped \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/WF-006-cut-clean-4-1-0-release-boundary.md}{WF-006}
+\end{itemize}
+

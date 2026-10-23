@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import fastUri from 'fast-uri';
 
 interface PatchedFloor {
   readonly packageName: string;
@@ -12,7 +13,7 @@ const PATCHED_FLOORS: readonly PatchedFloor[] = [
   { packageName: '@modelcontextprotocol/sdk', minimum: '1.30.0' },
   { packageName: 'body-parser', minimum: '2.3.0' },
   { packageName: 'brace-expansion', minimum: '5.0.9' },
-  { packageName: 'fast-uri', minimum: '3.1.5' },
+  { packageName: 'fast-uri', minimum: '3.1.9' },
   { packageName: 'hono', minimum: '4.12.34' },
   { packageName: 'ip-address', minimum: '10.3.1' },
   { packageName: 'nanoid', minimum: '3.3.18' },
@@ -48,6 +49,23 @@ describe('WF-166 dependency security closeout', () => {
   it('keeps clean installs on the patched Hono line', () => {
     const manifest = readJsonObject(resolve(process.cwd(), 'package.json'));
     expect(readStringProperty(manifest.overrides, 'hono')).toBe('^4.13.0');
+  });
+
+  it('keeps clean workspace installs on the patched fast-uri line', () => {
+    const manifest = readJsonObject(resolve(process.cwd(), 'package.json'));
+    expect(readStringProperty(manifest.overrides, 'fast-uri')).toBe('^3.1.9');
+  });
+
+  it('normalizes encoded uppercase hostname octets before comparing hosts', () => {
+    expect(fastUri.parse('//%41.com').host).toBe('a.com');
+    expect(fastUri.equal('//%41.com', '//a.com')).toBe(true);
+  });
+
+  it.each(['%68ttp://a/', '%u0068ttp://a/'])('rejects an encoded scheme in %s', (source) => {
+    const parsed = fastUri.parse(source);
+    expect(parsed.error).toEqual(expect.any(String));
+    expect(parsed.scheme).not.toBe('http');
+    expect(fastUri.equal(source, 'http://a/')).toBe(false);
   });
 });
 

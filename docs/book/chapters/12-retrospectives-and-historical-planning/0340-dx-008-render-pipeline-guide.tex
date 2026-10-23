@@ -1,0 +1,52 @@
+\chapter{DX-008 --- Render Pipeline Documentation Guide}\label{record-340}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX_008-render-pipeline-guide.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-008 — Render Pipeline Documentation Guide
+lane: retro
+legend: DX
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-340-disposition}
+
+Published docs/guides/render-pipeline.md covering the fixed render stage order, default runtime wiring, RenderState lifecycle, configurePipeline semantics, and current limitations. Linked the guide from the bijou-tui README, the repo docs map, and the bijou-tui advanced guide, and corrected the stale \texttt{P\allowbreak{}o\allowbreak{}s\allowbreak{}t\allowbreak{}-\allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} stage spelling in the advanced guide example.
+
+\section{Original Proposal}\label{record-340-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-340-problem}
+
+The render pipeline (the illustrated sequence below) is a powerful extension point but has zero documentation beyond type definitions. \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}P\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e} appears in RunOptions but there is no guide showing how to write middleware, what RenderState fields are available, or how stages interact.
+
+\input{diagrams/flows/flow-079}
+
+The perf-gradient demo proved this gap --- we could not instrument the pipeline from outside to measure per-stage timing.
+
+\section{Desired outcome}\label{record-340-desired-outcome}
+
+A guide at \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d} covering:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The five render stages and what each does
+\item
+  How to write a custom RenderMiddleware (worked example)
+\item
+  RenderState fields and their lifecycle
+\item
+  How configurePipeline interacts with default stages
+\item
+  Limitations (sync-only, no stage replacement, no timing hooks)
+\end{enumerate}
+
+Link from the bijou-tui README's ``Building Blocks'' section.
+
+\section{Effort}\label{record-340-effort}
+
+Medium --- requires explaining internal architecture to external audience.
+

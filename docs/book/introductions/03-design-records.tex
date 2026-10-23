@@ -1,0 +1,54 @@
+\chapter*{How to read a design record}
+\addcontentsline{toc}{chapter}{Introduction: How to read a design record}
+
+The records in this part were working agreements about changes to Bijou. A useful record makes a proposed outcome, its limits and the evidence needed to judge it visible before those choices become scattered through code. Some records also carry implementation notes and closeout evidence added as the work progressed.
+
+The recurring format reflects that purpose. It gives a reviewer several ways to question a change: whether it serves a concrete user, whether its boundaries are clear, whether it preserves existing contracts, and whether success can be observed. The fields are a way of exposing decisions to inspection. Their presence alone does not establish the quality or completion of the work.
+
+\section*{Sponsorship and the hill}
+
+\subsection*{Who the change serves}
+
+\textbf{Sponsored Human} and \textbf{Sponsored Agent}, sometimes written as sponsor fields, identify the people and automated consumers whose needs give the work its purpose. Human descriptions often name a task or a situation. Agent descriptions often emphasize deterministic data, provenance, inspection and reproducible checks. A named participant can also identify authorship or responsibility; the name itself is not evidence that a review occurred.
+
+\subsection*{The useful outcome}
+
+The \textbf{Hill} states the useful outcome being pursued: who should be able to do what, and why it matters. It gives the implementation an outcome to answer to. Read it alongside the scope and non-goals to understand the size of the promise.
+
+\section*{Playback questions and boundaries}
+
+\subsection*{Make the outcome observable}
+
+\textbf{Playback Questions} turn the outcome into observations. Can the intended person complete the task? Does the right pane own a key? Does a change appear in the same frame? Can an automated consumer inspect the result? These questions connect a technical plan to a demonstration or check that another reader could assess.
+
+\subsection*{Limit the promise}
+
+\textbf{Scope} and \textbf{Non-Goals} describe what the change owns and what remains outside it. \textbf{Prerequisites}, linked work and implementation outlines explain which contracts or earlier changes the proposal relies on. A dependency should be read as a claim about what must already be correct, not inferred merely because two records discuss the same topic.
+
+\section*{The different postures of one feature}
+
+\subsection*{Language, access and inspectability}
+
+Accessibility and assistive-reading sections ask how the feature communicates when its visual presentation is unavailable or unsuitable. Localization and directionality sections ask how language, text expansion and reading direction affect geometry and interaction. Agent-inspectability sections ask which stable facts, identities, diagnostics and outputs can be examined without reconstructing meaning from a terminal image.
+
+These questions arise from Bijou's philosophy: the useful meaning of a feature has to survive more than one way of encountering it. Their explicit place in the record makes it possible to notice an omitted mode or an unsupported interaction before implementation hides the omission behind a convincing default view.
+
+\section*{Invariants, tests and closeout}
+
+\subsection*{Contracts and proposed tests}
+
+\textbf{Linked Invariants} connect the proposal to contracts that the system is expected to preserve. The architecture or implementation outline identifies the seams expected to carry the change. \textbf{Tests To Write First} describes proposed evidence. A listed test is a plan until a recorded run or reproducible result establishes what was actually checked.
+
+\subsection*{What the evidence establishes}
+
+Closeout and retrospective sections can record what landed, which checks ran and what remains unresolved. Follow their issue, pull-request and commit references when assessing a completion claim. A source-text assertion, a focused runtime test, a visual capture and a full validation run establish different things; retain the scope of the evidence being cited.
+
+\section*{Reading across the collection}
+
+The records are grouped into DOGFOOD, developer experience, runtime, design language, localization, workflow and other design concerns. Identifiers such as DF, DX, RE, DL, LX and WF are historical family labels. Templates and naming changed over time, and some identifiers were reused. Use the full source path, title and linked work to identify a record reliably.
+
+\subsection*{Historical status and current scope}
+
+Status fields, dates, lane names and future-tense sections retain their original context. Historical references to cycles, legends and METHOD explain how a record was organized. They do not reinstate that process as a requirement for current work. GitHub issues and milestones own current scope, and current operating agreements govern how a new change is carried out.
+
+Read a record as an argument with evidence to follow. Its strongest contribution is often the precise question it allows the next reader to ask of the code.

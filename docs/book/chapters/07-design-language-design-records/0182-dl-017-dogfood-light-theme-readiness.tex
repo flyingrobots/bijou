@@ -1,0 +1,216 @@
+\chapter{DL-017 - DOGFOOD Light Theme Readiness}\label{record-182}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-017-dogfood-light-theme-readiness.md}\par}\smallskip
+
+\begin{RecordMeta}
+id: DL-017
+title: DOGFOOD Light Theme Readiness
+status: active
+lane: asap
+priority: medium
+github_issue: 341
+legend: DL
+
+\end{RecordMeta}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL - Design Language}
+
+\section{Decision Summary}\label{record-182-decision-summary}
+
+DOGFOOD's \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} shell theme should be safe to demonstrate in a real terminal without relying on the terminal profile's default background or lucky contrast. For \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}, the bounded repair is:
+
+\begin{itemize}
+\tightlist
+\item
+  framed settings, menu, and modal chrome paints explicit light-theme backgrounds
+\item
+  borders, panel fills, muted copy, selection rows, and action labels remain visually distinct in the Bijou light palette
+\item
+  the theme doctor covers the chrome-safe pairs that failed the release-video rehearsal by sight
+\item
+  deterministic tests prove both token-level contrast and rendered shell background ownership
+\end{itemize}
+
+\section{Sponsored Human}\label{record-182-sponsored-human}
+
+A release-video user needs to switch DOGFOOD into light mode and have the app look deliberate on camera. Settings and quit chrome should not show dark terminal patches, washed-out borders, or action labels that are hard to find.
+
+\section{Sponsored Agent}\label{record-182-sponsored-agent}
+
+An agent needs a deterministic witness for light-theme chrome. It should be able to render the DOGFOOD shell in \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}, inspect actual \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} cell metadata, and fail if settings or modal chrome leaves meaningful cells without a theme-owned background.
+
+\section{Hill}\label{record-182-hill}
+
+After this cycle, \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} is release-demo-ready for the current V7 surface: the theme paints its shell chrome, passes explicit chrome contrast diagnostics, and has enough focused proof to keep terminal-default background leaks from silently returning.
+
+\section{Problem}\label{record-182-problem}
+
+Issue \#341 came from the \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} release-video rehearsal. The light theme looked unfinished around settings and modal chrome: some border/background regions appeared to inherit the terminal's unstyled background, and several low-contrast token pairs made panels, muted text, and selected rows difficult to read.
+
+The dark DOGFOOD theme mostly hides this class of problem because terminal profiles are commonly dark. The light theme needs explicit proof because a terminal-default background leak can look acceptable on one profile and broken on another.
+
+\section{Scope}\label{record-182-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Add a focused rendered witness for DOGFOOD light-theme settings/menu/modal chrome.
+\item
+  Fix any shell-rendering path that fails to paint theme-owned backgrounds for the witness.
+\item
+  Retune the Bijou light palette only where the current tokens make borders, panels, muted text, selection rows, or modal actions unclear.
+\item
+  Expand DOGFOOD theme safe-pair diagnostics so light-theme chrome tokens are checked by \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+\item
+  Update release-facing docs/changelog so \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} records the light-theme demo-readiness repair honestly.
+\end{itemize}
+
+\section{Non-Goals}\label{record-182-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not solve \#343's full first-party dark/light variant coverage.
+\item
+  Do not redesign Theme Lab or Theme Inspector.
+\item
+  Do not add a global dark/light hotkey in this cycle.
+\item
+  Do not redesign DOGFOOD's layout, typography, or theme family model.
+\item
+  Do not turn \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} into a broad design-system feature train.
+\end{itemize}
+
+\section{User Experience Contract}\label{record-182-user-experience-contract}
+
+The light theme may be calmer than the dark theme, but it cannot be ambiguous. The user should be able to distinguish the app background, panels, borders, muted text, selected rows, scrollbars, and modal actions without changing their terminal profile.
+
+Settings, command-palette menu, and modal surfaces must paint their own backgrounds. Empty frame chrome inside those surfaces should not be transparent unless the transparency is a deliberate tokenized overlay with a deterministic fallback.
+
+\section{Lower Modes}\label{record-182-lower-modes}
+
+\subsection{Static Mode}\label{record-182-static-mode}
+
+Static rendered proof should expose actual \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} cells and token-derived foreground/background choices so tests can inspect theme ownership without parsing screenshots.
+
+\subsection{Pipe Mode}\label{record-182-pipe-mode}
+
+Pipe output remains text-first and does not need to encode color proof. The color-specific proof belongs in rendered \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} tests and theme diagnostics.
+
+\subsection{Accessible Mode}\label{record-182-accessible-mode}
+
+No new accessibility contract is introduced. Any action labels or status text made easier to see through color should remain textual, not color-only.
+
+\section{Localization / Directionality Posture}\label{record-182-localization-directionality-posture}
+
+This cycle does not add new localization or bidirectional-layout behavior. The theme repair must preserve the selected-locale text path, existing English-source documentation notices, and current left-to-right DOGFOOD chrome geometry.
+
+The rendered witnesses should avoid making assertions about translated copy beyond stable shell titles such as settings, command palette, and quit chrome. If a future right-to-left shell layout changes modal or drawer geometry, it should still inherit the same token-owned background contract.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-182-agent-inspectability-explainability-posture}
+
+Agents should be able to inspect the repair without screenshots. The important facts are:
+
+\begin{itemize}
+\tightlist
+\item
+  which concrete DOGFOOD shell theme is active
+\item
+  which shell surface is open: settings drawer, command-palette menu, or quit modal
+\item
+  whether visible chrome border cells have explicit foreground and background metadata
+\item
+  which safe-pair token declarations cover the chrome colors
+\item
+  whether \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} reports any low-contrast chrome pairs for DOGFOOD dark or light modes
+\end{itemize}
+
+The proof should stay in \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} metadata and theme-doctor reports so future agents can reason about background ownership deterministically.
+
+\section{Theme Diagnostics}\label{record-182-theme-diagnostics}
+
+The existing DOGFOOD safe-pair matrix should grow beyond primary text/status pairs to cover the light chrome pairs that matter for this bug:
+
+\begin{itemize}
+\tightlist
+\item
+  border tokens against primary, secondary, elevated, overlay, and muted surfaces
+\item
+  muted text against the same surfaces used by settings and modal panels
+\item
+  selection/focus gutter foregrounds and backgrounds
+\item
+  scroll thumb and scroll track visibility
+\item
+  modal action/status foregrounds against overlay and elevated surfaces
+\end{itemize}
+
+The diagnostic is intentionally token-level. Rendered tests prove that chrome uses those tokens; the doctor proves that the token pairs remain readable.
+
+\section{Linked Invariants}\label{record-182-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD light mode should not depend on terminal-profile background color.
+\item
+  Theme diagnostics should cover app chrome, not just body copy.
+\item
+  Light-theme repairs must stay compatible with existing dark theme behavior.
+\item
+  \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0} remains a narrow stabilization release.
+\end{itemize}
+
+\section{Implementation Plan}\label{record-182-implementation-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add focused failing tests that render DOGFOOD \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} settings drawer, command-palette menu, and quit modal chrome and find unpainted cells in each chrome rectangle.
+\item
+  Add a focused failing diagnostic test for missing DOGFOOD chrome safe pairs.
+\item
+  Fix the shell/component path that leaves backgrounds unset, or retune tokens if the renderer already paints but the selected color pair is too weak.
+\item
+  Expand the DOGFOOD safe-pair matrix to cover chrome-relevant light-theme pairs.
+\item
+  Run focused rendered tests, theme doctor tests, the DOGFOOD terminal capture smoke path, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}, \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}, \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k}, and the relevant broader suite before review.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-182-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD light-theme settings drawer, command-palette menu, and quit modal renders fail when visible chrome cells inside their overlay rectangles have no background metadata.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{}D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}L\allowbreak{}I\allowbreak{}G\allowbreak{}H\allowbreak{}T\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E\allowbreak{},\allowbreak{} \allowbreak{}\{\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}:\allowbreak{} \allowbreak{}D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E\allowbreak{}\_\allowbreak{}S\allowbreak{}A\allowbreak{}F\allowbreak{}E\allowbreak{}\_\allowbreak{}P\allowbreak{}A\allowbreak{}I\allowbreak{}R\allowbreak{}S\allowbreak{} \allowbreak{}\}\allowbreak{})} fails if chrome pairs are omitted or fall below the selected contrast floor.
+\item
+  Existing dark-theme DOGFOOD shell tests continue to pass.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-182-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Deterministic light-theme chrome witnesses exist for settings drawer, command-palette menu, and quit modal rendering.
+\item
+  Any unpainted background path found by the witness is fixed.
+\item
+  Bijou light theme border, panel, muted text, selection, and modal action tokens are readable enough for the DOGFOOD release-video path.
+\item
+  DOGFOOD theme diagnostics cover the relevant chrome safe pairs.
+\item
+  The DOGFOOD terminal capture smoke path is run as release-video-path evidence.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} records the demo-readiness fix.
+\item
+  Issue \#341 is closed by the implementation PR.
+\end{itemize}
+
+\section{Retrospective}\label{record-182-retrospective}
+
+To be completed when the PR lands.
+

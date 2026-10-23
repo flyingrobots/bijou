@@ -1,0 +1,149 @@
+\chapter{WF-144 Respecting the Dojo Ratchet To 1514}\label{record-226}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-144-respecting-dojo-ratchet-1514.md}\par}\smallskip
+
+\section{Status}\label{record-226-status}
+
+Implemented; pending review.
+
+\section{Issue}\label{record-226-issue}
+
+\begin{itemize}
+\tightlist
+\item
+  GitHub Issue: \href{https://github.com/flyingrobots/bijou/issues/393}{\#393}
+\end{itemize}
+
+\section{Context}\label{record-226-context}
+
+WF-143 landed the Respecting the Dojo burndown at \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}6\allowbreak{}4} aggregate Code Dojo violations. The next ratchet must cut at least \texttt{5\allowbreak{}0} more violations and set the ceiling to \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}1\allowbreak{}4} or lower.
+
+The active objective remains zero ESLint errors, zero Code Dojo warnings/errors/issues, and zero length-restriction violations. This cycle is a bounded cleanup slice toward that endpoint, not a license to widen baselines or move exceptions around.
+
+\section{Goal}\label{record-226-goal}
+
+Reduce aggregate Code Dojo debt from \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}6\allowbreak{}4} to \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}1\allowbreak{}4} or lower by eliminating at least \texttt{5\allowbreak{}0} live findings with behavior-preserving TypeScript fixes.
+
+\section{Selected Slice}\label{record-226-selected-slice}
+
+The implementation removed a coherent cluster of app-frame, transition, form, component, and smoke-runner findings without touching DOGFOOD docs source files:
+
+\input{tables/table-054}
+
+All six touched files are raw-ESLint clean and at or below their stored file/context ceiling.
+
+\section{Scope}\label{record-226-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Replace non-null assertions, unsafe assertions, \texttt{a\allowbreak{}n\allowbreak{}y} escapes, unchecked dynamic reads, and implicit interpolation with typed helpers, checked reads, explicit formatting, or narrowed runtime guards.
+\item
+  Prefer local helper extraction only when it removes repeated unsafe patterns without increasing touched file/context debt.
+\item
+  Preserve TUI app-frame rendering, scoped message wrapping, recorder behavior, smoke example orchestration, and bench runner output.
+\item
+  Lower ratchet artifacts only after live counts prove the reduction.
+\end{itemize}
+
+\section{Non-Goals}\label{record-226-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  ESLint rules, Code Dojo thresholds, hooks, and CI policy must not weaken.
+\item
+  File/context, mock-ban, and code-size ceilings must not rise.
+\item
+  DOGFOOD docs raw-string cleanup is out of scope for this slice unless it is deliberately chosen as the primary goalpost.
+\item
+  Exception churn cannot stand in for real cleanup.
+\end{itemize}
+
+\section{Current Evidence}\label{record-226-current-evidence}
+
+Live counts on \texttt{m\allowbreak{}a\allowbreak{}i\allowbreak{}n} at \texttt{1\allowbreak{}1\allowbreak{}5\allowbreak{}9\allowbreak{}b\allowbreak{}a\allowbreak{}3\allowbreak{}9}:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}6\allowbreak{}4}
+\item
+  ESLint findings: \texttt{1\allowbreak{},\allowbreak{}1\allowbreak{}5\allowbreak{}4}
+\item
+  file/context baseline: \texttt{3\allowbreak{}3\allowbreak{}2}
+\item
+  mock-ban baseline: \texttt{2\allowbreak{}3}
+\item
+  code-size baseline: \texttt{5\allowbreak{}5}, including \texttt{4} legacy hard-limit files
+\item
+  next aggregate target: \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}1\allowbreak{}4} or lower
+\end{itemize}
+
+Live implementation counts on \texttt{c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}t\allowbreak{}-\allowbreak{}1\allowbreak{}5\allowbreak{}1\allowbreak{}4}:
+
+\begin{itemize}
+\tightlist
+\item
+  aggregate Code Dojo debt: \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}1\allowbreak{}1}
+\item
+  ESLint findings: \texttt{1\allowbreak{},\allowbreak{}1\allowbreak{}0\allowbreak{}1}
+\item
+  file/context baseline: \texttt{3\allowbreak{}3\allowbreak{}2}
+\item
+  mock-ban baseline: \texttt{2\allowbreak{}3}
+\item
+  code-size baseline: \texttt{5\allowbreak{}5}, including \texttt{4} legacy hard-limit files
+\item
+  next aggregate target after this cycle: \texttt{1\allowbreak{},\allowbreak{}4\allowbreak{}6\allowbreak{}1} or lower
+\end{itemize}
+
+\section{Playback Questions}\label{record-226-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Is aggregate Code Dojo debt at \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}1\allowbreak{}4} or lower?
+\item
+  Did the implementation remove at least \texttt{5\allowbreak{}0} real violations?
+\item
+  Did touched file/context, mock-ban, and code-size ceilings stay flat or lower?
+\item
+  Did focused behavior tests for touched surfaces pass?
+\end{enumerate}
+
+\section{Validation Plan}\label{record-226-validation-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  Probe the selected files with focused Code Dojo gates.
+\item
+  Run focused tests for touched package/script surfaces.
+\item
+  Check aggregate debt with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}.
+\item
+  Confirm standards gates with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}:\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}f\allowbreak{}y}.
+\item
+  Validate documentation inventory with \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}:\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}.
+\item
+  Run \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} and \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}:\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t}.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-226-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  The selected touched TypeScript files reduce live findings by at least \texttt{5\allowbreak{}0}.
+\item
+  Aggregate Code Dojo debt is \texttt{1\allowbreak{},\allowbreak{}5\allowbreak{}1\allowbreak{}4} or lower.
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}e\allowbreak{}s\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} records the lower live ESLint count.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}j\allowbreak{}o\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}c\allowbreak{}e\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} report the lower ceiling.
+\item
+  Focused validation for the touched surfaces passes.
+\end{itemize}
+

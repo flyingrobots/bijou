@@ -1,0 +1,278 @@
+\chapter{Bijou Component System Audit}\label{record-425}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/archive/component-system-audit.md}\par}\smallskip
+
+This document is a Carbon-style audit of the shipped Bijou component surface.
+
+The goal is not just to list APIs. The goal is to answer:
+
+\begin{itemize}
+\tightlist
+\item
+  What is this component for?
+\item
+  What are its semantic variations?
+\item
+  Which variants are render-path or interaction-layer variants rather than new components?
+\item
+  When should it be used?
+\item
+  When should it not be used?
+\item
+  Does it belong in core Bijou or in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}?
+\item
+  How does it lower itself across output and interaction layers?
+\item
+  What is the closest Carbon Design System analogue?
+\end{itemize}
+
+\section{Design rules}\label{record-425-design-rules}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A core Bijou component belongs in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} when its meaning survives graceful degradation across \texttt{r\allowbreak{}i\allowbreak{}c\allowbreak{}h}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} modes.
+\item
+  A TUI component belongs in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} when it owns focus, scrolling, keymaps, overlay stacking, animation timing, history, or other lifecycle concerns that do not meaningfully degrade to pipe output.
+\item
+  \texttt{*\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} exports are render-path variants, not new design-system components. \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} is still \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})}. \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} is still \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+\item
+  Interactive wrappers are interaction-layer variants, not new semantics. \texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}A\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} is the TUI-owned interaction layer for \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}. \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} is the TUI-owned interaction layer for \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+\item
+  Variants should change tone, density, or behavior within one semantic job. If two exports answer different product questions, they are different components.
+\end{enumerate}
+
+\section{Canonical decision ladders}\label{record-425-canonical-decision-ladders}
+
+\subsection{Status and feedback}\label{record-425-status-and-feedback}
+
+\begin{itemize}
+\tightlist
+\item
+  Use \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})} for compact inline status attached to nearby content.
+\item
+  Use \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} for in-flow, persistent status that should remain part of the document.
+\item
+  Use \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} for a low-level anchored overlay primitive when the app owns the lifecycle.
+\item
+  Use the notification system for app-managed transient messaging, stacking, history, action buttons, and routing of warnings/errors.
+\item
+  Use \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}(\allowbreak{})} for stream output, audit trails, or diagnostic feeds rather than document UI.
+\end{itemize}
+
+\subsection{Choice and action discovery}\label{record-425-choice-and-action-discovery}
+
+\begin{itemize}
+\tightlist
+\item
+  Use \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})} for short, finite, mutually exclusive choices.
+\item
+  Use \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} for larger option sets that need live narrowing.
+\item
+  Use \texttt{m\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})} when the user is making a set, not a single choice.
+\item
+  Use \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} for global actions and navigation, not for ordinary field input.
+\end{itemize}
+
+\subsection{Content organization}\label{record-425-content-organization}
+
+\begin{itemize}
+\tightlist
+\item
+  Use \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})} or \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}o\allowbreak{}x\allowbreak{}(\allowbreak{})} to group related content.
+\item
+  Use \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} when content is secondary and should be progressively disclosed.
+\item
+  Use \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}s\allowbreak{}(\allowbreak{})} for peer views where only one is active at a time.
+\item
+  Use \texttt{s\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} for sequential progress, not for free-form navigation.
+\end{itemize}
+
+\subsection{Large collections}\label{record-425-large-collections}
+
+\begin{itemize}
+\tightlist
+\item
+  Use \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} for dense comparison across columns.
+\item
+  Use \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} when rows or cells must be actively inspected from the keyboard.
+\item
+  Use \texttt{b\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}s\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}L\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} for one-dimensional items with descriptions.
+\item
+  Use \texttt{t\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} for parent/child hierarchy.
+\item
+  Use \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}(\allowbreak{})} when the structure is dependency-oriented instead of strictly hierarchical.
+\end{itemize}
+
+\subsection{Overlays}\label{record-425-overlays}
+
+\begin{itemize}
+\tightlist
+\item
+  Use \texttt{t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}t\allowbreak{}i\allowbreak{}p\allowbreak{}(\allowbreak{})} for lightweight explanation tied to a nearby target.
+\item
+  Use \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} for supplemental context that should not fully block the workspace.
+\item
+  Use \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} when the user must review, decide, or confirm before continuing.
+\item
+  Use notifications for interruptive but non-blocking events.
+\end{itemize}
+
+\section{Family inventory}\label{record-425-family-inventory}
+
+\subsection{Core display and feedback}\label{record-425-core-display-and-feedback}
+
+\input{tables/table-113}
+
+\subsection{Core structure, navigation, and data}\label{record-425-core-structure-navigation-and-data}
+
+\input{tables/table-114}
+
+\subsection{Core forms and data collection}\label{record-425-core-forms-and-data-collection}
+
+\input{tables/table-115}
+
+\subsection{TUI interaction-layer components}\label{record-425-tui-interaction-layer-components}
+
+\input{tables/table-116}
+
+\subsection{TUI overlays and interruption management}\label{record-425-tui-overlays-and-interruption-management}
+
+\input{tables/table-117}
+
+\subsection{Shell, layout, and framework primitives}\label{record-425-shell-layout-and-framework-primitives}
+
+\input{tables/table-118}
+
+\section{Components that need stricter semantic positioning}\label{record-425-components-that-need-stricter-semantic-positioning}
+
+\subsection{\texorpdfstring{\texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} vs \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} vs notifications}{ vs  vs notifications}}\label{record-425-alert-vs-toast-vs-notifications}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}(\allowbreak{})} is static and in-flow. It belongs in core Bijou.
+\item
+  \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} is a low-level overlay primitive. It belongs in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}.
+\item
+  notifications are not just styled toasts. They are a system: lifecycle, stacking, placement, action handling, archive/history, and runtime routing. They belong in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}.
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} vs \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})}}{ vs }}\label{record-425-table-vs-navigabletable}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} answers the question ``How should dense data be compared?''
+\item
+  \texttt{n\allowbreak{}a\allowbreak{}v\allowbreak{}i\allowbreak{}g\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}T\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} answers the question ``How should dense data be inspected and traversed with focus?''
+\item
+  They are one semantic family with two interaction layers. The docs should present them together.
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} vs \texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}A\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}}{ vs }}\label{record-425-accordion-vs-interactiveaccordion}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} is the document-level disclosure component.
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}A\allowbreak{}c\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})} is the keyboard-owned TUI interaction layer for that same idea.
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} / \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}}{ /  / }}\label{record-425-select-filter-commandpalette}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}(\allowbreak{})} stores a value.
+\item
+  \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} stores a value from a large option space.
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} triggers an action or navigates to a place.
+\item
+  The docs should never present \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} as just another select.
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} / \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} / notifications}{ /  / notifications}}\label{record-425-modal-drawer-notifications}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}(\allowbreak{})} blocks.
+\item
+  \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} supplements.
+\item
+  notifications interrupt without taking over.
+\item
+  Those three should be documented as a single escalation ladder.
+\end{itemize}
+
+\section{Not every public export is a design-system component}\label{record-425-not-every-public-export-is-a-design-system-component}
+
+These APIs are important, but they should be documented as utilities, render-path variants, or framework seams rather than leaf components:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{a\allowbreak{}l\allowbreak{}e\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{s\allowbreak{}e\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{h\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}B\allowbreak{}o\allowbreak{}x\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}l\allowbreak{}i\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}, \texttt{d\allowbreak{}a\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}s\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{c\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r\allowbreak{}G\allowbreak{}u\allowbreak{}a\allowbreak{}r\allowbreak{}d\allowbreak{}(\allowbreak{})} / \texttt{w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}H\allowbreak{}i\allowbreak{}d\allowbreak{}d\allowbreak{}e\allowbreak{}n\allowbreak{}C\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{t\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}, \texttt{b\allowbreak{}a\allowbreak{}t\allowbreak{}c\allowbreak{}h\allowbreak{}(\allowbreak{})}, \texttt{m\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}(\allowbreak{})}, \texttt{m\allowbreak{}a\allowbreak{}p\allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{})}
+\item
+  key parsing, input stack, event bus, runtime, and pipeline APIs
+\end{itemize}
+
+\section{Follow-up recommendations}\label{record-425-follow-up-recommendations}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Write one canonical docs page per semantic component family rather than one page per export.
+\item
+  Add a standard docs template:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    What it is
+  \item
+    Variations
+  \item
+    When to use
+  \item
+    When not to use
+  \item
+    Interaction ownership
+  \item
+    Graceful degradation path
+  \item
+    Related components
+  \item
+    Closest Carbon analogue
+  \end{itemize}
+\item
+  Reframe showcase/examples around decision points:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    status and feedback
+  \item
+    collection browsing
+  \item
+    form choice patterns
+  \item
+    overlay escalation
+  \end{itemize}
+\item
+  Treat surface companions and TUI wrappers as family variants in docs, not as top-level unrelated components.
+\end{enumerate}
+

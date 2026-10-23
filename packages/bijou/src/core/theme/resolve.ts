@@ -44,8 +44,12 @@ export function createResolved(
 
     inkStatus(status: string): InkColor {
       const token = statusTokens.get(status);
-      const fallback = statusTokens.get('muted');
-      if (token === undefined) return noColor ? undefined : fallback?.hex;
+      // Kept in step with the `status()` accessor's fallback. This returns a hex
+      // and nothing else, and the two muted tokens share a hex in every shipped
+      // preset, so the change is not observable there — but the two fallbacks
+      // must not be able to disagree in a theme where the hexes differ.
+      const fallback = theme.semantic.muted;
+      if (token === undefined) return noColor ? undefined : fallback.hex;
       return noColor ? undefined : token.hex;
     },
 

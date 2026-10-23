@@ -1,0 +1,127 @@
+\chapter{HT-008 --- Surface-native text bypasses the terminal sanitization boundary}\label{record-258}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/HT_HT-008-surface-native-text-bypasses-the-terminal-sanitization-boundary.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "HT-008 — Surface-native text bypasses the terminal sanitization boundary"
+legend: "HT"
+cycle: "HT_HT-008-surface-native-text-bypasses-the-terminal-sanitization-boundary"
+source_backlog: "docs/method/backlog/asap/HT-008-surface-native-text-bypasses-the-terminal-sanitization-boundary.md"
+
+\end{RecordMeta}
+
+Source backlog item: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/\allowbreak{}a\allowbreak{}s\allowbreak{}a\allowbreak{}p\allowbreak{}/\allowbreak{}H\allowbreak{}T\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}8\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}n\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}-\allowbreak{}b\allowbreak{}y\allowbreak{}p\allowbreak{}a\allowbreak{}s\allowbreak{}s\allowbreak{}e\allowbreak{}s\allowbreak{}-\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}m\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}l\allowbreak{}-\allowbreak{}s\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}m\allowbreak{}d} Legend: HT
+
+\section{Sponsors}\label{record-258-sponsors}
+
+\begin{itemize}
+\tightlist
+\item
+  Human: Backlog operator
+\item
+  Agent: Implementation agent
+\end{itemize}
+
+These labels are abstract roles. In this design, \texttt{u\allowbreak{}s\allowbreak{}e\allowbreak{}r} means the served perspective, like in a user story, not a literal named person or specific agent instance.
+
+\section{Hill}\label{record-258-hill}
+
+TBD
+
+\section{Playback Questions}\label{record-258-playback-questions}
+
+\subsection{Human}\label{record-258-human}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  TBD
+\end{itemize}
+
+\subsection{Agent}\label{record-258-agent}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  TBD
+\end{itemize}
+
+\section{Accessibility and Assistive Reading}\label{record-258-accessibility-and-assistive-reading}
+
+\begin{itemize}
+\tightlist
+\item
+  Linear truth / reduced-complexity posture: TBD
+\item
+  Non-visual or alternate-reading expectations: TBD
+\end{itemize}
+
+\section{Localization and Directionality}\label{record-258-localization-and-directionality}
+
+\begin{itemize}
+\tightlist
+\item
+  Locale / wording / formatting assumptions: TBD
+\item
+  Logical direction / layout assumptions: TBD
+\end{itemize}
+
+\section{Agent Inspectability and Explainability}\label{record-258-agent-inspectability-and-explainability}
+
+\begin{itemize}
+\tightlist
+\item
+  What must be explicit and deterministic for agents: TBD
+\item
+  What must be attributable, evidenced, or governed: TBD
+\end{itemize}
+
+\section{Non-goals}\label{record-258-non-goals}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  TBD
+\end{itemize}
+
+\section{Backlog Context}\label{record-258-backlog-context}
+
+The 2026-04-14 audit pass found that Bijou's terminal-safety story is still split across several public text entry points.
+
+\section{Problem}\label{record-258-problem}
+
+The plain-text bridges sanitize control sequences before they reach terminal output, but several public surface-native helpers still accept raw strings and write them directly into cells or OSC sequences.
+
+Current evidence: - \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} - \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} - \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+
+That means an app can appear ``safe'' because some paths sanitize terminal text while other paths still allow destructive control bytes to survive into interactive/static output.
+
+\section{Desired outcome}\label{record-258-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Define one shared trusted/untrusted text boundary for public text-bearing APIs.
+\item
+  Route \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}g\allowbreak{}e\allowbreak{}(\allowbreak{})}, surface-text helpers, \texttt{h\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}k\allowbreak{}(\allowbreak{})}, and transitive callers through that boundary.
+\item
+  Add regression coverage for CSI, OSC, DCS, BEL, and mixed escape payloads.
+\item
+  Document when callers should use plain text, trusted styled text, or explicit ANSI parsing.
+\end{enumerate}
+
+\section{Why ASAP}\label{record-258-why-asap}
+
+\begin{itemize}
+\tightlist
+\item
+  This is the single most important remaining ship-readiness risk from the 2026-04-14 audit.
+\item
+  The repo is otherwise release-green, which makes this a high-leverage hardening task instead of speculative cleanup.
+\end{itemize}
+
+\section{Hill}\label{record-258-hill-1}
+
+Every public text-bearing helper passes through one auditable terminal-safety contract before it becomes cells or terminal control output.
+

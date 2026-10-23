@@ -1,6 +1,5 @@
 ---
 title: DL-027 Sapphire Noir First-Party Palette
-legend: DL
 lane: roadmap
 priority: medium
 github_issue: 497
@@ -15,7 +14,7 @@ keywords:
   - v9.0.0
 ---
 
-Legend: [DL - Design Language](../legends/DL-design-language.md)
+# Sapphire Noir First-Party Palette
 
 ## Linked Work
 
@@ -24,7 +23,7 @@ Legend: [DL - Design Language](../legends/DL-design-language.md)
 - Perceptual colour floor: [#352](https://github.com/flyingrobots/bijou/issues/352)
 - Theme-generator horizon: [#318](https://github.com/flyingrobots/bijou/issues/318)
 - CVD simulation and checking: [#500](https://github.com/flyingrobots/bijou/issues/500)
-- Campaign design: [DL-023](./DL-023-sapphire-theme-system.md), currently
+- Campaign design: [DL-023](https://github.com/flyingrobots/bijou/blob/22378d7cdc5024479188c5505262d22a5debd9b0/docs/design/DL-023-sapphire-theme-system.md), currently
   carried by [PR #516](https://github.com/flyingrobots/bijou/pull/516)
 
 ## Sponsors
@@ -75,7 +74,7 @@ An extracted-palette approach was also rejected: Bijou has no canonical image
 whose accidental colours should become product authority. The existing hue-255
 identity is the right anchor; the problem is how roles are mapped onto it.
 
-## Current Truth
+## Pre-Change Baseline
 
 The current presets call themselves calm, but two choices undermine that goal.
 
@@ -130,7 +129,7 @@ labels, glyphs, and modifiers remain intact.
 The cycle lands the minimum honest floor required by #497:
 
 - public sRGB, OKLAB, and OKLCH conversion helpers;
-- chroma-preserving sRGB gamut mapping that holds lightness and hue while
+- sRGB gamut mapping that holds lightness and hue while
   reducing chroma;
 - OKLAB delta-E and circular hue interpolation;
 - a dependency-free gamut-relative OKLCH constructor used by the preset model;
@@ -204,9 +203,9 @@ token roles rather than position or English strings as the colour oracle.
 
 ## Linked Invariants
 
-- [Tests Are the Spec](../invariants/tests-are-the-spec.md)
-- [Graceful Lowering Preserves Meaning](../invariants/graceful-lowering-preserves-meaning.md)
-- [Docs Are the Demo](../invariants/docs-are-the-demo.md)
+- [Tests Are the Spec](https://github.com/flyingrobots/bijou/blob/58ddb214/docs/invariants/tests-are-the-spec.md)
+- [Graceful Lowering Preserves Meaning](https://github.com/flyingrobots/bijou/blob/58ddb214/docs/invariants/graceful-lowering-preserves-meaning.md)
+- [Docs Are the Demo](https://github.com/flyingrobots/bijou/blob/58ddb214/docs/invariants/docs-are-the-demo.md)
 
 ## Implementation Outline
 
@@ -242,7 +241,8 @@ token roles rather than position or English strings as the colour oracle.
 
 ## Closeout Notes
 
-Implementation is complete on `cycle/sapphire-noir` for
+The published branch snapshot `917cfd182688b8119b27b724538e878077181404`
+reported implementation and validation on `cycle/sapphire-noir` for
 [PR #517](https://github.com/flyingrobots/bijou/pull/517):
 
 - `BIJOU_DARK` and `BIJOU_LIGHT` now compile through one Sapphire reference
@@ -265,7 +265,11 @@ Implementation is complete on `cycle/sapphire-noir` for
 
 The generic theme generator (#318), CVD simulation (#500), gradient
 interpolation (#504), and quantizer changes (#499) remain separate work.
-This design remains `active` until the pull request lands.
+These measurements describe that historical snapshot. Current-head validation
+and review corrections are recorded in the PR; the design remains `active`
+until the pull request lands. The current public explanation is in the
+[package README](../../packages/bijou/README.md#sapphire-noir-first-party-defaults);
+the original token-vocabulary chapter remains frozen in the book archive.
 
 ## DOGFOOD Home-Tab Mockup Matrix
 

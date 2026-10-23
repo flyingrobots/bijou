@@ -1,0 +1,339 @@
+{
+  "edition": "2026-10-20 progressive build edition",
+  "pages": 1933,
+  "pdf_sha256": "a6b8d9dadf78d680f86ae4ce8e37d9f841acf6d39a62ca69981e91f5515059b1",
+  "pdf_bytes": 22710082,
+  "editions": {
+    "teaching": {
+      "entrypoint": "bijou-book.tex",
+      "pdf": "bijou-book.pdf",
+      "physical_pages": 106,
+      "bytes": 14793930,
+      "sha256": "33625a686e859479007e859313ec801d7a3a66a9ba0eb2ba9fe409e3dd3e6524",
+      "copyright_page": 2,
+      "source_records": 0,
+      "missing_glyphs": 0,
+      "undefined_references": 0,
+      "vertical_overflows": 0,
+      "maximum_horizontal_overflow_pt": 0.11386,
+      "full_apache_paragraphs_verified": 32
+    },
+    "archive": {
+      "entrypoint": "bijou-archive.tex",
+      "pdf": "bijou-archive.pdf",
+      "physical_pages": 1872,
+      "bytes": 20333134,
+      "sha256": "4e05c2246b285297224503d279fe8b0fcc265db03bc306475aea19f5ab43a0ae",
+      "copyright_page": 2,
+      "source_records": 426,
+      "missing_glyphs": 0,
+      "undefined_references": 0,
+      "vertical_overflows": 0,
+      "maximum_horizontal_overflow_pt": 0.69456,
+      "full_apache_paragraphs_verified": 32
+    },
+    "complete": {
+      "entrypoint": "bijou-designs.tex",
+      "pdf": "bijou-designs.pdf",
+      "physical_pages": 1933,
+      "bytes": 22710082,
+      "sha256": "a6b8d9dadf78d680f86ae4ce8e37d9f841acf6d39a62ca69981e91f5515059b1",
+      "copyright_page": 2,
+      "source_records": 426,
+      "missing_glyphs": 0,
+      "undefined_references": 0,
+      "vertical_overflows": 0,
+      "maximum_horizontal_overflow_pt": 0.69456,
+      "full_apache_paragraphs_verified": 32
+    }
+  },
+  "source_documents": 426,
+  "source_corpus_bytes_preserved": true,
+  "historical_tex_bodies_byte_identical_to_previous_edition": true,
+  "main_text": {
+    "parts": 5,
+    "numbered_chapters": 14,
+    "workshops": 7,
+    "connecting_chapters": 7,
+    "historical_records": 0
+  },
+  "tex_tree_sha256": "1bfbef68a08f0e6b58ad403868ab1ed650f82db22b233dba77d08b52e126e364",
+  "corpus_sha256": "7f2f0fc444dc1a194001e84c5199fc72cf152b13b6420a6b62dd6eb00c0562fc",
+  "compiler": "LuaHBTeX 1.15.0 / TeX Live 2022",
+  "build": "Three serial converged LuaLaTeX passes per entrypoint in reused guarded worker.",
+  "validation": [
+    "All 426 original Markdown source hashes verified.",
+    "All 426 historical TeX bodies byte-identical to source-base commit.",
+    "All 852 historical destinations and record notices verified across archive and complete PDFs.",
+    "Teaching PDF contains 14 numbered chapters, five Parts, seven workshops and no historical record destinations.",
+    "All three PDFs include copyright on physical page 2 and the complete Apache appendix.",
+    "job.ts, app.ts and main.ts listings byte-identical to pinned companion commit."
+  ],
+  "resource_usage": {
+    "scratch_kib": 874652,
+    "host_free_bytes": 649479184384,
+    "worker": "bijou-design-book-worker",
+    "worker_stopped_after_build": true,
+    "launch_contract": "/tmp/bijou-design-book/progressive/launch-contract.json",
+    "host_validation_kib": 13300
+  },
+  "limitations": [
+    "Companion book-v2 typecheck, 44 tests, five independent stages and six PTY cases passed; hosted CI passed at its pinned commit.",
+    "Historical source assertions were not individually reclassified against current runtime.",
+    "No human screen-reader study or broad emulator matrix performed.",
+    "Unrelated dirty framed-app tutorial retains its pre-existing page links."
+  ],
+  "reader_previous_edition": {
+    "id": "21a2e2bb-ffe4-4ff5-9a94-2c9701f76d9c",
+    "status": "awaiting_filing",
+    "integrity": "intact",
+    "fingerprint": "4445c40be4917f6c7ff30aee6332c5eafc2a6e8a28d06d6000cfa726fb1039af",
+    "document_path": "/Users/j/git/reader/inbox/21a2e2bb-ffe4-4ff5-9a94-2c9701f76d9c/bijou-book-and-archive.md",
+    "received_at": "2026-10-20T21:49:24.407552+00:00",
+    "supersedes": "bdf1d8e9-27fc-40bd-8417-7ebba2543691",
+    "editions": {
+      "teaching": {
+        "pdf": "bijou-book.pdf",
+        "physical_pages": 95,
+        "sha256": "7299e2937884469aac19a6aa239d1749c9b41893db8469d6c74aa12201316d63",
+        "bytes": 14787647
+      },
+      "archive": {
+        "pdf": "bijou-archive.pdf",
+        "physical_pages": 1872,
+        "sha256": "e468f7b139420e366cd0ec743e0c16b31d126625d0cfddab989d065076cbd7c4",
+        "bytes": 20332307
+      },
+      "complete": {
+        "pdf": "bijou-designs.pdf",
+        "physical_pages": 1922,
+        "sha256": "eb46dae8d76dadcf5897f06114734e26785590a9484eb2d803645d79d62d8e8b",
+        "bytes": 22679362
+      }
+    },
+    "evidence_files": [
+      "evidence/Apache-2.0.txt",
+      "evidence/NOTICE.txt",
+      "evidence/archive-record-hashes.json",
+      "evidence/edition-manifest.json",
+      "evidence/source-corpus.json",
+      "evidence/source-manifest.json"
+    ]
+  },
+  "learning_material": {
+    "companion_commit": "1c5c47ce0eeeb7342fb7e95e6424a2256c1288a1",
+    "tag": "book-v2",
+    "github_actions": {
+      "run": 39515958225,
+      "url": "https://github.com/flyingrobots/bijou-job-monitor/actions/runs/39515958225",
+      "conclusion": "success",
+      "tests": 44
+    },
+    "local_companion": {
+      "candidate": "working source snapshot before companion commit",
+      "fresh_install": "npm ci --offline using project-owned npm cache",
+      "full_suite": {
+        "files": 8,
+        "tests": 44,
+        "passed": 44
+      },
+      "independent_stages": [
+        {
+          "stage": "01",
+          "directory": "01-model",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        },
+        {
+          "stage": "02",
+          "directory": "02-modes",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        },
+        {
+          "stage": "03",
+          "directory": "03-input",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        },
+        {
+          "stage": "04",
+          "directory": "04-async",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        },
+        {
+          "stage": "05",
+          "directory": "05-constraints",
+          "cli": "passed",
+          "independent_tests": "passed",
+          "finished_source_available": false
+        }
+      ],
+      "source_diffs": [
+        {
+          "from": "01-model",
+          "to": "02-modes",
+          "source_diff_matches": true,
+          "lines": 37
+        },
+        {
+          "from": "02-modes",
+          "to": "03-input",
+          "source_diff_matches": true,
+          "lines": 123
+        },
+        {
+          "from": "03-input",
+          "to": "04-async",
+          "source_diff_matches": true,
+          "lines": 291
+        },
+        {
+          "from": "04-async",
+          "to": "05-constraints",
+          "source_diff_matches": true,
+          "lines": 89
+        }
+      ],
+      "final_stage_modules_byte_identical_to_src": 8,
+      "exercises": {
+        "broken_exit": 1,
+        "repaired_exit": 0,
+        "cases": 4
+      },
+      "package_members": "stage sources, answers, walkthrough, LICENSE and NOTICE verified",
+      "human_walkthrough": "not_run",
+      "interactive_screen_reader_workflow": "not_implemented"
+    },
+    "pty": [
+      {
+        "stage": "03",
+        "scenario": "keyboard",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 6410,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "03",
+        "scenario": "sigterm",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 861,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "04",
+        "scenario": "keyboard",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 6875,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "04",
+        "scenario": "sigterm",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 917,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "05",
+        "scenario": "keyboard",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 6926,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      },
+      {
+        "stage": "05",
+        "scenario": "sigterm",
+        "exit": 0,
+        "terminal_flags_restored": true,
+        "output_bytes": 950,
+        "semantic_assertions": "covered by deterministic App/model tests; PTY checks output and lifecycle"
+      }
+    ],
+    "historical_record_pairs_supplied_and_verified": 426,
+    "artifacts": {
+      "historical-record-bodies.zip": {
+        "sha256": "44010333bbb4c03b7b29ec8492bdb341a0771ebfd122d8e29c585cbc2d5be7a0",
+        "bytes": 2574546
+      },
+      "bijou-job-monitor-book-v2.tar.gz": {
+        "sha256": "a04c38b6b3a66efc8b746651846897a61f48e1908bbe084414d7d1341aa25a4f",
+        "bytes": 60457
+      }
+    },
+    "human_walkthrough": {
+      "status": "not_run",
+      "next_step": "User will arrange an unfamiliar reader",
+      "protocol": "appendices/reader-walkthrough.tex",
+      "blank_template": "companion-material/walkthrough/results-template.json"
+    },
+    "table_artwork": {
+      "changed_panel": "edition-versions-g1-1",
+      "other_panels_exact_capture_hashes_preserved": 158
+    },
+    "documentation_checks": {
+      "npm_run_lint": "passed",
+      "focused_contracts": {
+        "files": 3,
+        "passed": 12
+      },
+      "docs_inventory": "passed"
+    }
+  },
+  "visual_review": [
+    "build-stage chapter, commands and TikZ progression",
+    "answer key with hint/diagnosis/repair subheadings",
+    "unfamiliar-reader protocol and explicit not-conducted status",
+    "actual Bijou version table for book-v2"
+  ],
+  "build_note": "All three entrypoints converged in three serial passes after publication copy review.",
+  "reader_delivery": {
+    "id": "87d5bfaf-36bc-4c63-bf47-1905b07cf98c",
+    "status": "awaiting_filing",
+    "integrity": "intact",
+    "fingerprint": "4051d26a38dc86062e1e6e50c7d73c8eb3c996107887fadd7d788d7b0606d488",
+    "document_path": "/Users/j/git/reader/inbox/87d5bfaf-36bc-4c63-bf47-1905b07cf98c/bijou-progressive-build-edition.md",
+    "received_at": "2026-10-20T23:51:11.789082+00:00",
+    "supersedes": "21a2e2bb-ffe4-4ff5-9a94-2c9701f76d9c",
+    "editions": {
+      "teaching": {
+        "pdf": "bijou-book.pdf",
+        "physical_pages": 106,
+        "sha256": "33625a686e859479007e859313ec801d7a3a66a9ba0eb2ba9fe409e3dd3e6524",
+        "bytes": 14793930
+      },
+      "archive": {
+        "pdf": "bijou-archive.pdf",
+        "physical_pages": 1872,
+        "sha256": "4e05c2246b285297224503d279fe8b0fcc265db03bc306475aea19f5ab43a0ae",
+        "bytes": 20333134
+      },
+      "complete": {
+        "pdf": "bijou-designs.pdf",
+        "physical_pages": 1933,
+        "sha256": "a6b8d9dadf78d680f86ae4ce8e37d9f841acf6d39a62ca69981e91f5515059b1",
+        "bytes": 22710082
+      }
+    },
+    "evidence_files": [
+      "evidence/Apache-2.0.txt",
+      "evidence/NOTICE.txt",
+      "evidence/archive-record-hashes.json",
+      "evidence/edition-manifest.json",
+      "evidence/historical-record-bodies.zip",
+      "evidence/learning-material-verification.json",
+      "evidence/source-corpus.json",
+      "evidence/source-manifest.json"
+    ]
+  }
+}

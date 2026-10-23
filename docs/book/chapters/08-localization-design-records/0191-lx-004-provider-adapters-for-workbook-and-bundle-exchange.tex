@@ -1,0 +1,354 @@
+\chapter{LX-004 --- Provider Adapters for Workbook and Bundle Exchange}\label{record-191}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/LX-004-provider-adapters-for-workbook-and-bundle-exchange.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/LX-localization-and-bidirectionality.md}{LX --- Localization and Bidirectionality}
+
+\section{Why this cycle exists}\label{record-191-why-this-cycle-exists}
+
+LX-003 established the provider-neutral exchange seam in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s}:
+
+\begin{itemize}
+\tightlist
+\item
+  spreadsheet-friendly workbooks
+\item
+  serializable catalog bundles
+\item
+  typed value encoding/decoding
+\end{itemize}
+
+That seam is useful, but still abstract. Real workflows need concrete adapters that can move those formats through common external media.
+
+This cycle exists to prove the seam with the smallest honest adapter layer:
+
+\begin{itemize}
+\tightlist
+\item
+  delimited text for sheets (\texttt{c\allowbreak{}s\allowbreak{}v} / \texttt{t\allowbreak{}s\allowbreak{}v})
+\item
+  JSON for catalog bundles
+\end{itemize}
+
+\section{Scope of this cycle}\label{record-191-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  serializing an \texttt{E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t} to TSV
+\item
+  parsing an \texttt{E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t} from TSV
+\item
+  serializing an \texttt{E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t} to CSV
+\item
+  parsing an \texttt{E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t} from CSV
+\item
+  serializing a \texttt{C\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}B\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e} to JSON
+\item
+  parsing a \texttt{C\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}B\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e} from JSON
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  filesystem helpers
+\item
+  XLSX
+\item
+  Google Sheets
+\item
+  remote services
+\item
+  multi-file workbook orchestration
+\end{itemize}
+
+The point is to prove the adapter surface without bringing in provider/platform coupling yet.
+
+\section{Human users}\label{record-191-human-users}
+
+\subsection{Primary human user}\label{record-191-primary-human-user}
+
+A localization maintainer who needs to:
+
+\begin{itemize}
+\tightlist
+\item
+  hand off one exchange sheet to external tooling in a real delimited text format
+\item
+  bring edited rows back from that format
+\item
+  move full catalog bundles through a serializable JSON representation
+\end{itemize}
+
+\subsection{Human hill}\label{record-191-human-hill}
+
+A builder can export a sheet to a real CSV/TSV string, import it back, and move full authoring bundles through JSON without inventing one-off parsing logic.
+
+\section{Agent users}\label{record-191-agent-users}
+
+\subsection{Primary agent user}\label{record-191-primary-agent-user}
+
+An agent maintaining localization workflows.
+
+It needs to:
+
+\begin{itemize}
+\tightlist
+\item
+  emit delimited review sheets that non-Bijou tooling can consume
+\item
+  parse those sheets back safely
+\item
+  serialize and deserialize full catalog bundles for transport or review
+\end{itemize}
+
+\subsection{Agent hill}\label{record-191-agent-hill}
+
+An agent can move localization exchange data through explicit adapter APIs instead of hand-rolling CSV escaping or JSON bundle parsing in each workflow.
+
+\section{Human playback}\label{record-191-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder exports a translation workbook for \texttt{d\allowbreak{}e}.
+\item
+  They take the sheet and serialize it to TSV or CSV.
+\item
+  Another tool edits the serialized rows.
+\item
+  The builder parses the edited sheet back into an \texttt{E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t}.
+\item
+  They import the workbook rows and merge them into authoring catalogs.
+\item
+  They serialize a full catalog bundle to JSON and later restore it back into authoring catalogs.
+\end{enumerate}
+
+\section{Agent playback}\label{record-191-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent exports a workbook.
+\item
+  It serializes the sheet to TSV or CSV for an external review tool.
+\item
+  It parses the edited sheet back.
+\item
+  It serializes full catalog bundles to JSON for handoff or snapshotting.
+\item
+  It restores bundles from JSON and feeds them back into the tooling core.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-191-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-191-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  adapter logic must build on the LX-003 exchange seam instead of replacing it
+\item
+  CSV/TSV parsing must preserve exact cell strings
+\item
+  delimiter/quote/newline edge cases must be tested, not hand-waved
+\item
+  JSON bundle adapters must stay explicit and version-safe
+\item
+  filesystem and service concerns remain out of scope
+\end{itemize}
+
+\section{Deliverable}\label{record-191-deliverable}
+
+Extend \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s} with adapter APIs for:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t} \textless-\textgreater{} \texttt{c\allowbreak{}s\allowbreak{}v}
+\item
+  \texttt{E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t} \textless-\textgreater{} \texttt{t\allowbreak{}s\allowbreak{}v}
+\item
+  \texttt{C\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}B\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e} \textless-\textgreater{} \texttt{j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+\section{Proposed API direction}\label{record-191-proposed-api-direction}
+
+The first slice should be close to:
+
+\begin{CodeBlock}
+type DelimitedFormat = 'csv' | 'tsv';
+
+function serializeExchangeSheet(
+  sheet: ExchangeSheet,
+  format: DelimitedFormat,
+): string;
+
+function parseExchangeSheet(
+  name: string,
+  input: string,
+  format: DelimitedFormat,
+): ExchangeSheet;
+
+function serializeCatalogBundleJson(bundle: CatalogBundle): string;
+function parseCatalogBundleJson(input: string): CatalogBundle;
+\end{CodeBlock}
+
+Higher-level helpers can be added later if needed, but this cycle should prove the core adapter surface.
+
+\section{Tests to write first}\label{record-191-tests-to-write-first}
+
+\subsection{Cycle-owned playback tests}\label{record-191-cycle-owned-playback-tests}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}L\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}4\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  exported workbook sheets roundtrip through TSV and still import into runtime-consumable catalogs
+\item
+  exported workbook sheets roundtrip through CSV even with commas, quotes, and newlines in cells
+\item
+  catalog bundles roundtrip through JSON and still restore full authoring catalogs
+\item
+  malformed CSV/TSV/JSON payloads fail clearly
+\end{itemize}
+
+\subsection{Package-local unit tests}\label{record-191-package-local-unit-tests}
+
+Under \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  CSV quoting/escaping is correct
+\item
+  TSV preserves tabs/newlines through quoting rules
+\item
+  parsers reject ragged rows
+\item
+  JSON bundle parser rejects malformed versioned payloads
+\end{itemize}
+
+\section{Risks}\label{record-191-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  under-testing delimiter edge cases
+\item
+  accidentally normalizing away exact cell payloads
+\item
+  letting adapter helpers grow into file I/O abstractions
+\item
+  making JSON bundle parsing too permissive
+\end{itemize}
+
+\section{Out of scope}\label{record-191-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  file reads/writes
+\item
+  XLSX
+\item
+  Google Sheets
+\item
+  multi-sheet ZIP/manifest packaging
+\item
+  service adapters of any kind
+\end{itemize}
+
+\section{Retrospective}\label{record-191-retrospective}
+
+\subsection{What landed}\label{record-191-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  new adapter surface in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s} for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t} \textless-\textgreater{} CSV
+  \item
+    \texttt{E\allowbreak{}x\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}g\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}e\allowbreak{}t} \textless-\textgreater{} TSV
+  \item
+    \texttt{C\allowbreak{}a\allowbreak{}t\allowbreak{}a\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}B\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e} \textless-\textgreater{} JSON
+  \end{itemize}
+\item
+  new cycle-owned playback tests:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}L\allowbreak{}X\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}4\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  new package-local adapter tests:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}t\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+  \end{itemize}
+\item
+  adapter coverage for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    CSV quoting and escaping
+  \item
+    TSV cell preservation
+  \item
+    ragged-row rejection
+  \item
+    malformed JSON bundle rejection
+  \end{itemize}
+\item
+  explicit adapter exports layered on top of the LX-003 workbook/bundle seam instead of bypassing it
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-191-drift-from-ideal}
+
+No material drift in scope.
+
+One deliberate boundary held:
+
+\begin{itemize}
+\tightlist
+\item
+  there are still no filesystem helpers, XLSX adapters, or Google Sheets/service integrations
+\end{itemize}
+
+That is correct for this cycle. LX-004 proved the adapter surface with plain text and JSON formats first.
+
+\subsection{Debt spawned}\label{record-191-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/LX-005-rich-spreadsheet-and-filesystem-adapters.md}{LX-005 --- Rich Spreadsheet and Filesystem Adapters}
+\end{itemize}
+

@@ -1,0 +1,250 @@
+\chapter{WF-001 --- Adopt the Legends/Cycles Workflow}\label{record-200}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-001-adopt-cycle-workflow.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+
+\section{Why this cycle exists}\label{record-200-why-this-cycle-exists}
+
+Bijou has been mixing multiple planning models:
+
+\begin{itemize}
+\tightlist
+\item
+  roadmap milestones
+\item
+  strategy notes
+\item
+  specs
+\item
+  ad hoc backlog capture
+\end{itemize}
+
+That makes it harder for both humans and agents to tell:
+
+\begin{itemize}
+\tightlist
+\item
+  what is active
+\item
+  what is backlog
+\item
+  where design truth lives
+\item
+  where tests tied to a cycle should go
+\end{itemize}
+
+This cycle establishes the workflow itself as a first-class repo artifact.
+
+\section{Human users}\label{record-200-human-users}
+
+\subsection{Primary human user}\label{record-200-primary-human-user}
+
+A maintainer or contributor who needs to:
+
+\begin{itemize}
+\tightlist
+\item
+  capture ideas
+\item
+  pick the next piece of work
+\item
+  understand active design intent
+\item
+  see what tests belong to a cycle
+\item
+  record debt and follow-on work honestly
+\end{itemize}
+
+\subsection{Human hill}\label{record-200-human-hill}
+
+A human maintainer can open the repo and understand:
+
+\begin{itemize}
+\tightlist
+\item
+  what a legend is
+\item
+  what a cycle is
+\item
+  where backlog items live
+\item
+  where active design docs live
+\item
+  where cycle-specific tests live
+\end{itemize}
+
+without reverse-engineering tribal process from old roadmap prose.
+
+\section{Agent users}\label{record-200-agent-users}
+
+\subsection{Primary agent user}\label{record-200-primary-agent-user}
+
+A coding/design agent working inside the repo who needs to:
+
+\begin{itemize}
+\tightlist
+\item
+  discover the current planning model quickly
+\item
+  know where to place new design docs
+\item
+  know where to place cycle-owned tests
+\item
+  know which invariants must be linked and protected
+\item
+  know how to spawn backlog debt instead of silently drifting
+\end{itemize}
+
+\subsection{Agent hill}\label{record-200-agent-hill}
+
+An agent can enter the repo and, with minimal context, place design, tests, backlog fallout, and changelog updates in the right locations without reinforcing the old \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}o\allowbreak{}a\allowbreak{}d\allowbreak{}m\allowbreak{}a\allowbreak{}p} drift.
+
+\section{Human playback}\label{record-200-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A maintainer has a new idea.
+\item
+  They create one file in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/}.
+\item
+  They decide to start the work.
+\item
+  They move that file into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/}.
+\item
+  They enrich the cycle doc with hills, playbacks, invariants, and test intent.
+\item
+  They write failing tests under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}1\allowbreak{}/} or the relevant cycle directory.
+\item
+  They land the work.
+\item
+  They record drift and spin out any debt into fresh backlog items.
+\end{enumerate}
+
+\section{Agent playback}\label{record-200-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent reads \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/WORKFLOW.md}{Bijou Workflow}.
+\item
+  The agent finds the relevant legend doc.
+\item
+  The agent checks linked invariants.
+\item
+  The agent discovers the active cycle doc in \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/}.
+\item
+  The agent writes or updates cycle-owned tests in \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}<\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}>\allowbreak{}/}.
+\item
+  The agent lands the change and records retrospective fallout as backlog files.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-200-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/shell-owns-shell-concerns.md}{Shell Owns Shell Concerns}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Deliverables}\label{record-200-deliverables}
+
+\begin{itemize}
+\tightlist
+\item
+  add \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}o\allowbreak{}d\allowbreak{}/\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}l\allowbreak{}o\allowbreak{}g\allowbreak{}/}
+\item
+  add \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/}
+\item
+  add \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}l\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}s\allowbreak{}/}
+\item
+  add \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}/}
+\item
+  add a canonical workflow doc
+\item
+  add legend docs
+\item
+  add invariant docs
+\item
+  add cycle test support in \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/}
+\item
+  mark \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/} as legacy/frozen for new work
+\item
+  capture the current i18n package split as a backlog item instead of a fresh spec pair
+\end{itemize}
+
+\section{Tests to write first}\label{record-200-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  a cycle-owned test proving the new directories/docs exist
+\item
+  a cycle-owned test proving the workflow doc documents Legends/Cycles and \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}<\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}>\allowbreak{}/}
+\item
+  a cycle-owned test proving core legend and invariant docs exist
+\item
+  a cycle-owned test proving the i18n package-split idea is now backlog work instead of new spec work
+\end{itemize}
+
+\section{Risks}\label{record-200-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  partially adopting the workflow while continuing to add new work to \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/}
+\item
+  leaving the old roadmap as if it were still the active source of truth
+\item
+  documenting the workflow without updating the test harness to discover \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/}
+\end{itemize}
+
+\section{Retrospective}\label{record-200-retrospective}
+
+\subsection{What landed}\label{record-200-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  the repo now has explicit workflow, legend, invariant, backlog, and design-cycle surfaces
+\item
+  cycle-owned tests now have an official home in \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/}
+\item
+  the just-added i18n package-boundary planning work was rehomed as backlog instead of living as fresh spec files
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}s\allowbreak{}/} is now explicitly marked as legacy for new work
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-200-drift-from-ideal}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} still exists as a large legacy planning artifact
+\item
+  older \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}*} notes still need a deliberate migration story
+\item
+  historical spec files remain and are not converted in this cycle
+\end{itemize}
+
+\subsection{Debt spawned}\label{record-200-debt-spawned}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/retro/WF_002-migrate-legacy-planning-artifacts.md}{WF-002 --- Migrate Legacy Planning Artifacts}
+\end{itemize}
+

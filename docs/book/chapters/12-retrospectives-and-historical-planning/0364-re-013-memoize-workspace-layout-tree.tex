@@ -1,0 +1,20 @@
+\chapter{RE-013 --- Memoize Workspace Layout Tree}\label{record-364}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/RE-013-memoize-workspace-layout-tree.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Idea}\label{record-364-idea}
+
+\texttt{b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}T\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})} creates new \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} objects on every mouse event, even when the terminal size, page layout, and tab count haven't changed. The tree structure only changes on resize, tab switch, or pane layout change.
+
+Memoize the tree against the inputs that determine its shape (cols, rows, active page, pane layout hash). Return the cached tree when inputs match. This eliminates \textasciitilde20 object allocations per mouse event for a typical 2-tab, 2-pane layout.
+
+\section{Why}\label{record-364-why}
+
+The perf-gradient demo showed that view() time is only \textasciitilde2ms, but every mouse event also runs \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}s\allowbreak{}(\allowbreak{})} which calls \texttt{b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}T\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}(\allowbreak{})}. In a typical app with 60fps rendering and mouse tracking, this is 60+ unnecessary tree builds per second.
+
+\section{Effort}\label{record-364-effort}
+
+Small --- hash the inputs, compare, return cached tree.
+

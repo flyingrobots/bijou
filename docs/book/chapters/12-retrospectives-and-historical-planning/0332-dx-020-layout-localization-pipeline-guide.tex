@@ -1,0 +1,52 @@
+\chapter{DX-020 --- Layout Localization Pipeline Guide}\label{record-332}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX-020-layout-localization-pipeline-guide.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "DX-020 — Layout Localization Pipeline Guide"
+legend: DX
+lane: retro
+
+\end{RecordMeta}
+
+Completed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}. The dedicated strategy note now lives at \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}g\allowbreak{}y\allowbreak{}/\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}l\allowbreak{}o\allowbreak{}c\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and the advanced/runtime docs link to it from \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}A\allowbreak{}R\allowbreak{}C\allowbreak{}H\allowbreak{}I\allowbreak{}T\allowbreak{}E\allowbreak{}C\allowbreak{}T\allowbreak{}U\allowbreak{}R\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}A\allowbreak{}D\allowbreak{}V\allowbreak{}A\allowbreak{}N\allowbreak{}C\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}g\allowbreak{}u\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}m\allowbreak{}d}. The repo now has an explicit deep guide for localization vs painting, coordinate accumulation, and retained-layout fit.
+
+\section{Original Proposal}\label{record-332-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Problem}\label{record-332-problem}
+
+The layout/localization path around \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} is important to both performance and correctness, but the repo does not yet have a dedicated strategy doc explaining:
+
+\begin{itemize}
+\tightlist
+\item
+  localization vs painting
+\item
+  how offsets accumulate
+\item
+  when layout is recomputed
+\item
+  where retained-layout work would fit
+\end{itemize}
+
+The 2026-04-11 documentation audit called this out as a missing deep guide for advanced users and maintainers.
+
+\section{Desired outcome}\label{record-332-desired-outcome}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Write a dedicated strategy doc for the layout-localization pipeline.
+\item
+  Explain the recursion model, coordinate spaces, and relationship between localization and paint/output stages.
+\item
+  Link it from the advanced guide and relevant architecture docs.
+\end{enumerate}
+
+\section{Effort}\label{record-332-effort}
+
+Small to medium --- mostly documentation, but it may expose naming or API cleanup opportunities along the way.
+

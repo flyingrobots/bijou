@@ -1,0 +1,10 @@
+\begin{center}
+\BookDiagram{\begin{tikzpicture}[box/.style={draw=BookHeading,fill=BookPanel,text width=24mm,align=center,inner sep=5pt,font=\footnotesize},edge/.style={-{Latex[length=2mm]},draw=BookHeading}]
+\node[box] (a) at (0,0) {\textbf{01}\\Facts};
+\node[box] (b) at (3.2,0) {\textbf{02}\\Presentations};
+\node[box] (c) at (6.4,0) {\textbf{03}\\Input};
+\node[box] (d) at (9.6,0) {\textbf{04}\\Async work};
+\node[box] (e) at (12.8,0) {\textbf{05}\\Constraints};
+\draw[edge] (a)--(b);\draw[edge] (b)--(c);\draw[edge] (c)--(d);\draw[edge] (d)--(e);
+\end{tikzpicture}}
+\end{center}

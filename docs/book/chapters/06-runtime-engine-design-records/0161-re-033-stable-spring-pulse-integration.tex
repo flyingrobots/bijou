@@ -1,0 +1,149 @@
+\chapter{RE-033 Stable Spring Pulse Integration}\label{record-161}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-033-stable-spring-pulse-integration.md}\par}\smallskip
+
+\section{Sponsored Users}\label{record-161-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Application builders using \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} spring animation for camera controls, pane motion, drawers, or other interactive UI state.
+\item
+  Terminal users on slow, remote, or overloaded shells where frame pulses can arrive late or in large bursts.
+\item
+  Agents debugging Bijou apps from event streams rather than visual intuition.
+\end{itemize}
+
+\section{Problem}\label{record-161-problem}
+
+\texttt{a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{}\{\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}s\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}'\allowbreak{} \allowbreak{}\}\allowbreak{})} currently integrates spring physics with the raw runtime pulse delta. A slow frame can therefore hand \texttt{s\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}(\allowbreak{})} a very large \texttt{d\allowbreak{}t}, and semi-implicit Euler integration can convert one delayed pulse into a large velocity and position spike.
+
+Apps can patch around this by implementing their own bounded fixed-timestep command, but the invariant belongs in Bijou: a spring command should stay stable when the terminal slows down.
+
+\section{Hills}\label{record-161-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can use Bijou's default spring animation in a slow terminal without writing app-local \texttt{d\allowbreak{}t} clamps.
+\item
+  A user holding an animated control during a delayed frame sees motion slow or catch up conservatively, not explode past the intended state.
+\item
+  An agent can prove spring stability with a focused test that drives the command with large pulse deltas.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-161-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  If a spring receives a one-second pulse, does the first emitted value remain bounded between the start and target for a critically damped spring?
+\item
+  Does the animation still settle at the exact target value and emit completion normally?
+\item
+  Does the fix live inside Bijou's \texttt{a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} spring command rather than in downstream application code?
+\end{enumerate}
+
+\section{Requirements}\label{record-161-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Spring animation commands must integrate using bounded fixed timesteps.
+\item
+  Large pulse deltas must not be applied to \texttt{s\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}(\allowbreak{})} as one raw step.
+\item
+  The default behavior must remain app-friendly without requiring new options.
+\item
+  Tween animation behavior is out of scope for this cycle.
+\item
+  Existing \texttt{a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{s\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} public call sites must remain source compatible.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-161-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} includes a slow-pulse spring regression.
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} bounds spring integration internally.
+\item
+  Existing spring, tween, immediate, and sequence tests continue to pass.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} passes.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} passes.
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} passes.
+\end{itemize}
+
+\section{Design}\label{record-161-design}
+
+Use a small fixed-step accumulator inside \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}(\allowbreak{})}.
+
+The command should:
+
+\begin{itemize}
+\tightlist
+\item
+  accumulate pulse time;
+\item
+  cap the amount of pulse time accepted per runtime pulse;
+\item
+  step \texttt{s\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}(\allowbreak{})} in fixed increments;
+\item
+  emit at most one frame per runtime pulse after it has stepped;
+\item
+  dispose and emit \texttt{o\allowbreak{}n\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} exactly as before when the spring settles.
+\end{itemize}
+
+Dropping excessive slow-frame time is intentional. A terminal animation should prefer stable, slightly delayed motion over trying to simulate a full stalled second in one event loop turn.
+
+\section{RED}\label{record-161-red}
+
+Initial RED test: a critically damped spring from \texttt{0} to \texttt{1\allowbreak{}0\allowbreak{}0} receives repeated one-second pulses. With raw \texttt{d\allowbreak{}t} integration, the first frame jumps far beyond the target.
+
+The initial run failed in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} because the spring did not settle under the slow-pulse sequence.
+
+\section{GREEN}\label{record-161-green}
+
+\texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}(\allowbreak{})} now accumulates runtime pulse time, accepts at most a small bounded pulse window, and advances spring physics with fixed timesteps. It emits one frame after one or more physics steps and preserves the existing completion path.
+
+The public \texttt{a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} call remains source-compatible. Spring callers may tune \texttt{f\allowbreak{}i\allowbreak{}x\allowbreak{}e\allowbreak{}d\allowbreak{}S\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}S\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}s} and \texttt{m\allowbreak{}a\allowbreak{}x\allowbreak{}P\allowbreak{}u\allowbreak{}l\allowbreak{}s\allowbreak{}e\allowbreak{}S\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}s}, but the defaults are stable without new app code.
+
+\section{Drift Check}\label{record-161-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} passed.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} passed.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}t} passed.
+\item
+  \texttt{g\allowbreak{}i\allowbreak{}t\allowbreak{} \allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k} passed.
+\end{itemize}
+
+\section{Playback}\label{record-161-playback}
+
+Playback answers:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A one-second pulse no longer reaches \texttt{s\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}S\allowbreak{}t\allowbreak{}e\allowbreak{}p\allowbreak{}(\allowbreak{})} as one raw integration step; the regression proves a critically damped spring remains bounded.
+\item
+  The command still resolves at the exact target value and preserves completion semantics.
+\item
+  The fix lives inside \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}, not in an app-local workaround.
+\end{enumerate}
+
+\section{Retrospective}\label{record-161-retrospective}
+
+The jedit camera failure was a useful dogfood signal: spring stability is a framework guarantee, not an application responsibility. This cycle intentionally kept scope to spring integration. A broader frame scheduler remains a better future home for runtime-wide pulse policy, but \texttt{a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} is now safe by default for the existing public API.
+

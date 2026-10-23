@@ -1,0 +1,11 @@
+Bijou Job Monitor
+Copyright 2026 James Ross.
+
+This application accompanies the Bijou Documentation Book.
+It uses Bijou 7.2.0, Copyright James Ross and the Bijou contributors,
+under the Apache License, Version 2.0. Bijou source:
+https://github.com/flyingrobots/bijou
+
+The companion is original example code. Book excerpts identify any subsequent
+adaptations. Dependency license and copyright notices remain in the installed
+packages and must accompany any redistribution that includes those packages.

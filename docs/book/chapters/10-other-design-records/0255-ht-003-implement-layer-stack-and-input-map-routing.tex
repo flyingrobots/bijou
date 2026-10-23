@@ -1,0 +1,265 @@
+\chapter{HT-003 --- Implement Layer Stack and Input Map Routing}\label{record-255}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/HT-003-implement-layer-stack-and-input-map-routing.md}\par}\smallskip
+
+\emph{Cycle for turning the shell layer-stack doctrine into real routing, dismissal, and control-hint behavior inside \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{HT --- Humane Terminal}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/HT-002-layered-focus-and-interaction.md}{HT-002 --- Layered Focus and Interaction}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-255-why-this-cycle-exists}
+
+HT-002 established the right direction:
+
+\begin{itemize}
+\tightlist
+\item
+  layers should behave like a stack
+\item
+  the topmost layer should own input
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c} should dismiss topmost layers before quitting
+\item
+  visible controls should come from the active input map
+\end{itemize}
+
+But the runtime was still routing shell surfaces through raw branch order.
+
+This cycle exists to make that doctrine real enough to stop the \texttt{E\allowbreak{}s\allowbreak{}c}/footer class of bugs from reappearing constantly.
+
+\section{Human users / jobs / hills}\label{record-255-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-255-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  framed-app operators moving through search, settings, help, notifications, and quit confirm
+\item
+  DOGFOOD users switching between pane work and shell-owned layers
+\item
+  builders relying on \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} defaults instead of reinventing shell logic
+\end{itemize}
+
+\subsection{Human jobs}\label{record-255-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Dismiss the thing on top without accidentally triggering something beneath it.
+\item
+  Trust the footer to describe the active controls instead of stale underlying controls.
+\item
+  Understand when a page-owned modal is blocking the workspace.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-255-human-hill}
+
+The shell behaves like a calm stack of layers instead of a pile of conditionals: dismissal is unsurprising and footer hints are truthful.
+
+\section{Agent users / jobs / hills}\label{record-255-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-255-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents driving framed apps by key sequences
+\item
+  agents validating shell behavior through playbacks
+\item
+  agents that need a structured way to infer what the shell considers active
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-255-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Inspect the active shell layer order from model state instead of reverse-engineering branch order.
+\item
+  Predict whether a key will dismiss, route to the page modal, or fall through to the workspace.
+\item
+  Derive visible controls from the topmost layer, not by parsing terminal chrome heuristically.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-255-agent-hill}
+
+An agent can inspect a frame model and understand the current shell/page layer stack well enough to predict \texttt{E\allowbreak{}s\allowbreak{}c} and footer behavior reliably.
+
+\section{Human playback}\label{record-255-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user opens settings from a framed app.
+\item
+  Settings becomes the topmost active layer and the footer shows settings controls.
+\item
+  The user opens help from within settings.
+\item
+  Help becomes the topmost layer and its controls replace the settings footer.
+\item
+  The user presses \texttt{E\allowbreak{}s\allowbreak{}c}.
+\item
+  Help dismisses and settings becomes active again.
+\item
+  The user presses \texttt{E\allowbreak{}s\allowbreak{}c} again.
+\item
+  Settings dismisses.
+\item
+  The user presses \texttt{E\allowbreak{}s\allowbreak{}c} once more.
+\item
+  Only now does the shell treat the key as a quit request and open quit confirm.
+\end{enumerate}
+
+\section{Agent playback}\label{record-255-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent inspects a frame model with a search layer open over settings.
+\item
+  The model describes the layer stack as the illustrated sequence below.
+\item
+  The topmost input map is \texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h}, so the footer shows search controls.
+\item
+  The agent sends \texttt{E\allowbreak{}s\allowbreak{}c}.
+\item
+  The search layer dismisses.
+\item
+  The layer stack becomes \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s}.
+\item
+  The footer now shows settings controls.
+\item
+  The agent sends \texttt{E\allowbreak{}s\allowbreak{}c} again.
+\item
+  Settings dismisses, restoring the base workspace.
+\end{enumerate}
+
+\input{diagrams/flows/flow-066}
+
+\section{Linked invariants}\label{record-255-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/topmost-layer-dismisses-first.md}{Topmost Layer Dismisses First}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/shell-owns-shell-concerns.md}{Shell Owns Shell Concerns}
+\end{itemize}
+
+\section{Implementation outline}\label{record-255-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a shared shell-layer descriptor model.
+\item
+  Expose a public \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} helper for tests/agents.
+\item
+  Drive key routing from the topmost active layer instead of raw boolean branch order.
+\item
+  Make mouse handling respect the same topmost-layer blocking model.
+\item
+  Drive footer hints from the active layer's input map or shell-specific control source.
+\item
+  Add regressions for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    top-down \texttt{E\allowbreak{}s\allowbreak{}c} dismissal
+  \item
+    structured layer-stack inspection
+  \item
+    page-modal footer truth
+  \end{itemize}
+\end{enumerate}
+
+\section{Tests to write first}\label{record-255-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle doc regression for HT-003 and its follow-on backlog item
+\item
+  shell regression proving \texttt{E\allowbreak{}s\allowbreak{}c} dismisses topmost layers before quit
+\item
+  shell regression proving footer hints come from the topmost active layer
+\item
+  regression proving the layer stack can be described structurally for shell layers and page modals
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-255-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  the implementation may still describe a layer stack rather than literally pushing/popping key maps as first-class runtime objects
+\item
+  page-owned modals still expose only a \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p}, not a richer layer object
+\item
+  shell help content is still composed from binding sources rather than a fully unified input-map registry
+\end{itemize}
+
+\section{Retrospective}\label{record-255-retrospective}
+
+What landed:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})} in the public TUI API
+\item
+  topmost-layer-driven key routing in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  topmost-layer-aware mouse blocking
+\item
+  footer hints derived from the active layer instead of raw booleans
+\item
+  page-modal footer truth through modal-keymap-driven help hints
+\end{itemize}
+
+What did not land:
+
+\begin{itemize}
+\tightlist
+\item
+  a literal push/pop runtime registry of layer objects
+\item
+  richer page-provided layer descriptors beyond \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}a\allowbreak{}l\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}M\allowbreak{}a\allowbreak{}p}
+\item
+  a dedicated agent-visible shell introspection surface beyond the public layer-stack helper
+\end{itemize}
+
+Follow-on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/HT-004-promote-explicit-layer-objects-and-richer-shell-introspection.md}{HT-004 --- Promote Explicit Layer Objects and Richer Shell Introspection}
+\end{itemize}
+

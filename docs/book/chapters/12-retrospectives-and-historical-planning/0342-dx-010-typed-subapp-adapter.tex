@@ -1,0 +1,46 @@
+\chapter{DX-010 --- Typed Sub-App Adapter Factory}\label{record-342}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX_010-typed-subapp-adapter.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-010 — Typed Sub-App Adapter Factory
+lane: retro
+legend: DX
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-342-disposition}
+
+Shipped \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}S\allowbreak{}u\allowbreak{}b\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}A\allowbreak{}d\allowbreak{}a\allowbreak{}p\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} as an exhaustive discriminant-based \texttt{o\allowbreak{}n\allowbreak{}M\allowbreak{}s\allowbreak{}g} factory for sub-app composition. The canonical sub-app example, package docs, and guide now use the helper, and compile-time coverage is proven with \texttt{@\allowbreak{}t\allowbreak{}s\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}-\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} regression assertions in the sub-app mount tests while \texttt{m\allowbreak{}a\allowbreak{}p\allowbreak{}C\allowbreak{}m\allowbreak{}d} remains available for explicit command interception.
+
+\section{Original Proposal}\label{record-342-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-342-idea}
+
+Replace the manual \texttt{m\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{m\allowbreak{}a\allowbreak{}p\allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{})} pattern with a compile-time-checked adapter factory:
+
+\begin{CodeBlock}
+const adapter = createSubAppAdapter<ParentMsg, ChildMsg>({
+  'child-done': (msg) => ({ type: 'panel-closed' }),
+  'child-error': (msg) => ({ type: 'show-alert', text: msg.error }),
+});
+\end{CodeBlock}
+
+TypeScript enforces that every \texttt{C\allowbreak{}h\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}M\allowbreak{}s\allowbreak{}g} variant is covered. A forgotten mapping is a compile error, not a silent message drop.
+
+\section{Why}\label{record-342-why}
+
+The current \texttt{m\allowbreak{}a\allowbreak{}p\allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{})} pattern works but requires manual wiring with no type-level guarantee of completeness. In larger apps with multiple sub-apps, a missing mapping causes a message to vanish silently --- the hardest kind of bug to diagnose in a TEA architecture.
+
+\section{Open questions}\label{record-342-open-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Should the adapter handle both messages and commands, or just messages?
+\item
+  Should it support pass-through for shared message types?
+\end{itemize}
+

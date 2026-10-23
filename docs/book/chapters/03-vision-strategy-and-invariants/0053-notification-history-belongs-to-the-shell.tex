@@ -1,0 +1,572 @@
+\chapter{Notification History Belongs to the Shell}\label{record-053}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/strategy/notification-history-belongs-to-the-shell.md}\par}\smallskip
+
+\emph{Design note for a shell-owned notification center in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}}
+
+\section{Why this exists}\label{record-053-why-this-exists}
+
+Bijou already has the underlying notification substrate:
+
+\begin{itemize}
+\tightlist
+\item
+  stacked live notifications
+\item
+  actionable notifications
+\item
+  archived notification history
+\item
+  runtime notification routing in the frame shell
+\end{itemize}
+
+That means the next problem is not ``can Bijou archive notifications?'' It is:
+
+\begin{itemize}
+\tightlist
+\item
+  where does a human go when they miss one?
+\item
+  how do they review important notices without reopening a one-off demo or reading logs?
+\item
+  how do notifications feel like part of the shell instead of a bolt-on overlay system?
+\end{itemize}
+
+If every framed app invents its own history modal, drift is guaranteed:
+
+\begin{itemize}
+\tightlist
+\item
+  different entry points
+\item
+  different close behavior
+\item
+  different filters
+\item
+  different scroll semantics
+\item
+  different footer/status cues
+\end{itemize}
+
+That is the same kind of product drift that justified shell-owned settings and shell-owned quit policy. Notification history should follow the same path.
+
+\section{Design-thinking frame}\label{record-053-design-thinking-frame}
+
+\subsection{Primary user}\label{record-053-primary-user}
+
+The primary user is the \textbf{workspace operator}:
+
+\begin{itemize}
+\tightlist
+\item
+  they are in the middle of real work
+\item
+  a toast or warning may have appeared while they were reading somewhere else
+\item
+  they need a calm place to recover missed information without losing context
+\end{itemize}
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``What just happened?''
+\item
+  ``Did I miss something important?''
+\item
+  ``Where do I go to review notices after they disappear?''
+\item
+  ``Can I trust that important shell feedback has a durable home?''
+\end{itemize}
+
+\subsection{Secondary user}\label{record-053-secondary-user}
+
+The secondary user is the \textbf{workspace builder}:
+
+\begin{itemize}
+\tightlist
+\item
+  a developer using \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\item
+  someone who wants a standard review surface for shell/app notifications
+\item
+  someone who does not want to rebuild archive modals, footer counters, filters, and keyboard behavior for every app
+\end{itemize}
+
+They are asking:
+
+\begin{itemize}
+\tightlist
+\item
+  ``Can the shell give me a standard notification center?''
+\item
+  ``Can I surface important notices without building a custom inbox UI?''
+\item
+  ``Will notification review stay coherent with help, settings, search, and quit?''
+\end{itemize}
+
+\subsection{Jobs to be done}\label{record-053-jobs-to-be-done}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Help me recover missed feedback.} If a transient notice mattered, I need a stable place to review it later.
+\item
+  \textbf{Help me distinguish feedback by weight.} Not every message deserves the same treatment. Toasts, persistent notifications, and reviewable history should feel intentionally different.
+\item
+  \textbf{Help me review without losing my place.} I should be able to inspect notifications while keeping the current workspace visible behind the shell surface.
+\item
+  \textbf{Help me implement durable feedback once.} App authors should supply notification state and optional actions, not reinvent archive UI and shell entry points.
+\end{enumerate}
+
+\section{Hills}\label{record-053-hills}
+
+\subsection{Hill 1 --- Missed notices are recoverable}\label{record-053-hill-1-missed-notices-are-recoverable}
+
+A user can reliably open one shell-owned place to review current and recent notifications.
+
+\subsection{Hill 2 --- Feedback feels proportional}\label{record-053-hill-2-feedback-feels-proportional}
+
+Low-weight toasts stay lightweight. Important notices remain reviewable. The shell does not force every event to become a blocking modal.
+
+\subsection{Hill 3 --- Notification review feels shell-owned}\label{record-053-hill-3-notification-review-feels-shell-owned}
+
+The center behaves like a sibling of help, search, settings, and quit, not like a page-specific hack.
+
+\subsection{Hill 4 --- Context remains visible}\label{record-053-hill-4-context-remains-visible}
+
+The notification center should feel like a sidecar review surface, not a full app detour.
+
+\section{Product direction}\label{record-053-product-direction}
+
+The shell should provide a \textbf{right-edge notification center}.
+
+The mental model is:
+
+\begin{quote}
+toasts are what just happened; the notification center is where I go to review what mattered.
+\end{quote}
+
+Why a right-edge drawer:
+
+\begin{itemize}
+\tightlist
+\item
+  settings already occupy the left edge as the ``change preferences'' sidecar
+\item
+  notifications are naturally review-oriented rather than configuration-oriented
+\item
+  a right-edge surface lets the current workspace remain visible
+\item
+  it gives the shell a balanced left/right sidecar model:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    left: settings
+  \item
+    right: notification review
+  \end{itemize}
+\end{itemize}
+
+This should be treated as a shell surface, not as a special page.
+
+\section{Feedback ladder}\label{record-053-feedback-ladder}
+
+The shell should make these layers feel distinct:
+
+\subsection{Toast}\label{record-053-toast}
+
+\begin{itemize}
+\tightlist
+\item
+  ephemeral
+\item
+  low-weight
+\item
+  auto-dismiss
+\item
+  no expectation of deep recall by itself
+\end{itemize}
+
+\subsection{Notification}\label{record-053-notification}
+
+\begin{itemize}
+\tightlist
+\item
+  meaningful enough to matter
+\item
+  shell-managed timing/stacking/routing
+\item
+  still visible in the active workspace context
+\end{itemize}
+
+\subsection{Notification center}\label{record-053-notification-center}
+
+\begin{itemize}
+\tightlist
+\item
+  durable review surface
+\item
+  archive/inbox/history semantics
+\item
+  filterable
+\item
+  reachable through shell affordances and command search
+\end{itemize}
+
+This is the important design rule:
+
+\begin{quote}
+\textbf{Toasts are not inboxes.}
+\end{quote}
+
+If an event may matter after it disappears, the shell needs a review surface.
+
+\section{Relationship to the existing substrate}\label{record-053-relationship-to-the-existing-substrate}
+
+Bijou should build this feature on the notification model that already exists in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/src/notification.ts}{\texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}s}}:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}s}
+\item
+  \texttt{N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}w\allowbreak{}E\allowbreak{}x\allowbreak{}i\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}h\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}
+\end{itemize}
+
+That means:
+
+\begin{itemize}
+\tightlist
+\item
+  no second archive store
+\item
+  no parallel ``notification center state'' that drifts from the notification stack
+\item
+  no bespoke demo-only history format
+\end{itemize}
+
+The shell should own:
+
+\begin{itemize}
+\tightlist
+\item
+  container geometry
+\item
+  entry points
+\item
+  footer cues
+\item
+  focus/scroll/input ownership
+\item
+  review affordances
+\end{itemize}
+
+The app should own:
+
+\begin{itemize}
+\tightlist
+\item
+  notification meaning
+\item
+  optional archived-item actions
+\item
+  optional filter/value policy when custom notification state is supplied
+\end{itemize}
+
+\section{Visual model}\label{record-053-visual-model}
+
+The intended feel is a calm right-edge inbox drawer, not a giant modal wall of prose.
+
+Rough structure:
+
+\begin{CodeBlock}
++--------------------------------------+
+| Notifications                   All |
++--------------------------------------+
+| Live: 2 • Archived: 14              |
+|--------------------------------------|
+| ERROR    2m ago                      |
+| Deploy blocked                       |
+| Runtime failed to boot candidate     |
+| Retry deploy                         |
+|--------------------------------------|
+| WARNING  4m ago                      |
+| Queue pressure rising                |
+| Latency trending upward              |
+|--------------------------------------|
+| INFO     8m ago                      |
+| Background sync ready                |
++--------------------------------------+
+\end{CodeBlock}
+
+Important properties:
+
+\begin{itemize}
+\tightlist
+\item
+  right-edge shell drawer
+\item
+  short header with title and active filter
+\item
+  compact status line summarizing live vs archived counts
+\item
+  vertically scrollable entries
+\item
+  tone, time, title, message snippet, and optional action cue
+\item
+  no attempt to turn the drawer into a full log viewer
+\end{itemize}
+
+\section{Principles}\label{record-053-principles}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Toasts are not the archive} The stack is for current interruption; the center is for review.
+\item
+  \textbf{The shell owns recovery} Notification review should be as standard as help, search, settings, and quit.
+\item
+  \textbf{The current workspace stays visible} This is a sidecar, not a route transition.
+\item
+  \textbf{Footer tells the truth} The footer should surface a subtle notification/inbox cue so users know the center exists.
+\item
+  \textbf{Filters should stay simple} Start with pragmatic filters that match the existing notification substrate: \texttt{A\allowbreak{}l\allowbreak{}l}, \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}, \texttt{E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}, \texttt{W\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}, \texttt{S\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}, \texttt{I\allowbreak{}n\allowbreak{}f\allowbreak{}o}.
+\item
+  \textbf{Archived actions must be explicit} If an archived notification exposes a follow-up action, the shell should label that clearly as a deliberate review-time action, not pretend the toast never expired.
+\item
+  \textbf{Tests are the spec} The next implementation slice should be driven by failing \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} tests and one proving surface, not by adding another app-specific history modal.
+\end{enumerate}
+
+\section{Proposed v0 API shape}\label{record-053-proposed-v0-api-shape}
+
+The frame should own the container. Apps should provide notification content declaratively.
+
+\begin{CodeBlock}
+interface FrameNotificationCenter<Msg> {
+  readonly title?: string;
+  readonly state: NotificationState<Msg>;
+  readonly filters?: readonly NotificationHistoryFilter[];
+  readonly activeFilter?: NotificationHistoryFilter;
+  readonly onFilterChange?: (filter: NotificationHistoryFilter) => Msg | undefined;
+  readonly onActivateItem?: (item: NotificationRecord<Msg>) => Msg | undefined;
+  readonly emptyLabel?: string;
+}
+
+interface CreateFramedAppOptions<PageModel, Msg> {
+  // existing fields...
+  readonly notificationCenter?: (args: {
+    readonly model: FrameModel<PageModel>;
+    readonly activePage: FramePage<PageModel, Msg>;
+    readonly pageModel: PageModel;
+    readonly runtimeNotifications: NotificationState<never>;
+  }) => FrameNotificationCenter<Msg> | undefined;
+}
+\end{CodeBlock}
+
+Why this shape:
+
+\begin{itemize}
+\tightlist
+\item
+  the shell still owns drawer layout and behavior
+\item
+  apps can expose their own notification state when they already have one
+\item
+  the frame can still provide a fallback center for frame-managed runtime notifications
+\item
+  filters and archived-item activation stay opt-in and explicit
+\end{itemize}
+
+\section{Standard shell behavior}\label{record-053-standard-shell-behavior}
+
+\subsection{Entry points}\label{record-053-entry-points}
+
+The shell should expose a stable way to open notification review:
+
+\begin{itemize}
+\tightlist
+\item
+  a standard shell binding such as \texttt{S\allowbreak{}h\allowbreak{}i\allowbreak{}f\allowbreak{}t\allowbreak{}+\allowbreak{}N}
+\item
+  a command-palette entry like \texttt{O\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{} \allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}
+\item
+  a footer cue that implies review is available
+\end{itemize}
+
+The exact footer copy can evolve, but it should remain small and truthful.
+
+\subsection{Footer cue}\label{record-053-footer-cue}
+
+The footer should not dump archive counts constantly.
+
+It should prioritize:
+
+\begin{itemize}
+\tightlist
+\item
+  live notification count when there are active notices
+\item
+  a subtle inbox/history affordance when the archive is non-empty
+\end{itemize}
+
+The footer cue is discoverability, not a second notification center.
+
+\subsection{Geometry}\label{record-053-geometry}
+
+\begin{itemize}
+\tightlist
+\item
+  anchored to the right edge
+\item
+  bounded width with compact-terminal fallback
+\item
+  keeps the active page visible behind it
+\item
+  owns focus/input while open
+\end{itemize}
+
+\subsection{Scroll and focus}\label{record-053-scroll-and-focus}
+
+\begin{itemize}
+\tightlist
+\item
+  wheel scrolls the drawer when hovered
+\item
+  arrow keys / \texttt{j} / \texttt{k} move through entries
+\item
+  \texttt{d} / \texttt{u}, \texttt{g} / \texttt{G} page and jump
+\item
+  the underlying workspace does not keep reacting while the drawer is open
+\end{itemize}
+
+\subsection{Filters}\label{record-053-filters}
+
+v0 filters should stay aligned with the notification model already in the repo:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{A\allowbreak{}l\allowbreak{}l}
+\item
+  \texttt{A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}
+\item
+  \texttt{E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}
+\item
+  \texttt{W\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}
+\item
+  \texttt{S\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}
+\item
+  \texttt{I\allowbreak{}n\allowbreak{}f\allowbreak{}o}
+\end{itemize}
+
+Cycling filters with one key is acceptable in v0. A richer row/segmented filter control can come later if it proves necessary.
+
+\subsection{Archived-item activation}\label{record-053-archived-item-activation}
+
+Archived items should only expose a primary action when the app provides one explicitly.
+
+That action should be framed honestly:
+
+\begin{itemize}
+\tightlist
+\item
+  ``Run again''
+\item
+  ``Open details''
+\item
+  ``Retry''
+\end{itemize}
+
+not as if the archived notification were still a live toast waiting for immediate response.
+
+\section{v0 proving surfaces}\label{record-053-v0-proving-surfaces}
+
+The first proving surfaces should be:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  the framed notifications lab in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/examples/notifications/main.ts}{examples/notifications/main.ts}
+\item
+  frame-managed runtime notifications in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}
+\end{enumerate}
+
+DOGFOOD should adopt the shell cues later, but it should not be forced to invent fake notifications just to validate the shell container.
+
+\section{Out of scope for v0}\label{record-053-out-of-scope-for-v0}
+
+The first slice should \textbf{not} try to solve everything:
+
+\begin{itemize}
+\tightlist
+\item
+  unread/read persistence
+\item
+  cross-session archive storage
+\item
+  grouped threads or notification threads
+\item
+  a full log viewer
+\item
+  snooze/remind-later workflows
+\item
+  per-notification custom drawer layouts
+\item
+  replacing structured app logs
+\end{itemize}
+
+Those can come later if the shell-owned review surface proves valuable.
+
+\section{What success looks like}\label{record-053-what-success-looks-like}
+
+When this is done well:
+
+\begin{itemize}
+\tightlist
+\item
+  a user sees a toast, misses it, and still knows where to go later
+\item
+  a framed app gets durable notification review without a custom history modal
+\item
+  the footer hints that review exists without becoming noisy
+\item
+  notification review feels like part of the shell family instead of another isolated overlay
+\end{itemize}
+
+\section{Recommended implementation order}\label{record-053-recommended-implementation-order}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add failing \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} tests for a shell-owned notification center:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    open/close
+  \item
+    scroll ownership
+  \item
+    filter changes
+  \item
+    footer cue
+  \item
+    command-palette entry
+  \end{itemize}
+\item
+  Add one focused proving surface in the framed notifications lab.
+\item
+  Implement the right-edge drawer and shell routing in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}.
+\item
+  Reuse the existing notification archive model instead of introducing new storage.
+\item
+  Only after that, consider archived-item actions and richer inbox semantics.
+\end{enumerate}
+

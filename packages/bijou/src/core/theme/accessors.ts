@@ -13,7 +13,7 @@ export interface ThemeAccessors {
   border(key: keyof Theme['border']): TokenValue;
   /** Look up a surface color token. */
   surface(key: keyof Theme['surface']): TokenValue;
-  /** Look up a status color token with fallback to `'muted'`. */
+  /** Look up a status color token, falling back to `semantic.muted` when unknown. */
   status(key: string): TokenValue;
   /** Look up a UI element color token with fallback to `semantic.primary`. */
   ui(key: string): TokenValue;
@@ -43,7 +43,13 @@ export function createThemeAccessors(theme: ResolvedTheme): ThemeAccessors {
       try {
         return tokenGraph.get(`status.${key}`, mode);
       } catch {
-        return tokenGraph.get('status.muted', mode);
+        // `semantic.muted`, not `status.muted`. The two share a hex in every
+        // shipped preset, but `status.muted` also carries `strikethrough` — so an
+        // unknown key used to render struck through, which reads as "cancelled"
+        // rather than "de-emphasised" and says something the caller never did.
+        // This also matches the sibling `ui()` fallback, which already reaches
+        // into `semantic`.
+        return tokenGraph.get('semantic.muted', mode);
       }
     },
     ui: (key) => {

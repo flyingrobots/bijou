@@ -1,0 +1,116 @@
+\chapter{DX-016 --- Scenario Provenance Tags For Intelligent Bench Filtering}\label{record-323}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX-016-scenario-provenance-tags.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DX-016 — Scenario Provenance Tags For Intelligent Bench Filtering
+lane: retro
+
+\end{RecordMeta}
+
+\section{Disposition}\label{record-323-disposition}
+
+Shipped scenario provenance tags across the bench registry. Scenarios now declare stable lowercase tags, the CLI supports tag-filtered run/list flows with comma-separated AND inside one --tag and OR across repeated --tag flags, bench docs explain the contract, and focused bench tests cover tag parsing and selection.
+
+\section{Original Proposal}\label{record-323-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-323-idea}
+
+Add a \texttt{t\allowbreak{}a\allowbreak{}g\allowbreak{}s\allowbreak{}:\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}o\allowbreak{}n\allowbreak{}l\allowbreak{}y\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}[\allowbreak{}]} field to the \texttt{S\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o} interface in \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}. Tags describe what a scenario exercises, not what it looks like:
+
+\begin{CodeBlock}
+interface Scenario<State> {
+  // ...existing fields...
+  readonly tags: readonly string[];
+}
+
+// Example:
+export const paintGradientRgb: Scenario<State> = {
+  id: 'paint-gradient-rgb',
+  tags: ['paint', 'setRGB', 'unique-styles', 'no-hex-parse'],
+  // ...
+};
+\end{CodeBlock}
+
+Harnesses can then filter:
+
+\begin{CodeBlock}
+# Run everything that exercises the diff path
+bench run --tag=diff
+
+# Run everything that stresses unique style count
+bench run --tag=unique-styles
+
+# Run the RE-017 gate set
+bench run --tag=re017-gate
+\end{CodeBlock}
+
+Multi-tag logic: \texttt{-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}=\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{},\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f} = AND, \texttt{-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}=\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}=\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f} = OR (or pick one convention and document it).
+
+\section{Why}\label{record-323-why}
+
+The scenario registry will grow. RE-017 has 4 scenarios today but the full target is 20+ across paint / diff / layout / compose / text categories. Running ``all scenarios'' will become slow and scatter attention. We need a way to say ``just run the ones that could have been affected by my change'':
+
+\begin{itemize}
+\tightlist
+\item
+  Touched the differ? \texttt{-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}=\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f}
+\item
+  Touched the layout engine? \texttt{-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}=\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t}
+\item
+  Touched hex parsing? \texttt{-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}=\allowbreak{}h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e}
+\item
+  Landing a perf optimization that only affects paint? \texttt{-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}=\allowbreak{}p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t}
+\end{itemize}
+
+\section{Why This Is Cool}\label{record-323-why-this-is-cool}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Lets CI gates be precise.} A PR that only touches the layout code can run \texttt{-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g\allowbreak{}=\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t} in CI and skip diff scenarios --- faster feedback, same signal.
+\item
+  \textbf{Self-documenting.} Tags describe the \emph{intent} of each scenario. Reading the registry at a glance tells you what's covered and where gaps are.
+\item
+  \textbf{Enables coverage tracking.} ``Do we have a scenario tagged \texttt{e\allowbreak{}m\allowbreak{}o\allowbreak{}j\allowbreak{}i}?'' becomes easy to answer. Missing tags = missing coverage.
+\item
+  \textbf{Pairs with the sandbox harness.} The interactive sandbox (task I-7) could offer tag-based scenario selection in its UI.
+\end{enumerate}
+
+\section{Shape}\label{record-323-shape}
+
+Propose a tag vocabulary (append as the registry grows):
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Path tags:} \texttt{p\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}t}, \texttt{d\allowbreak{}i\allowbreak{}f\allowbreak{}f}, \texttt{l\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t}, \texttt{n\allowbreak{}o\allowbreak{}r\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}i\allowbreak{}z\allowbreak{}e}, \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}e}, \texttt{r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e}.
+\item
+  \textbf{API tags:} \texttt{s\allowbreak{}e\allowbreak{}t}, \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}R\allowbreak{}G\allowbreak{}B}, \texttt{b\allowbreak{}l\allowbreak{}i\allowbreak{}t}, \texttt{f\allowbreak{}i\allowbreak{}l\allowbreak{}l}, \texttt{c\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}r}.
+\item
+  \textbf{Stress tags:} \texttt{u\allowbreak{}n\allowbreak{}i\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}s}, \texttt{s\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f}, \texttt{d\allowbreak{}e\allowbreak{}n\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}f}, \texttt{h\allowbreak{}e\allowbreak{}x\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}r\allowbreak{}s\allowbreak{}e}, \texttt{s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e}, \texttt{e\allowbreak{}m\allowbreak{}o\allowbreak{}j\allowbreak{}i}, \texttt{w\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}-\allowbreak{}c\allowbreak{}h\allowbreak{}a\allowbreak{}r}.
+\item
+  \textbf{Shape tags:} \texttt{s\allowbreak{}m\allowbreak{}a\allowbreak{}l\allowbreak{}l}, \texttt{m\allowbreak{}e\allowbreak{}d\allowbreak{}i\allowbreak{}u\allowbreak{}m}, \texttt{l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e}, \texttt{x\allowbreak{}l\allowbreak{}a\allowbreak{}r\allowbreak{}g\allowbreak{}e}.
+\item
+  \textbf{Gate tags:} \texttt{r\allowbreak{}e\allowbreak{}0\allowbreak{}1\allowbreak{}7\allowbreak{}-\allowbreak{}g\allowbreak{}a\allowbreak{}t\allowbreak{}e}, \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e}, \texttt{n\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t\allowbreak{}l\allowbreak{}y}.
+\end{itemize}
+
+A scenario typically has 3-5 tags. Tags are lowercase, hyphenated, stable (renaming a tag is a backwards-incompatible change).
+
+\section{Related}\label{record-323-related}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}o\allowbreak{}s\allowbreak{}/\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- where the field lands.
+\item
+  \texttt{b\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}l\allowbreak{}i\allowbreak{}.\allowbreak{}t\allowbreak{}s} --- where \texttt{-\allowbreak{}-\allowbreak{}t\allowbreak{}a\allowbreak{}g} is consumed.
+\item
+  Task \texttt{\#\allowbreak{}1\allowbreak{}8} (I-7) --- sandbox can use tags for scenario selection.
+\item
+  Task \texttt{\#\allowbreak{}3\allowbreak{}5} --- the CI gate that consumes tag filters.
+\end{itemize}
+

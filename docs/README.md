@@ -1,55 +1,54 @@
-# DOCUMENTATION
-
-This is the repo documentation map for Bijou. Documentation is organized by
-intent. Do not audit the repository by recursively walking the filesystem;
-follow the entrypoints below.
-
-Current Truth: start with the root README, this repo documentation map, and the
-entrypoints below. For live work tracking, use open GitHub Issues and labels;
-`docs/method/` preserves evidence and history.
-
-## Entrypoints
+# Bijou documentation
 
 | Surface | Role |
 | :--- | :--- |
-| **[README.md](../README.md)** | Public front door: package map, quick start, and positioning. |
-| **[GUIDE.md](../GUIDE.md)** | Orientation: the fast path and monorepo orchestration. |
-| **[DOGFOOD](./DOGFOOD.md)** | Canonical human-facing docs app. Run `npm run dogfood`. |
-| **[ARCHITECTURE.md](../ARCHITECTURE.md)** | Structural reference: ports, adapters, and package responsibilities. |
-| **[ADVANCED_GUIDE.md](../ADVANCED_GUIDE.md)** | Deep dives: pipeline, motion, shaders, and proving workflows. |
-| **[Terminal Scenarios](./guides/terminal-scenarios.md)** | End-to-end guide for colored output, forms, TUI apps, and shader renderers. |
-| **[Framed App Tutorial](./guides/framed-app-tutorial.md)** | Middle path between the tiny counter and DOGFOOD-scale framed apps. |
+| [Project README](../README.md) | Public front door |
+| [Teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf) | Build and test the job monitor |
+| [Design Archive](./book/bijou-archive.pdf) | Historical design records |
+| [Complete edition](./book/bijou-designs.pdf) | Frozen teaching and historical collection |
 
-## Doctrine and Direction
+[Read the teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf), use the
+[Design Archive](./book/bijou-archive.pdf), or
+[Read the complete book](./book/bijou-designs.pdf).
+See [LaTeX sources and edition details](./book/README.md).
 
-| Signpost | Role |
-| :--- | :--- |
-| **[VISION](./VISION.md)** | Core tenets and project identity. |
-| **[BEARING](./BEARING.md)** | Current direction and active tensions. |
-| **[METHOD](./METHOD.md)** | Repo work doctrine: backlog lanes and the cycle loop. |
-| **[method/backlog/README.md](./method/backlog/README.md)** | Historical evidence: older backlog lanes and shaped release lineage. |
-| **[strategy/README.md](./strategy/README.md)** | Doctrine map: living strategy notes vs historical planning artifacts. |
-| **[Design Cycles](./design/README.md)** | Active and landed cycle design docs. |
-| **[Legends](./legends/README.md)** | Thematic intent by lane and doctrine family. |
-| **[System-Style JS](./system-style-javascript.md)** | Engineering doctrine: boundaries, adapters, and codecs. |
-| **[TypeScript Code Standards](./typescript-code-standards.editors-edition.md)** | Verbatim Code Dojo doctrine for humans and agents touching TypeScript, tests, adapters, scripts, or architecture. |
-| **[Code Dojo Exceptions](./code-dojo-exceptions.md)** | Standards-debt ledger and 50-violation-per-goalpost burndown policy. |
-| **[Documentation Standards](./DOCUMENTATION_STANDARDS.md)** | Reader-task page types, corpus ownership, examples, accessibility, and upkeep policy. |
-| **[Design System](./design-system/README.md)** | Foundations, patterns, and component families. |
+The teaching book follows a job monitor through five Parts: why Bijou, building
+the application, understanding its machinery, making it dependable, and shipping
+and maintaining it. It includes practical reference material and the component atlas.
 
-## Reference
+The archive preserves 426 guides, principles, design records,
+release notes, audits and retrospectives as historical appendices. Their original
+claims and status have not been reclassified as current implementation guarantees.
+The complete edition preserves the combined 20 October 2026 publication. The live
+teaching book and its LaTeX sources now belong to the job-monitor repository.
+Individual source Markdown files remain removed;
+their exact text and hashes survive in the frozen corpus for DOGFOOD and checks.
 
-| Surface | Role |
-| :--- | :--- |
-| **[CLI](./CLI.md)** | Command surface: binaries and operator scripts. |
-| **[MCP](./MCP.md)** | MCP server posture and tool reference. |
-| **[Packed Bijou Cell Receipts](./reference/packed-bijou-cells.md)** | Exact `packed-bijou-cells/1` schema, validation diagnostics, and byte-preserving `Surface` adaptation. |
-| **[Profunctor Page Inspection](./reference/profunctor-page-inspection.md)** | Exact `lowerProfunctorPageArtifacts()` inputs, modes, outputs, diagnostics, and bounded target posture. |
-| **[Technical Teardown](./TECHNICAL_TEARDOWN.md)** | End-to-end architecture and runtime explanation for new readers. |
-| **[guides/render-pipeline.md](./guides/render-pipeline.md)** | Concrete render-stage guide for `configurePipeline()`, `RenderState`, and stage-order truth. |
-| **[CHANGELOG.md](./CHANGELOG.md)** | Historical truth of merged behavior. |
-| **[ROADMAP](./ROADMAP.md)** | Reference-only strategic horizon, not the active queue. |
-| **[specs/README.md](./specs/README.md)** | Spec artifact format, acceptance criteria conventions, and validation guidance. |
+For a bounded source excerpt, run from the repository root:
 
----
-**For a machine-readable inventory of all documentation, run `npm run docs:inventory`.**
+```bash
+node --import tsx scripts/read-documentation.ts docs/ARCHITECTURE.md 1 80
+```
+
+The arguments are the original path, first line and line limit (maximum 250).
+`npm run docs:inventory` lists the retained operating documents and book artifacts.
+
+Start with the teaching book's Preface and version page. Every teaching Part
+has an introduction and a concrete learning outcome. The seven workshops use the
+separate [published companion repository](https://github.com/flyingrobots/bijou-job-monitor),
+pinned to Bijou 7.2.0 at edition `book-v2`. Five independent build stages, actual
+source diffs and an explained exercise answer key support the workshops. The human
+walkthrough is prepared; the user will arrange an unfamiliar reader.
+The glossary and topic finder support practical lookup.
+
+## Current operating references
+
+- [Project front door](../README.md)
+- [Agent agreements](../AGENTS.md)
+- [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
+- [Code Dojo exceptions and debt](./code-dojo-exceptions.md)
+- [Changelog](./CHANGELOG.md)
+- [Framed app tutorial](./guides/framed-app-tutorial.md)
+
+GitHub issues and milestones own current scope. Historical proposals in the book
+retain their original status. Linear migration still requires a connected team.

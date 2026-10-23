@@ -1,0 +1,73 @@
+\chapter{Guide --- Bijou}\label{record-008}
+
+\noindent{\footnotesize\color{BookMuted}\path{GUIDE.md}\par}\smallskip
+
+This is the developer-level operator guide for Bijou. Use it for orientation, the productive-fast path, and to understand how the monorepo packages orchestrate the terminal surface.
+
+For deep-track doctrine, render pipeline internals, and repository-wide engineering standards, use \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/ADVANCED_GUIDE.md}{ADVANCED\_GUIDE.md}.
+
+\section{Choose Your Lane}\label{record-008-choose-your-lane}
+
+\subsection{1. Build a CLI or Script}\label{record-008-build-a-cli-or-script}
+
+Use the core toolkit for prompts, structured output, and environment detection. - \textbf{Read}: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/GUIDE.md}{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} Guide} - \textbf{Host}: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-node/GUIDE.md}{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} Guide}
+
+\subsection{2. Build an Interactive TUI}\label{record-008-build-an-interactive-tui}
+
+Use the TEA runtime for full-screen applications with layout, motion, and overlays. - \textbf{Read}: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-tui/GUIDE.md}{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} Guide} - \textbf{Host}: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-node/GUIDE.md}{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} Guide}
+
+\subsection{3. Build a Framed App}\label{record-008-build-a-framed-app}
+
+Use the compact framed app tutorial when the counter is too small but DOGFOOD is too large to learn from. - \textbf{Run}: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e} - \textbf{Read}: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/guides/framed-app-tutorial.md}{Framed app tutorial}
+
+\subsection{4. Learn the Monorepo}\label{record-008-learn-the-monorepo}
+
+Understand the project's identity, work doctrine, and architectural boundaries. - \textbf{Read}: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/README.md}{\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}} (The Documentation Map) - \textbf{Read}: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/VISION.md}{\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}V\allowbreak{}I\allowbreak{}S\allowbreak{}I\allowbreak{}O\allowbreak{}N\allowbreak{}.\allowbreak{}m\allowbreak{}d}} (Core Tenets) - \textbf{Read}: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/WORKFLOW.md}{Contributor workflow}
+
+\subsection{5. Proving Ground}\label{record-008-proving-ground}
+
+See Bijou in action by running the documentation app. - \textbf{Run}: \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d} - \textbf{Read}: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/DOGFOOD.md}{\texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}}
+
+\section{Big Picture: Package Orchestration}\label{record-008-big-picture-package-orchestration}
+
+Bijou is a tiered engine. You choose your depth based on the task:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} (Foundation)}: Pure TypeScript. No I/O. Logic for boxes, tables, trees, and prompts. This layer produces \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} or \texttt{L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}N\allowbreak{}o\allowbreak{}d\allowbreak{}e} objects.
+\item
+  \textbf{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} (Engine)}: The TEA loop. It orchestrates those surfaces, manages focus, drives animations, and calculates the minimal ANSI delta to update the screen.
+\item
+  \textbf{\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} (Host)}: The physical bridge. It provides the terminal dimensions, handles \texttt{s\allowbreak{}t\allowbreak{}d\allowbreak{}i\allowbreak{}n} events, and emits the final ANSI bytes to \texttt{s\allowbreak{}t\allowbreak{}d\allowbreak{}o\allowbreak{}u\allowbreak{}t}.
+\end{enumerate}
+
+\section{Orientation Checklist}\label{record-008-orientation-checklist}
+
+\begin{itemize}
+\tightlist
+\item[$\square$]
+  \textbf{I am building a standalone tool}: Start with \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item[$\square$]
+  \textbf{I am building a full-screen dashboard}: Start with \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item[$\square$]
+  \textbf{I need to localize my app}: Start with \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item[$\square$]
+  \textbf{I am debugging the render loop}: Start with \texttt{A\allowbreak{}D\allowbreak{}V\allowbreak{}A\allowbreak{}N\allowbreak{}C\allowbreak{}E\allowbreak{}D\allowbreak{}\_\allowbreak{}G\allowbreak{}U\allowbreak{}I\allowbreak{}D\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d}.
+\item[$\square$]
+  \textbf{I am contributing to the repository}: Start with \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}O\allowbreak{}R\allowbreak{}K\allowbreak{}F\allowbreak{}L\allowbreak{}O\allowbreak{}W\allowbreak{}.\allowbreak{}m\allowbreak{}d} and the GitHub issue tracker.
+\end{itemize}
+
+\section{Rule of Thumb}\label{record-008-rule-of-thumb}
+
+For a comprehensive inventory, use \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/README.md}{docs/README.md}.
+
+For current work and planned releases, use \href{https://github.com/flyingrobots/bijou/issues}{GitHub issues} and \href{https://github.com/flyingrobots/bijou/milestones}{milestones}.
+
+New to the project? Start with the \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/README.md}{README.md} and the package guides linked above.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{The goal is to move the terminal from a collection of widgets to a professional application bedrock.}
+

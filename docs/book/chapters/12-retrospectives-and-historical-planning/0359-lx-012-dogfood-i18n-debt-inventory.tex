@@ -1,0 +1,73 @@
+\chapter{LX-012 --- DOGFOOD i18n Debt Inventory}\label{record-359}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/LX-012-dogfood-i18n-debt-inventory.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "LX-012 — DOGFOOD i18n Debt Inventory"
+legend: LX
+lane: retro
+
+\end{RecordMeta}
+
+Completed on \texttt{c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}/\allowbreak{}l\allowbreak{}x\allowbreak{}-\allowbreak{}0\allowbreak{}1\allowbreak{}2\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}-\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y}.
+
+DOGFOOD now has a deterministic source inventory for remaining localizable UI strings. The inventory groups raw localizable strings by source surface, filters out nonlocalizable ids, file paths, import paths, and cataloged fallback calls, and enforces the current count through \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t}. The release readiness plan includes the new ratchet so future DOGFOOD work cannot silently increase the counted localization debt.
+
+\section{Original Proposal}\label{record-359-original-proposal}
+
+LX-011 added the first DOGFOOD locale preference ratchet, but most visible DOGFOOD copy can still enter the app as raw English strings in pages, previews, and examples.
+
+Problem:
+
+\begin{itemize}
+\tightlist
+\item
+  DOGFOOD now has a localization seam, but no counted inventory of the remaining localizable UI copy.
+\item
+  New surfaces can add English strings without making the debt visible.
+\item
+  Reviewers cannot distinguish intentionally literal examples from user-facing copy that should move through catalogs.
+\end{itemize}
+
+Desired outcome:
+
+\begin{itemize}
+\tightlist
+\item
+  Add a deterministic DOGFOOD i18n debt inventory grouped by surface area.
+\item
+  Count localizable UI strings and ratchet the count downward or hold it steady.
+\item
+  Separate true nonlocalizable identifiers, code examples, and fixture literals from visible application copy.
+\item
+  Make the report useful in code review without relying on rendered screenshots or fragile stdout snapshots.
+\end{itemize}
+
+Why ASAP:
+
+\begin{itemize}
+\tightlist
+\item
+  The Settings locale selector made localization visible to users.
+\item
+  The next DOGFOOD documentation and Blocks work will otherwise keep adding English-only copy.
+\item
+  A counted debt ledger lets catalog expansion happen incrementally without pretending the whole app is translated.
+\end{itemize}
+
+Hill:
+
+A maintainer can run one deterministic check and see which DOGFOOD surfaces still contain localizable English, what changed, and whether the branch increased or reduced the debt.
+
+Non-goals:
+
+\begin{itemize}
+\tightlist
+\item
+  Do not translate all DOGFOOD copy in this cycle.
+\item
+  Do not block markdown source documentation that is intentionally prose.
+\item
+  Do not infer localization coverage by scraping terminal render output.
+\end{itemize}
+

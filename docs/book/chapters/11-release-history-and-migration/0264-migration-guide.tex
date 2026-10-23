@@ -1,0 +1,398 @@
+\chapter{Migration Guide: Bijou v4.0.0 To v4.1.0}\label{record-264}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/4.1.0/migration-guide.md}\par}\smallskip
+
+This guide is for users already on \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} who want to move to \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}.
+
+If you are coming from an older major line, read \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/MIGRATING_TO_V4.md}{\texttt{M\allowbreak{}I\allowbreak{}G\allowbreak{}R\allowbreak{}A\allowbreak{}T\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}\_\allowbreak{}T\allowbreak{}O\allowbreak{}\_\allowbreak{}V\allowbreak{}4\allowbreak{}.\allowbreak{}m\allowbreak{}d}} first.
+
+\section{Migration At A Glance}\label{record-264-migration-at-a-glance}
+
+Not every user has real migration work to do.
+
+\input{tables/table-075}
+
+\section{Upgrade Checklist}\label{record-264-upgrade-checklist}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Upgrade all Bijou packages together to the same version.
+\item
+  Rebuild and re-typecheck before making behavioral changes.
+\item
+  Audit framed-shell typing if you use \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}.
+\item
+  Audit custom command code if you rely on long-lived effects or subscriptions.
+\item
+  Replace shell-folklore assumptions with exported layer/runtime helpers where possible.
+\item
+  Adopt the new localization packages only if you need that surface.
+\item
+  Re-run your fullscreen and shell interaction tests, especially for help/settings/notification/quit flows.
+\end{enumerate}
+
+\section{1. Upgrade In Lock-Step}\label{record-264-upgrade-in-lock-step}
+
+Bijou still versions its published packages in lock-step.
+
+Upgrade the packages you use together:
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou@4.1.0 @flyingrobots/bijou-node@4.1.0
+\end{CodeBlock}
+
+Add the fullscreen packages if your app uses them:
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou-tui@4.1.0 @flyingrobots/bijou-tui-app@4.1.0
+\end{CodeBlock}
+
+If you adopt the new localization surface, also add the relevant i18n packages:
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou-i18n@4.1.0 @flyingrobots/bijou-i18n-tools@4.1.0
+\end{CodeBlock}
+
+If you also need filesystem or XLSX exchange adapters, install those in the same lock-step release:
+
+\begin{CodeBlock}
+npm install @flyingrobots/bijou-i18n-tools-node@4.1.0 @flyingrobots/bijou-i18n-tools-xlsx@4.1.0
+\end{CodeBlock}
+
+These i18n packages are part of the \texttt{4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} automated publish surface, so they land together with the rest of the workspace in this release.
+
+\section{2. Framed Apps: Move Onto The Typed Shell Surface}\label{record-264-framed-apps-move-onto-the-typed-shell-surface}
+
+If your app uses \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}, this is the migration area most likely to matter.
+
+The shell now exports explicit framed message and update helpers:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>}
+\item
+  \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}U\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}<\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{},\allowbreak{} \allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>}
+\item
+  \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>}
+\item
+  \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}U\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}<\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{},\allowbreak{} \allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>}
+\item
+  \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}<\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{},\allowbreak{} \allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>}
+\end{itemize}
+
+\subsection{What to change}\label{record-264-what-to-change}
+
+\begin{itemize}
+\tightlist
+\item
+  stop treating framed page updates as effectively \texttt{a\allowbreak{}n\allowbreak{}y}
+\item
+  update explicit type annotations that assumed page messages were only your raw app \texttt{M\allowbreak{}s\allowbreak{}g}
+\item
+  update tests that asserted the framed shell collapsed everything back to plain \texttt{M\allowbreak{}s\allowbreak{}g}
+\end{itemize}
+
+\subsection{Typical before/after mindset}\label{record-264-typical-beforeafter-mindset}
+
+Before:
+
+\begin{itemize}
+\tightlist
+\item
+  the page/shell seam was often typed loosely
+\item
+  external casts papered over framed-shell complexity
+\end{itemize}
+
+After:
+
+\begin{itemize}
+\tightlist
+\item
+  the page/shell seam should stay typed explicitly
+\item
+  page updates should accept \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>} where appropriate
+\item
+  framed app updates should be allowed to return \texttt{C\allowbreak{}m\allowbreak{}d\allowbreak{}<\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>\allowbreak{}>\allowbreak{}[\allowbreak{}]}
+\end{itemize}
+
+If your code was already mostly inference-driven and you were not fighting the shell types directly, you may have little to change. If you have custom wrapper helpers around \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}, inspect them carefully.
+
+\section{3. Commands: Stop Pretending They Only End In Messages}\label{record-264-commands-stop-pretending-they-only-end-in-messages}
+
+\texttt{C\allowbreak{}m\allowbreak{}d\allowbreak{}<\allowbreak{}M\allowbreak{}>} now models the runtime more honestly.
+
+A command may now:
+
+\begin{itemize}
+\tightlist
+\item
+  complete synchronously or asynchronously
+\item
+  emit intermediate messages through \texttt{e\allowbreak{}m\allowbreak{}i\allowbreak{}t\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  resolve to a final message
+\item
+  resolve to \texttt{Q\allowbreak{}U\allowbreak{}I\allowbreak{}T}
+\item
+  return a cleanup handle or cleanup function
+\item
+  resolve to \texttt{v\allowbreak{}o\allowbreak{}i\allowbreak{}d}
+\end{itemize}
+
+\subsection{What to look for}\label{record-264-what-to-look-for}
+
+\begin{itemize}
+\tightlist
+\item
+  custom command wrappers that assume every command returns a final message
+\item
+  tests that stub commands as only \texttt{P\allowbreak{}r\allowbreak{}o\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}e\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{} \allowbreak{}|\allowbreak{} \allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}|\allowbreak{} \allowbreak{}Q\allowbreak{}U\allowbreak{}I\allowbreak{}T\allowbreak{}>}
+\item
+  child-app command mapping that accidentally discards cleanup results
+\end{itemize}
+
+\subsection{What to do}\label{record-264-what-to-do}
+
+\begin{itemize}
+\tightlist
+\item
+  widen your local command typings if you mirrored the old narrower contract
+\item
+  prefer the built-in sub-app lifecycle helpers if you were manually coercing command results
+\item
+  treat cleanup-producing commands as first-class runtime work, not as hacks that need \texttt{a\allowbreak{}n\allowbreak{}y}
+\end{itemize}
+
+If you only use built-in helpers like \texttt{t\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}, \texttt{a\allowbreak{}n\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}, or normal message-returning commands, this may be invisible to you. The migration is most relevant for custom runtime work and command composition helpers.
+
+\section{4. Shell Layers: Use The Exported Truth}\label{record-264-shell-layers-use-the-exported-truth}
+
+If you wrote code or tests that reason about shell layering indirectly, update them to prefer the exported shell inspection surface:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  \texttt{a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\item
+  \texttt{u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}
+\end{itemize}
+
+\subsection{Why this matters}\label{record-264-why-this-matters}
+
+Since \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}, the shell has become more explicit about:
+
+\begin{itemize}
+\tightlist
+\item
+  topmost-layer ownership
+\item
+  dismissal order
+\item
+  footer/help truth
+\item
+  settings/search/help/notification/quit layering
+\end{itemize}
+
+That means older tests or utilities that inferred shell state from raw render order, footer strings, or branch order inside \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} are more likely to drift.
+
+\subsection{What to re-test}\label{record-264-what-to-re-test}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c} behavior
+\item
+  search/help/settings transitions
+\item
+  notification center and history behavior
+\item
+  quit confirmation flows
+\item
+  mouse shielding while exclusive overlays are open
+\end{itemize}
+
+\section{5. Runtime Internals: Prefer Engine Seams Over Shell Folklore}\label{record-264-runtime-internals-prefer-engine-seams-over-shell-folklore}
+
+If you extend or inspect runtime internals directly, start moving toward the explicit runtime-engine exports introduced since \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}.
+
+The relevant surfaces are the \texttt{R\allowbreak{}E} slices:
+
+\begin{itemize}
+\tightlist
+\item
+  state machine and view stack ownership
+\item
+  retained layouts and invalidation
+\item
+  layout-driven input routing
+\item
+  command/effect buffering
+\item
+  component layout and interaction contracts
+\end{itemize}
+
+This does \textbf{not} mean the migration is complete. The repo still tracks \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}{RE-007} because some framed-shell behavior still needs to move more fully onto those seams.
+
+The practical rule is:
+
+\begin{itemize}
+\tightlist
+\item
+  prefer exported runtime seams where they exist
+\item
+  avoid adding new shell-only branch-order logic if you can use the runtime-engine model instead
+\end{itemize}
+
+\section{6. Localization Is Opt-In, Not Forced}\label{record-264-localization-is-opt-in-not-forced}
+
+If you do not need localization, you do not need to migrate code just because the new localization packages exist.
+
+If you do want localization, \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} gives you a real substrate:
+
+\begin{itemize}
+\tightlist
+\item
+  runtime locale/direction contracts
+\item
+  tools for catalogs and exchange workflows
+\item
+  Node filesystem adapters
+\item
+  XLSX-oriented tooling
+\item
+  localized shell chrome and DOGFOOD surfaces
+\end{itemize}
+
+That is an adoption opportunity, not a forced migration.
+
+\section{7. Docs And DOGFOOD Usually Require No App Migration}\label{record-264-docs-and-dogfood-usually-require-no-app-migration}
+
+Most of the DOGFOOD, design-system, METHOD, and release-doc work does not require code changes in downstream apps.
+
+It does change what is now available to you:
+
+\begin{itemize}
+\tightlist
+\item
+  a much more complete field guide
+\item
+  stronger component-family guidance
+\item
+  clearer repo doctrine and release documentation
+\end{itemize}
+
+Treat these as improved references, not breaking changes.
+
+\section{8. Validation Checklist After Upgrading}\label{record-264-validation-checklist-after-upgrading}
+
+For a normal app upgrade, run at least:
+
+\begin{CodeBlock}
+npm run build
+npm test
+\end{CodeBlock}
+
+If your app uses TypeScript and the fullscreen runtime, also run your typecheck and any shell smoke tests you have.
+
+Pay special attention to:
+
+\begin{itemize}
+\tightlist
+\item
+  framed shell compile errors
+\item
+  command typing errors
+\item
+  tests around help/settings/search/quit
+\item
+  notification history and overlay behavior
+\item
+  mouse interaction over modal/help/palette surfaces
+\end{itemize}
+
+\section{9. Migration Recommendations By App Shape}\label{record-264-migration-recommendations-by-app-shape}
+
+\subsection{Core CLI / prompt app}\label{record-264-core-cli-prompt-app}
+
+Usually:
+
+\begin{itemize}
+\tightlist
+\item
+  upgrade dependencies
+\item
+  rebuild
+\item
+  read the new docs when you want deeper design-system guidance
+\end{itemize}
+
+\subsection{Fullscreen TUI app without heavy shell customization}\label{record-264-fullscreen-tui-app-without-heavy-shell-customization}
+
+Usually:
+
+\begin{itemize}
+\tightlist
+\item
+  upgrade dependencies
+\item
+  fix any framed typing fallout
+\item
+  re-test shell overlays and interaction flows
+\end{itemize}
+
+\subsection{Fullscreen app with custom shell helpers or runtime extensions}\label{record-264-fullscreen-app-with-custom-shell-helpers-or-runtime-extensions}
+
+Usually:
+
+\begin{itemize}
+\tightlist
+\item
+  audit command typings
+\item
+  audit shell-layer assumptions
+\item
+  move toward exported framed/runtime helpers
+\item
+  re-run high-signal interaction tests
+\end{itemize}
+
+\subsection{Localization-aware app}\label{record-264-localization-aware-app}
+
+Usually:
+
+\begin{itemize}
+\tightlist
+\item
+  decide whether to adopt the new i18n packages now or later
+\item
+  verify package availability in the published release
+\item
+  add localized shell copy incrementally instead of rewriting the whole app at once
+\end{itemize}
+
+\section{Final Advice}\label{record-264-final-advice}
+
+Compared with the \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} migration, \texttt{v\allowbreak{}4\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} is less about one hard boundary change and more about aligning your app with clearer repo truth.
+
+The important upgrades are:
+
+\begin{itemize}
+\tightlist
+\item
+  accept the typed framed-shell surface
+\item
+  accept the more honest \texttt{C\allowbreak{}m\allowbreak{}d\allowbreak{}<\allowbreak{}M\allowbreak{}>} contract
+\item
+  trust exported shell/runtime inspection helpers over folklore
+\item
+  adopt localization only if and when you need it
+\end{itemize}
+
+If your app is mostly core Bijou plus light TUI usage, the migration should be manageable. If you have deep custom shell/runtime code, this is a good release to pay down those assumptions.
+

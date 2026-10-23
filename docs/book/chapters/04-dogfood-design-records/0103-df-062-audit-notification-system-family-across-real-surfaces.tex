@@ -1,0 +1,147 @@
+\chapter{DF-062 Audit notification system family across real surfaces}\label{record-103}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-062-audit-notification-system-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-062 Audit notification system family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - notifications
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-103-framing}
+
+The notification system is the family for transient events that need more structure than one directly composed \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})}: stacking, placement, tones, actions, dismissal, archive/history review, and shell routing.
+
+This audit verifies the family against real story rendering and runtime behavior. The point is not to invent another notice component. The point is to prove that \texttt{p\allowbreak{}u\allowbreak{}s\allowbreak{}h\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}, \texttt{d\allowbreak{}i\allowbreak{}s\allowbreak{}m\allowbreak{}i\allowbreak{}s\allowbreak{}s\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}(\allowbreak{})}, \texttt{t\allowbreak{}i\allowbreak{}c\allowbreak{}k\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}(\allowbreak{})}, \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{})}, \texttt{r\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}N\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}H\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}y\allowbreak{}(\allowbreak{})}, and framed runtime notification routing all still describe one coherent system.
+
+\section{Sponsored Users}\label{record-103-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors deciding when to use a notification system instead of a local toast, alert, log line, drawer, or modal.
+\item
+  Docs readers switching DOGFOOD between interactive, static, pipe, and accessible profiles to see what survives without animation or z-order.
+\item
+  Maintainers who need one focused regression covering notification lifecycle, history, story metadata, and frame-owned routing.
+\end{itemize}
+
+\section{Hills}\label{record-103-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect DOGFOOD and see live stacks, archived history, and frame-routed notifications as one notification-system family.
+\item
+  A reader can switch notification stories through every canonical output mode without losing tone, action, ordering, recall, or routing facts.
+\item
+  A maintainer can run one cycle test that proves notification story docs, component-family doctrine, and runtime behavior have not drifted apart.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-103-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Do DOGFOOD stories show both full notification-system and app-owned transient notification usage?
+\item
+  Do the stories cover live stack, history review, mixed variants, actions, and framed runtime routing?
+\item
+  Do rich/static previews keep notification chrome, stacking, placement, and shell context visible?
+\item
+  Do pipe and accessible lowerings preserve chronological event text without pretending overlay geometry still exists?
+\item
+  Does the runtime still archive dismissed notifications after their exit phase?
+\item
+  Do framed apps still route runtime issues and page \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}y\allowbreak{}(\allowbreak{})} commands through frame-managed notifications?
+\end{itemize}
+
+\section{Requirements}\label{record-103-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep the \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m} and \texttt{t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s} DOGFOOD story identities.
+\item
+  Add a frame-routing variant to the notification-system story.
+\item
+  Render every notification-system story variant in every canonical story profile.
+\item
+  Exercise the real notification lifecycle: push, tick, dismiss, archive, render stack, and render history.
+\item
+  Exercise framed runtime routing through \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})} and \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}y\allowbreak{}(\allowbreak{})}.
+\item
+  Keep constrained lowerings plain, chronological, and semantic-preserving.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-103-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}2\allowbreak{}/\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates DOGFOOD stories for \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m} and \texttt{t\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}c\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s}.
+\item
+  Every documented notification variant renders non-empty output in every profile.
+\item
+  Rich/static output includes structured visual containment; pipe and accessible output do not depend on box drawing.
+\item
+  Constrained lowerings preserve live-stack events, history review, framed routing facts, and app-owned transient notices.
+\item
+  Runtime lifecycle assertions prove notifications can be pushed, ticked, dismissed, archived, stacked, and rendered as history.
+\item
+  Framed app assertions prove runtime issues and page \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}y\allowbreak{}(\allowbreak{})} commands route through frame-managed notifications.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-103-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a framed-routing variant to the notification-system DOGFOOD story.
+\item
+  Add a DF-062 cycle test that renders notification stories through the shared story protocol.
+\item
+  Add runtime assertions for direct notification state and framed app routing.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\end{enumerate}
+
+\section{Drift Check}\label{record-103-drift-check}
+
+The runtime already had deep notification support: stack rendering, history rendering, animated entry/exit phases, history archive, frame-owned runtime notifications, and page-level \texttt{n\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f\allowbreak{}y\allowbreak{}(\allowbreak{})} routing.
+
+The drift was explanatory. DOGFOOD showed stack and history, but it did not make frame-routed notifications visible as part of the same family. This slice adds that story variant and binds it to runtime assertions.
+
+\section{Playback}\label{record-103-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note, and DOGFOOD did not visibly connect frame-managed runtime notifications to the notification-system family.
+\item
+  GREEN: the new cycle test renders notification-system and transient notification stories across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve shell context, stacking, placement, and notification chrome.
+\item
+  Pipe previews preserve chronological event and history text without box drawing.
+\item
+  Accessible previews linearize tone, action, recall, and frame-routing facts.
+\item
+  Runtime assertions prove direct notification lifecycle and framed routing behavior.
+\end{itemize}
+
+\section{Retrospective}\label{record-103-retrospective}
+
+This cycle keeps notifications as a system, not a grab bag of overlays. The important boundary is that local \texttt{t\allowbreak{}o\allowbreak{}a\allowbreak{}s\allowbreak{}t\allowbreak{}(\allowbreak{})} is for one directly composed event, while the notification system owns lifecycle, recall, routing, and shell-level review.
+

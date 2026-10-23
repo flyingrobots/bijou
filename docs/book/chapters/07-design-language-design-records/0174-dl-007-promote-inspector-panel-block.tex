@@ -1,0 +1,267 @@
+\chapter{DL-007 --- Promote Inspector Panel Block}\label{record-174}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-007-promote-inspector-panel-block.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL --- Design Language}
+
+\section{Why this cycle exists}\label{record-174-why-this-cycle-exists}
+
+DL-006 proved the first canonical inspector seam through \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} and the DOGFOOD variants pane.
+
+That gave Bijou a reusable component, but not yet a reusable block.
+
+The design-system block acceptance bar says a structure is ready to become a block when:
+
+\begin{itemize}
+\tightlist
+\item
+  it recurs across more than one surface or product need
+\item
+  its interaction ownership is stable
+\item
+  its patterns are already canonical elsewhere
+\item
+  its lowering story is explicit
+\end{itemize}
+
+This cycle exists to clear that next bar by promoting inspector language into a reusable TUI block helper instead of leaving two drawer-based inspector surfaces to keep hand-composing strings.
+
+\section{Scope of this cycle}\label{record-174-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  one reusable \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} block helper in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}
+\item
+  one refinement to \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} so block composition does not require nested decorative chrome
+\item
+  proving the block in two existing inspector-drawer examples
+\item
+  clear separation between core inspector content semantics and TUI block ownership
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  a generalized shell inspector runtime
+\item
+  inspector state management beyond what the host app already owns
+\item
+  notification-center adoption
+\item
+  guided-flow block promotion
+\end{itemize}
+
+\section{Human users}\label{record-174-human-users}
+
+\subsection{Primary human user}\label{record-174-primary-human-user}
+
+A builder composing shell-attached supplemental context next to an existing primary task.
+
+They need:
+
+\begin{itemize}
+\tightlist
+\item
+  a reusable inspector drawer that already feels calm and structured
+\item
+  one obvious current selection
+\item
+  stable drawer ownership instead of inventing new overlay conventions
+\item
+  no nested-box visual noise
+\end{itemize}
+
+\subsection{Human hill}\label{record-174-human-hill}
+
+A builder can attach a supplemental inspector drawer to a shell surface and get calm current-selection emphasis plus compact titled sections without hand-drawing another ad hoc panel.
+
+\section{Agent users}\label{record-174-agent-users}
+
+\subsection{Primary agent user}\label{record-174-primary-agent-user}
+
+An agent generating or auditing drawer-attached contextual side panels in Bijou.
+
+It needs:
+
+\begin{itemize}
+\tightlist
+\item
+  one block-level helper to target instead of reconstructing drawer + inspector composition
+\item
+  explicit proof that inspector language now recurs across more than one real surface
+\item
+  clear boundaries between core component semantics and TUI block ownership
+\end{itemize}
+
+\subsection{Agent hill}\label{record-174-agent-hill}
+
+An agent can point to one canonical \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} helper, prove it in two example surfaces, and explain what belongs to the core \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} component versus the block helper.
+
+\section{Human playback}\label{record-174-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder opens the compact app-frame demo and toggles its inspector drawer.
+\item
+  The drawer shows the active page/context through the same calm inspector language instead of ad hoc lines.
+\item
+  The builder opens the canonical release-workbench inspector drawer.
+\item
+  The same block language appears there too, even though the surface is richer and region-aware.
+\item
+  The builder can see that inspector panels are now a reusable block, not just one good-looking detail box in DOGFOOD.
+\end{enumerate}
+
+\section{Agent playback}\label{record-174-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent opens the DL-007 cycle doc.
+\item
+  It can identify the promotion seam as \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} plus two existing example surfaces.
+\item
+  It can run cycle and package tests and see explicit assertions for drawer-attached inspector structure in both examples.
+\item
+  It can point to the next design-language backlog item once the cycle is closed.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-174-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/shell-owns-shell-concerns.md}{Shell Owns Shell Concerns}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-174-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  inspector block promotion must prove recurrence in more than one real surface
+\item
+  drawer ownership must stay with the shell/TUI layer, not leak into the core component
+\item
+  core \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} semantics must remain usable outside the block
+\item
+  block composition must not rely on nested decorative chrome to communicate structure
+\item
+  pipe and accessible modes must preserve the same current-selection and section meaning
+\end{itemize}
+
+\section{Implementation outline}\label{record-174-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Move DL-007 into the active cycle area and enrich it with playbacks and invariants.
+\item
+  Write failing cycle and package tests for a reusable \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} helper.
+\item
+  Refine \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} only as needed for clean block composition.
+\item
+  Implement \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}.
+\item
+  Migrate the compact app-frame demo and canonical release-workbench drawer to the block helper.
+\item
+  Close the cycle and spawn the next design-language backlog item.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-174-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}L\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the active cycle doc includes the required workflow sections
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} renders current-selection inspector content inside drawer chrome without losing lowering semantics
+\item
+  the compact app-frame example uses the promoted block
+\item
+  the canonical release-workbench uses the promoted block
+\item
+  the next design-language backlog item exists
+\end{itemize}
+
+\section{Risks}\label{record-174-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  promoting a block too early and freezing the wrong responsibilities
+\item
+  adding so much API shape that the helper becomes harder to use than raw \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})}
+\item
+  coupling the helper too tightly to one example instead of a reusable shell pattern
+\end{itemize}
+
+\section{Out of scope}\label{record-174-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  generalized inspector routing/state
+\item
+  notification-center migration
+\item
+  localization-specific inspector work
+\item
+  guided-flow block promotion
+\end{itemize}
+
+\section{Retrospective}\label{record-174-retrospective}
+
+\subsection{What landed}\label{record-174-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  a new \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} helper in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}
+\item
+  a chrome-less composition mode for \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}(\allowbreak{})} so the block can use drawer chrome without nested decorative boxes
+\item
+  the compact app-frame demo now proves the block in a smaller shell surface
+\item
+  the canonical release-workbench now proves the block in a richer pane-scoped shell surface
+\item
+  cycle and package tests that make inspector block promotion executable instead of only aspirational
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-174-drift-from-ideal}
+
+This cycle did not introduce a generalized inspector runtime or inspector state model.
+
+That was intentional and correct.
+
+The right promotion step was one block helper composed from stable patterns and ownership rules, not a larger shell subsystem.
+
+\subsection{Debt spawned}\label{record-174-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DL-008-promote-guided-flow-block.md}{DL-008 --- Promote Guided Flow Block}
+\end{itemize}
+

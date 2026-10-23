@@ -1,0 +1,18 @@
+\chapter{RE-011 --- Eliminate Per-Frame Allocation in Render Pipeline}\label{record-362}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/inbox/RE-011-pipeline-per-frame-allocation.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+
+\section{Problem}\label{record-362-problem}
+
+\texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}e\allowbreak{}x\allowbreak{}e\allowbreak{}c\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}/\allowbreak{}p\allowbreak{}i\allowbreak{}p\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s} allocates a new \texttt{c\allowbreak{}h\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}[\allowbreak{}]} array every frame by spreading all stage middleware into a flat list. At 60fps this is 60 array allocations per second with no reuse.
+
+\section{Fix}\label{record-362-fix}
+
+Cache the flattened chain array and only rebuild when middleware is added (track a dirty flag on \texttt{u\allowbreak{}s\allowbreak{}e\allowbreak{}(\allowbreak{})}). The chain is static after app initialization in most apps.
+
+\section{Effort}\label{record-362-effort}
+
+Small --- add a dirty flag and cached array.
+

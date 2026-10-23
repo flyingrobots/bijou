@@ -1,0 +1,161 @@
+\chapter{WF-132 - Release Readiness And DOGFOOD I18n Gates}\label{record-214}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-132-release-readiness-and-dogfood-i18n-gates.md}\par}\smallskip
+
+\section{Status}\label{record-214-status}
+
+In progress for issues \href{https://github.com/flyingrobots/bijou/issues/270}{\#270} and \href{https://github.com/flyingrobots/bijou/issues/312}{\#312}.
+
+\section{Linked Legend}\label{record-214-linked-legend}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{l\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}:\allowbreak{}w\allowbreak{}f} for release workflow readiness.
+\item
+  \texttt{l\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}:\allowbreak{}d\allowbreak{}f} for DOGFOOD docs-surface coverage.
+\item
+  \texttt{l\allowbreak{}e\allowbreak{}g\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}:\allowbreak{}l\allowbreak{}x} for localization debt and scanner behavior.
+\end{itemize}
+
+\section{Sponsors}\label{record-214-sponsors}
+
+\begin{itemize}
+\tightlist
+\item
+  Human sponsor: James Ross.
+\item
+  Agent sponsor: Codex.
+\end{itemize}
+
+\section{Hill}\label{record-214-hill}
+
+Before \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} is cut, release readiness should be inspectable as a milestone-specific report and DOGFOOD i18n debt should cover newly added docs modules by default.
+
+\section{Problem}\label{record-214-problem}
+
+The repo already has \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s}, but the command is mostly a validation gauntlet. It does not produce a milestone-aware readiness report that proves tracker closure, WIP-label cleanup, release-document posture, and package smoke coverage before a release tag.
+
+The DOGFOOD i18n debt ratchet also depends on a hand-maintained source list. New \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}*\allowbreak{}/\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}s} modules can introduce visible strings without participating in the debt baseline.
+
+\section{Scope}\label{record-214-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} as the single release readiness command.
+\item
+  Add an optional milestone report mode that can be run before tagging, for example \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{} \allowbreak{}v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}.
+\item
+  Classify tracker, docs, release-packet, and package-smoke readiness using deterministic fixture-testable data.
+\item
+  Discover DOGFOOD TypeScript debt sources from \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}*\allowbreak{}/\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}s} by default, with documented exclusions for tooling-only files.
+\item
+  Preserve per-surface i18n debt counts so ratchet output stays actionable.
+\end{itemize}
+
+\section{Non-Goals}\label{record-214-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not move broad V8/V9 product work into \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0}.
+\item
+  Do not require GitHub access for the default no-argument local gauntlet.
+\item
+  Do not replace the GitHub release dry-run workflow; the local report should point to the existing workflow boundary.
+\item
+  Do not burn down the current DOGFOOD raw-string debt in this cycle.
+\end{itemize}
+
+\section{Playback Questions}\label{record-214-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{} \allowbreak{}v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} explain why a release is or is not ready before running expensive local gates?
+\item
+  Can a new \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}*\allowbreak{}/\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}s} module introduce visible copy without increasing the DOGFOOD i18n debt ratchet?
+\item
+  Are remaining release-process gaps documented instead of silently implied?
+\end{itemize}
+
+\section{Accessibility / Assistive Posture}\label{record-214-accessibility-assistive-posture}
+
+No runtime UI accessibility behavior changes. The new readiness report is plain text plus a Markdown table so it can be copied into release PRs and read by terminal or screen-reader workflows.
+
+\section{Localization / Directionality Posture}\label{record-214-localization-directionality-posture}
+
+\#312 directly strengthens localization guardrails. It does not localize existing raw DOGFOOD copy; it makes the current raw-string debt baseline honest across newly discovered DOGFOOD modules.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-214-agent-inspectability-explainability-posture}
+
+The release-readiness report classifies each gate as pass/fail with a concise summary. The i18n debt scanner continues to report counts by source surface so agents can identify which DOGFOOD module moved the ratchet.
+
+\section{Linked Invariants}\label{record-214-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Release tags require issue-complete tracker posture and release evidence.
+\item
+  DOGFOOD visible strings must either be cataloged, counted as known debt, or explicitly excluded as non-product tooling.
+\item
+  The no-argument local \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} gauntlet must keep working without GitHub access.
+\end{itemize}
+
+\section{Implementation Plan}\label{record-214-implementation-plan}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Extend \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} with a milestone-aware readiness report model and CLI parsing for \texttt{-\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}e}.
+\item
+  Keep the existing command plan intact, but add package-smoke proof by recognizing the existing \texttt{s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}:\allowbreak{}c\allowbreak{}a\allowbreak{}n\allowbreak{}a\allowbreak{}r\allowbreak{}i\allowbreak{}e\allowbreak{}s} package-pack canary step and the release dry-run workflow boundary.
+\item
+  Add fixture tests for ready, open-issue, lingering-WIP, stale-docs, and missing-release-packet report classification.
+\item
+  Replace the hand-maintained \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}I\allowbreak{}1\allowbreak{}8\allowbreak{}N\allowbreak{}\_\allowbreak{}D\allowbreak{}E\allowbreak{}B\allowbreak{}T\allowbreak{}\_\allowbreak{}S\allowbreak{}O\allowbreak{}U\allowbreak{}R\allowbreak{}C\allowbreak{}E\allowbreak{}S} list with deterministic source discovery under \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/}.
+\item
+  Add tests proving newly added docs modules are discovered and can fail the ratchet when they add raw visible strings.
+\item
+  Update release/DOGFOOD docs, roadmap posture, and changelog entries.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-214-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Release-readiness report classification for ready milestone fixture data.
+\item
+  Release-readiness report failures for open tracker issues, WIP labels, stale release docs, and missing release packet evidence.
+\item
+  CLI parsing for \texttt{-\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}e}.
+\item
+  DOGFOOD i18n source discovery for new docs modules and documented exclusions.
+\item
+  DOGFOOD i18n ratchet failure when a newly discovered module adds raw visible text above a supplied zero baseline.
+\end{itemize}
+
+\section{Acceptance}\label{record-214-acceptance}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s} keeps running the current gauntlet.
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}:\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{} \allowbreak{}v\allowbreak{}7\allowbreak{}.\allowbreak{}1\allowbreak{}.\allowbreak{}0} prints a concise readiness report before running the gauntlet and blocks if milestone readiness is not satisfied.
+\item
+  Report classification is covered by unit tests with fixture tracker data.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}:\allowbreak{}d\allowbreak{}e\allowbreak{}b\allowbreak{}t} covers new \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}*\allowbreak{}*\allowbreak{}/\allowbreak{}*\allowbreak{}.\allowbreak{}t\allowbreak{}s} modules unless the module is explicitly excluded as tooling-only.
+\item
+  The current DOGFOOD i18n baseline reflects the newly covered sources and still reports counts by source surface.
+\end{itemize}
+
+\section{Retrospective}\label{record-214-retrospective}
+
+To be completed when the PR lands.
+

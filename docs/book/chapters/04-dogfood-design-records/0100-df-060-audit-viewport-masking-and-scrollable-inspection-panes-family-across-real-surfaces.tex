@@ -1,0 +1,141 @@
+\chapter{DF-060 Audit viewport masking and scrollable inspection panes family across real surfaces}\label{record-100}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-060-audit-viewport-masking-and-scrollable-inspection-panes-family-across-real-surfaces.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-060 Audit viewport masking and scrollable inspection panes family across real surfaces
+legend: DF
+lane: design
+priority: medium
+keywords:
+  - component-audit
+  - dogfood
+  - lowerings
+  - viewport
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-100-framing}
+
+Viewport masking is the family that proves overflow is owned by bounded panes, not by callers slicing strings after rendering. \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} is the base masking primitive for structured surfaces, \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} adds long-document position context, and \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} adds workspace focus ownership. Their string counterparts remain explicit text-lowering paths.
+
+This audit verifies the DOGFOOD \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} story against real story rendering, component-family doctrine, and mode-aware lowerings. It also closes the story drift where DOGFOOD taught only the base viewport mask even though the family doc already included pager and focus-area panes.
+
+\section{Sponsored Users}\label{record-100-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  TUI app authors wrapping existing surfaces in bounded scroll regions.
+\item
+  Docs readers checking the distinction between masking, paging, and focused inspection panes.
+\item
+  Maintainers who need one focused regression tying viewport story metadata, variants, and design-system guidance to real output.
+\end{itemize}
+
+\section{Hills}\label{record-100-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A builder can inspect DOGFOOD and see viewport mask, structured stack, pager, and focused pane variants in one family.
+\item
+  A reader can switch every variant through interactive, static, pipe, and accessible profiles while preserving scroll and focus context.
+\item
+  A maintainer can run one cycle test that proves viewport-family story metadata and family guidance have not drifted away from runtime behavior.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-100-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does DOGFOOD expose the family through the \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}s\allowbreak{}k\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}s} coverage id?
+\item
+  Do variants cover pure viewport masking, structured masking, pager status, and focus-area chrome?
+\item
+  Do rich/static previews keep bounded pane chrome visible?
+\item
+  Do pipe lowerings preserve sequential content and scroll/focus context without pretending hidden regions are interactive?
+\item
+  Do accessible lowerings linearize pane content with explicit position or focus facts?
+\item
+  Do component-family docs still cover viewport, pager, focus area, and the row-aware holdout boundary?
+\end{itemize}
+
+\section{Requirements}\label{record-100-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Keep the existing \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} story identity and coverage family id.
+\item
+  Render every viewport-family story variant in every canonical story profile.
+\item
+  Treat scrollbars, gutters, and box drawing as visual-profile chrome only.
+\item
+  Keep pipe and accessible lowerings scroll-context-first and semantic-preserving.
+\item
+  Confirm \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}-\allowbreak{}s\allowbreak{}y\allowbreak{}s\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}m\allowbreak{}d} still matches the runtime story posture for viewport, pager, and focus-area primitives.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-100-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}0\allowbreak{}/\allowbreak{}v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}s\allowbreak{}k\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}-\allowbreak{}f\allowbreak{}a\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}a\allowbreak{}u\allowbreak{}d\allowbreak{}i\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s} proves the cycle doc carries the modern playback sections.
+\item
+  The test locates the DOGFOOD \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})\allowbreak{} \allowbreak{}/\allowbreak{} \allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} story and verifies expected variants.
+\item
+  Every variant renders non-empty output in every documented profile.
+\item
+  Rich/static output includes structured visual containment; pipe and accessible output do not depend on box drawing.
+\item
+  Pipe and accessible output preserve viewport scroll, pager line, and focus pane context.
+\item
+  Component-family docs retain viewport, pager, focus area, content guidance, lowering guidance, and the domain-specific row-aware boundary.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-100-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Extend the existing \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}-\allowbreak{}s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} DOGFOOD story with pager and focused pane variants.
+\item
+  Add mode-aware constrained lowerings for the story so pipe/accessibility profiles expose scroll/focus facts as text rather than visual chrome.
+\item
+  Add a DF-060 cycle test that renders every variant through the shared story protocol.
+\item
+  Move the backlog note into \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{}i\allowbreak{}g\allowbreak{}n\allowbreak{}/} and update the v6 lane pointer.
+\end{enumerate}
+
+\section{Drift Check}\label{record-100-drift-check}
+
+Runtime support already existed for the full family. The drift was in DOGFOOD: the story represented only \texttt{v\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} while the design-system family also documented \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} and \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}A\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})}.
+
+This slice fixes that by extending the story instead of filing follow-on debt. No runtime API changes were required.
+
+\section{Playback}\label{record-100-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  RED: the release lane had only a backlog note, and the DOGFOOD story did not visibly exercise pager or focused-pane variants.
+\item
+  GREEN: the new cycle test renders \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t}, \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{}u\allowbreak{}r\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}s\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}, \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}r\allowbreak{}-\allowbreak{}w\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}o\allowbreak{}w}, and \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e} variants across interactive, static, pipe, and accessible profiles.
+\item
+  Rich/static previews preserve scrollbars, status lines, focus gutters, and nested surface masking.
+\item
+  Pipe previews preserve viewport scroll, pager line, and focus context without box drawing.
+\item
+  Accessible previews linearize the same pane facts in reading order.
+\end{itemize}
+
+\section{Retrospective}\label{record-100-retrospective}
+
+The runtime did not need another overflow abstraction. The useful release work was making DOGFOOD tell the whole family story: mask structured surfaces, page long linear documents, and mark focused inspection panes without letting scroll chrome become semantic content.
+

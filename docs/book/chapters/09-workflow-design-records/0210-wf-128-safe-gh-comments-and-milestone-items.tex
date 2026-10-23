@@ -1,0 +1,180 @@
+\chapter{WF-128 Safe GitHub Comments And Milestone Item Mirrors}\label{record-210}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-128-safe-gh-comments-and-milestone-items.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: WF-128 Safe GitHub Comments And Milestone Item Mirrors
+legend: WF
+lane: bad-code
+priority: medium
+issues:
+  - https://github.com/flyingrobots/bijou/issues/287
+  - https://github.com/flyingrobots/bijou/issues/288
+keywords:
+  - github
+  - comments
+  - roadmap
+  - milestone
+  - workflow
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-210-framing}
+
+Two small workflow defects came out of the V7 closeout:
+
+\begin{itemize}
+\tightlist
+\item
+  review comments can be corrupted when Markdown literals are passed through a shell-interpolated \texttt{g\allowbreak{}h\allowbreak{} \allowbreak{}p\allowbreak{}r\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}d\allowbreak{}y\allowbreak{} \allowbreak{}"\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}"} argument
+\item
+  roadmap release snapshots can be misread when GitHub milestone totals include pull requests as milestone items while nearby prose says ``issues''
+\end{itemize}
+
+Both are process bugs. They do not change runtime behavior, but they do affect the reliability of review evidence and release bookkeeping.
+
+\section{Sponsored Users}\label{record-210-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  A maintainer posting self-review, Code Lawyer, or activity-summary comments needs a command pattern that preserves Markdown literally.
+\item
+  A release maintainer reading \texttt{R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} needs to know whether the snapshot counts GitHub milestone items or issue-only rows.
+\item
+  A review agent needs executable repo tests that catch unsafe comment examples and ambiguous milestone-count language before the pattern spreads.
+\end{itemize}
+
+\section{Hill}\label{record-210-hill}
+
+A maintainer can post Markdown-heavy GitHub comments and reconcile release snapshot rows without relying on memory: \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}O\allowbreak{}R\allowbreak{}K\allowbreak{}F\allowbreak{}L\allowbreak{}O\allowbreak{}W\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} state the safe conventions, and WF-128 tests prove those conventions stay visible.
+
+\section{Current Truth}\label{record-210-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  Issue \#287 records that a PR \#284 self-review comment was polluted when Markdown backticks inside a double-quoted \texttt{-\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}d\allowbreak{}y} argument were evaluated by the shell.
+\item
+  Issue \#288 records that V7 tracker-sync work had to count milestone PRs \#278 and \#280 to match GitHub milestone totals.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}O\allowbreak{}R\allowbreak{}K\allowbreak{}F\allowbreak{}L\allowbreak{}O\allowbreak{}W\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d} do not currently name the \texttt{-\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}d\allowbreak{}y\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e} / literal-heredoc path for review comments.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} says GitHub milestones and issue labels are live tracker state, but the release snapshot columns are named only \texttt{O\allowbreak{}p\allowbreak{}e\allowbreak{}n} and \texttt{C\allowbreak{}l\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}d}, which makes item counts look like issue-only counts.
+\end{itemize}
+
+\section{Product Shape}\label{record-210-product-shape}
+
+\subsection{Safe Comment Posting}\label{record-210-safe-comment-posting}
+
+\begin{CodeBlock}
+Workflow review step
+  self-review / Code Lawyer / activity summary
+    |
+    v
+  gh pr comment "$PR_NUMBER" --body-file - <<'EOF'
+  Markdown stays literal:
+  - `commands`
+  - $()
+  - tables
+  EOF
+\end{CodeBlock}
+
+The rule is intentionally boring: if a GitHub comment body contains Markdown, commands, backticks, \texttt{\$\allowbreak{}(\allowbreak{})}, tables, or copied review output, post it through \texttt{-\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}d\allowbreak{}y\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e} with a quoted heredoc or a real file.
+
+\subsection{Milestone Item Mirrors}\label{record-210-milestone-item-mirrors}
+
+\begin{CodeBlock}
+GitHub milestone page / API
+  open milestone items   = issues + pull requests assigned to milestone
+  closed milestone items = issues + pull requests assigned to milestone
+
+ROADMAP release snapshot
+  Open Items / Closed Items
+  Completed lineage includes milestone PR rows when PRs contribute to totals.
+\end{CodeBlock}
+
+\section{Runtime And API Contract}\label{record-210-runtime-and-api-contract}
+
+This cycle changes documentation and cycle-test proof only. It does not change package exports, runtime APIs, schemas, localization strings, or DOGFOOD rendered output.
+
+\section{Lower Modes}\label{record-210-lower-modes}
+
+No user-facing TUI surface changes are included.
+
+\begin{itemize}
+\tightlist
+\item
+  Static mode: documentation prose becomes clearer.
+\item
+  Pipe mode: not applicable because no command output contract changes.
+\item
+  Accessible mode: not applicable because no rendered app surface changes.
+\end{itemize}
+
+\section{Tests To Write First}\label{record-210-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Add \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}F\allowbreak{}-\allowbreak{}1\allowbreak{}2\allowbreak{}8\allowbreak{}/\allowbreak{}s\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}s\allowbreak{}-\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}-\allowbreak{}m\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  RED state:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    workflow docs do not contain the safe \texttt{-\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}d\allowbreak{}y\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e\allowbreak{} \allowbreak{}-\allowbreak{} \allowbreak{}<\allowbreak{}<\allowbreak{}'\allowbreak{}E\allowbreak{}O\allowbreak{}F\allowbreak{}'} pattern
+  \item
+    roadmap release snapshot does not say \texttt{O\allowbreak{}p\allowbreak{}e\allowbreak{}n\allowbreak{} \allowbreak{}I\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}s} / \texttt{C\allowbreak{}l\allowbreak{}o\allowbreak{}s\allowbreak{}e\allowbreak{}d\allowbreak{} \allowbreak{}I\allowbreak{}t\allowbreak{}e\allowbreak{}m\allowbreak{}s}
+  \item
+    roadmap maintenance guidance does not warn against comparing item totals to issue-only lists without accounting for milestone PRs
+  \end{itemize}
+\item
+  GREEN state:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    docs expose the safe comment posting rule
+  \item
+    roadmap terminology distinguishes milestone item counts from issue-only counts
+  \item
+    changelog records the bad-code cleanup
+  \end{itemize}
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-210-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Issue \#287 is closed by the PR.
+\item
+  Issue \#288 is closed by the PR.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}W\allowbreak{}O\allowbreak{}R\allowbreak{}K\allowbreak{}F\allowbreak{}L\allowbreak{}O\allowbreak{}W\allowbreak{}.\allowbreak{}m\allowbreak{}d} and \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}M\allowbreak{}E\allowbreak{}T\allowbreak{}H\allowbreak{}O\allowbreak{}D\allowbreak{}.\allowbreak{}m\allowbreak{}d} prefer \texttt{-\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}d\allowbreak{}y\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}l\allowbreak{}e} for Markdown-heavy GitHub comments.
+\item
+  \texttt{A\allowbreak{}G\allowbreak{}E\allowbreak{}N\allowbreak{}T\allowbreak{}S\allowbreak{}.\allowbreak{}m\allowbreak{}d} reminds agents not to inline shell-sensitive review comments through \texttt{-\allowbreak{}-\allowbreak{}b\allowbreak{}o\allowbreak{}d\allowbreak{}y\allowbreak{} \allowbreak{}"\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}"}.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}R\allowbreak{}O\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}A\allowbreak{}P\allowbreak{}.\allowbreak{}m\allowbreak{}d} names release snapshot counts as milestone items and states that milestone items include issues plus pull requests.
+\item
+  WF-128 passes.
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/\allowbreak{}C\allowbreak{}H\allowbreak{}A\allowbreak{}N\allowbreak{}G\allowbreak{}E\allowbreak{}L\allowbreak{}O\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d} records the cleanup.
+\end{itemize}
+
+\section{Risks And Guardrails}\label{record-210-risks-and-guardrails}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not introduce a new GitHub-comment wrapper script unless the docs-only pattern proves insufficient.
+\item
+  Do not solve the broader tracker-sync sentinel from \#268 here.
+\item
+  Do not change release milestones or move any issue between lanes.
+\item
+  Do not cut V7 in this cycle.
+\end{itemize}
+

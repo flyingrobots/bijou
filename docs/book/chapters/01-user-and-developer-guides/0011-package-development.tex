@@ -1,0 +1,139 @@
+\chapter{Package Development Guide}\label{record-011}
+
+\noindent{\footnotesize\color{BookMuted}\path{PACKAGE_DEVELOPMENT.md}\par}\smallskip
+
+This guide describes the minimum steps to add a new package to the Bijou monorepo without breaking workspace conventions.
+
+\section{Why the packages are split}\label{record-011-why-the-packages-are-split}
+
+Bijou keeps package boundaries narrow so apps can adopt only the layer they need:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u} is pure TypeScript and owns surfaces, components, blocks, themes, and port contracts.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} adapts those ports to Node.js, terminal IO, filesystem access, and host environment detection.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} owns the interactive TEA runtime, key/input routing, layout, animation, and render pipeline.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p} owns the batteries-included framed shell.
+\item
+  \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}-\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}-\allowbreak{}a\allowbreak{}p\allowbreak{}p} gives app authors a project scaffold instead of asking them to assemble the shell manually.
+\item
+  i18n packages are split between runtime lookup and authoring/workflow tools so apps do not import CSV, TSV, XLSX, or filesystem tooling at runtime.
+\end{itemize}
+
+That split adds workspace setup cost, but it keeps pure rendering independent from host IO and lets small CLIs avoid full TUI shell dependencies.
+
+\section{1) Create package scaffold}\label{record-011-create-package-scaffold}
+
+Create a package directory under \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}<\allowbreak{}n\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}>\allowbreak{}/} with:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{t\allowbreak{}s\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} with composite references
+\item
+  source folder (usually \texttt{s\allowbreak{}r\allowbreak{}c\allowbreak{}/})
+\item
+  optional test folder and build artifacts
+\end{itemize}
+
+A minimal \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} follows this shape:
+
+\begin{CodeBlock}
+{
+  "name": "@flyingrobots/bijou-<package>",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest --run --config ../../vitest.config.ts"
+  },
+  "dependencies": {
+    "@flyingrobots/bijou": "workspace:*"
+  }
+}
+\end{CodeBlock}
+
+\section{2) Register in the workspace}\label{record-011-register-in-the-workspace}
+
+The root workspace uses globs (\texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}*}), so no explicit package list change is required for package discovery if you keep the package under \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/}.
+
+\section{3) Wire TypeScript project references}\label{record-011-wire-typescript-project-references}
+
+For workspace \texttt{t\allowbreak{}s\allowbreak{}c\allowbreak{} \allowbreak{}-\allowbreak{}b} execution to compile your package correctly:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Ensure package \texttt{t\allowbreak{}s\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} has \texttt{c\allowbreak{}o\allowbreak{}m\allowbreak{}p\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e} and a valid \texttt{r\allowbreak{}e\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}e\allowbreak{}n\allowbreak{}c\allowbreak{}e\allowbreak{}s} array.
+\item
+  Add a package-level \texttt{t\allowbreak{}s\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g\allowbreak{}.\allowbreak{}t\allowbreak{}s\allowbreak{}b\allowbreak{}u\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}f\allowbreak{}o} entry under \texttt{t\allowbreak{}s\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}g} conventions as needed.
+\item
+  Keep \texttt{r\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}D\allowbreak{}i\allowbreak{}r}/\texttt{o\allowbreak{}u\allowbreak{}t\allowbreak{}D\allowbreak{}i\allowbreak{}r} under \texttt{s\allowbreak{}r\allowbreak{}c} and \texttt{d\allowbreak{}i\allowbreak{}s\allowbreak{}t}.
+\end{enumerate}
+
+\section{4) Connect ports and context where relevant}\label{record-011-connect-ports-and-context-where-relevant}
+
+Packages that contribute runtime behavior should pass through the port and context abstractions:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Runtime side}: export \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t} implementations (\texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}).
+\item
+  \textbf{IO side}: keep terminal/file/timer interactions on \texttt{I\allowbreak{}O\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t}.
+\item
+  \textbf{Style side}: keep color and formatting behind \texttt{S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}o\allowbreak{}r\allowbreak{}t}.
+\end{itemize}
+
+Never import \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} or \texttt{f\allowbreak{}s} in core packages. If you need host access, move it into an adapter package and inject through ports.
+
+\section{5) Export surfaces and contracts in a public API file}\label{record-011-export-surfaces-and-contracts-in-a-public-api-file}
+
+Use a package-level \texttt{s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}s} to aggregate public exports and keep import paths stable for consumers.
+
+\begin{CodeBlock}
+export * from './runtime.js';
+export * from './types.js';
+\end{CodeBlock}
+
+\section{6) Add tests and docs}\label{record-011-add-tests-and-docs}
+
+Every added public function should include at least:
+
+\begin{itemize}
+\tightlist
+\item
+  Unit test coverage.
+\item
+  A short fixture or usage example.
+\item
+  Package README section describing setup and API shape.
+\end{itemize}
+
+\section{7) Add to user-facing docs}\label{record-011-add-to-user-facing-docs}
+
+For discoverability:
+
+\begin{itemize}
+\tightlist
+\item
+  Add/update the root package map entry if the package is user-facing.
+\item
+  Add the package README excerpt to \texttt{R\allowbreak{}E\allowbreak{}A\allowbreak{}D\allowbreak{}M\allowbreak{}E\allowbreak{}.\allowbreak{}m\allowbreak{}d} Package Map when needed.
+\item
+  Add any new API docs under \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}s\allowbreak{}/} and cross-link from the appropriate architecture or GUIDE file.
+\end{itemize}
+

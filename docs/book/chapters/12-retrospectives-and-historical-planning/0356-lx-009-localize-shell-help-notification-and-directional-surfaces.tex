@@ -1,0 +1,42 @@
+\chapter{LX-009 --- Localize Shell Help, Notification, and Directional Surfaces}\label{record-356}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/LX-009-localize-shell-help-notification-and-directional-surfaces.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/LX-localization-and-bidirectionality.md}{LX --- Localization and Bidirectionality}
+
+\section{Idea}\label{record-356-idea}
+
+LX-008 proved the shell i18n seam in real product surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  frame-owned shell copy can come from catalogs
+\item
+  DOGFOOD can load localized shell and app copy
+\item
+  shell direction metadata can drive at least one visible mirrored behavior
+\end{itemize}
+
+The next slice should finish the most obvious remaining gaps:
+
+\begin{itemize}
+\tightlist
+\item
+  help overlay binding descriptions and grouping copy
+\item
+  notification-center history/body strings and filters
+\item
+  broader logical-direction behavior in shell-owned drawers and related chrome
+\end{itemize}
+
+\section{Why}\label{record-356-why}
+
+LX-008 intentionally stopped once the i18n seam was real.
+
+That was the correct stopping point, but it leaves visible English islands and only partial direction-aware shell behavior. LX-009 should tighten those gaps before we claim the shell is broadly localized.
+
+\section{Status}\label{record-356-status}
+
+Backlog spawned by the retrospective for LX-008.
+

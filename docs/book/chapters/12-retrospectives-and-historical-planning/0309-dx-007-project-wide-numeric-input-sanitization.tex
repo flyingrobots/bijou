@@ -1,0 +1,44 @@
+\chapter{DX-007 --- Project-Wide Numeric Input Sanitization}\label{record-309}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/retro/DX-007-project-wide-numeric-input-sanitization.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: "DX-007 — Project-Wide Numeric Input Sanitization"
+legend: DX
+lane: retro
+
+\end{RecordMeta}
+
+Completed on \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}v\allowbreak{}5\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}. Bijou now has shared numeric boundary helpers in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}t\allowbreak{}s}, broad adoption across core, TUI, and Node adapters, and dedicated tests in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}c\allowbreak{}o\allowbreak{}r\allowbreak{}e\allowbreak{}/\allowbreak{}n\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}. What was originally an audit reminder is now a reusable boundary rule rather than repeated ad hoc guards.
+
+\section{Original Proposal}\label{record-309-original-proposal}
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/method/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-309-idea}
+
+Audit all public API functions that accept numeric parameters and ensure they guard against \texttt{N\allowbreak{}a\allowbreak{}N}, \texttt{I\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}y}, \texttt{-\allowbreak{}I\allowbreak{}n\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}y}, and fractional values where integers are expected.
+
+The v4.4.0 data-viz review found several places where non-finite user input propagated silently into rendering logic. The fixes were targeted (sparkline, braille-chart, stats-panel), but the same class of bug likely exists in other components.
+
+\section{Approach}\label{record-309-approach}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Grep for all exported functions with \texttt{n\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r} parameters
+\item
+  Classify: which accept user-supplied values vs internal-only
+\item
+  Add \texttt{N\allowbreak{}u\allowbreak{}m\allowbreak{}b\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}i\allowbreak{}s\allowbreak{}F\allowbreak{}i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}e} guards or \texttt{M\allowbreak{}a\allowbreak{}t\allowbreak{}h\allowbreak{}.\allowbreak{}f\allowbreak{}l\allowbreak{}o\allowbreak{}o\allowbreak{}r} clamping at boundaries
+\item
+  Consider a shared \texttt{s\allowbreak{}a\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}z\allowbreak{}e\allowbreak{}N\allowbreak{}u\allowbreak{}m\allowbreak{}e\allowbreak{}r\allowbreak{}i\allowbreak{}c\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{}n\allowbreak{},\allowbreak{} \allowbreak{}f\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}b\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{})} utility
+\item
+  Add edge-case tests for each affected function
+\end{enumerate}
+
+\section{Why}\label{record-309-why}
+
+Three separate review passes (2 self-reviews + CodeRabbit) all found NaN/Infinity bugs. This is a systemic gap, not a one-off.
+

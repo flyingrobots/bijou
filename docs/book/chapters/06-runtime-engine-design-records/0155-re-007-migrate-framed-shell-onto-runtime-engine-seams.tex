@@ -1,0 +1,454 @@
+\chapter{RE-007 --- Migrate Framed Shell Onto Runtime Engine Seams}\label{record-155}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}\par}\smallskip
+
+\emph{Cycle for proving the runtime engine through the framed shell instead of leaving the most visible shell state on ad hoc branch structure}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-001-define-runtime-engine-architecture.md}{RE-001 --- Define Runtime Engine Architecture}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md}{RE-002 --- Promote First-Class State Machine and View Stack}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md}{RE-003 --- Retain Layout Trees and Layout Invalidation}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md}{RE-004 --- Route Input Through Layouts and Layer Bubbling}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-005-buffer-commands-and-effects-separately.md}{RE-005 --- Buffer Commands and Effects Separately}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md}{RE-006 --- Formalize Component Layout and Interaction Contracts}
+\end{itemize}
+
+\section{Sponsor human}\label{record-155-sponsor-human}
+
+A maintainer evolving the framed shell who needs to explain layer ownership, routing, and command dispatch in runtime-engine terms instead of tracing ad hoc branch order.
+
+\section{Sponsor agent}\label{record-155-sponsor-agent}
+
+An agent inspecting or testing the framed shell that needs to recover runtime-backed view stacks, retained layout geometry, and buffered command/effect truth through the same vocabulary the runtime engine exposes everywhere else.
+
+\section{Non-goals}\label{record-155-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Rewriting shell rendering or visual output. This cycle migrates ownership and routing, not painting.
+\item
+  Changing outward shell behavior. The shell should act the same after each slice; only the internal truth source changes.
+\item
+  Migrating non-shell runtime consumers. Other runtime adopters are separate cycles.
+\end{itemize}
+
+\section{Accessibility / assistive reading posture}\label{record-155-accessibility-assistive-reading-posture}
+
+Not directly affected. This cycle changes internal ownership, not user-facing output. Assistive reading contracts remain wherever the shell already honors them.
+
+\section{Localization / directionality posture}\label{record-155-localization-directionality-posture}
+
+Not directly affected. Shell localization surfaces are unchanged by this migration. Directionality remains the responsibility of the rendering layer, which this cycle does not touch.
+
+\section{Agent inspectability / explainability posture}\label{record-155-agent-inspectability-explainability-posture}
+
+Central to this cycle. Every slice must leave the shell's runtime state inspectable through the same \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}, \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}t\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}d\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}s}, and runtime buffer vocabulary that agents already use for non-shell runtime work. The agent hill is the primary proof surface.
+
+\section{Why this cycle exists}\label{record-155-why-this-cycle-exists}
+
+The runtime engine now has explicit seams for:
+
+\begin{itemize}
+\tightlist
+\item
+  state machines
+\item
+  view stacks
+\item
+  retained layouts
+\item
+  layout-driven input routing
+\item
+  buffered commands and effects
+\end{itemize}
+
+But the framed shell still carries its own most visible runtime truths in older shell-local structures. The shell can already describe a layer stack, but that stack is still reconstructed as a plain descriptor array rather than living as a first-class runtime object.
+
+This cycle exists to stop leaving the highest-visibility shell behavior outside the runtime engine. The shell should become the proving surface for the engine seams rather than the place where those seams get bypassed.
+
+\section{Human users / jobs / hills}\label{record-155-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-155-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  maintainers evolving the framed shell
+\item
+  builders inspecting layered shell behavior
+\item
+  contributors debugging shell routing, footer truth, and overlay ownership
+\end{itemize}
+
+\subsection{Human jobs}\label{record-155-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Inspect the shell's visible layers as a real runtime-backed stack.
+\item
+  Explain which shell layer is active and which layer sits underneath it without reverse-engineering branch order.
+\item
+  Move shell routing and command/effect dispatch onto the runtime seams in later slices without re-inventing shell-local state models.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-155-human-hill}
+
+A maintainer can point at the framed shell and explain its active layer stack in runtime-engine terms instead of saying ``the shell works because these branches happen in this order.''
+
+\section{Agent users / jobs / hills}\label{record-155-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-155-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents reading shell state to explain focus or overlay ownership
+\item
+  agents writing tests around shell layering
+\item
+  agents preparing later shell migration slices for routing and buffered shell work
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-155-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Read the framed shell's view stack through the same \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k} vocabulary used elsewhere in the runtime engine.
+\item
+  Distinguish the workspace root from dismissible overlays without re-deriving shell semantics.
+\item
+  Prepare later migration slices for retained-layout-driven shell routing and runtime-buffer-backed shell command/effect dispatch.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-155-agent-hill}
+
+An agent can inspect the framed shell and recover a root-based runtime view stack whose active layer, underlying layer, and blocking semantics match the shell's real behavior.
+
+\section{Human playback}\label{record-155-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A workspace is open in a framed app.
+\item
+  The workspace is the root runtime view.
+\item
+  The user opens settings.
+\item
+  The shell pushes a dismissible settings overlay onto the runtime view stack.
+\item
+  The user opens search on top of settings.
+\item
+  The shell pushes a dismissible search overlay onto the same runtime view stack.
+\item
+  The active runtime view now truthfully describes the search layer, while the underlying view is still settings.
+\item
+  Footer hints and help surfaces can inspect that same stack instead of rediscovering shell state from separate branches.
+\end{enumerate}
+
+\section{Agent playback}\label{record-155-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent inspects a framed shell model with settings and search open.
+\item
+  The agent asks for the shell's runtime-backed view stack.
+\item
+  The stack returns:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    a non-dismissible workspace root
+  \item
+    a dismissible settings overlay
+  \item
+    a dismissible search overlay
+  \end{itemize}
+\item
+  The active runtime view reports the same metadata that shell help/footer introspection already uses.
+\item
+  The agent can now reason about shell overlay ownership with the same runtime vocabulary used by retained layouts and buffered runtime work.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-155-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/runtime-truth-wins.md}{Runtime Truth Wins}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/state-machine-and-view-stack-are-distinct.md}{State Machine and View Stack Are Distinct}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/topmost-layer-dismisses-first.md}{Topmost Layer Dismisses First}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{Commands Change State, Effects Do Not}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\end{itemize}
+
+\section{First slice in this cycle}\label{record-155-first-slice-in-this-cycle}
+
+The first honest slice is not ``rewrite the whole shell.'' It is:
+
+\begin{itemize}
+\tightlist
+\item
+  make the framed shell layer stack a real \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+\item
+  keep the existing \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}, \texttt{a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})}, and \texttt{u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} helpers as compatibility surfaces
+\item
+  expose a runtime-backed \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} helper so tests, humans, and agents can inspect the shell directly in runtime terms
+\end{itemize}
+
+This slice proves that the shell can adopt runtime-backed view ownership without changing outward shell behavior first.
+
+\section{Implementation outline}\label{record-155-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Promote shell layer descriptors into runtime-backed view layers with stable ids, blocking semantics, dismissibility, and attached descriptor models.
+\item
+  Make the workspace the root runtime view.
+\item
+  Push page-modal, settings, help, notification-center, search/command-palette, and quit-confirm overlays onto the runtime stack in the shell's existing order.
+\item
+  Derive the legacy descriptor helpers from that runtime view stack instead of rebuilding plain arrays separately.
+\item
+  Export the runtime-backed helper through the public framed-app API and the package index.
+\end{enumerate}
+
+\section{Later slices still in this cycle}\label{record-155-later-slices-still-in-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  retained-layout-driven shell routing
+\item
+  runtime-buffer-backed shell command/effect dispatch
+\item
+  removing remaining shell-local branch structures that duplicate runtime ownership
+\end{itemize}
+
+\section{Tests to write first}\label{record-155-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle test proving \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} is now the active runtime-engine cycle
+\item
+  app-frame regression proving the framed shell layer stack is now backed by \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k}
+\item
+  export regression proving the new helper is public through \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}
+\item
+  signpost regression proving \texttt{P\allowbreak{}L\allowbreak{}A\allowbreak{}N\allowbreak{}.\allowbreak{}m\allowbreak{}d}, \texttt{B\allowbreak{}E\allowbreak{}A\allowbreak{}R\allowbreak{}I\allowbreak{}N\allowbreak{}G\allowbreak{}.\allowbreak{}m\allowbreak{}d}, and the RE legend stop treating \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} like a backlog stub
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-155-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  the shell still mixes routing, layout, and command/effect concerns, so this first slice must stay narrow instead of pretending the whole migration is done
+\item
+  keeping the compatibility descriptor helpers is necessary now, but later slices should avoid duplicating runtime truth unnecessarily
+\item
+  retained-layout-driven shell routing may want richer view metadata than the first runtime-backed stack carries here
+\end{itemize}
+
+\section{Retrospective}\label{record-155-retrospective}
+
+What this first slice lands:
+
+\begin{itemize}
+\tightlist
+\item
+  a runtime-backed shell layer stack
+\item
+  a public \texttt{d\allowbreak{}e\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}b\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}V\allowbreak{}i\allowbreak{}e\allowbreak{}w\allowbreak{}S\allowbreak{}t\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}(\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} helper
+\item
+  compatibility descriptor helpers derived from runtime truth
+\item
+  signposts that say \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}7} is active instead of merely queued
+\end{itemize}
+
+What this first slice does not land:
+
+\begin{itemize}
+\tightlist
+\item
+  no retained-layout-driven shell routing yet
+\item
+  no runtime-buffer-backed shell command/effect dispatch yet
+\item
+  no removal of every shell-local branch
+\end{itemize}
+
+What the second slice lands:
+
+\begin{itemize}
+\tightlist
+\item
+  route key ownership through the runtime view stack instead of choosing shell owners from ad hoc top-layer branches
+\item
+  use retained shell drawer layouts so pointer ownership for settings and notification center comes from runtime hit-testing instead of drawer-specific inside/outside helpers alone
+\end{itemize}
+
+What the third slice lands:
+
+\begin{itemize}
+\tightlist
+\item
+  a workspace retained layout tree with header tab and pane children so sub-layer hit-testing uses the same retained layout infrastructure
+\item
+  settings row children in the settings retained layout so row click resolution uses layout path inspection instead of scroll-offset math
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}i\allowbreak{}t\allowbreak{}A\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}R\allowbreak{}o\allowbreak{}w\allowbreak{}A\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}, and \texttt{i\allowbreak{}s\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}S\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r} removed --- all replaced by retained layout path inspection through \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}H\allowbreak{}i\allowbreak{}t}
+\item
+  \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}s} extracted as a shared pane geometry resolver for both the workspace layout tree and the mouse handler
+\end{itemize}
+
+What the fourth slice lands:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>} discriminated union in \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s} covering every shell mutation and command emission as plain data facts
+\item
+  a handler table inside \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p} that interprets each command variant through model mutation and TEA command accumulation
+\item
+  \texttt{d\allowbreak{}r\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r} using \texttt{b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t} and \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r} to process route results
+\item
+  mouse routing handler produces shell commands directly instead of delegating to a separate \texttt{h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}u\allowbreak{}s\allowbreak{}e} function
+\item
+  key routing handler produces shell commands through per-layer helper functions (\texttt{h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}s}, \texttt{h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}S\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}s}, \texttt{h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}W\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}s}, etc.) instead of a 280-line if-chain in \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})}
+\item
+  \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} key and mouse branches reduced to single-line buffer drains
+\item
+  removed: \texttt{h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}u\allowbreak{}s\allowbreak{}e}, \texttt{w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}O\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}K\allowbreak{}e\allowbreak{}y}, \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}Q\allowbreak{}u\allowbreak{}i\allowbreak{}t\allowbreak{}R\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t}, \texttt{o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r}, \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}H\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+What this cycle does not address:
+
+\begin{itemize}
+\tightlist
+\item
+  notification toast hit-testing stays outside the retained layout system (viewport-positioned overlays managed by notification.ts)
+\item
+  FrameScopedMsg branches (timers, transitions, notification ticks) stay as special cases in update() --- they are frame-owned state mutations, not routed input events
+\end{itemize}
+
+\section{Runtime-buffer-backed command/effect dispatch --- design intent}\label{record-155-runtime-buffer-backed-commandeffect-dispatch-design-intent}
+
+This section captures the architectural intent for the final slice so it is not lost across sessions.
+
+\subsection{Current pattern}\label{record-155-current-pattern}
+
+The shell's \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} function has two separate steps:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Routing}: \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}K\allowbreak{}e\allowbreak{}y\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} / \texttt{r\allowbreak{}e\allowbreak{}s\allowbreak{}o\allowbreak{}l\allowbreak{}v\allowbreak{}e\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}M\allowbreak{}o\allowbreak{}u\allowbreak{}s\allowbreak{}e\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}(\allowbreak{})} calls \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t\allowbreak{}(\allowbreak{})} to determine which layer owns the input. The routing handler callback returns \texttt{\{\allowbreak{} \allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}:\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e\allowbreak{} \allowbreak{}\}} or \texttt{\{\allowbreak{} \allowbreak{}s\allowbreak{}t\allowbreak{}o\allowbreak{}p\allowbreak{}:\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e\allowbreak{} \allowbreak{}\}} --- it never produces commands or effects.
+\item
+  \textbf{Command production}: After routing, the \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} function matches on \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}k\allowbreak{}i\allowbreak{}n\allowbreak{}d} through a long chain of \texttt{i\allowbreak{}f} branches, each producing \texttt{[\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{},\allowbreak{} \allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}<\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}<\allowbreak{}M\allowbreak{}s\allowbreak{}g\allowbreak{}>\allowbreak{}>\allowbreak{}[\allowbreak{}]\allowbreak{}]} tuples with manually accumulated command arrays.
+\end{enumerate}
+
+These are decoupled: routing decides ownership, then entirely separate code produces commands. The runtime buffer API (\texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}, \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}E\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}, \texttt{b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t}, \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}) exists but the shell does not use it.
+
+\subsection{Target pattern}\label{record-155-target-pattern}
+
+Input is routed through the runtime view stack. Instead of routing handlers returning bare \texttt{\{\allowbreak{} \allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}:\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e\allowbreak{} \allowbreak{}\}}, they return commands and effects as part of the route outcome:
+
+\begin{CodeBlock}
+routeRuntimeInput(stack, layouts, event, ({ layer, hit }) => {
+  // Layer-specific command production happens HERE,
+  // inside the routing callback
+  return {
+    handled: true,
+    commands: [emitMsgForPage(pageId, action)],
+    effects: [],
+  };
+});
+\end{CodeBlock}
+
+The route result carries accumulated commands and effects from all visited layers. The shell then buffers them:
+
+\begin{CodeBlock}
+const buffers = bufferRuntimeRouteResult(
+  createRuntimeBuffers(),
+  routeResult,
+);
+\end{CodeBlock}
+
+And applies them after routing completes:
+
+\begin{CodeBlock}
+const { state, applied } = applyRuntimeCommandBuffer(
+  model,
+  buffers.commands,
+  applyCommand,
+);
+\end{CodeBlock}
+
+\subsection{Why this matters}\label{record-155-why-this-matters}
+
+\begin{itemize}
+\tightlist
+\item
+  Routing and command production become one step instead of two. The layer that handles the input also says what should happen, inside the same callback.
+\item
+  The long \texttt{i\allowbreak{}f\allowbreak{} \allowbreak{}(\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}k\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{} \allowbreak{}=\allowbreak{}=\allowbreak{}=\allowbreak{} \allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{})} chain in \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} moves into the routing handler, which already knows the layer context.
+\item
+  Commands are collected through the same buffer mechanism the runtime engine uses for component-level input handling, instead of through ad-hoc array accumulation.
+\item
+  Effects become a first-class channel. The shell currently has no explicit effect separation --- everything is a command. The buffer API gives effects their own lane without changing the TEA return type.
+\end{itemize}
+
+\subsection{Scope}\label{record-155-scope}
+
+This is a structural refactoring of the shell's update function. It touches \textasciitilde20 functions across \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}, \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}, and \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}p\allowbreak{}a\allowbreak{}l\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}. The change is repetitive but mechanical: every \texttt{[\allowbreak{}m\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}m\allowbreak{}d\allowbreak{}s\allowbreak{}]} return site moves into a routing handler that returns \texttt{\{\allowbreak{} \allowbreak{}h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}d\allowbreak{}:\allowbreak{} \allowbreak{}t\allowbreak{}r\allowbreak{}u\allowbreak{}e\allowbreak{},\allowbreak{} \allowbreak{}c\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}s\allowbreak{}:\allowbreak{} \allowbreak{}[\allowbreak{}.\allowbreak{}.\allowbreak{}.\allowbreak{}]\allowbreak{} \allowbreak{}\}}.
+
+Outward shell behavior must not change. The same inputs must produce the same model transitions and the same commands.
+
+\subsection{Risks}\label{record-155-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  The routing handler closure becomes large because it absorbs all layer-specific logic. May need to extract per-layer handler functions to keep readability.
+\item
+  The TEA \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} return type (\texttt{[\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}l\allowbreak{},\allowbreak{} \allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}[\allowbreak{}]\allowbreak{}]}) is consumed by the event bus. The buffer API produces \texttt{R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}s}, which must be drained back into \texttt{C\allowbreak{}m\allowbreak{}d\allowbreak{}[\allowbreak{}]} at the boundary. This is a seam, not a full TEA replacement.
+\item
+  Key priority logic (\texttt{f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t} vs \texttt{p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}-\allowbreak{}f\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}t}) currently lives outside routing. It needs to move into the routing handler or be resolved before routing begins.
+\end{itemize}
+

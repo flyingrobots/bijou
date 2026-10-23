@@ -1,0 +1,258 @@
+\chapter{DF-072 DOGFOOD Release Title Artifact Gallery}\label{record-112}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DF-072-dogfood-release-title-artifact-gallery.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: DF-072 DOGFOOD Release Title Artifact Gallery
+legend: DF
+lane: cool-ideas
+priority: medium
+issue: https://github.com/flyingrobots/bijou/issues/289
+keywords:
+  - dogfood
+  - release
+  - release-title
+  - title-gallery
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-112-framing}
+
+Issue \#289 asks DOGFOOD to treat release title screens as first-class release artifacts instead of replacing the last title treatment in place. V7 shipped with \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{} \allowbreak{}T\allowbreak{}r\allowbreak{}u\allowbreak{}t\allowbreak{}h}; this follow-up adds a unique post-release treatment and keeps both artifacts visible through the Release page.
+
+The design follows a Design Thinking loop: observe that release identity is valuable after the release lands, frame titles as reusable proof artifacts, prototype a gallery that keeps the newest treatment first, and prove every title through interactive, static, pipe, accessible, and localized output.
+
+\section{Sponsor Human}\label{record-112-sponsor-human}
+
+\begin{itemize}
+\tightlist
+\item
+  A maintainer reviewing the release wants to see that v7 was published and that follow-up work is intentionally tracked instead of silently changing the historical title.
+\item
+  A DOGFOOD reader wants the Release page to open with the current title while still making the original release title discoverable.
+\end{itemize}
+
+\section{Sponsor Agent}\label{record-112-sponsor-agent}
+
+\begin{itemize}
+\tightlist
+\item
+  A review agent needs release-title metadata, lower-mode facts, and localization keys in one typed structure instead of scattered prose.
+\end{itemize}
+
+\section{Hill}\label{record-112-hill}
+
+A DOGFOOD reader can open the Release guide and see a latest-first title gallery whose current item is a unique \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}L\allowbreak{}a\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{} \allowbreak{}W\allowbreak{}a\allowbreak{}k\allowbreak{}e} post-release title screen, while the original \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{} \allowbreak{}T\allowbreak{}r\allowbreak{}u\allowbreak{}t\allowbreak{}h} artifact remains available with its own lower-mode facts.
+
+\section{Playback Questions}\label{record-112-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the Release guide open with the current title treatment?
+\item
+  Does the historical \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{} \allowbreak{}T\allowbreak{}r\allowbreak{}u\allowbreak{}t\allowbreak{}h} artifact remain selectable?
+\item
+  Do static, pipe, and accessible modes all lower from the same typed release-title record?
+\item
+  Does every new visible string have source rows and generated catalogs for all supported DOGFOOD locales?
+\item
+  Does compact interactive rendering stay within the caller's requested width?
+\end{itemize}
+
+\section{Current Truth}\label{record-112-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} is already published.
+\item
+  The strict \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} GitHub milestone has no open issues.
+\item
+  Issue \#289 is open in the Beyond milestone and already describes the gallery shape this patch should land.
+\item
+  DOGFOOD currently has one release-title metadata object, one Release guide, and localized strings for that single title.
+\end{itemize}
+
+\section{Product Shape}\label{record-112-product-shape}
+
+\subsection{Release Page Gallery}\label{record-112-release-page-gallery}
+
+\begin{CodeBlock}
+DOGFOOD Release
+
+> V7 Launch Wake        v7-launch   current
+  A released line leaves a readable trail.
+  lanes: published release | follow-up patch | title gallery | green main CI
+
+  V7 Product Truth      v7          historical
+  Blocks prove product surfaces. DOGFOOD proves Blocks.
+  lanes: table parity | scoped Node I/O | BlockLab | release title
+\end{CodeBlock}
+
+\subsection{Current Title}\label{record-112-current-title}
+
+\begin{CodeBlock}
++ BIJOU DOGFOOD -------------------------------------------+
+| V7 Launch Wake                                           |
+| A released line leaves a readable trail.                 |
+|                                                          |
+| Proof lanes: published release | follow-up patch | ...   |
+| Release gate: v7.0.0 released, patch lane open           |
+| Motif: Wake lines, not fireworks: proof remains visible  |
+|                                                          |
+| [Release Notes] [Migration] [DOGFOOD] [BlockLab]         |
++----------------------------------------------------------+
+\end{CodeBlock}
+
+\subsection{Narrow Title}\label{record-112-narrow-title}
+
+\begin{CodeBlock}
++ BIJOU DOGFOOD ----+
+| V7 Launch Wake    |
+| Release trail.    |
+| lanes: published  |
+| gate: v7.0.0 ...  |
+| motif: wake lines |
++-------------------+
+\end{CodeBlock}
+
+\section{Lower Modes}\label{record-112-lower-modes}
+
+Static mode keeps the title useful without border art:
+
+\begin{CodeBlock}
+Bijou DOGFOOD release title. Release V7 Launch Wake.
+Proof lanes: published release, follow-up patch, title gallery, green main CI.
+Motif: Wake lines, not fireworks: proof remains visible after ship.
+\end{CodeBlock}
+
+Pipe mode exposes facts for agents:
+
+\begin{CodeBlock}
+release_id  v7-launch
+release_title   V7 Launch Wake
+release_motif   Wake lines, not fireworks: proof remains visible after ship.
+proof_lane  published release
+proof_lane  follow-up patch
+proof_lane  title gallery
+proof_lane  green main CI
+navigation_available    true
+\end{CodeBlock}
+
+Accessible mode names the same proof without depending on layout:
+
+\begin{CodeBlock}
+DOGFOOD title screen for V7 Launch Wake.
+Current release proof lanes are published release, follow-up patch,
+title gallery, green main CI.
+Visual motif: Wake lines, not fireworks: proof remains visible after ship.
+Navigation remains available after the title.
+\end{CodeBlock}
+
+\section{Runtime And API Contract}\label{record-112-runtime-and-api-contract}
+
+\begin{itemize}
+\tightlist
+\item
+  Release-title data is represented by typed \texttt{D\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}R\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}T\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e} records.
+\item
+  \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}R\allowbreak{}E\allowbreak{}L\allowbreak{}E\allowbreak{}A\allowbreak{}S\allowbreak{}E\allowbreak{}\_\allowbreak{}T\allowbreak{}I\allowbreak{}T\allowbreak{}L\allowbreak{}E\allowbreak{}\_\allowbreak{}G\allowbreak{}A\allowbreak{}L\allowbreak{}L\allowbreak{}E\allowbreak{}R\allowbreak{}Y} is latest-first.
+\item
+  \texttt{C\allowbreak{}U\allowbreak{}R\allowbreak{}R\allowbreak{}E\allowbreak{}N\allowbreak{}T\allowbreak{}\_\allowbreak{}D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}R\allowbreak{}E\allowbreak{}L\allowbreak{}E\allowbreak{}A\allowbreak{}S\allowbreak{}E\allowbreak{}\_\allowbreak{}T\allowbreak{}I\allowbreak{}T\allowbreak{}L\allowbreak{}E} points at the current title treatment.
+\item
+  Rendering defaults to the current title but accepts an explicit historical title for stable artifact playback.
+\item
+  DOGFOOD Release guides are generated from the gallery, not manually copied per title.
+\end{itemize}
+
+\section{Linked Invariants}\label{record-112-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  New release-title UI strings must be represented in every supported DOGFOOD locale.
+\item
+  Lower modes must expose the same release id, title, motif, proof lanes, and navigation availability as the interactive title.
+\item
+  Release-title rendering must stay deterministic and width-bounded from its explicit inputs.
+\end{itemize}
+
+\section{Accessibility, Localization, And Inspectability}\label{record-112-accessibility-localization-and-inspectability}
+
+\begin{itemize}
+\tightlist
+\item
+  Every visible string added in this cycle has \texttt{e\allowbreak{}n}, \texttt{d\allowbreak{}e}, \texttt{e\allowbreak{}s}, and \texttt{f\allowbreak{}r} source rows and regenerated runtime catalogs.
+\item
+  The title's motif is exposed as text in interactive, static, pipe, and accessible modes.
+\item
+  The renderer remains deterministic and does not query GitHub, wall-clock time, or release APIs.
+\item
+  Interactive output must stay inside the requested width for compact terminals.
+\end{itemize}
+
+\section{Tests To Write First}\label{record-112-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Extend \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}F\allowbreak{}-\allowbreak{}0\allowbreak{}6\allowbreak{}0\allowbreak{}/\allowbreak{}v\allowbreak{}7\allowbreak{}-\allowbreak{}d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}r\allowbreak{}e\allowbreak{}e\allowbreak{}n\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  RED state:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    no \texttt{C\allowbreak{}U\allowbreak{}R\allowbreak{}R\allowbreak{}E\allowbreak{}N\allowbreak{}T\allowbreak{}\_\allowbreak{}D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}R\allowbreak{}E\allowbreak{}L\allowbreak{}E\allowbreak{}A\allowbreak{}S\allowbreak{}E\allowbreak{}\_\allowbreak{}T\allowbreak{}I\allowbreak{}T\allowbreak{}L\allowbreak{}E}
+  \item
+    no \texttt{D\allowbreak{}O\allowbreak{}G\allowbreak{}F\allowbreak{}O\allowbreak{}O\allowbreak{}D\allowbreak{}\_\allowbreak{}R\allowbreak{}E\allowbreak{}L\allowbreak{}E\allowbreak{}A\allowbreak{}S\allowbreak{}E\allowbreak{}\_\allowbreak{}T\allowbreak{}I\allowbreak{}T\allowbreak{}L\allowbreak{}E\allowbreak{}\_\allowbreak{}G\allowbreak{}A\allowbreak{}L\allowbreak{}L\allowbreak{}E\allowbreak{}R\allowbreak{}Y}
+  \item
+    no \texttt{v\allowbreak{}7\allowbreak{}-\allowbreak{}l\allowbreak{}a\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}h} lower-mode facts
+  \item
+    Release page still exposes only \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}-\allowbreak{}t\allowbreak{}i\allowbreak{}t\allowbreak{}l\allowbreak{}e\allowbreak{}-\allowbreak{}v\allowbreak{}7}
+  \end{itemize}
+\item
+  GREEN state:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the gallery is latest-first
+  \item
+    \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}L\allowbreak{}a\allowbreak{}u\allowbreak{}n\allowbreak{}c\allowbreak{}h\allowbreak{} \allowbreak{}W\allowbreak{}a\allowbreak{}k\allowbreak{}e} is the current title
+  \item
+    \texttt{V\allowbreak{}7\allowbreak{} \allowbreak{}P\allowbreak{}r\allowbreak{}o\allowbreak{}d\allowbreak{}u\allowbreak{}c\allowbreak{}t\allowbreak{} \allowbreak{}T\allowbreak{}r\allowbreak{}u\allowbreak{}t\allowbreak{}h} remains available as a historical guide
+  \item
+    pipe output includes \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}\_\allowbreak{}i\allowbreak{}d} and \texttt{r\allowbreak{}e\allowbreak{}l\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}\_\allowbreak{}m\allowbreak{}o\allowbreak{}t\allowbreak{}i\allowbreak{}f}
+  \end{itemize}
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-112-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Issue \#289 is closed by the PR.
+\item
+  DOGFOOD has a unique post-release title screen for \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0}.
+\item
+  The original v7 title treatment remains inspectable.
+\item
+  Runtime catalogs are regenerated from source.
+\item
+  The changelog records the follow-up.
+\end{itemize}
+
+\section{Risks And Guardrails}\label{record-112-risks-and-guardrails}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not rewrite the release history or imply that \#289 was part of the strict \texttt{v\allowbreak{}7\allowbreak{}.\allowbreak{}0\allowbreak{}.\allowbreak{}0} milestone.
+\item
+  Do not make the title gallery a live GitHub integration.
+\item
+  Do not remove existing V7 title metadata or tests.
+\end{itemize}
+

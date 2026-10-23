@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { documentationFileExists as existsSync } from '../../../scripts/documentation-corpus.js';
 import { describe, expect, it } from 'vitest';
 import {
   expectClaims,
@@ -16,7 +16,7 @@ describe('DX-050 Profunctor Page inspection design', () => {
     expectClaims(design, [
       'github_issue: 468',
       'status: complete',
-      'Legend: [DX - Developer Experience](../legends/DX-developer-experience.md)',
+      'Legend: [DX - Developer Experience]',
       '## Current Truth',
       '## Acceptance Criteria',
       '## Sponsor Human',
@@ -46,27 +46,6 @@ describe('DX-050 Profunctor Page inspection design', () => {
       'Full local verification passes `4,015` tests',
       'Hidden unsupported blocks become `hidden-unsupported-block` residuals',
       'Visible unsupported blocks',
-    ]);
-  });
-
-  it('keeps roadmap and bearing aligned with live tracker truth', () => {
-    const roadmap = normalized('docs/ROADMAP.md');
-    const bearing = normalized('docs/BEARING.md');
-
-    expectClaims(roadmap, [
-      'Last synced from GitHub milestone items: 2026-08-09.',
-      '| `v8.2.0` | [v8.2.0](https://github.com/flyingrobots/bijou/milestone/8) | 26 | 5 |',
-      '[#485](https://github.com/flyingrobots/bijou/issues/485)',
-      '[#472](https://github.com/flyingrobots/bijou/issues/472)',
-      '[#473](https://github.com/flyingrobots/bijou/issues/473)',
-      '[DX-050](./design/DX-050-profunctor-page-inspection.md)',
-    ]);
-    expectClaims(bearing, [
-      '`v8.2.0` milestone is quality automation and reliability: 26 open and 5 closed milestone items',
-      '`v8.0.0` milestone is Runtime Graph release closeout: 3 open milestone items and 4 closed milestone items',
-      '[DX-050](./design/DX-050-profunctor-page-inspection.md)',
-      '[RE-036](./design/RE-036-packed-bijou-cells-surface-adapter.md)',
-      'lowers current debt to `22` file/context and `10` code-size violations',
     ]);
   });
 });

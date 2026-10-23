@@ -1,0 +1,136 @@
+\chapter{HT-007 Focus Map Surface}\label{record-257}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/HT-007-focus-map-surface.md}\par}\smallskip
+
+\begin{RecordMeta}
+title: HT-007 Focus Map Surface
+legend: HT
+lane: design
+
+\end{RecordMeta}
+
+\section{Framing}\label{record-257-framing}
+
+Focus behavior in complex shells and multi-pane workstations is difficult to reason about from runtime output alone. The humane terminal story is stronger when focus ownership is inspectable and explainable.
+
+HT-007 adds a pure focus map report and surface helper. The first slice accepts focus facts from an app or shell, detects basic focus-health issues, and renders plain text or a bounded \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+
+\section{Sponsored Users}\label{record-257-sponsored-users}
+
+\begin{itemize}
+\tightlist
+\item
+  App authors debugging tab order and focus ownership.
+\item
+  Maintainers investigating multi-pane focus regressions.
+\item
+  Agent workflows that need focus facts as deterministic text.
+\end{itemize}
+
+\section{Hills}\label{record-257-hills}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A developer can render the current focus map with focused node, owner, region, tab order, and disabled state.
+\item
+  A maintainer can detect multiple focused nodes, missing focused node, focused-disabled nodes, and duplicate tab indexes.
+\item
+  A test can render the report as a \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} for docs or debug panes.
+\end{enumerate}
+
+\section{Playback Questions}\label{record-257-playback-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Does the helper preserve focus ownership and tab order in the report?
+\item
+  Does the focused node stand out in text output?
+\item
+  Does issue detection catch no focus, multiple focus, disabled focus, and duplicate tab indexes?
+\item
+  Does the surface helper render a bounded report?
+\item
+  Does \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} export the focus map API from the source barrel?
+\end{itemize}
+
+\section{Requirements}\label{record-257-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  Add \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}M\allowbreak{}a\allowbreak{}p\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}?\allowbreak{})}.
+\item
+  Add \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}M\allowbreak{}a\allowbreak{}p\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{},\allowbreak{} \allowbreak{}o\allowbreak{}p\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}?\allowbreak{})}.
+\item
+  Add \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}F\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}M\allowbreak{}a\allowbreak{}p\allowbreak{}(\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}s\allowbreak{})}.
+\item
+  Support node id, optional owner, optional role, optional rect, optional tab index, focusable, focused, and disabled flags.
+\item
+  Keep the first slice pure; it must expose focus truth, not invent a second focus system.
+\end{itemize}
+
+\section{Acceptance Criteria}\label{record-257-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Focused RED tests fail before implementation and pass after.
+\item
+  Text output includes focused node, ownership, tab order, and issues.
+\item
+  Surface output respects supplied width and height.
+\item
+  Docs and changelog describe the helper.
+\end{itemize}
+
+\section{Implementation Outline}\label{record-257-implementation-outline}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement the helper in \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}-\allowbreak{}m\allowbreak{}a\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Export it from \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  Keep report ordering deterministic: tab index first, then id.
+\end{itemize}
+
+\section{Drift Check}\label{record-257-drift-check}
+
+\begin{itemize}
+\tightlist
+\item
+  Scope stayed pure and report-only; the helper consumes focus facts supplied by an app or shell instead of creating a competing focus manager.
+\item
+  The first issue set covers foundational focus invariants. Richer trap and dead-island detection remains a follow-up because it needs parent/edge facts that are not part of this slice.
+\item
+  Ordering is deterministic: tab index first, then node id.
+\end{itemize}
+
+\section{Playback}\label{record-257-playback}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}s\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}F\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}M\allowbreak{}a\allowbreak{}p\allowbreak{}(\allowbreak{})} returns ordered nodes, focused node ids, and structured issues for missing focus, multiple focused nodes, focused-disabled nodes, and duplicate tab indexes.
+\item
+  \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}M\allowbreak{}a\allowbreak{}p\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} renders owner, role, rect, tab order, focusable, focused, and disabled state, with focused node rows prefixed by \texttt{*}.
+\item
+  \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}M\allowbreak{}a\allowbreak{}p\allowbreak{}S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}(\allowbreak{})} renders the same report as a bounded \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}.
+\item
+  \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i} exports the focus map API from its source barrel.
+\end{itemize}
+
+\section{Retrospective}\label{record-257-retrospective}
+
+\begin{itemize}
+\tightlist
+\item
+  This pairs cleanly with the layout and input-routing inspectors: layout shows where regions are, input routing shows how events moved, and the focus map shows who currently owns focus.
+\item
+  App-provided focus facts are the right boundary for the first slice. Inferring focus from rendered text would create brittle diagnostics and hide the runtime truth the helper is meant to expose.
+\end{itemize}
+

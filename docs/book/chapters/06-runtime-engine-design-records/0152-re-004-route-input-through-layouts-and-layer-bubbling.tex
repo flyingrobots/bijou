@@ -1,0 +1,319 @@
+\chapter{RE-004 --- Route Input Through Layouts and Layer Bubbling}\label{record-152}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-004-route-input-through-layouts-and-layer-bubbling.md}\par}\smallskip
+
+\emph{Cycle for making retained layouts the authoritative routing surface for input, topmost layer first}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE --- Runtime Engine}
+\end{itemize}
+
+Depends on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-001-define-runtime-engine-architecture.md}{RE-001 --- Define Runtime Engine Architecture}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-002-promote-first-class-state-machine-and-view-stack.md}{RE-002 --- Promote First-Class State Machine and View Stack}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-003-retain-layout-trees-and-layout-invalidation.md}{RE-003 --- Retain Layout Trees and Layout Invalidation}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-152-why-this-cycle-exists}
+
+RE-003 made retained geometry first-class.
+
+But the runtime still needs to answer the next question:
+
+\begin{itemize}
+\tightlist
+\item
+  given an input event and a view stack with retained layouts, who sees it first?
+\item
+  when does it stop?
+\item
+  when does it bubble downward?
+\item
+  how does pointer routing know which node was actually hit?
+\end{itemize}
+
+This cycle exists to land a pure runtime-engine routing seam that:
+
+\begin{itemize}
+\tightlist
+\item
+  reads the retained layouts of the current view stack
+\item
+  routes topmost view first
+\item
+  uses layout-driven hit testing for pointer input
+\item
+  respects blocking vs bubbling semantics by layer
+\item
+  stays shell-agnostic instead of embedding framed-app branches into the runtime core
+\end{itemize}
+
+This is still intentionally smaller than full component contracts. It gives the runtime a routing spine before \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}5} and \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}6} deepen command/effect and component interaction semantics further.
+
+\section{Human users / jobs / hills}\label{record-152-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-152-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  framework maintainers evolving runtime interaction rules
+\item
+  builders composing modal, palette, drawer, and workspace views
+\item
+  shell authors who need pointer and key routing to stop depending on branch order
+\end{itemize}
+
+\subsection{Human jobs}\label{record-152-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Route key and pointer input through explicit topmost-first layer semantics.
+\item
+  Trust a blocking top layer to prevent lower views from accidentally seeing the same input.
+\item
+  Use retained geometry to tell which layout node a pointer event actually hit.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-152-human-hill}
+
+A human can explain why a given input was handled, blocked, or bubbled by pointing at the view stack, retained layouts, and routing result instead of reverse-engineering branch order.
+
+\section{Agent users / jobs / hills}\label{record-152-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-152-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents inspecting why an input hit one view instead of another
+\item
+  agents generating deterministic routing tests
+\item
+  agents preparing future component-level interaction contracts
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-152-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Read routing results and know which view and node received an input first.
+\item
+  Distinguish between ``unhandled and bubbled'' vs ``stopped by a blocking layer.''
+\item
+  Inspect pointer hit paths without parsing painted frames heuristically.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-152-agent-hill}
+
+An agent can inspect the runtime routing result and explain which layers were visited, which node was hit, and why lower views did or did not receive the same input.
+
+\section{Human playback}\label{record-152-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user has a workspace view open with a non-blocking tooltip above it.
+\item
+  The tooltip does not handle a click.
+\item
+  Because the tooltip does not block lower views, the click bubbles to the workspace view.
+\item
+  Later, a blocking modal opens above the same workspace.
+\item
+  The user clicks outside the modal's actionable content.
+\item
+  The modal does not handle the click, but it still blocks lower views.
+\item
+  The workspace never receives that click.
+\end{enumerate}
+
+\section{Agent playback}\label{record-152-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent inspects a runtime with \texttt{w\allowbreak{}o\allowbreak{}r\allowbreak{}k\allowbreak{}s\allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h} in the view stack.
+\item
+  The search view is topmost and blocking.
+\item
+  A key event enters the runtime.
+\item
+  The runtime routes the event to \texttt{s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h} first.
+\item
+  The search handler emits one command and one effect.
+\item
+  The routing result reports:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    visited layers in topmost-first order
+  \item
+    \texttt{s\allowbreak{}e\allowbreak{}a\allowbreak{}r\allowbreak{}c\allowbreak{}h} as the handling view
+  \item
+    no lower-layer visitation after handling
+  \end{itemize}
+\item
+  For a pointer event, the routing result also exposes the hit path inside the retained layout tree.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-152-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/topmost-layer-dismisses-first.md}{Topmost Layer Dismisses First}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/layout-owns-interaction-geometry.md}{Layout Owns Interaction Geometry}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/commands-change-state-effects-do-not.md}{Commands Change State, Effects Do Not}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\end{itemize}
+
+\section{Implementation outline}\label{record-152-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add pure runtime-engine input types for shell-agnostic key and pointer input.
+\item
+  Add pure layout-hit testing over retained layout trees.
+\item
+  Add a pure input-routing helper that:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    visits topmost view first
+  \item
+    resolves retained layout for that view
+  \item
+    computes pointer hit paths when geometry applies
+  \item
+    calls a supplied per-view handler
+  \item
+    stops on handled input
+  \item
+    stops on unhandled input if the layer blocks below
+  \item
+    bubbles otherwise
+  \end{itemize}
+\item
+  Return a structured routing result that records:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    visited view ids
+  \item
+    handled/stopped state
+  \item
+    commands and effects emitted
+  \item
+    hit path when pointer routing applies
+  \end{itemize}
+\item
+  Keep handler semantics generic in this cycle rather than formalizing full component interaction contracts yet.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-152-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle test proving the legend now points at \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}4} as the active cycle and leaves the remaining runtime-engine backlog in place
+\item
+  package-local runtime tests proving:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    deepest-node layout hit testing works
+  \item
+    key routing is topmost-first
+  \item
+    unhandled input bubbles through non-blocking views
+  \item
+    unhandled input stops at blocking views
+  \item
+    pointer routing exposes hit node ids from retained layout geometry
+  \item
+    routing results preserve separate command/effect arrays
+  \end{itemize}
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-152-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  detailed component-level interaction contracts are still deferred to \texttt{R\allowbreak{}E\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}6}
+\item
+  the first routing seam should stay generic enough to work for framed shell, DOGFOOD, and future runtimes without hard-coding shell concepts
+\item
+  some future views may need more nuanced propagation semantics than simple handled-or-blocked rules, but this cycle should land the clear baseline first
+\end{itemize}
+
+\section{Retrospective}\label{record-152-retrospective}
+
+What landed:
+
+\begin{itemize}
+\tightlist
+\item
+  pure runtime-engine input event types
+\item
+  retained-layout hit testing
+\item
+  topmost-first routing over the active view stack
+\item
+  explicit bubbling vs blocking behavior
+\item
+  structured routing results with visited views and emitted commands/effects
+\end{itemize}
+
+What did not land:
+
+\begin{itemize}
+\tightlist
+\item
+  no full command/effect buffering runtime yet
+\item
+  no component-level interaction contract yet
+\item
+  no framed-shell migration yet
+\end{itemize}
+
+Follow-on:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-005-buffer-commands-and-effects-separately.md}{RE-005 --- Buffer Commands and Effects Separately}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/RE-006-formalize-component-layout-and-interaction-contracts.md}{RE-006 --- Formalize Component Layout and Interaction Contracts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/up-next/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}{RE-007 --- Migrate Framed Shell Onto Runtime Engine Seams}
+\end{itemize}
+

@@ -1,0 +1,364 @@
+\chapter{HT-002 --- Layered Focus and Interaction}\label{record-254}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/HT-002-layered-focus-and-interaction.md}\par}\smallskip
+
+\emph{Cycle for defining how Bijou shells should treat focus layers, dismiss order, and input ownership as one coherent stack}
+
+Legend:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/HT-humane-terminal.md}{HT --- Humane Terminal}
+\end{itemize}
+
+\section{Why this cycle exists}\label{record-254-why-this-cycle-exists}
+
+Bijou has accumulated multiple shell-owned surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  help
+\item
+  search
+\item
+  command palette
+\item
+  settings
+\item
+  notifications
+\item
+  quit confirm
+\item
+  page-owned modals
+\end{itemize}
+
+They currently route input by branch order. That is workable until it is not: the moment two layers disagree about \texttt{E\allowbreak{}s\allowbreak{}c}, footer hints, or control ownership, the shell starts feeling brittle.
+
+This cycle exists to define a calmer model:
+
+\begin{itemize}
+\tightlist
+\item
+  layers behave like a stack
+\item
+  the topmost layer owns input
+\item
+  the topmost layer owns the visible controls
+\item
+  dismiss actions pop layers before they trigger broader shell behavior
+\end{itemize}
+
+The purpose of this cycle is design, not implementation. The follow-on runtime refactor will come in the next cycle.
+
+\section{Human users / jobs / hills}\label{record-254-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-254-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  operators inside framed Bijou apps
+\item
+  first-time DOGFOOD users who open layered shell surfaces
+\item
+  builders trying to understand why \texttt{E\allowbreak{}s\allowbreak{}c}, \texttt{T\allowbreak{}a\allowbreak{}b}, and footer hints behave the way they do
+\end{itemize}
+
+\subsection{Human jobs}\label{record-254-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Understand which layer currently owns input.
+\item
+  Dismiss the thing in front of me without accidentally quitting the app.
+\item
+  Trust the footer and help hints to describe the active controls truthfully.
+\item
+  Move back to the underlying pane without guessing whether hidden controls are still live.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-254-human-hill}
+
+A user can open and close layered shell surfaces without ever feeling that \texttt{E\allowbreak{}s\allowbreak{}c} or the footer lied about what would happen next.
+
+\section{Agent users / jobs / hills}\label{record-254-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-254-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  agents navigating framed apps through deterministic key sequences
+\item
+  agents inspecting shell state for playbacks, tests, or UI generation
+\item
+  agents trying to decide which controls are valid without scraping visual chrome heuristically
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-254-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Determine the active interaction layer without reconstructing branch order from source.
+\item
+  Read the active input map for the topmost layer.
+\item
+  Predict what \texttt{E\allowbreak{}s\allowbreak{}c}, navigation keys, and shell shortcuts will do right now.
+\item
+  Derive truthful control hints from the same source that governs routing.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-254-agent-hill}
+
+An agent can inspect or infer a single active layer stack and know which input map is live, what controls are truthful, and what dismissal will do next.
+
+\section{Human playback}\label{record-254-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user is in DOGFOOD docs and opens component search with \texttt{/}.
+\item
+  Search pushes a search layer onto the shell stack.
+\item
+  The search layer's input map becomes active, and the footer updates to search-specific controls.
+\item
+  The underlying pane controls disappear from the footer because they are no longer truthful.
+\item
+  The user presses \texttt{E\allowbreak{}s\allowbreak{}c}.
+\item
+  The search layer dismisses and pops off the stack.
+\item
+  The previously focused docs pane becomes active again, along with its pane controls.
+\item
+  The user presses \texttt{E\allowbreak{}s\allowbreak{}c} again.
+\item
+  No dismissible overlay remains, so the shell now interprets \texttt{E\allowbreak{}s\allowbreak{}c} as a quit request and opens quit confirm.
+\end{enumerate}
+
+\section{Agent playback}\label{record-254-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent enters a framed app and requests the current shell layer state.
+\item
+  The shell reports a base workspace layer plus one topmost settings drawer layer.
+\item
+  The active input map is the settings drawer map, not the underlying pane map.
+\item
+  The agent derives visible controls from that topmost input map and ignores stale pane-local hints.
+\item
+  The agent sends \texttt{E\allowbreak{}s\allowbreak{}c}.
+\item
+  The shell pops the settings layer and restores the workspace layer and its active pane input map.
+\item
+  The agent sends \texttt{E\allowbreak{}s\allowbreak{}c} again.
+\item
+  With no dismissible overlay left, the shell opens quit confirm instead of silently quitting or dispatching to a stale pane action.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-254-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/focus-owns-input.md}{Focus Owns Input}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/topmost-layer-dismisses-first.md}{Topmost Layer Dismisses First}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/visible-controls-are-a-promise.md}{Visible Controls Are a Promise}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/shell-owns-shell-concerns.md}{Shell Owns Shell Concerns}
+\end{itemize}
+
+\section{Proposed direction}\label{record-254-proposed-direction}
+
+\subsection{Layer model}\label{record-254-layer-model}
+
+Treat shell and page interaction surfaces as a stack of explicit layers:
+
+\begin{itemize}
+\tightlist
+\item
+  base workspace layer
+\item
+  pane-local modal layer
+\item
+  shell search/palette layer
+\item
+  shell help layer
+\item
+  shell settings layer
+\item
+  shell notification center layer
+\item
+  shell quit-confirm layer
+\end{itemize}
+
+The stack is logical, not merely visual. Only the topmost layer owns input.
+
+\subsection{Input maps}\label{record-254-input-maps}
+
+Each layer should provide or select an input map that describes:
+
+\begin{itemize}
+\tightlist
+\item
+  the keys it handles
+\item
+  the dismissal behavior it owns
+\item
+  the controls that can be shown in the footer/help
+\item
+  whether it is dismissible, blocking, or review-only
+\end{itemize}
+
+This makes the input map do three jobs from one source of truth:
+
+\begin{itemize}
+\tightlist
+\item
+  routing
+\item
+  visible controls
+\item
+  agent-readable interaction state
+\end{itemize}
+
+\subsection{Dismiss order}\label{record-254-dismiss-order}
+
+Dismissal should be top-down and unsurprising:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  If a dismissible layer is open, \texttt{E\allowbreak{}s\allowbreak{}c} dismisses that layer.
+\item
+  If the topmost layer is not dismissible, \texttt{E\allowbreak{}s\allowbreak{}c} does nothing or follows that layer's explicit contract.
+\item
+  Only when no dismissible layer remains should \texttt{E\allowbreak{}s\allowbreak{}c} fall back to the shell quit request.
+\end{enumerate}
+
+\texttt{q} and \texttt{C\allowbreak{}t\allowbreak{}r\allowbreak{}l\allowbreak{}+\allowbreak{}C} can remain explicit quit affordances, but they should still respect text-entry exceptions and shell-owned quit policy.
+
+\subsection{Visible controls}\label{record-254-visible-controls}
+
+Footer and help hints should be derived from the topmost input map, not copied from whichever branch happened to handle the last render.
+
+This means:
+
+\begin{itemize}
+\tightlist
+\item
+  a search layer shows search controls
+\item
+  a modal shows modal controls
+\item
+  an inactive pane does not keep advertising its keys when covered
+\item
+  when a layer pops, the previous active map becomes visible again
+\end{itemize}
+
+\subsection{Agent-visible semantics}\label{record-254-agent-visible-semantics}
+
+The shell should eventually expose enough structured layer state that tests, playbacks, and agents do not need to infer ownership from rendered text alone.
+
+Candidate shape:
+
+\begin{itemize}
+\tightlist
+\item
+  ordered active layers
+\item
+  topmost input map id
+\item
+  dismissibility
+\item
+  active control hints
+\item
+  owning region or surface id
+\end{itemize}
+
+\section{Implementation outline}\label{record-254-implementation-outline}
+
+This cycle is design-only. The intended implementation follow-on is:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Introduce a shell layer model in \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}d\allowbreak{}A\allowbreak{}p\allowbreak{}p\allowbreak{}(\allowbreak{})}.
+\item
+  Convert search/help/settings/notifications/quit confirm into explicit layer descriptors.
+\item
+  Promote or adapt input maps so each layer drives both routing and visible controls.
+\item
+  Make \texttt{E\allowbreak{}s\allowbreak{}c} follow top-down dismiss semantics.
+\item
+  Prove the behavior through DOGFOOD and shell regressions.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-254-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  cycle doc regression asserting the new Humane Terminal cycle, invariant, and doctrine links exist
+\item
+  shell behavior regressions proving top-down dismiss order once implementation begins
+\item
+  footer/help regressions proving visible controls come from the topmost input map
+\item
+  DOGFOOD playback proving search dismissal restores the underlying pane controls before quit is possible
+\end{itemize}
+
+\section{Risks / unknowns}\label{record-254-risks-unknowns}
+
+\begin{itemize}
+\tightlist
+\item
+  page-owned modals and shell-owned layers currently live in different conceptual buckets
+\item
+  not every existing key path is modeled as an input map yet
+\item
+  some layers may want special \texttt{E\allowbreak{}s\allowbreak{}c} behavior beyond simple dismissal
+\item
+  the eventual public API for agent-readable layer state needs to be useful without overfitting the current shell internals
+\end{itemize}
+
+\section{Retrospective}\label{record-254-retrospective}
+
+This cycle deliberately stops at doctrine and interaction model definition.
+
+What it clarified:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c} bugs are symptoms of missing layer semantics, not isolated routing accidents
+\item
+  the shell needs a topmost-layer model, not more special-case branch ordering
+\item
+  input maps are a promising shared seam for routing, footer truth, and agent visibility
+\end{itemize}
+
+Drift and follow-on:
+
+\begin{itemize}
+\tightlist
+\item
+  the runtime still routes most shell layers ad hoc today
+\item
+  that follow-on has now landed as \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design/HT-003-implement-layer-stack-and-input-map-routing.md}{HT-003 --- Implement Layer Stack and Input Map Routing}
+\end{itemize}
+

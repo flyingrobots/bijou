@@ -1,0 +1,100 @@
+\chapter{What's New in Bijou 4.2.0}\label{record-276}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/releases/4.2.0/whats-new.md}\par}\smallskip
+
+\section{MCP Rendering Server}\label{record-276-mcp-rendering-server}
+
+Bijou now ships \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p}, an MCP (Model Context Protocol) server that exposes Bijou's terminal components as rendering tools over stdio.
+
+Any MCP client --- Claude Code, Cursor, or a custom integration --- can call 22 tools to get Unicode box-drawing output that renders correctly in monospace chat contexts. Tables, trees, DAGs, alert boxes, progress bars, timelines, and more --- all produced without ANSI escape codes.
+
+\subsection{Why this matters}\label{record-276-why-this-matters}
+
+LLM-powered coding tools talk in plain text. Structured terminal output (tables, graphs, trees) is useful in that context, but the rendering usually lives on the other side of a TTY. bijou-mcp bridges that gap: the AI calls a tool, Bijou renders the component, and the result drops into the conversation as clean Unicode text.
+
+\subsection{Highlights}\label{record-276-highlights}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{22 rendering tools} covering data/structure, containers/layout, feedback/status, navigation, rich panels, and utility categories
+\item
+  \textbf{No ANSI} --- uses \texttt{c\allowbreak{}r\allowbreak{}e\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}T\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t} with \texttt{p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}S\allowbreak{}t\allowbreak{}y\allowbreak{}l\allowbreak{}e\allowbreak{}(\allowbreak{})} for terminal-free rendering
+\item
+  \textbf{Zero config} --- point your MCP client at the bin entrypoint and go
+\end{itemize}
+
+See the \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/packages/bijou-mcp/README.md}{bijou-mcp README} for the full tool inventory and configuration instructions.
+
+\section{Runtime Engine: Framed Shell Migration (RE-007)}\label{record-276-runtime-engine-framed-shell-migration-re-007}
+
+The framed shell now routes all input through the runtime engine's \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t} infrastructure instead of ad-hoc key/mouse branches.
+
+\subsection{What changed}\label{record-276-what-changed}
+
+\begin{itemize}
+\tightlist
+\item
+  Key routing flows through \texttt{r\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}I\allowbreak{}n\allowbreak{}p\allowbreak{}u\allowbreak{}t} producing \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}h\allowbreak{}e\allowbreak{}l\allowbreak{}l\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d} facts
+\item
+  Mouse hit-testing uses retained layout trees with explicit layout nodes (\texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}:\allowbreak{}\{\allowbreak{}p\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}\}}, \texttt{p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}:\allowbreak{}\{\allowbreak{}p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}I\allowbreak{}d\allowbreak{}\}}, \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}-\allowbreak{}r\allowbreak{}o\allowbreak{}w\allowbreak{}:\allowbreak{}\{\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}\}})
+\item
+  Commands are buffered via \texttt{b\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}R\allowbreak{}e\allowbreak{}s\allowbreak{}u\allowbreak{}l\allowbreak{}t} and applied via \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}R\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}C\allowbreak{}o\allowbreak{}m\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}B\allowbreak{}u\allowbreak{}f\allowbreak{}f\allowbreak{}e\allowbreak{}r}
+\item
+  Shell commands are a plain discriminated union interpreted by a handler table, not classes with behavior
+\item
+  The \texttt{u\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}(\allowbreak{})} key and mouse branches are reduced to single-line buffer drains
+\end{itemize}
+
+\subsection{What was removed}\label{record-276-what-was-removed}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{h\allowbreak{}a\allowbreak{}n\allowbreak{}d\allowbreak{}l\allowbreak{}e\allowbreak{}F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}u\allowbreak{}s\allowbreak{}e}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}n\allowbreak{}e\allowbreak{}H\allowbreak{}i\allowbreak{}t\allowbreak{}A\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}R\allowbreak{}o\allowbreak{}w\allowbreak{}A\allowbreak{}t\allowbreak{}P\allowbreak{}o\allowbreak{}s\allowbreak{}i\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\item
+  \texttt{i\allowbreak{}s\allowbreak{}I\allowbreak{}n\allowbreak{}s\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}S\allowbreak{}e\allowbreak{}t\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}s\allowbreak{}D\allowbreak{}r\allowbreak{}a\allowbreak{}w\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{w\allowbreak{}i\allowbreak{}t\allowbreak{}h\allowbreak{}O\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}K\allowbreak{}e\allowbreak{}y}
+\item
+  \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}Q\allowbreak{}u\allowbreak{}i\allowbreak{}t\allowbreak{}R\allowbreak{}e\allowbreak{}q\allowbreak{}u\allowbreak{}e\allowbreak{}s\allowbreak{}t}
+\item
+  \texttt{o\allowbreak{}b\allowbreak{}s\allowbreak{}e\allowbreak{}r\allowbreak{}v\allowbreak{}e\allowbreak{}d\allowbreak{}R\allowbreak{}o\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}F\allowbreak{}o\allowbreak{}r\allowbreak{}L\allowbreak{}a\allowbreak{}y\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}l\allowbreak{}y\allowbreak{}H\allowbreak{}e\allowbreak{}l\allowbreak{}p\allowbreak{}S\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}A\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n}
+\end{itemize}
+
+These functions were replaced by the runtime engine's routing and buffer infrastructure. The migration is captured in \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/docs/design/RE-007-migrate-framed-shell-onto-runtime-engine-seams.md}{RE-007}.
+
+\section{Bug Fixes}\label{record-276-bug-fixes}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Inspector \texttt{s\allowbreak{}u\allowbreak{}p\allowbreak{}p\allowbreak{}o\allowbreak{}r\allowbreak{}t\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}T\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}L\allowbreak{}a\allowbreak{}b\allowbreak{}e\allowbreak{}l}} now renders in interactive mode. Pipe and accessible modes already included it; interactive was silently dropping the label.
+\item
+  \textbf{Explainability evidence values} now render through the MCP wrapper. Evidence items display as ``label --- value'' instead of label-only.
+\end{itemize}
+
+\section{Infrastructure}\label{record-276-infrastructure}
+
+\begin{itemize}
+\tightlist
+\item
+  All release infrastructure (publish workflow, dry-run workflow, pack verification, npm verify checks) now includes \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}m\allowbreak{}c\allowbreak{}p}.
+\item
+  The repo's planning system has been migrated to METHOD with all 7 legends resolving correctly.
+\end{itemize}
+
+\section{Package Map}\label{record-276-package-map}
+
+This release adds one new package to the lock-step family:
+
+\input{tables/table-078}
+
+All 10 workspace packages are versioned together at \texttt{4\allowbreak{}.\allowbreak{}2\allowbreak{}.\allowbreak{}0}.
+

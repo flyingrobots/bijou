@@ -1,0 +1,401 @@
+\chapter{WF-165 Respecting the Dojo Ratchet 12}\label{record-247}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/WF-165-respecting-dojo-ratchet-12.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/WF-workflow-and-delivery.md}{WF --- Workflow and Delivery}
+
+\section{Sponsor Human}\label{record-247-sponsor-human}
+
+James Ross.
+
+\section{Sponsor Agent}\label{record-247-sponsor-agent}
+
+Codex.
+
+\section{Decision Summary}\label{record-247-decision-summary}
+
+Complete issue \href{https://github.com/flyingrobots/bijou/issues/480}{\#480} by removing all \texttt{2\allowbreak{}5} files that are counted in both the file/context and code-size ledgers. The combined \texttt{5\allowbreak{}0}-violation reduction lowers aggregate Code Dojo debt from \texttt{6\allowbreak{}2} to \texttt{1\allowbreak{}2} or lower.
+
+Deliver the goalpost through bounded review tranches. Each tranche preserves public entrypoints as typed compatibility facades, proves that its extracted module family remains outside runtime import cycles, and lowers only the live ledger entries it actually removes.
+
+\section{Hill}\label{record-247-hill}
+
+The repository has \texttt{3\allowbreak{}7} file/context violations and \texttt{2\allowbreak{}5} code-size violations. All \texttt{2\allowbreak{}5} code-size offenders are also file/context offenders. Removing those double-counted roots behind stable facades therefore satisfies the next mandatory \texttt{5\allowbreak{}0}-violation goalpost without weakening a threshold, adding an exception, or changing public behavior.
+
+The first tranche starts with five of the smaller double-counted roots:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}e\allowbreak{}v\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}b\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}-\allowbreak{}f\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}-\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}s\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}i\allowbreak{}p\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}m\allowbreak{}o\allowbreak{}k\allowbreak{}e\allowbreak{}-\allowbreak{}a\allowbreak{}l\allowbreak{}l\allowbreak{}-\allowbreak{}e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}b\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}i\allowbreak{}1\allowbreak{}8\allowbreak{}n\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}t\allowbreak{}i\allowbreak{}m\allowbreak{}e\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\end{itemize}
+
+Ledger edits are evidence after extraction. They are not the implementation.
+
+\section{Current Truth}\label{record-247-current-truth}
+
+\begin{itemize}
+\tightlist
+\item
+  Aggregate Code Dojo debt: \texttt{3\allowbreak{}2}
+\item
+  File/context baseline: \texttt{2\allowbreak{}2}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  Code-size baseline: \texttt{1\allowbreak{}0}, including \texttt{3} hard-limit files
+\item
+  ESLint baseline: \texttt{0}
+\item
+  Required goalpost: \texttt{1\allowbreak{}2} aggregate violations or lower
+\item
+  Tranches A through C: \texttt{3\allowbreak{}0} counted violations removed from \texttt{1\allowbreak{}5} roots
+\item
+  Remaining double-counted roots: \texttt{1\allowbreak{}0}
+\item
+  Tracker issue: \href{https://github.com/flyingrobots/bijou/issues/480}{\#480}
+\item
+  Previous goalpost: \href{https://github.com/flyingrobots/bijou/issues/477}{\#477}
+\item
+  V8 contract pull: \href{https://github.com/flyingrobots/bijou/issues/459}{\#459}
+\end{itemize}
+
+\section{Scope}\label{record-247-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Bind the exact \texttt{2\allowbreak{}5} double-counted roots in deterministic cycle evidence.
+\item
+  Deliver those roots through bounded review tranches.
+\item
+  Start tranche A with the five smaller roots named in this design.
+\item
+  Preserve every selected public import path and export name.
+\item
+  Keep mutable module state inside one implementation module unless an explicit port makes cross-module ownership safe.
+\item
+  Keep overload declarations beside their implementation.
+\item
+  Preserve source-debt identity across extracted implementation parts.
+\item
+  Prove every changed split family remains absent from runtime import cycles.
+\item
+  Remove ledger entries only after the live size gates accept the facade and extracted modules.
+\item
+  Lower the package debt ceiling only to the measured live result.
+\item
+  Update the exception ledger, changelog, roadmap, bearing, and cycle evidence in every tranche.
+\end{itemize}
+
+\section{Non-Goals}\label{record-247-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  No Profunctor Page feature implementation.
+\item
+  No public API or behavior redesign.
+\item
+  No opportunistic repair of pre-existing runtime cycles tracked by \href{https://github.com/flyingrobots/bijou/issues/476}{\#476}.
+\item
+  No new standards exception or large-file marker.
+\item
+  No weakened threshold or aspirational ledger edit.
+\item
+  No release tag or publication.
+\end{itemize}
+
+\section{Tranche A Contract}\label{record-247-tranche-a-contract}
+
+Tranche A removes five roots from both counted ledgers:
+
+\input{tables/table-057}
+
+The expected tranche result is:
+
+\begin{itemize}
+\tightlist
+\item
+  File/context baseline: \texttt{3\allowbreak{}7\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}3\allowbreak{}2}
+\item
+  Code-size baseline: \texttt{2\allowbreak{}5\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}2\allowbreak{}0}
+\item
+  Aggregate debt: \texttt{6\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}5\allowbreak{}2}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  ESLint baseline: \texttt{0}
+\end{itemize}
+
+The overall WF-165 goalpost remains open after tranche A.
+
+\section{Tranche B Contract}\label{record-247-tranche-b-contract}
+
+Tranche B removes the five smallest remaining roots from both counted ledgers:
+
+\input{tables/table-058}
+
+The expected tranche-B result is:
+
+\begin{itemize}
+\tightlist
+\item
+  File/context baseline: \texttt{3\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}2\allowbreak{}7}
+\item
+  Code-size baseline: \texttt{2\allowbreak{}0\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}1\allowbreak{}5}
+\item
+  Aggregate debt: \texttt{5\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}4\allowbreak{}2}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  ESLint baseline: \texttt{0}
+\end{itemize}
+
+The selection is mechanical: these are the five smallest remaining entries in the code-size baseline, and every one is also present in the file/context baseline. The tranche does not redesign public behavior, change public exports, add an exception, or introduce cache invalidation. Review hardening corrects bounded runtime scheduling, shutdown, crash, modal, footer, and performance chart defects exposed by the extraction. It also restores pre-split DAG detour width, empty-badge, render-target adoption, deterministic noise, and harness elapsed-time semantics. The overall WF-165 goalpost remains open after tranche B.
+
+\section{Tranche C Contract}\label{record-247-tranche-c-contract}
+
+Tranche C removes the five smallest remaining roots from both counted ledgers:
+
+\input{tables/table-059}
+
+The expected tranche-C result is:
+
+\begin{itemize}
+\tightlist
+\item
+  File/context baseline: \texttt{2\allowbreak{}7\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}2\allowbreak{}2}
+\item
+  Code-size baseline: \texttt{1\allowbreak{}5\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}1\allowbreak{}0}
+\item
+  Aggregate debt: \texttt{4\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}3\allowbreak{}2}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  ESLint baseline: \texttt{0}
+\end{itemize}
+
+The selection is mechanical: these are the five smallest remaining entries in the code-size baseline, and every one is also present in the file/context baseline. Each original path remains a stable facade. Example process entry, public exports, deterministic merge-readiness classification, notification input behavior, image navigation and rendering, and framed-app output remain unchanged. Review evidence additionally binds shared notification geometry, RGB-only active-tab backgrounds, localized default frame titles, grapheme-safe dividers, source-invalidated image-preview caching, and bounded active-tab token caching. The overall WF-165 goalpost remains open after tranche C.
+
+\section{Tranche D Contract}\label{record-247-tranche-d-contract}
+
+Tranche D removes the five smallest remaining roots from both counted ledgers:
+
+\input{tables/table-060}
+
+The expected tranche-D result is:
+
+\begin{itemize}
+\tightlist
+\item
+  File/context baseline: \texttt{2\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}1\allowbreak{}7}
+\item
+  Code-size baseline: \texttt{1\allowbreak{}0\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}5}
+\item
+  Aggregate debt: \texttt{3\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}2\allowbreak{}2}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  ESLint baseline: \texttt{0}
+\end{itemize}
+
+The selection is mechanical: these are the five smallest remaining entries in the code-size baseline, and every one is also present in the file/context baseline. Each original path remains a stable facade. Public types, exports, byte layouts, validation diagnostics, hashes, rendering behavior, localization counts, terminal output, and performance-sensitive packed paths remain unchanged. The overall WF-165 goalpost remains open after tranche D.
+
+\section{Tranche E Contract}\label{record-247-tranche-e-contract}
+
+Tranche E removes the final five roots from the code-size ledger and from their double-counted positions in the file/context ledger:
+
+\input{tables/table-061}
+
+The expected tranche-E result is:
+
+\begin{itemize}
+\tightlist
+\item
+  File/context baseline: \texttt{1\allowbreak{}7\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}1\allowbreak{}2}
+\item
+  Code-size baseline: \texttt{5\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}0}
+\item
+  Aggregate debt: \texttt{2\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}1\allowbreak{}2}
+\item
+  Mock-ban baseline: \texttt{0}
+\item
+  ESLint baseline: \texttt{0}
+\end{itemize}
+
+The selection is exhaustive: these are the only remaining code-size entries, and every one is also present in the file/context baseline. Each original path remains a stable facade. Public types, exports, runtime lifecycle, table semantics, framed-app behavior, DOGFOOD process behavior, story identity, and rendered output remain unchanged. Tranche E closes the WF-165 \texttt{6\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}1\allowbreak{}2} goalpost only after the live ledgers, family bounds, runtime-cycle proof, documentation, and full repository gates agree.
+
+\section{Implementation Outline}\label{record-247-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add RED evidence for the exact active-tranche roots and target ledgers.
+\item
+  Extract cohesive declarations and behavior into focused adjacent modules.
+\item
+  Keep each original root as a stable compatibility facade.
+\item
+  Preserve behavior through existing focused suites and new export/size witnesses.
+\item
+  Prove that changed split families remain outside runtime import cycles.
+\item
+  Remove only the five proven roots from the file/context baseline.
+\item
+  Record each tranche's measured debt in the exception ledger and package ceiling.
+\item
+  Run documentation upkeep and the complete repository gate before review.
+\item
+  Close the goalpost only when all \texttt{2\allowbreak{}5} double-counted roots are gone.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-247-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Assert that the exact five tranche-A roots leave the file/context ledger.
+\item
+  Assert that the same five roots leave the code-size report.
+\item
+  Assert that every tranche-A facade and implementation module is at most \texttt{1\allowbreak{}5\allowbreak{}0} lines and \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  Assert that every changed production family remains absent from runtime import cycles.
+\item
+  Preserve focused behavioral tests for each touched public entrypoint.
+\item
+  Assert that aggregate debt is exactly \texttt{5\allowbreak{}2} after tranche A.
+\item
+  Assert that aggregate debt is exactly \texttt{4\allowbreak{}2} after tranche B.
+\item
+  Assert that the exact five tranche-C roots leave both measured ledgers.
+\item
+  Assert that every tranche-C facade and implementation module is at most \texttt{1\allowbreak{}5\allowbreak{}0} lines and \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  Assert that aggregate debt is exactly \texttt{3\allowbreak{}2} after tranche C.
+\item
+  Assert that the exact five tranche-D roots leave both measured ledgers.
+\item
+  Assert that every tranche-D facade and implementation module is at most \texttt{1\allowbreak{}5\allowbreak{}0} lines and \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  Assert that aggregate debt is exactly \texttt{2\allowbreak{}2} after tranche D.
+\item
+  Assert that the exact five tranche-E roots leave both measured ledgers.
+\item
+  Assert that every tranche-E facade and implementation module is at most \texttt{1\allowbreak{}5\allowbreak{}0} lines and \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  Assert that aggregate debt is exactly \texttt{1\allowbreak{}2} after tranche E.
+\end{itemize}
+
+\section{Validation Plan}\label{record-247-validation-plan}
+
+\begin{CodeBlock}
+npx vitest run --config vitest.config.ts \
+  tests/cycles/DX-050 \
+  tests/cycles/RE-036 \
+  tests/cycles/WF-130 \
+  tests/cycles/WF-163 \
+  tests/cycles/WF-164 \
+  tests/cycles/WF-165
+npm run code-dojo:verify
+npm run typecheck
+npm run lint
+npm run lint:eslint
+npm run docs:inventory
+npm run test:run
+git diff --check
+\end{CodeBlock}
+
+\section{Acceptance Criteria}\label{record-247-acceptance-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  All \texttt{2\allowbreak{}5} double-counted roots leave both measured ledgers.
+\item
+  Aggregate Code Dojo debt is \texttt{1\allowbreak{}2} or lower.
+\item
+  File/context and code-size ledgers match measured live files.
+\item
+  Mock-ban and ESLint baselines remain \texttt{0}.
+\item
+  Every selected public entrypoint preserves its export names.
+\item
+  No changed split family participates in a runtime import cycle.
+\item
+  No newly created file exceeds \texttt{1\allowbreak{}5\allowbreak{}0} lines or \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes.
+\item
+  Every tranche remains within the repository review-size policy.
+\item
+  Full local and GitHub validation gates pass.
+\item
+  Main at the resulting merge revision satisfies the next goalpost obligation before the V8 contract tracker closes.
+\end{itemize}
+
+\section{Playback Questions}\label{record-247-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Did every removed ledger entry correspond to a measured file reduction?
+\item
+  Did every compatibility facade preserve its public export names?
+\item
+  Are all changed split families absent from runtime import cycles?
+\item
+  Did the tranche preserve behavior instead of moving unbounded code into a differently named file?
+\item
+  Does the final combined evidence remove at least \texttt{5\allowbreak{}0} counted violations?
+\end{enumerate}
+
+\section{Accessibility And Assistive Posture}\label{record-247-accessibility-and-assistive-posture}
+
+This is a structural standards cycle. Extracted modules preserve current text, focus, lower-mode, and assistive semantics. No visual or interaction redesign is in scope.
+
+\section{Localization And Directionality Posture}\label{record-247-localization-and-directionality-posture}
+
+Extracted modules preserve catalog keys, localized values, reading order, and direction-sensitive behavior. The i18n runtime split must not change fallback, interpolation, reference, locale, or direction resolution.
+
+\section{Agent Inspectability And Explainability Posture}\label{record-247-agent-inspectability-and-explainability-posture}
+
+The exact target roots, tranche boundaries, live threshold checks, runtime-cycle proof, aggregate ceiling, and current documentation agree. A successor can identify every compatibility facade and implementation part without reconstructing the goalpost from commit history.
+
+\section{Linked Invariants}\label{record-247-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/typescript-code-standards.editors-edition.md}{TypeScript Code Standards}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/code-dojo-exceptions.md}{Code Dojo Exceptions}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/5b10cb89165b76673ffc60da59d7de5a531e55e9/docs/METHOD.md}{Work Doctrine}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/DOCUMENTATION_STANDARDS.md}{Documentation Standards}
+\item
+  Tracker issue: \href{https://github.com/flyingrobots/bijou/issues/480}{\#480}
+\end{itemize}
+
+\section{Retrospective And Closeout}\label{record-247-retrospective-and-closeout}
+
+Open. Tranche A landed in \href{https://github.com/flyingrobots/bijou/pull/484}{\#484}. Five compatibility facades now delegate to focused contract, state, execution, and adapter modules; all facade exports remain stable, every family file is within the strict context threshold, focused behavior suites pass, and repository runtime-cycle analysis reports no cycle touching a changed family. The live ledgers move from \texttt{3\allowbreak{}7\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}2\allowbreak{}5\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}6\allowbreak{}2} to \texttt{3\allowbreak{}2\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}2\allowbreak{}0\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}5\allowbreak{}2}.
+
+Tranche B landed through \href{https://github.com/flyingrobots/bijou/pull/486}{\#486}. It applies the same bounded extraction to the TUI runtime, performance gradient, scripted driver, DAG renderer, and TUI-app skeleton. Their public facades preserve the original exports while explicit family manifests bind the focused implementation modules used for size and runtime-cycle evidence. The review witness also binds behavior that the extraction initially drifted: same-column DAG detours, middleware-replaced render targets, the original noise permutation, empty DAG badges, and initialization-inclusive harness time. The live ledgers move again to \texttt{2\allowbreak{}7\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}1\allowbreak{}5\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}4\allowbreak{}2}. Fifteen double-counted roots remain before the overall \texttt{6\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}1\allowbreak{}2} goalpost can close.
+
+Tranche C is implemented in \href{https://github.com/flyingrobots/bijou/pull/487}{\#487}. The canonical example app, Notifications, Image Viewer, PR review-status tool, and framed-app renderer remain stable facades over focused implementation families. Exact public-export and family manifests bind the compatibility surface, strict context thresholds, and runtime-cycle proof. Review hardening shares compact notification geometry between rendering and hit testing, preserves RGB-only active-tab backgrounds, localizes the default frame title, keeps divider graphemes intact, removes an orphan image-viewer mode message, and adds bounded caches for derived active-tab tokens and rendered image previews. The preview cache binds its entries to the source path, modification time, byte size, viewport, mode, and tuning so a source-file rewrite invalidates stale output. The live ledgers move to \texttt{2\allowbreak{}2\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}1\allowbreak{}0\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}3\allowbreak{}2}; ten double-counted roots remain before the overall \texttt{6\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}1\allowbreak{}2} goalpost can close.
+
+Tranche D is implemented in \href{https://github.com/flyingrobots/bijou/pull/488}{\#488}. \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, DOGFOOD i18n-debt analysis, framed-app overlays, \texttt{u\allowbreak{}i\allowbreak{}-\allowbreak{}s\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}e\allowbreak{}-\allowbreak{}i\allowbreak{}r\allowbreak{}/\allowbreak{}1}, and the terminal differ remain stable public facades over the exact family manifests locked by the tranche contract. Every family member stays within \texttt{1\allowbreak{}5\allowbreak{}0} lines and \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes, and repository runtime-cycle analysis finds no cycle touching the changed families. The \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} witness preserves allocation-free numeric RGB writes and covers negative source-origin clipping. The DOGFOOD scanner retains \texttt{2\allowbreak{},\allowbreak{}3\allowbreak{}4\allowbreak{}7} raw strings and \texttt{7\allowbreak{}8} missing Markdown localizations while excluding its own implementation family. The live ledgers now measure \texttt{1\allowbreak{}7\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}5\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}2\allowbreak{}2}; no public API or rendering redesign entered scope. Five double-counted roots remain for tranche E.
+
+Tranche E is implemented in \href{https://github.com/flyingrobots/bijou/pull/489}{\#489}. The TUI runtime, table, framed-app, DOGFOOD application, and DOGFOOD story catalog remain stable public facades over the exact family manifests locked by the tranche contract. Every family member stays within \texttt{1\allowbreak{}5\allowbreak{}0} lines and \texttt{1\allowbreak{}2\allowbreak{},\allowbreak{}0\allowbreak{}0\allowbreak{}0} bytes, and repository runtime-cycle analysis reports no cycle touching the changed families. The story catalog preserves all \texttt{4\allowbreak{}2} ordered story definitions; its typed package identity lowers the split localization lineage from \texttt{1\allowbreak{},\allowbreak{}4\allowbreak{}5\allowbreak{}3} to \texttt{1\allowbreak{},\allowbreak{}4\allowbreak{}2\allowbreak{}7} raw strings. The live ledgers reach \texttt{1\allowbreak{}2\allowbreak{} \allowbreak{}+\allowbreak{} \allowbreak{}0\allowbreak{} \allowbreak{}=\allowbreak{} \allowbreak{}1\allowbreak{}2}, completing the WF-165 \texttt{6\allowbreak{}2\allowbreak{} \allowbreak{}-\allowbreak{}>\allowbreak{} \allowbreak{}1\allowbreak{}2} goalpost without weakening a threshold or redesigning a public surface.
+

@@ -1,0 +1,23 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-context-recovery",
+  "task": "Preserve immutable publication evidence under repository path hygiene",
+  "bytesConsumed": 185740,
+  "filesRead": [
+    "scripts/no-local-paths.test.ts",
+    "docs/book/README.md",
+    "docs/book/build-report.json",
+    "docs/book/reader-delivery.json"
+  ],
+  "filesModified": [
+    "scripts/no-local-paths.test.ts",
+    "docs/book/README.md"
+  ],
+  "tripwires": [],
+  "design_justification": "The user requires exact original source and delivery evidence. Five named frozen data artifacts retain original paths and are exempt only while their entire SHA-256 matches this edition. No directory-wide exclusion or live code exemption is introduced. Live README loses its workstation-specific absolute path. Source corpus, receipts and original evidence bytes remain unchanged.",
+  "validation": {
+    "red": "Full pre-push path hygiene rejected one live README and five frozen artifacts",
+    "planned_green": "Focused path hygiene check, then full standard push gates"
+  }
+}

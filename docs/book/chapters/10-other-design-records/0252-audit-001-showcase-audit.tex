@@ -1,0 +1,134 @@
+\chapter{AUDIT-001 --- Mentor Audit of examples/showcase}\label{record-252}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/AUDIT-001-showcase-audit.md}\par}\smallskip
+
+\emph{Expert evaluation of the Bijou Showcase application to ensure adherence to core invariants, hexagonal boundaries, and anti-SLUDGE TypeScript standards.}
+
+Legend: - \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/legends/HT-humane-terminal.md}{HT --- Humane Terminal} - \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/legends/DL-design-language.md}{DL --- Design Language} - \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Why this cycle exists}\label{record-252-why-this-cycle-exists}
+
+The Showcase app is the most visible ``complex'' implementation of Bijou. If it contains anti-patterns (e.g., hardcoded colors, loose typing, or mixed architectural concerns), it will mislead developers into adopting those same bad habits.
+
+As the \textbf{EXPERT Bijou BigBro}, I must audit this app to: - Identify and backlog ``sludge'' for correction. - Propose refactors that align with the \textbf{Hexagonal} and \textbf{TEA} pillars. - Ensure it serves as a ``Humane'' reference for others.
+
+\section{Human users / jobs / hills}\label{record-252-human-users-jobs-hills}
+
+\subsection{Primary human users}\label{record-252-primary-human-users}
+
+\begin{itemize}
+\tightlist
+\item
+  Developers looking at \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/} for inspiration.
+\item
+  Maintainers ensuring the library supports complex use-cases cleanly.
+\end{itemize}
+
+\subsection{Human jobs}\label{record-252-human-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Learn how to structure a multi-page TUI app.
+\item
+  See ``pro-level'' Bijou usage.
+\end{enumerate}
+
+\subsection{Human hill}\label{record-252-human-hill}
+
+A developer can read the Showcase source and see a perfect reflection of the \textbf{Invariants}---clear boundaries, semantic tokens, and rhythmic layout---without any ``clever sludge.''
+
+\section{Agent users / jobs / hills}\label{record-252-agent-users-jobs-hills}
+
+\subsection{Primary agent users}\label{record-252-primary-agent-users}
+
+\begin{itemize}
+\tightlist
+\item
+  EXPERT Bijou BigBro (auditor/mentor).
+\end{itemize}
+
+\subsection{Agent jobs}\label{record-252-agent-jobs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Audit the \texttt{U\allowbreak{}p\allowbreak{}d\allowbreak{}a\allowbreak{}t\allowbreak{}e} loop for side-effects.
+\item
+  Verify \texttt{S\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e} usage follows performance best practices.
+\end{enumerate}
+
+\subsection{Agent hill}\label{record-252-agent-hill}
+
+An agent can mechanically verify that the showcase app never imports a Node.js-specific adapter into its \texttt{F\allowbreak{}r\allowbreak{}a\allowbreak{}m\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}g\allowbreak{}e} logic.
+
+\section{Test Plan}\label{record-252-test-plan}
+
+\subsection{Golden Path (The Audit)}\label{record-252-golden-path-the-audit}
+
+\begin{itemize}
+\tightlist
+\item
+  Scan \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}h\allowbreak{}o\allowbreak{}w\allowbreak{}c\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{a\allowbreak{}n\allowbreak{}y} or \texttt{a\allowbreak{}s\allowbreak{} \allowbreak{}a\allowbreak{}n\allowbreak{}y}.
+  \item
+    Hardcoded ANSI or hex strings.
+  \item
+    Direct \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s} or \texttt{f\allowbreak{}s} access.
+  \end{itemize}
+\item
+  Scan \texttt{e\allowbreak{}x\allowbreak{}a\allowbreak{}m\allowbreak{}p\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}s\allowbreak{}h\allowbreak{}o\allowbreak{}w\allowbreak{}c\allowbreak{}a\allowbreak{}s\allowbreak{}e\allowbreak{}/\allowbreak{}r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}s} for:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Improper \texttt{c\allowbreak{}t\allowbreak{}x} propagation.
+  \item
+    Violation of the 2-cell rhythm.
+  \end{itemize}
+\end{itemize}
+
+\section{Playback Questions}\label{record-252-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Does the showcase app leak ``adapter sludge'' into its page definitions?
+\item
+  Are the message types (\texttt{M}) strictly defined or do they use \texttt{a\allowbreak{}n\allowbreak{}y}?
+\item
+  Is the layout ``geometricly lawful'' (2-cell rhythm)?
+\end{enumerate}
+
+\section{Linked Invariants}\label{record-252-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/invariants/buffer-holds-facts.md}{The Buffer Holds Facts}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/ARCHITECTURE.md}{Hexagonal Architecture}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/backlog/badcode/bad-code.md}{Anti-SLUDGE Policy}
+\end{itemize}
+
+\section{Implementation Outline}\label{record-252-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Research:} Deep-read \texttt{a\allowbreak{}p\allowbreak{}p\allowbreak{}.\allowbreak{}t\allowbreak{}s} and \texttt{r\allowbreak{}e\allowbreak{}g\allowbreak{}i\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}y\allowbreak{}.\allowbreak{}t\allowbreak{}s}.
+\item
+  \textbf{Strategy:} Categorize findings into \texttt{b\allowbreak{}a\allowbreak{}d\allowbreak{}-\allowbreak{}c\allowbreak{}o\allowbreak{}d\allowbreak{}e} (ASAP/Backlog) and \texttt{c\allowbreak{}o\allowbreak{}o\allowbreak{}l\allowbreak{}-\allowbreak{}i\allowbreak{}d\allowbreak{}e\allowbreak{}a\allowbreak{}s}.
+\item
+  \textbf{Execution:} Log findings and propose surgical fixes for the most egregious violations.
+\end{enumerate}
+

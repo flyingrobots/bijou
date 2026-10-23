@@ -1,0 +1,33 @@
+\chapter{DX-010 --- Typed Sub-App Adapter Factory}\label{record-315}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/method/graveyard/legacy-backlog/cool-ideas/DX-010-typed-subapp-adapter.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legends/DX-developer-experience.md}{DX --- Developer Experience}
+
+\section{Idea}\label{record-315-idea}
+
+Replace the manual \texttt{m\allowbreak{}o\allowbreak{}u\allowbreak{}n\allowbreak{}t\allowbreak{}(\allowbreak{})} / \texttt{m\allowbreak{}a\allowbreak{}p\allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{})} pattern with a compile-time-checked adapter factory:
+
+\begin{CodeBlock}
+const adapter = createSubAppAdapter<ParentMsg, ChildMsg>({
+  'child-done': (msg) => ({ type: 'panel-closed' }),
+  'child-error': (msg) => ({ type: 'show-alert', text: msg.error }),
+});
+\end{CodeBlock}
+
+TypeScript enforces that every \texttt{C\allowbreak{}h\allowbreak{}i\allowbreak{}l\allowbreak{}d\allowbreak{}M\allowbreak{}s\allowbreak{}g} variant is covered. A forgotten mapping is a compile error, not a silent message drop.
+
+\section{Why}\label{record-315-why}
+
+The current \texttt{m\allowbreak{}a\allowbreak{}p\allowbreak{}C\allowbreak{}m\allowbreak{}d\allowbreak{}s\allowbreak{}(\allowbreak{})} pattern works but requires manual wiring with no type-level guarantee of completeness. In larger apps with multiple sub-apps, a missing mapping causes a message to vanish silently --- the hardest kind of bug to diagnose in a TEA architecture.
+
+\section{Open questions}\label{record-315-open-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  Should the adapter handle both messages and commands, or just messages?
+\item
+  Should it support pass-through for shared message types?
+\end{itemize}
+

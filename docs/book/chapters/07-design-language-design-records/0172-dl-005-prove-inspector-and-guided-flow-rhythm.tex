@@ -1,0 +1,261 @@
+\chapter{DL-005 --- Prove Inspector and Guided Flow Rhythm}\label{record-172}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-005-prove-inspector-and-guided-flow-rhythm.md}\par}\smallskip
+
+Legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/DL-design-language.md}{DL --- Design Language}
+
+\section{Why this cycle exists}\label{record-172-why-this-cycle-exists}
+
+DL-004 proved calmer drawer rhythm and structured notice rows in the shell notification center.
+
+The next design-language proof should move into another likely future block candidate:
+
+\begin{itemize}
+\tightlist
+\item
+  guided flows
+\item
+  explainability walkthroughs
+\item
+  compact multi-section review surfaces with one obvious next action
+\end{itemize}
+
+Inspector panels are still part of the original idea, but they should not share a cycle with guided-flow proof if that forces us to invent two half-finished surfaces.
+
+This cycle exists to prove the guided-flow side first by turning the \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/strategy/ai-explainability-standard.md}{AI Explainability Standard} into a canonical component instead of leaving it as doctrine only.
+
+\section{Scope of this cycle}\label{record-172-scope-of-this-cycle}
+
+This cycle intentionally covers:
+
+\begin{itemize}
+\tightlist
+\item
+  one canonical \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})} component in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}
+\item
+  explicit \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]} labeling
+\item
+  separated rationale, evidence, next action, and governance sections
+\item
+  calm section rhythm for compact guided-flow review surfaces
+\item
+  graceful lowering into pipe and accessible modes
+\end{itemize}
+
+It does \textbf{not} include:
+
+\begin{itemize}
+\tightlist
+\item
+  a generalized guided-flow block runtime
+\item
+  inspector-panel implementation
+\item
+  shell integration or notification-center changes
+\item
+  service-backed AI integrations
+\end{itemize}
+
+\section{Human users}\label{record-172-human-users}
+
+\subsection{Primary human user}\label{record-172-primary-human-user}
+
+A builder or app user reviewing an AI-mediated recommendation.
+
+They need:
+
+\begin{itemize}
+\tightlist
+\item
+  visible \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]} labeling
+\item
+  an explanation of why the recommendation exists
+\item
+  evidence separated from the recommendation itself
+\item
+  one clear next action
+\item
+  a calm surface instead of a decorative wall of text
+\end{itemize}
+
+\subsection{Human hill}\label{record-172-human-hill}
+
+A user can read an AI-mediated recommendation and answer what it is, why it is here, what evidence supports it, and what they should do next without feeling like they are parsing marketing copy.
+
+\section{Agent users}\label{record-172-agent-users}
+
+\subsection{Primary agent user}\label{record-172-primary-agent-user}
+
+An agent generating or auditing guided-flow and explainability surfaces in Bijou.
+
+It needs:
+
+\begin{itemize}
+\tightlist
+\item
+  one canonical explainability component to target
+\item
+  explicit section structure rather than ad hoc copy blocks
+\item
+  proof that guided-flow rhythm follows the design language and AI doctrine
+\end{itemize}
+
+\subsection{Agent hill}\label{record-172-agent-hill}
+
+An agent can point to one reusable explainability surface and show that Bijou's \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]}, rationale, evidence, and next-action doctrine is real code instead of only prose.
+
+\section{Human playback}\label{record-172-human-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  A user encounters an AI-mediated recommendation.
+\item
+  The surface marks itself visibly as \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]}.
+\item
+  The recommendation title appears before supporting explanation.
+\item
+  Rationale, evidence, and next action are separated into calm sections.
+\item
+  The user can see what to do next without guessing whether the recommendation is advisory or authoritative.
+\end{enumerate}
+
+\section{Agent playback}\label{record-172-agent-playback}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  An agent opens the DL-005 cycle doc.
+\item
+  It can identify the canonical proving seam as \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})} rather than a shell-specific one-off.
+\item
+  It can run cycle and package tests and see explicit assertions for \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]} labeling, section separation, and graceful lowering.
+\item
+  It can point to the next backlog item for inspector-panel proof work.
+\end{enumerate}
+
+\section{Linked invariants}\label{record-172-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/tests-are-the-spec.md}{Tests Are the Spec}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/graceful-lowering-preserves-meaning.md}{Graceful Lowering Preserves Meaning}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/invariants/docs-are-the-demo.md}{Docs Are the Demo}
+\end{itemize}
+
+\section{Invariants for this cycle}\label{record-172-invariants-for-this-cycle}
+
+\begin{itemize}
+\tightlist
+\item
+  AI-mediated explainability surfaces must mark themselves explicitly
+\item
+  evidence must not be merged into recommendation copy
+\item
+  the surface must present one obvious next action when that data exists
+\item
+  pipe and accessible modes must preserve the same meaning without relying on borders or color
+\item
+  this cycle must prove one canonical guided-flow surface before returning to inspector panels
+\end{itemize}
+
+\section{Implementation outline}\label{record-172-implementation-outline}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Move DL-005 into the active cycle area and enrich it with playbacks and invariants.
+\item
+  Write failing cycle tests for the new explainability surface and its lowering behavior.
+\item
+  Implement \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})} in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}.
+\item
+  Export it through the canonical component barrels.
+\item
+  Close the cycle and spawn the inspector-panel follow-on backlog item.
+\end{enumerate}
+
+\section{Tests to write first}\label{record-172-tests-to-write-first}
+
+Under \texttt{t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}c\allowbreak{}y\allowbreak{}c\allowbreak{}l\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}D\allowbreak{}L\allowbreak{}-\allowbreak{}0\allowbreak{}0\allowbreak{}5\allowbreak{}/}:
+
+\begin{itemize}
+\tightlist
+\item
+  the active cycle doc includes the required workflow sections
+\item
+  \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})} marks AI visibly and separates rationale, evidence, and next action
+\item
+  accessible lowering preserves the meaning of the same fields without visual-only cues
+\item
+  the next design-language backlog item exists
+\end{itemize}
+
+\section{Risks}\label{record-172-risks}
+
+\begin{itemize}
+\tightlist
+\item
+  making the component feel like AI decoration instead of explanation
+\item
+  overfitting the component to one future product instead of a reusable pattern
+\item
+  smuggling shell or service assumptions into a core component
+\end{itemize}
+
+\section{Out of scope}\label{record-172-out-of-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  inspector-panel proof work
+\item
+  runtime agent integrations
+\item
+  persistent review history
+\item
+  generalized block promotion
+\end{itemize}
+
+\section{Retrospective}\label{record-172-retrospective}
+
+\subsection{What landed}\label{record-172-what-landed}
+
+\begin{itemize}
+\tightlist
+\item
+  a new canonical \texttt{e\allowbreak{}x\allowbreak{}p\allowbreak{}l\allowbreak{}a\allowbreak{}i\allowbreak{}n\allowbreak{}a\allowbreak{}b\allowbreak{}i\allowbreak{}l\allowbreak{}i\allowbreak{}t\allowbreak{}y\allowbreak{}(\allowbreak{})} component in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}
+\item
+  explicit \texttt{[\allowbreak{}A\allowbreak{}I\allowbreak{}]} labeling as part of the component instead of ad hoc copy
+\item
+  calm section rhythm for rationale, evidence, next action, and governance
+\item
+  graceful lowering that preserves the same meaning in pipe and accessible modes
+\item
+  cycle and package tests that make the explainability doctrine executable instead of only descriptive
+\end{itemize}
+
+\subsection{Drift from ideal}\label{record-172-drift-from-ideal}
+
+Inspector-panel proof work did not land in this cycle.
+
+That was intentional and correct.
+
+Trying to prove guided-flow and inspector language in the same cycle would have forced two half-finished surfaces instead of one canonical explainability component.
+
+\subsection{Debt spawned}\label{record-172-debt-spawned}
+
+Spawned:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/graveyard/legacy-backlog/DL-006-prove-inspector-panel-rhythm.md}{DL-006 --- Prove Inspector Panel Rhythm}
+\end{itemize}
+

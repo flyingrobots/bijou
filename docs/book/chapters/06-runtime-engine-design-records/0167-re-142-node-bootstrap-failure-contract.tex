@@ -1,0 +1,93 @@
+\chapter{RE-142 - Node Bootstrap Failure Contract}\label{record-167}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/RE-142-node-bootstrap-failure-contract.md}\par}\smallskip
+
+Linked issues: \#142, \#143, \#144
+
+Linked legend: \href{https://github.com/flyingrobots/bijou/blob/1853ad902f6bf219326409e7f743a5a1d6517dbc/docs/legends/RE-runtime-engine.md}{RE - Runtime Engine}
+
+\section{Sponsor Human}\label{record-167-sponsor-human}
+
+A Node host app author who needs startup failures to explain whether the terminal, raw mode, stdout dimensions, or ambient context is the problem.
+
+\section{Sponsor Agent}\label{record-167-sponsor-agent}
+
+A runtime verification agent that can assert a stable bootstrap error contract instead of matching ad hoc process or terminal errors.
+
+\section{Hill}\label{record-167-hill}
+
+\texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} startup failures are represented by \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} with stable \texttt{r\allowbreak{}e\allowbreak{}a\allowbreak{}s\allowbreak{}o\allowbreak{}n}, \texttt{h\allowbreak{}i\allowbreak{}n\allowbreak{}t}, and optional \texttt{c\allowbreak{}a\allowbreak{}u\allowbreak{}s\allowbreak{}e} fields, and the docs explain the expected recovery paths.
+
+\section{Scope}\label{record-167-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Add tests for the structured bootstrap error object.
+\item
+  Add a deterministic stdout-dimension failure test.
+\item
+  Document the reason/hint/cause contract in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} docs.
+\item
+  Preserve existing behavior for successful context initialization.
+\end{itemize}
+
+\section{Playback Questions}\label{record-167-playback-questions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Does \texttt{B\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}B\allowbreak{}o\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}t\allowbreak{}r\allowbreak{}a\allowbreak{}p\allowbreak{}E\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r} preserve reason, hint, and cause?
+\item
+  Does \texttt{i\allowbreak{}n\allowbreak{}i\allowbreak{}t\allowbreak{}D\allowbreak{}e\allowbreak{}f\allowbreak{}a\allowbreak{}u\allowbreak{}l\allowbreak{}t\allowbreak{}C\allowbreak{}o\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}x\allowbreak{}t\allowbreak{}(\allowbreak{})} produce a structured error for unusable stdout dimensions?
+\item
+  Do package docs explain the recovery path for common host startup failures?
+\end{enumerate}
+
+\section{Accessibility / Assistive Reading Posture}\label{record-167-accessibility-assistive-reading-posture}
+
+Hints should be direct recovery text that a human can act on from a terminal error or test failure.
+
+\section{Localization / Directionality Posture}\label{record-167-localization-directionality-posture}
+
+Bootstrap diagnostics remain developer-facing English strings in this cycle.
+
+\section{Agent Inspectability / Explainability Posture}\label{record-167-agent-inspectability-explainability-posture}
+
+Tests assert the stable error fields directly, so agents should not need to parse terminal-specific stack traces.
+
+\section{Linked Invariants}\label{record-167-linked-invariants}
+
+\begin{itemize}
+\tightlist
+\item
+  Host initialization failures need structured facts.
+\item
+  Ambient process state should not be the only way tests can reason about startup failures.
+\end{itemize}
+
+\section{Verification}\label{record-167-verification}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{} \allowbreak{}-\allowbreak{}-\allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}p\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}a\allowbreak{}g\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}/\allowbreak{}s\allowbreak{}r\allowbreak{}c\allowbreak{}/\allowbreak{}i\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}x\allowbreak{}.\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t\allowbreak{}.\allowbreak{}t\allowbreak{}s}
+\item
+  \texttt{n\allowbreak{}p\allowbreak{}m\allowbreak{} \allowbreak{}r\allowbreak{}u\allowbreak{}n\allowbreak{} \allowbreak{}t\allowbreak{}y\allowbreak{}p\allowbreak{}e\allowbreak{}c\allowbreak{}h\allowbreak{}e\allowbreak{}c\allowbreak{}k\allowbreak{}:\allowbreak{}t\allowbreak{}e\allowbreak{}s\allowbreak{}t}
+\end{itemize}
+
+\section{Tests To Write First}\label{record-167-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Structured error object test.
+\item
+  Deterministic stdout dimension failure test.
+\end{itemize}
+
+\section{Retrospective}\label{record-167-retrospective}
+
+See \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/method/retro/WF-122-day-zero-audit-fixes.md}{WF-122 day zero audit fixes}.
+

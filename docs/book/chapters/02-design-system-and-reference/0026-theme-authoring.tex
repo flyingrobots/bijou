@@ -1,0 +1,472 @@
+\chapter{Theme Authoring Guide}\label{record-026}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design-system/theme-authoring.md}\par}\smallskip
+
+This guide explains how to write your own Bijou theme, how to choose the right token family, and how to load a custom theme into a real app.
+
+Use this together with:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/theme-tokens.md}{Theme Token Vocabulary} for what each token family means
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/src/core/theme/tokens.ts}{packages/bijou/src/core/theme/tokens.ts} for the raw type contract
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/src/core/theme/presets.ts}{packages/bijou/src/core/theme/presets.ts} for concrete built-in examples
+\end{itemize}
+
+\section{What a Bijou theme contains}\label{record-026-what-a-bijou-theme-contains}
+
+Every Bijou theme has these top-level groups:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\allowbreak{}a\allowbreak{}m\allowbreak{}e}
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c}
+\item
+  \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r}
+\item
+  \texttt{u\allowbreak{}i}
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}
+\end{itemize}
+
+The built-in required keys inside those groups are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}: \texttt{s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}, \texttt{e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}, \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}, \texttt{i\allowbreak{}n\allowbreak{}f\allowbreak{}o}, \texttt{p\allowbreak{}e\allowbreak{}n\allowbreak{}d\allowbreak{}i\allowbreak{}n\allowbreak{}g}, \texttt{a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}, \texttt{m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c}: \texttt{s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}, \texttt{e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}, \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}, \texttt{i\allowbreak{}n\allowbreak{}f\allowbreak{}o}, \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}n\allowbreak{}t}, \texttt{m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}, \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r}: \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}, \texttt{s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y}, \texttt{s\allowbreak{}u\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s}, \texttt{w\allowbreak{}a\allowbreak{}r\allowbreak{}n\allowbreak{}i\allowbreak{}n\allowbreak{}g}, \texttt{e\allowbreak{}r\allowbreak{}r\allowbreak{}o\allowbreak{}r}, \texttt{m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{u\allowbreak{}i}: \texttt{c\allowbreak{}u\allowbreak{}r\allowbreak{}s\allowbreak{}o\allowbreak{}r}, \texttt{f\allowbreak{}o\allowbreak{}c\allowbreak{}u\allowbreak{}s\allowbreak{}G\allowbreak{}u\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}r}, \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}h\allowbreak{}u\allowbreak{}m\allowbreak{}b}, \texttt{s\allowbreak{}c\allowbreak{}r\allowbreak{}o\allowbreak{}l\allowbreak{}l\allowbreak{}T\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k}, \texttt{s\allowbreak{}e\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}o\allowbreak{}n\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r}, \texttt{l\allowbreak{}o\allowbreak{}g\allowbreak{}o}, \texttt{t\allowbreak{}a\allowbreak{}b\allowbreak{}l\allowbreak{}e\allowbreak{}H\allowbreak{}e\allowbreak{}a\allowbreak{}d\allowbreak{}e\allowbreak{}r}, \texttt{t\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}k\allowbreak{}E\allowbreak{}m\allowbreak{}p\allowbreak{}t\allowbreak{}y}
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}: \texttt{p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y}, \texttt{s\allowbreak{}e\allowbreak{}c\allowbreak{}o\allowbreak{}n\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}y}, \texttt{e\allowbreak{}l\allowbreak{}e\allowbreak{}v\allowbreak{}a\allowbreak{}t\allowbreak{}e\allowbreak{}d}, \texttt{o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y}, \texttt{m\allowbreak{}u\allowbreak{}t\allowbreak{}e\allowbreak{}d}
+\item
+  \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}: \texttt{b\allowbreak{}r\allowbreak{}a\allowbreak{}n\allowbreak{}d}, \texttt{p\allowbreak{}r\allowbreak{}o\allowbreak{}g\allowbreak{}r\allowbreak{}e\allowbreak{}s\allowbreak{}s}
+\end{itemize}
+
+If a built-in key is missing in a DTCG JSON theme, Bijou will still load the document, but that missing token resolves to a black/default placeholder. In practice, that means an incomplete theme is considered malformed even if it parses successfully.
+
+\section{Choose tokens by job, not by color}\label{record-026-choose-tokens-by-job-not-by-color}
+
+Before picking colors, decide what each token is responsible for:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}*} is for foreground meaning and emphasis
+\item
+  \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}*} is for fills, containment, elevation, and interruption level
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}.\allowbreak{}*} is for structure and boundary emphasis
+\item
+  \texttt{u\allowbreak{}i\allowbreak{}.\allowbreak{}*} is for reusable shell/runtime chrome
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}*} is for actual state labels and indicators
+\item
+  \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t\allowbreak{}.\allowbreak{}*} is for rare decorative or continuous-range emphasis
+\end{itemize}
+
+If you need the rulebook for those meanings, read \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/theme-tokens.md}{Theme Token Vocabulary} first. This guide is about authoring and loading; that guide is about semantics.
+
+\section{Token value shape}\label{record-026-token-value-shape}
+
+A color token can be either:
+
+\begin{itemize}
+\tightlist
+\item
+  a simple foreground hex string, like \texttt{"\allowbreak{}\#\allowbreak{}8\allowbreak{}8\allowbreak{}c\allowbreak{}0\allowbreak{}d\allowbreak{}0\allowbreak{}"}
+\item
+  or an object with:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{h\allowbreak{}e\allowbreak{}x}
+  \item
+    optional \texttt{b\allowbreak{}g}
+  \item
+    optional \texttt{m\allowbreak{}o\allowbreak{}d\allowbreak{}i\allowbreak{}f\allowbreak{}i\allowbreak{}e\allowbreak{}r\allowbreak{}s}
+  \end{itemize}
+\end{itemize}
+
+Supported modifiers are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{b\allowbreak{}o\allowbreak{}l\allowbreak{}d}
+\item
+  \texttt{d\allowbreak{}i\allowbreak{}m}
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}r\allowbreak{}i\allowbreak{}k\allowbreak{}e\allowbreak{}t\allowbreak{}h\allowbreak{}r\allowbreak{}o\allowbreak{}u\allowbreak{}g\allowbreak{}h}
+\item
+  \texttt{i\allowbreak{}n\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}s\allowbreak{}e}
+\item
+  \texttt{u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}
+\item
+  \texttt{c\allowbreak{}u\allowbreak{}r\allowbreak{}l\allowbreak{}y\allowbreak{}-\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}
+\item
+  \texttt{d\allowbreak{}o\allowbreak{}t\allowbreak{}t\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}s\allowbreak{}h\allowbreak{}e\allowbreak{}d\allowbreak{}-\allowbreak{}u\allowbreak{}n\allowbreak{}d\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}i\allowbreak{}n\allowbreak{}e}
+\end{itemize}
+
+Example token values:
+
+\begin{CodeBlock}
+"primary": "#eceff4"
+\end{CodeBlock}
+
+\begin{CodeBlock}
+"primary": {
+  "hex": "#eceff4",
+  "bg": "#2e3440",
+  "modifiers": ["bold"]
+}
+\end{CodeBlock}
+
+\section{The shortest working custom theme}\label{record-026-the-shortest-working-custom-theme}
+
+If you want a file you can start from immediately, this is the smallest honest shape to copy and edit.
+
+\begin{CodeBlock}
+{
+  "name": { "$value": "my-theme" },
+  "status": {
+    "success": { "$type": "color", "$value": "#22c55e" },
+    "error": { "$type": "color", "$value": "#ef4444" },
+    "warning": { "$type": "color", "$value": "#f59e0b" },
+    "info": { "$type": "color", "$value": "#38bdf8" },
+    "pending": { "$type": "color", "$value": { "hex": "#64748b", "modifiers": ["dim"] } },
+    "active": { "$type": "color", "$value": "#38bdf8" },
+    "muted": { "$type": "color", "$value": { "hex": "#64748b", "modifiers": ["dim", "strikethrough"] } }
+  },
+  "semantic": {
+    "success": { "$type": "color", "$value": "#22c55e" },
+    "error": { "$type": "color", "$value": "#ef4444" },
+    "warning": { "$type": "color", "$value": "#f59e0b" },
+    "info": { "$type": "color", "$value": "#38bdf8" },
+    "accent": { "$type": "color", "$value": "#c084fc" },
+    "muted": { "$type": "color", "$value": { "hex": "#94a3b8", "modifiers": ["dim"] } },
+    "primary": { "$type": "color", "$value": { "hex": "#f8fafc", "modifiers": ["bold"] } }
+  },
+  "border": {
+    "primary": { "$type": "color", "$value": "#38bdf8" },
+    "secondary": { "$type": "color", "$value": "#c084fc" },
+    "success": { "$type": "color", "$value": "#22c55e" },
+    "warning": { "$type": "color", "$value": "#f59e0b" },
+    "error": { "$type": "color", "$value": "#ef4444" },
+    "muted": { "$type": "color", "$value": "#64748b" }
+  },
+  "ui": {
+    "cursor": { "$type": "color", "$value": "#38bdf8" },
+    "focusGutter": { "$type": "color", "$value": "#c084fc" },
+    "scrollThumb": { "$type": "color", "$value": "#38bdf8" },
+    "scrollTrack": { "$type": "color", "$value": "#334155" },
+    "sectionHeader": { "$type": "color", "$value": { "hex": "#f8fafc", "modifiers": ["bold"] } },
+    "logo": { "$type": "color", "$value": "#38bdf8" },
+    "tableHeader": { "$type": "color", "$value": "#f8fafc" },
+    "trackEmpty": { "$type": "color", "$value": "#1e293b" }
+  },
+  "surface": {
+    "primary": { "$type": "color", "$value": { "hex": "#f8fafc", "bg": "#0f172a" } },
+    "secondary": { "$type": "color", "$value": { "hex": "#e2e8f0", "bg": "#1e293b" } },
+    "elevated": { "$type": "color", "$value": { "hex": "#f8fafc", "bg": "#334155" } },
+    "overlay": { "$type": "color", "$value": { "hex": "#f8fafc", "bg": "#0f172a" } },
+    "muted": { "$type": "color", "$value": { "hex": "#94a3b8", "bg": "#020617" } }
+  },
+  "gradient": {
+    "brand": {
+      "$type": "gradient",
+      "$value": [
+        { "pos": 0, "color": "#38bdf8" },
+        { "pos": 1, "color": "#c084fc" }
+      ]
+    },
+    "progress": {
+      "$type": "gradient",
+      "$value": [
+        { "pos": 0, "color": "#22c55e" },
+        { "pos": 1, "color": "#38bdf8" }
+      ]
+    }
+  }
+}
+\end{CodeBlock}
+
+Save that as something like \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s\allowbreak{}/\allowbreak{}m\allowbreak{}y\allowbreak{}-\allowbreak{}t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n}.
+
+\section{Loading a custom theme}\label{record-026-loading-a-custom-theme}
+
+For Node-hosted apps, the fastest path is \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E}:
+
+\begin{CodeBlock}
+BIJOU_THEME=./themes/my-theme.json npm run dogfood
+\end{CodeBlock}
+
+\section{Applying a theme programmatically}\label{record-026-applying-a-theme-programmatically}
+
+If you already have a \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} object in code, the easiest hosted path is:
+
+\begin{CodeBlock}
+import { startApp } from '@flyingrobots/bijou-node';
+
+await startApp(app, { theme: MY_THEME });
+\end{CodeBlock}
+
+That one call creates the Node host context with your theme and uses it for the run. If the app relies on ambient \texttt{c\allowbreak{}t\allowbreak{}x} resolution, that same themed context is also registered as the default for the hosted run.
+
+If you want explicit ownership of the context object first, use:
+
+\begin{CodeBlock}
+import { createNodeContext } from '@flyingrobots/bijou-node';
+
+const ctx = createNodeContext({ theme: MY_THEME });
+await startApp(app, { ctx });
+\end{CodeBlock}
+
+\section{Automatic light/dark theme sets}\label{record-026-automatic-lightdark-theme-sets}
+
+If you want more than one theme, \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} now supports a named theme set at the host layer:
+
+\begin{CodeBlock}
+await startApp(app, {
+  themes: [
+    { id: 'light', theme: LIGHT_THEME },
+    { id: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+});
+\end{CodeBlock}
+
+\texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e} accepts:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{a\allowbreak{}u\allowbreak{}t\allowbreak{}o}
+\item
+  \texttt{l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}
+\item
+  \texttt{d\allowbreak{}a\allowbreak{}r\allowbreak{}k}
+\end{itemize}
+
+When \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e} is \texttt{a\allowbreak{}u\allowbreak{}t\allowbreak{}o}, the host uses Bijou's terminal color-scheme detection to choose the initial entry.
+
+If your ids are not literally \texttt{l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} and \texttt{d\allowbreak{}a\allowbreak{}r\allowbreak{}k}, add explicit scheme hints:
+
+\begin{CodeBlock}
+await startApp(app, {
+  themes: [
+    { id: 'sunrise', scheme: 'light', theme: LIGHT_THEME },
+    { id: 'midnight', scheme: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+});
+\end{CodeBlock}
+
+\section{User override policy}\label{record-026-user-override-policy}
+
+There are three practical override layers:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}e} for an app-owned persisted user choice
+\item
+  \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E} for host/env-driven selection
+\item
+  \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e\allowbreak{}:\allowbreak{} \allowbreak{}'\allowbreak{}a\allowbreak{}u\allowbreak{}t\allowbreak{}o\allowbreak{}'} for light/dark automation when nothing more explicit is chosen
+\end{itemize}
+
+Example:
+
+\begin{CodeBlock}
+await startApp(app, {
+  themes: [
+    { id: 'light', theme: LIGHT_THEME },
+    { id: 'dark', theme: DARK_THEME },
+  ],
+  themeMode: 'auto',
+  themeOverride: savedThemeId,
+});
+\end{CodeBlock}
+
+Behavior:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}O\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}r\allowbreak{}i\allowbreak{}d\allowbreak{}e} wins when it matches one of the provided entries
+\item
+  otherwise \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E} can still select a named entry by id
+\item
+  otherwise, if \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E} is set but does not resolve to a known preset, JSON theme, or named theme entry, the explicit \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} fallback wins when provided
+\item
+  otherwise \texttt{t\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}M\allowbreak{}o\allowbreak{}d\allowbreak{}e} picks the initial theme
+\item
+  otherwise the first entry becomes the fallback
+\end{itemize}
+
+That same pattern works for any hosted app that goes through \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}n\allowbreak{}o\allowbreak{}d\allowbreak{}e} theme resolution.
+
+If \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}T\allowbreak{}H\allowbreak{}E\allowbreak{}M\allowbreak{}E} points at a \texttt{.\allowbreak{}j\allowbreak{}s\allowbreak{}o\allowbreak{}n} file, Bijou treats it as a DTCG document. If it points at a known preset name, Bijou loads the preset instead.
+
+Examples:
+
+\begin{CodeBlock}
+BIJOU_THEME=cyan-magenta npm run dogfood
+BIJOU_THEME=teal-orange-pink npm run dogfood
+BIJOU_THEME=./themes/my-theme.json npm run dogfood
+\end{CodeBlock}
+
+\section{Authoring in TypeScript}\label{record-026-authoring-in-typescript}
+
+If you own the app code and want to construct a theme in code instead of a JSON file, match the \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} type directly:
+
+\begin{CodeBlock}
+import type { Theme } from '@flyingrobots/bijou';
+
+export const MY_THEME: Theme = {
+  name: 'my-theme',
+  status: {
+    success: { hex: '#22c55e' },
+    error: { hex: '#ef4444' },
+    warning: { hex: '#f59e0b' },
+    info: { hex: '#38bdf8' },
+    pending: { hex: '#64748b', modifiers: ['dim'] },
+    active: { hex: '#38bdf8' },
+    muted: { hex: '#64748b', modifiers: ['dim', 'strikethrough'] },
+  },
+  semantic: {
+    success: { hex: '#22c55e' },
+    error: { hex: '#ef4444' },
+    warning: { hex: '#f59e0b' },
+    info: { hex: '#38bdf8' },
+    accent: { hex: '#c084fc' },
+    muted: { hex: '#94a3b8', modifiers: ['dim'] },
+    primary: { hex: '#f8fafc', modifiers: ['bold'] },
+  },
+  border: {
+    primary: { hex: '#38bdf8' },
+    secondary: { hex: '#c084fc' },
+    success: { hex: '#22c55e' },
+    warning: { hex: '#f59e0b' },
+    error: { hex: '#ef4444' },
+    muted: { hex: '#64748b' },
+  },
+  ui: {
+    cursor: { hex: '#38bdf8' },
+    focusGutter: { hex: '#c084fc' },
+    scrollThumb: { hex: '#38bdf8' },
+    scrollTrack: { hex: '#334155' },
+    sectionHeader: { hex: '#f8fafc', modifiers: ['bold'] },
+    logo: { hex: '#38bdf8' },
+    tableHeader: { hex: '#f8fafc' },
+    trackEmpty: { hex: '#1e293b' },
+  },
+  surface: {
+    primary: { hex: '#f8fafc', bg: '#0f172a' },
+    secondary: { hex: '#e2e8f0', bg: '#1e293b' },
+    elevated: { hex: '#f8fafc', bg: '#334155' },
+    overlay: { hex: '#f8fafc', bg: '#0f172a' },
+    muted: { hex: '#94a3b8', bg: '#020617' },
+  },
+  gradient: {
+    brand: [
+      { pos: 0, color: [56, 189, 248] },
+      { pos: 1, color: [192, 132, 252] },
+    ],
+    progress: [
+      { pos: 0, color: [34, 197, 94] },
+      { pos: 1, color: [56, 189, 248] },
+    ],
+  },
+};
+\end{CodeBlock}
+
+\section{What you may extend}\label{record-026-what-you-may-extend}
+
+The public generic \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}<\allowbreak{}S\allowbreak{},\allowbreak{} \allowbreak{}U\allowbreak{},\allowbreak{} \allowbreak{}G\allowbreak{}>} contract allows app-level extension of:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}
+\item
+  \texttt{u\allowbreak{}i}
+\item
+  \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t}
+\end{itemize}
+
+That means app code can add stable extra keys when the domain really needs them.
+
+Good examples:
+
+\begin{itemize}
+\tightlist
+\item
+  extra \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s} values for a real workflow state machine
+\item
+  extra \texttt{u\allowbreak{}i} tokens for recurring shell chrome
+\item
+  extra \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} keys for a stable branded effect
+\end{itemize}
+
+Bad examples:
+
+\begin{itemize}
+\tightlist
+\item
+  adding one-off ad hoc token keys because a single component needs a special case
+\item
+  using \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s\allowbreak{}.\allowbreak{}*} for focus or selection
+\item
+  using \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}*} as a generic text-emphasis bucket
+\end{itemize}
+
+\section{Practical authoring rules}\label{record-026-practical-authoring-rules}
+
+\begin{itemize}
+\tightlist
+\item
+  Start from a built-in preset and edit semantically, not from a blank page.
+\item
+  Keep foreground/background contrast honest on every \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}*} token.
+\item
+  Use \texttt{d\allowbreak{}e\allowbreak{}f\allowbreak{}i\allowbreak{}n\allowbreak{}e\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}S\allowbreak{}a\allowbreak{}f\allowbreak{}e\allowbreak{}P\allowbreak{}a\allowbreak{}i\allowbreak{}r\allowbreak{}s\allowbreak{}(\allowbreak{})} plus \texttt{d\allowbreak{}o\allowbreak{}c\allowbreak{}t\allowbreak{}o\allowbreak{}r\allowbreak{}T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}(\allowbreak{})} when an app or component needs a reusable contrast contract across multiple foreground/background roles.
+\item
+  Test the theme in \texttt{i\allowbreak{}n\allowbreak{}t\allowbreak{}e\allowbreak{}r\allowbreak{}a\allowbreak{}c\allowbreak{}t\allowbreak{}i\allowbreak{}v\allowbreak{}e}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} modes.
+\item
+  Do not rely on color alone; labels and structure still need to make sense in \texttt{n\allowbreak{}o\allowbreak{}C\allowbreak{}o\allowbreak{}l\allowbreak{}o\allowbreak{}r}, \texttt{p\allowbreak{}i\allowbreak{}p\allowbreak{}e}, and \texttt{a\allowbreak{}c\allowbreak{}c\allowbreak{}e\allowbreak{}s\allowbreak{}s\allowbreak{}i\allowbreak{}b\allowbreak{}l\allowbreak{}e} lowering.
+\item
+  If the theme adds recurring framework chrome, prefer extending \texttt{u\allowbreak{}i} instead of hard-coding raw colors in shell code.
+\end{itemize}
+
+\section{Where to look next}\label{record-026-where-to-look-next}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/docs/design-system/theme-tokens.md}{Theme Token Vocabulary}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/GUIDE.md}{packages/bijou/GUIDE.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou/ADVANCED_GUIDE.md}{packages/bijou/ADVANCED\_GUIDE.md}
+\item
+  \href{https://github.com/flyingrobots/bijou/blob/cbd70612140e7a450d764b3c7be1c6af878b99bc/packages/bijou-node/GUIDE.md}{packages/bijou-node/GUIDE.md}
+\end{itemize}
+

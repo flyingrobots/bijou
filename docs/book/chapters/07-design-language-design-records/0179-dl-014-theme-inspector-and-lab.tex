@@ -1,0 +1,261 @@
+\chapter{DL-014 Theme Inspector And Lab}\label{record-179}
+
+\noindent{\footnotesize\color{BookMuted}\path{docs/design/DL-014-theme-inspector-and-lab.md}\par}\smallskip
+
+\section{Decision Summary}\label{record-179-decision-summary}
+
+Bijou should make theme facts inspectable inside DOGFOOD before the broader mode-aware runtime migration is complete.
+
+This slice adds two bounded surfaces:
+
+\begin{itemize}
+\tightlist
+\item
+  an \texttt{F\allowbreak{}1\allowbreak{}0} Theme Inspector drawer in DOGFOOD
+\item
+  a \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s} / Theme Lab docs page with default palettes, shell-gallery facts, token swatches, and safe-pair diagnostics
+\end{itemize}
+
+The first implementation inspects theme tokens only. It does not guess element-level token ownership from final RGB values.
+
+\section{Linked Work}\label{record-179-linked-work}
+
+\begin{itemize}
+\tightlist
+\item
+  Parent goalpost: \href{https://github.com/flyingrobots/bijou/issues/308}{\#308}
+\item
+  User story: \href{https://github.com/flyingrobots/bijou/issues/311}{\#311}
+\item
+  Related Theme Lab idea: \href{https://github.com/flyingrobots/bijou/issues/315}{\#315}
+\item
+  Safe-pair contract: \href{https://github.com/flyingrobots/bijou/issues/314}{\#314}
+\end{itemize}
+
+\section{Sponsored Perspectives}\label{record-179-sponsored-perspectives}
+
+\subsection{Human Perspective}\label{record-179-human-perspective}
+
+A designer-engineer wants to inspect the active theme's token palette from inside a running Bijou TUI so that contrast, token naming, and reuse mistakes can be debugged without leaving the app.
+
+\subsection{Agent Perspective}\label{record-179-agent-perspective}
+
+An implementation agent wants a deterministic DOGFOOD surface and scripted assertions for theme facts so future theme work can be reviewed without relying only on subjective screenshots.
+
+\section{Current Truth}\label{record-179-current-truth}
+
+Bijou has a typed \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} contract with \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c}, \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e}, \texttt{b\allowbreak{}o\allowbreak{}r\allowbreak{}d\allowbreak{}e\allowbreak{}r}, \texttt{u\allowbreak{}i}, \texttt{s\allowbreak{}t\allowbreak{}a\allowbreak{}t\allowbreak{}u\allowbreak{}s}, and \texttt{g\allowbreak{}r\allowbreak{}a\allowbreak{}d\allowbreak{}i\allowbreak{}e\allowbreak{}n\allowbreak{}t} families. DL-013 added a mode-aware token-theme builder, and DL-015 added safe-pair contrast contracts. DOGFOOD had explicit dark/light themes, but those facts were visible only through settings and tests.
+
+The legacy runtime \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e} object is still single-mode. This design works inside that limitation by inspecting concrete runtime themes and documenting the mode migration separately in \#313.
+
+\section{Problem}\label{record-179-problem}
+
+Theme work is hard to evaluate when token choices are buried in code:
+
+\begin{itemize}
+\tightlist
+\item
+  colors can look acceptable in one screen but fail in another surface
+\item
+  token names and token usage are not visible to the person running DOGFOOD
+\item
+  safe-pair diagnostics are test-only facts
+\item
+  dark/light design decisions are not presented as a product surface
+\end{itemize}
+
+\section{Scope}\label{record-179-scope}
+
+\begin{itemize}
+\tightlist
+\item
+  Add first-party \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} presets.
+\item
+  Retokenize DOGFOOD dark/light shell themes to consume those presets.
+\item
+  Add a \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s} page to DOGFOOD.
+\item
+  Add an \texttt{F\allowbreak{}1\allowbreak{}0} Theme Inspector drawer to the DOGFOOD docs route.
+\item
+  Render token swatches grouped by family.
+\item
+  Show deterministic safe-pair pass counts.
+\item
+  Add scripted tests for presets, DogFood theme inheritance, F10 behavior, and the Theme Lab page.
+\end{itemize}
+
+\section{Non-Goals}\label{record-179-non-goals}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not implement full runtime theme/mode separation in this slice.
+\item
+  Do not make \texttt{F\allowbreak{}1\allowbreak{}0} a global app-frame feature for every consumer app yet.
+\item
+  Do not implement element-level token overlays without renderer provenance.
+\item
+  Do not guess token ownership from RGB equality.
+\item
+  Do not block lower-mode rendering on rich color swatches.
+\end{itemize}
+
+\section{Product Shape}\label{record-179-product-shape}
+
+\begin{CodeBlock}
+-------------------- DOGFOOD docs shell --------------------+
+| Guides  Components  Blocks  Packages  Philosophy  Themes  |
+|                                                           |
+| +-- themes --------+  +-- docs • Theme Lab --------------+ |
+| | > Theme Lab      |  | theme posture                    | |
+| |                  |  | shell gallery                    | |
+| |                  |  | bijou-dark token swatches        | |
+| |                  |  | bijou-light token swatches       | |
+| +------------------+  +----------------------------------+ |
+| ? Help • / Search • F2 Settings • F10 Theme Inspector     |
++-----------------------------------------------------------+
+\end{CodeBlock}
+
+The quick inspector is a right-side drawer:
+
+\begin{CodeBlock}
+                         +-- Theme Inspector --------------+
+                         | Active: DOGFOOD / Dark          |
+                         | Theme:  dogfood-dark            |
+                         | 32/32 safe pairs pass           |
+                         |                                  |
+                         | SEMANTIC                        |
+                         | [swatch] semantic.primary       |
+                         | [swatch] semantic.muted         |
+                         | SURFACE                         |
+                         | [swatch] surface.primary        |
+                         | ...                             |
+                         | F10/Esc close • ↑/↓ scroll      |
+                         +----------------------------------+
+\end{CodeBlock}
+
+\section{Lower Modes}\label{record-179-lower-modes}
+
+The inspector and lab are still useful in lower modes because every swatch row also prints the token path and token value text. Color improves scanning, but the token name and diagnostics remain visible without color.
+
+\section{Runtime And API Contract}\label{record-179-runtime-and-api-contract}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}D\allowbreak{}A\allowbreak{}R\allowbreak{}K} and \texttt{B\allowbreak{}I\allowbreak{}J\allowbreak{}O\allowbreak{}U\allowbreak{}\_\allowbreak{}L\allowbreak{}I\allowbreak{}G\allowbreak{}H\allowbreak{}T} are exported from \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u}.
+\item
+  The presets are registered in \texttt{P\allowbreak{}R\allowbreak{}E\allowbreak{}S\allowbreak{}E\allowbreak{}T\allowbreak{}S} as \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}.
+\item
+  DOGFOOD shell themes keep concrete mode theme names:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    family id: \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d}
+  \item
+    dark choice id: \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k}, concrete theme name: \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k}
+  \item
+    light choice id: \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}:\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}, concrete theme name: \texttt{d\allowbreak{}o\allowbreak{}g\allowbreak{}f\allowbreak{}o\allowbreak{}o\allowbreak{}d\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}
+  \end{itemize}
+\item
+  DOGFOOD clones the default preset values into those shell themes so mutating runtime RGB caches cannot accidentally alias future app-level overrides.
+\item
+  \texttt{F\allowbreak{}1\allowbreak{}0} toggles the DOGFOOD-only Theme Inspector drawer after the title screen.
+\item
+  \texttt{E\allowbreak{}s\allowbreak{}c} closes the drawer.
+\item
+  \texttt{↑}/\texttt{↓}, \texttt{j}/\texttt{k}, \texttt{d}/\texttt{u}, and \texttt{g}/\texttt{G} scroll the drawer without changing the page behind it.
+\item
+  \texttt{q} still routes to the normal DOGFOOD quit confirmation and closes the drawer so the confirmation is visible.
+\item
+  Other keys are bounded and do not drive the page behind the drawer.
+\end{itemize}
+
+\section{Accessibility And Localization}\label{record-179-accessibility-and-localization}
+
+The Theme Lab and quick inspector use DOGFOOD catalog entries for all new user-facing strings. New keys are present in every supported runtime locale: English, German, Spanish, and French. Stable token paths such as \texttt{s\allowbreak{}e\allowbreak{}m\allowbreak{}a\allowbreak{}n\allowbreak{}t\allowbreak{}i\allowbreak{}c\allowbreak{}.\allowbreak{}p\allowbreak{}r\allowbreak{}i\allowbreak{}m\allowbreak{}a\allowbreak{}r\allowbreak{}y} and \texttt{s\allowbreak{}u\allowbreak{}r\allowbreak{}f\allowbreak{}a\allowbreak{}c\allowbreak{}e\allowbreak{}.\allowbreak{}o\allowbreak{}v\allowbreak{}e\allowbreak{}r\allowbreak{}l\allowbreak{}a\allowbreak{}y\allowbreak{}.\allowbreak{}b\allowbreak{}g} remain developer identifiers and are not localized.
+
+\section{Inspectability}\label{record-179-inspectability}
+
+The lab and drawer expose:
+
+\begin{itemize}
+\tightlist
+\item
+  active shell theme label
+\item
+  runtime theme name
+\item
+  grouped token paths
+\item
+  token hex and foreground/background values
+\item
+  gradient stop values
+\item
+  color-reuse counts
+\item
+  safe-pair pass counts
+\end{itemize}
+
+\section{Implementation Slices}\label{record-179-implementation-slices}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t} presets and export them.
+\item
+  Retokenize DOGFOOD dark/light shell themes to consume those presets.
+\item
+  Add the DOGFOOD \texttt{T\allowbreak{}h\allowbreak{}e\allowbreak{}m\allowbreak{}e\allowbreak{}s} page and token-swatch renderer.
+\item
+  Add the \texttt{F\allowbreak{}1\allowbreak{}0} Theme Inspector drawer and scripted tests.
+\item
+  Keep \texttt{q} quit routing and drawer scrolling deterministic while the drawer is open.
+\end{enumerate}
+
+\section{Tests To Write First}\label{record-179-tests-to-write-first}
+
+\begin{itemize}
+\tightlist
+\item
+  Preset registry includes \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}d\allowbreak{}a\allowbreak{}r\allowbreak{}k} and \texttt{b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}l\allowbreak{}i\allowbreak{}g\allowbreak{}h\allowbreak{}t}.
+\item
+  DOGFOOD dark/light shell themes inherit the default preset token values.
+\item
+  \texttt{F\allowbreak{}1\allowbreak{}0} opens and closes the Theme Inspector drawer after entering docs.
+\item
+  \texttt{q} opens the normal quit confirmation while the drawer is open.
+\item
+  Scroll keys move the drawer viewport without closing it.
+\item
+  The Theme Lab page renders first-party default names, shell-gallery facts, token swatches, and gradient rows.
+\end{itemize}
+
+\section{Validation}\label{record-179-validation}
+
+Run:
+
+\begin{CodeBlock}
+npx vitest run packages/bijou/src/core/theme/presets.test.ts scripts/docs-preview.test.ts --testNamePattern "presets|DogFood dark and light|Theme Inspector|Theme Lab"
+npx vitest run scripts/docs-preview.test.ts
+npm run typecheck:test
+npm run lint
+git diff --check
+\end{CodeBlock}
+
+\section{Follow-On Debt}\label{record-179-follow-on-debt}
+
+\begin{itemize}
+\tightlist
+\item
+  Promote the inspector into an opt-in app-frame API once its command model is stable.
+\item
+  Add theme/mode separation for runtime shell settings in \#313.
+\item
+  Add renderer provenance so element-level token overlays can be truthful.
+\item
+  Move long-form Theme Lab Markdown into the DOGFOOD Markdown localization model when that frontmatter workflow is ready.
+\end{itemize}
+

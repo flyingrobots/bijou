@@ -8,8 +8,22 @@ describe('detectOutputMode', () => {
     expect(detectOutputMode(rt)).toBe('accessible');
   });
 
-  it('returns pipe when NO_COLOR is set', () => {
+  // NO_COLOR is a statement about colour, not about capability. It must not
+  // downgrade a real terminal out of interactive mode; colour suppression happens
+  // on the theme/style path, which never consults `mode`.
+  it('leaves an interactive session interactive when NO_COLOR is set', () => {
     const rt = mockRuntime({ env: { NO_COLOR: '1' }, stdoutIsTTY: true });
+    expect(detectOutputMode(rt)).toBe('interactive');
+  });
+
+  it('returns pipe when NO_COLOR is set and stdout is not a TTY', () => {
+    // pipe because of the TTY, not because of NO_COLOR.
+    const rt = mockRuntime({ env: { NO_COLOR: '1' }, stdoutIsTTY: false });
+    expect(detectOutputMode(rt)).toBe('pipe');
+  });
+
+  it('returns pipe when NO_COLOR is combined with TERM=dumb', () => {
+    const rt = mockRuntime({ env: { NO_COLOR: '1', TERM: 'dumb' }, stdoutIsTTY: true });
     expect(detectOutputMode(rt)).toBe('pipe');
   });
 
@@ -33,7 +47,7 @@ describe('detectOutputMode', () => {
     expect(detectOutputMode(rt)).toBe('interactive');
   });
 
-  it('BIJOU_ACCESSIBLE takes priority over NO_COLOR', () => {
+  it('BIJOU_ACCESSIBLE takes priority over an interactive TTY', () => {
     const rt = mockRuntime({
       env: { BIJOU_ACCESSIBLE: '1', NO_COLOR: '1' },
       stdoutIsTTY: true,
@@ -41,12 +55,13 @@ describe('detectOutputMode', () => {
     expect(detectOutputMode(rt)).toBe('accessible');
   });
 
-  it('NO_COLOR takes priority over CI', () => {
+  it('CI still decides when NO_COLOR is also set', () => {
+    // Previously NO_COLOR short-circuited to pipe before CI was ever consulted.
     const rt = mockRuntime({
       env: { NO_COLOR: '1', CI: 'true' },
       stdoutIsTTY: true,
     });
-    expect(detectOutputMode(rt)).toBe('pipe');
+    expect(detectOutputMode(rt)).toBe('static');
   });
 });
 
