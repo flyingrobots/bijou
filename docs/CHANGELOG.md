@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Dependency provenance retains direct and transitive consumers of background
+  colors authored as `TokenValue` literals, while absent backgrounds remain
+  unresolved (PR #516).
+
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 

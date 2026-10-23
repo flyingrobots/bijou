@@ -29,7 +29,8 @@ function collectTokenDefinitionPaths(
       continue;
     }
     paths.push(fullPath);
-    if (includeBackgrounds && isTokenDefinition(value) && value.bg !== undefined) {
+    const hasBackground = (isTokenValue(value) || isTokenDefinition(value)) && value.bg !== undefined;
+    if (includeBackgrounds && hasBackground) {
       paths.push(`${fullPath}.bg`);
     }
   }
