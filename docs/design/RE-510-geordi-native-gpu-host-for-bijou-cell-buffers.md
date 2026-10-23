@@ -730,6 +730,15 @@ interface GeordiNativeBijouCellsReceipt {
     readonly probePolicyHash: string;
     readonly probeResultsHash: string;
     readonly frameHash?: string;
+    readonly readbacks: readonly {
+      readonly source: 'offscreen-target' | 'presentation-target';
+      readonly phase:
+        | 'offscreen-only'
+        | 'before-window-present'
+        | 'after-window-present';
+      readonly scope: 'full-frame' | 'probe-regions';
+      readonly evidenceRef: string;
+    }[];
   };
   readonly evidence: readonly {
     readonly id: string;
@@ -826,6 +835,35 @@ Missing artifacts, noncanonical structured bytes, malformed digests, and any
 byte/digest mismatch are controlled validation failures. Commit shared
 TypeScript/Rust byte-and-digest vectors for every row, including nested
 artifact corruption and padding/layout counterexamples.
+
+### Readback Posture
+
+`output.readbacks` is required and lists actual GPU-to-CPU pixel transfers in
+execution order; an empty array explicitly asserts none. Each entry references
+verified probe or presentation evidence binding this invocation, source
+target, frame dimensions, copied rectangles and transferred byte count.
+Unknown tags, dangling references, missing transfers or invented no-readback
+assertions fail receipt validation. Classify a transfer as `full-frame` whenever
+its regions cover the complete frame, even if the implementation calls them
+probes. Include full-frame transfers through intermediate staging buffers.
+
+Offscreen receipts permit only `offscreen-only` events. Native-window receipts
+use the before/after phases relative to that frame's window-present operation;
+the source distinguishes a probe target from the presented target. No event
+means no readback, not missing instrumentation. The required positive GPU lane
+must record its offscreen probe readback truthfully, including full-frame scope
+if it reads the whole target. Such a test receipt does not prove readback-free
+window presentation.
+
+Playback question 5 is answered from the native-window receipt: any
+`before-window-present`/`full-frame` event means a full-frame CPU readback
+preceded presentation. A no-full-frame-readback claim requires complete event
+instrumentation and evidence for the same presentation invocation; unrelated
+offscreen probes cannot establish it. This field reports posture and does not
+add a new GPU claim to the closed registry. Commit vectors distinguishing no
+readback, region-only offscreen probes, full-frame offscreen probes and
+full-frame pre-presentation readback, plus rejected contradictory phase/scope
+evidence.
 
 ### Complete Input Identity
 
