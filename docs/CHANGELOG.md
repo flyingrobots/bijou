@@ -11,6 +11,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
+### Added
+
+- Added `release:witnesses` to replay the inherited V8 product witness families
+  with pinned inputs, byte-exact generated artifacts, and a commit-bound receipt.
+  Dirty checkouts, fixture drift, or failed checks prevent a success receipt;
+  final stable-release acceptance remains tracked separately.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and
