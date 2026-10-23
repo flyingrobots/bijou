@@ -1,0 +1,31 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Protect actual excluded-candidate inspection inputs while assessing a disputed review request",
+  "bytesConsumed": 354644,
+  "filesRead": [
+    "packages/bijou/src/core/theme/graph-dependencies.ts",
+    "packages/bijou/src/core/theme/graph-dependents.ts",
+    "packages/bijou/src/core/theme/theme-rule-candidates.ts",
+    "packages/bijou/src/core/theme/theme-rules.ts",
+    "packages/bijou/src/core/theme/preset-authoring.test.ts"
+  ],
+  "filesModified": [
+    "packages/bijou/README.md",
+    "packages/bijou/src/core/theme/graph-dependents.ts",
+    "tests/cycles/DL-024/theme-excluded-candidate-dependencies.test.ts"
+  ],
+  "tripwires": [
+    "The proposed filtering changes dependency reporting while excluded candidate colors remain resolved and displayed",
+    "Comparison baseline passed4 tests; applying the review proposal caused3 expected dependency assertions to fail, including an existing contract test",
+    "The temporary proposal was restored only in its two previously-clean paths; its failing result is not represented as a defect in the original implementation",
+    "Retained byte checkpoint is a lower cumulative checkpoint; later focused reads are listed without inventing an exact total",
+    "Normal pre-commit rejected two unsafe asymmetric matcher assignments in the new test; typed field assertions replaced them without changing any baseline"
+  ],
+  "validation": {
+    "baseline": "Four tests pass while an excluded input color changes its inspected hex and the selected value remains unchanged",
+    "proposal": "Three of four focused checks fail after the requested filter; published resolver behavior is preserved",
+    "final": "Forced fresh rebuild, focused suites, normal commit/push hooks and full strict checks must pass before publication; the disputed thread stays open pending reassessment"
+  }
+}

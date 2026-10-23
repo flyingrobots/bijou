@@ -8,8 +8,41 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Wrap Theme Lab provenance entries before painting so candidate scores and
+  contrast ratios remain complete in narrow panels.
+
+- Keep foreground and background dependencies separate during transitive theme
+  provenance traversal, so an unchanged field cannot create false propagation.
+
+- Dependency provenance retains direct and transitive consumers of background
+  colors authored as `TokenValue` literals, while absent backgrounds remain
+  unresolved (PR #516).
+
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
+
+### Added
+
+- **Inspectable theme provenance and key-binding conflicts** — rule-authored
+  presets retain their definitions when renamed, token graphs expose
+  mode-aware direct and transitive reverse dependents without resolving cyclic
+  values, and Theme Lab can explain a token's rule, winner, rejected
+  candidates, score, contrast, and direct draft override. `@flyingrobots/bijou`
+  adds `renameRuleAuthoredTheme()`, `ruleAuthoredDefinitions()`,
+  `collectTokenDependents()`, `collectTransitiveTokenDependents()`, and
+  `tokenDefinitionPaths()`; `@flyingrobots/bijou-tui` adds
+  `findKeyBindingConflicts()` and `describeKeyBindingConflict()` with
+  runtime-accurate enabled/disabled claim reporting.
+
+### Changed
+
+- **Sapphire Theme Lab interaction pass** — DOGFOOD now opens Theme Lab with
+  its full shell-theme picker and a live component specimen above the fold,
+  applies draft colours to the preview, marks edits across every editable
+  path, keeps provenance honest about direct overrides, and stacks complete
+  panels below the two-column width floor. Editor controls are declared as a
+  real key map, use `n`/`p` and `1`/`2`/`3` without stealing frame keys, and
+  publish matching localized editor and footer guidance.
 
 ### Documentation book consolidation
 

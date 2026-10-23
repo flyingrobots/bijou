@@ -85,6 +85,25 @@ fake duplication rather than a real second API.
 - **`themeContrastRatio()`**: Deterministic foreground/background contrast
   calculation for token-pair tests.
 
+Rule-authored themes retain inspectable authoring definitions.
+`renameRuleAuthoredTheme(theme, name)` creates a renamed theme while preserving
+that provenance; `ruleAuthoredDefinitions(theme)` returns its immutable
+snapshot, or `undefined` for themes without registered authoring data.
+`tokenDefinitionPaths(definitions)` lists authored token paths.
+`collectTokenDependents(definitions, mode)` reports direct consumers;
+`collectTransitiveTokenDependents(definitions, mode)` follows the full chain.
+These maps select the requested adaptive branch, omit unresolved references
+and inspect dependencies without evaluating cyclic token values.
+They include inspection inputs such as excluded candidates whose colors remain
+visible in provenance; an edge does not promise that every edit changes the
+selected hex value.
+
+DOGFOOD's Theme Lab uses this provenance to show rules, candidates, scores,
+contrast and direct draft overrides alongside a live component specimen.
+It stacks its panels below the two-column width floor. A direct override is
+reported separately from a value that changed through propagation; this view
+does not claim every edit triggers complete graph-driven recomputation.
+
 ### Mode-Aware Authoring
 - **`renderByMode()`**: Dispatch a component to the current output contract.
 - **`lintModeLowering()`**: Compare explicit semantic facts across output modes.

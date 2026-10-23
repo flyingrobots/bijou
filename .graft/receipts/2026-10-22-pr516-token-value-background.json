@@ -1,0 +1,26 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Preserve graph dependency provenance for supported TokenValue literal backgrounds",
+  "bytesConsumed": 354644,
+  "filesRead": [
+    "packages/bijou/src/core/theme/graph-dependents.ts",
+    "packages/bijou/src/core/theme/graph-guards.ts",
+    "tests/cycles/DL-024/theme-provenance.part01.test.ts",
+    "tests/cycles/DL-024/theme-provenance.part02.test.ts"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/theme/graph-dependents.ts",
+    "tests/cycles/DL-024/theme-token-value-background.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "Two deterministic RED cases failed only at the missing reverse edge after successful forward resolution and dependency inspection",
+    "354644 is a retained cumulative Graft read checkpoint; subsequent targeted test/guard reads are additionally listed without inventing an exact later byte total"
+  ],
+  "validation": {
+    "red": "Dark/light tests fail: surface.bg resolves and has a forward edge, but reverse lookup is undefined",
+    "green": "Small source guard correction; focused graph/provenance regressions, normal hooks and final full push gate must pass before publication"
+  }
+}

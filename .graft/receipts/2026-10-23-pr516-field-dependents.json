@@ -1,0 +1,23 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Fix field-specific transitive theme provenance after PR review",
+  "bytesConsumed": 427194,
+  "filesRead": [
+    "packages/bijou/src/core/theme/graph-dependents.ts",
+    "packages/bijou/src/core/theme/graph-dependencies.ts",
+    "packages/bijou/src/core/theme/graph-import.ts",
+    "packages/bijou/src/core/theme/graph.ts"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/theme/graph-field-dependents.ts",
+    "packages/bijou/src/core/theme/graph-dependents.ts",
+    "tests/cycles/DL-024/theme-field-dependents.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "Preserve excluded-candidate inspection inputs; separate only foreground/background traversal",
+    "Four deterministic failing foreground/background counterexamples precede the implementation fix"
+  ]
+}

@@ -1798,7 +1798,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "es": "{paneSwitch} • [/] color • canal r/g/b • -/+ ajustar • 0 restablecer"
+        "es": "{paneSwitch} • n/p color • canal 1/2/3 • -/+ ajustar • 0 restablecer"
       }
     },
     {
@@ -4033,7 +4033,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "es": "Controles: [/] color | canal r/g/b | -/+ ajustar | 0 restablecer"
+        "es": "Controles: n/p color | canal 1/2/3 | -/+ ajustar | 0 restablecer"
       }
     },
     {

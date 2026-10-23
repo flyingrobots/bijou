@@ -82,7 +82,7 @@ export function renderThemeLabEditorSurface(
     dogfoodText(
       localization,
       'themeLab.editor.controls',
-      'Controls: [/] color | r/g/b channel | -/+ nudge | 0 reset',
+      'Controls: n/p color | 1/2/3 channel | -/+ nudge | 0 reset',
     ),
     tokens.muted,
   );

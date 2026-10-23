@@ -2000,7 +2000,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "{paneSwitch} • [/] color • r/g/b channel • -/+ nudge • 0 reset"
+        "en": "{paneSwitch} • n/p color • 1/2/3 channel • -/+ nudge • 0 reset"
       }
     },
     {
@@ -4321,7 +4321,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "Controls: [/] color | r/g/b channel | -/+ nudge | 0 reset"
+        "en": "Controls: n/p color | 1/2/3 channel | -/+ nudge | 0 reset"
       }
     },
     {
