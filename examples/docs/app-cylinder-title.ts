@@ -2,7 +2,7 @@ import { rasterToGlyphSurface } from '../../packages/bijou-tui/src/index.js';
 import type { Surface } from '../../packages/bijou/src/index.js';
 import { CYLINDER_ADVANCE, CYLINDER_LAYOUT } from './app-cylinder-font.js';
 import { rasterizeCylinderGlyph, type CylinderGrid } from './app-cylinder-project.js';
-import { mixHexColor, sampleColorRamp } from './app-landing-colors.js';
+import { sampleColorRamp } from './app-landing-colors.js';
 import type { LandingThemeTokens } from './app-landing-types.js';
 
 const TAU = Math.PI * 2;
@@ -65,9 +65,10 @@ function paintBraille(
         }
       }
       const wave = 0.5 + 0.5 * Math.sin(x / columns * TAU - time * 1.4 + y * 0.12);
-      const foreground = sampleColorRamp(tokens.logoRamp, wave);
+      // Keep every stroke at full ink strength; express depth through the palette.
+      const foreground = sampleColorRamp(tokens.logoRamp, wave * 0.8 + light * 0.2);
       surface.set(left + x, top + y, {
-        char, fg: mixHexColor(tokens.background, foreground, 0.4 + light * 0.6),
+        char, fg: foreground,
         bg: tokens.background, empty: false,
       });
     }

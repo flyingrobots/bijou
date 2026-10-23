@@ -45,3 +45,11 @@ Character density carries the pattern; a single quiet foreground is sampled from
 the active theme’s decorative ramp over its explicit background. Terminal cell
 aspect ratio, existing quality tiles and quantized animation time are preserved.
 The field is decorative; panels and navigation retain their semantic text colors.
+
+The title/backdrop hierarchy uses contrast constraints: decorative ink stays at
+or below 1.45:1 against the page, tapering to 1.08:1 in a soft ellipse behind the
+cylinder. The active theme supplies every color. Letter strokes use the full
+logo palette rather than fading toward the page; depth changes their palette
+position. Book-mode tests verify at least 6:1 stroke contrast across sampled
+rotation phases. These are software color measurements for the illustration,
+not a general accessibility certification for raster lettering.

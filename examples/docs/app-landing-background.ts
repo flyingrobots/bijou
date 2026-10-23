@@ -2,7 +2,7 @@ import {
   createSurface,
   type Surface,
 } from '../../packages/bijou/src/index.js';
-import { sampleColorRamp } from './app-landing-colors.js';
+import { landingBackdropInkIndex, landingBackdropInkRamp } from './app-landing-backdrop-ink.js';
 import { landingNoiseDensity } from './app-landing-noise.js';
 import type {
   LandingQualityProfile,
@@ -33,11 +33,12 @@ export function paintLandingBackground(
 ): void {
   const { width, height } = surface;
   const tile = Math.max(1, Math.floor(quality.backgroundTile));
-  const foreground = sampleColorRamp(tokens.waveRamp, 0.72);
+  const ink = landingBackdropInkRamp(tokens);
   for (let tileY = 0; tileY < height; tileY += tile) {
     const sampleY = Math.min(height - 1, tileY + Math.floor(tile / 2));
     for (let tileX = 0; tileX < width; tileX += tile) {
       const sampleX = Math.min(width - 1, tileX + Math.floor(tile / 2));
+      const foreground = ink[landingBackdropInkIndex(sampleX, sampleY, width, height)] ?? tokens.background;
       const density = landingNoiseDensity(sampleX, sampleY, timeMs);
       const char = LANDING_NOISE_CHARS[Math.round(density * (LANDING_NOISE_CHARS.length - 1))] ?? ' ';
       for (let y = tileY; y < Math.min(height, tileY + tile); y++) {

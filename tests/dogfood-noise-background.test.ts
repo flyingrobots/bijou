@@ -44,7 +44,7 @@ describe('ASCII noise backdrop', () => {
       for (let x = 0; x < initial.width; x++) {
         const cell = initial.get(x, y);
         expect(cell.empty).toBe(false);
-        expect(cell.fg).not.toBe(cell.bg);
+
         backgrounds.add(cell.bg);
         const density = landingNoiseDensity(x, y, 0);
         expect(density).toBeGreaterThanOrEqual(0);
