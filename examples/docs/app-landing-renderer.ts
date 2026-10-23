@@ -17,7 +17,7 @@ import {
   resolveLandingQuality,
   resolveLandingQualityMode,
 } from './app-landing-quality.js';
-import { paintV7TitleArt } from './app-landing-title-art.js';
+import { paintCylinderTitle } from './app-cylinder-title.js';
 import {
   createWordmarkSurface,
   fitGlyphLinesToWidth,
@@ -68,7 +68,7 @@ export function createLandingRenderer(options: LandingRendererOptions): (model: 
 
     const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
     paintLandingBackground(surface, quantizedTimeMs, tokens, quality, textModifiers);
-    paintV7TitleArt(surface, tokens, textModifiers, quantizedTimeMs);
+    paintCylinderTitle(surface, tokens, quantizedTimeMs);
 
     const wordmarkGlyphs = transparentLogoGlyphs(fitGlyphLinesToWidth(FLYING_ROBOTS_LOGO_LINES, Math.max(1, width - 4)));
     const wordmark = createWordmarkSurface(wordmarkGlyphs, textModifiers);

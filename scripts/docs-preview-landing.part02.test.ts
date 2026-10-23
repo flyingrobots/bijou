@@ -1,121 +1,57 @@
-import { BOOK_MODE_COLORS } from '../examples/docs/dogfood-book-palette.js';
-import {
-  afterEach,
-  colorHex,
-  createDocsApp,
-  createTestContext,
-  describe,
-  expectedBijouLogoYOffset,
-  expectedBijouSvgOverlay,
-  expectedStackedWakeChar,
-  expect,
-  frameText,
-  it,
-  matchingBijouSvgOverlayGlyphCount,
-  bijouSvgOverlayMetrics,
-  runScript,
-  serializeFrame,
-  stackedWakeRowCount,
-  titleBackgroundGlyphCount,
-  V7_RASTER_TITLE_GLYPHS,
-  _resetDefaultContextForTesting,
-} from './docs-preview.test-support.js';
-
+import { afterEach, createDocsApp, createTestContext, describe, expect, frameText, it,
+  runScript, serializeFrame, _resetDefaultContextForTesting } from './docs-preview.test-support.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
+import { createSurface } from '../packages/bijou/src/index.js';
+import { paintCylinderTitle } from '../examples/docs/app-cylinder-title.js';
+import { resolveLandingTheme } from '../examples/docs/app-landing-themes.js';
 
-describe('docs preview app', () => {
-  afterEach(() => { _resetDefaultContextForTesting(); });
+function silhouette(text: string): string {
+  return Array.from(text, (char) => /[\u2801-\u28ff]/u.test(char) ? char : ' ').join('');
+}
 
-  it('renders a stacked sine-wave V7 title wake with the Bijou SVG overlay', async () => {
+afterEach(() => { _resetDefaultContextForTesting(); });
+
+describe('Jacquard cylinder landing', () => {
+  it('renders real Braille glyph coverage and moves the silhouette on a pulse', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
     const app = createDocsApp(ctx);
-
     const initial = await runScript(app, [], { ctx });
     const pulsed = await runScript(app, [{ pulse: { dt: 0.35 } }], { ctx });
+    const first = frameText(must(initial.frames[0]));
+    const next = frameText(must(pulsed.frames.at(-1)));
+    expect(first.match(/[\u2801-\u28ff]/gu)?.length ?? 0).toBeGreaterThan(100);
+    expect(next.match(/[\u2801-\u28ff]/gu)?.length ?? 0).toBeGreaterThan(100);
+    expect(silhouette(first)).not.toBe(silhouette(next));
+    expect(first).toContain('V8 / Jacquard 12');
+    expect(first).not.toContain('V7 Launch Wake');
+  });
 
-    const initialText = frameText(must(initial.frames[0]));
-    const pulsedText = frameText(must(pulsed.frames[pulsed.frames.length - 1]));
-
-    expect(titleBackgroundGlyphCount(initialText)).toBeGreaterThan(1000);
-    expect(titleBackgroundGlyphCount(pulsedText)).toBeGreaterThan(1000);
-    expect(stackedWakeRowCount(must(initial.frames[0]))).toBeGreaterThan(12);
-    expect(stackedWakeRowCount(must(pulsed.frames[pulsed.frames.length - 1]))).toBeGreaterThan(12);
-    const overlay = matchingBijouSvgOverlayGlyphCount(must(initial.frames[0]), 0);
-    expect(overlay.expected).toBeGreaterThan(450);
-    expect(overlay.matched).toBeGreaterThan(Math.floor(overlay.expected * 0.85));
-    const metrics = bijouSvgOverlayMetrics(initial.frames[0]?.width, initial.frames[0]?.height);
-    let sameColorWakeCells = 0;
-    for (let y = 0; y < initial.frames[0]?.height; y++) {
-      for (let x = 0; x < initial.frames[0]?.width; x++) {
-        if (
-          x >= metrics.left
-          && x < metrics.left + metrics.columns
-          && y >= metrics.top
-          && y < metrics.top + metrics.rows
-        ) {
-          continue;
-        }
-        const cell = initial.frames[0]?.get(x, y);
-        if (!V7_RASTER_TITLE_GLYPHS.has(cell.char)) continue;
-        if (colorHex(cell.bg) === BOOK_MODE_COLORS.dark.background) continue;
-        if (colorHex(cell.fg) !== colorHex(cell.bg)) continue;
-        sameColorWakeCells++;
+  it('reproduces fixed-time geometry and keeps every title cell inside its bounded viewport', () => {
+    const tokens = resolveLandingTheme(0);
+    const first = createSurface(120, 40);
+    const second = createSurface(120, 40);
+    paintCylinderTitle(first, tokens, 352);
+    paintCylinderTitle(second, tokens, 352);
+    expect(serializeFrame(first)).toEqual(serializeFrame(second));
+    let count = 0;
+    for (let y = 0; y < first.height; y++) {
+      for (let x = 0; x < first.width; x++) {
+        const cell = first.get(x, y);
+        if (!/[\u2801-\u28ff]/u.test(cell.char)) continue;
+        count++;
+        expect(x).toBeGreaterThanOrEqual(2);
+        expect(x).toBeLessThan(118);
+        expect(y).toBeLessThan(24);
+        expect(cell.bg).toBe(tokens.background);
       }
     }
-    expect(sameColorWakeCells).toBeGreaterThan(400);
-    expect(serializeFrame(must(initial.frames[0]))).not.toEqual(serializeFrame(must(pulsed.frames[pulsed.frames.length - 1])));
+    expect(count).toBeGreaterThan(100);
   });
-});
 
-describe('docs preview app', () => {
-  afterEach(() => { _resetDefaultContextForTesting(); });
-
-  it('uses the Bijou SVG as a transparent-background title mask', async () => {
-    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
-    const app = createDocsApp(ctx);
-
-    const initial = await runScript(app, [], { ctx });
-    const frame = must(initial.frames[0]);
-    const overlay = expectedBijouSvgOverlay(frame.width, frame.height);
-    const paintedPathCell = { x: overlay.left, y: overlay.top };
-    const transparentMaskCell = { x: overlay.left + 15, y: overlay.top };
-
-    expect(overlay.mask.get(0, 0).char).toBe('▓');
-    expect(overlay.mask.get(15, 0).char).toBe(' ');
-    expect(frame.get(paintedPathCell.x, paintedPathCell.y).char).toBe(overlay.mask.get(0, 0).char);
-    expect(frame.get(transparentMaskCell.x, transparentMaskCell.y).char).toBe(
-      expectedStackedWakeChar(transparentMaskCell.x, transparentMaskCell.y, frame.width),
-    );
-    expect(colorHex(frame.get(paintedPathCell.x, paintedPathCell.y).fg)).not.toBeNull();
-    expect(colorHex(frame.get(transparentMaskCell.x, transparentMaskCell.y).fg)).not.toBeNull();
-  });
-});
-
-describe('docs preview app', () => {
-  afterEach(() => { _resetDefaultContextForTesting(); });
-
-  it('animates the Bijou SVG title mask with staggered row and fill waves', async () => {
-    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40, refreshRate: 60 } });
-    const app = createDocsApp(ctx);
-    const pulseMs = 352;
-
-    const initial = await runScript(app, [], { ctx });
-    const pulsed = await runScript(app, [{ pulse: { dt: pulseMs / 1000 } }], { ctx });
-    const initialFrame = must(initial.frames[0]);
-    const pulsedFrame = must(pulsed.frames.at(-1));
-    const overlay = expectedBijouSvgOverlay(initialFrame.width, initialFrame.height);
-    const sampleX = 0;
-    const sampleY = 0;
-    const expectedChar = overlay.mask.get(sampleX, sampleY).char;
-    const initialY = overlay.top + expectedBijouLogoYOffset(sampleX, overlay.mask.width, 0);
-    const pulsedY = overlay.top + expectedBijouLogoYOffset(sampleX, overlay.mask.width, pulseMs);
-
-    expect(expectedChar).not.toBe(' ');
-    expect(initialY).not.toBe(pulsedY);
-    expect(initialFrame.get(overlay.left + sampleX, initialY).char).toBe(expectedChar);
-    expect(pulsedFrame.get(overlay.left + sampleX, pulsedY).char).toBe(expectedChar);
-    expect(colorHex(initialFrame.get(overlay.left + sampleX, initialY).fg)).not.toBe(
-      colorHex(pulsedFrame.get(overlay.left + sampleX, pulsedY).fg),
-    );
+  it.each([[39, 20], [80, 13]])('leaves undersized %sx%s surfaces untouched', (width, height) => {
+    const surface = createSurface(width, height);
+    const before = serializeFrame(surface);
+    paintCylinderTitle(surface, resolveLandingTheme(0), 0);
+    expect(serializeFrame(surface)).toEqual(before);
   });
 });
