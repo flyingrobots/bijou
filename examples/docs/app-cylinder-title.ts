@@ -6,7 +6,8 @@ import { mixHexColor, sampleColorRamp } from './app-landing-colors.js';
 import type { LandingThemeTokens } from './app-landing-types.js';
 
 const TAU = Math.PI * 2;
-const PERIOD_SECONDS = 3.6;
+const PERIOD_SECONDS = 10.8;
+const LETTER_PHASE_RADIANS = 0.06 / 3.6 * TAU;
 
 /** Jacquard 12 cylinder: four staggered words, perspective, depth and Braille coverage. */
 export function paintCylinderTitle(surface: Surface, tokens: LandingThemeTokens, timeMs: number): void {
@@ -29,7 +30,7 @@ export function paintCylinderTitle(surface: Surface, tokens: LandingThemeTokens,
   for (let row = 0; row < 4; row++) {
     CYLINDER_LAYOUT.glyphs.forEach(({ glyph, x }, index) => {
       const angle = Math.PI / 2 - time / PERIOD_SECONDS * TAU + row * TAU / 4
-        + index * 0.06 / PERIOD_SECONDS * TAU;
+        + index * LETTER_PHASE_RADIANS;
       const cos = Math.cos(angle);
       if (cos <= 0.04) return;
       rasterizeCylinderGlyph(glyph, {

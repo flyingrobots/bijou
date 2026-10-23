@@ -22,7 +22,7 @@ describe('Jacquard cylinder landing', () => {
     expect(first.match(/[\u2801-\u28ff]/gu)?.length ?? 0).toBeGreaterThan(100);
     expect(next.match(/[\u2801-\u28ff]/gu)?.length ?? 0).toBeGreaterThan(100);
     expect(silhouette(first)).not.toBe(silhouette(next));
-    expect(first).toContain('V8 / Jacquard 12');
+    expect(first).toContain('Bijou v8');
     expect(first).not.toContain('V7 Launch Wake');
   });
 

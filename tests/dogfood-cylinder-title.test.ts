@@ -43,7 +43,7 @@ describe('offline Jacquard cylinder font', () => {
   it.each(['static', 'pipe', 'accessible'] as const)('preserves V8 meaning without animation in %s output', (mode) => {
     const output = renderDogfoodReleaseTitleText({ mode, width: 100 });
     expect(CURRENT_DOGFOOD_RELEASE_TITLE.id).toBe('v8');
-    expect(output).toContain('V8 / Jacquard 12');
+    expect(output).toContain('Bijou v8');
     expect(output).not.toMatch(/[\u2800-\u28ff]/u);
     expect(output).not.toContain('\u001b');
     expect(output).not.toContain('v8.0.0 released');

@@ -4,7 +4,7 @@ import { dogfoodLocalizedText as dogfoodText } from './localization.js';
 /** V8 identity describes this edition without claiming an unpublished stable release. */
 export const V8_DOGFOOD_RELEASE_TITLE: DogfoodReleaseTitle = Object.freeze({
   id: 'v8',
-  title: dogfoodText(undefined, 'release.title.v8.title', 'V8 / Jacquard 12'),
+  title: dogfoodText(undefined, 'release.title.v8.title', 'Bijou v8'),
   titleKey: 'release.title.v8.title',
   summary: dogfoodText(undefined, 'release.title.v8.summary', 'A rolling Jacquard 12 title with readable release facts in every presentation.'),
   summaryKey: 'release.title.v8.summary',
