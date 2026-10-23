@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- `@flyingrobots/bijou-tui` exports immutable raster fonts, code-point text layout, RGBA text rasterization and font-to-surface rendering through the existing raster pipeline.
+
+- DOGFOOD's V8 landing title rolls actual Jacquard 12 glyphs around a cylinder, with offline font geometry and readable release facts in lower presentation modes.
+
 ### Fixed
 
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for

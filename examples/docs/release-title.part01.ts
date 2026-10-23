@@ -1,3 +1,4 @@
+import { V8_DOGFOOD_RELEASE_TITLE } from './release-title-v8.js';
 import type { OutputMode } from '@flyingrobots/bijou';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { dogfoodLocalizedText as dogfoodText } from './localization.js';
@@ -35,36 +36,35 @@ export interface RenderDogfoodReleaseTitleTextOptions {
 }
 export const V7_DOGFOOD_RELEASE_TITLE: DogfoodReleaseTitle = Object.freeze({
   id: 'v7',
-  title: 'V7 Product Truth',
+  title: dogfoodText(undefined, 'release.title.v7.title', 'V7 Product Truth'),
   titleKey: 'release.title.v7.title',
-  summary:
-    'Release identity, current proof lanes, and lower-mode release facts for DOGFOOD.',
+  summary: dogfoodText(undefined, 'release.title.v7.summary', 'Release identity, current proof lanes, and lower-mode release facts for DOGFOOD.'),
   summaryKey: 'release.title.v7.summary',
-  subtitle: 'Blocks prove product surfaces. DOGFOOD proves Blocks.',
+  subtitle: dogfoodText(undefined, 'release.title.v7.subtitle', 'Blocks prove product surfaces. DOGFOOD proves Blocks.'),
   subtitleKey: 'release.title.v7.subtitle',
-  gate: 'v6 issue-complete, v7 closeout in flight',
+  gate: dogfoodText(undefined, 'release.title.v7.gate', 'v6 issue-complete, v7 closeout in flight'),
   gateKey: 'release.title.v7.gate',
-  navigation: ['Docs', 'Blocks', 'BlockLab', 'Release Notes'],
+  navigation: dogfoodText(undefined, 'release.title.v7.navigation', 'Docs | Blocks | BlockLab | Release Notes').split(' | '),
   navigationKey: 'release.title.v7.navigation',
   proofLanes: Object.freeze([
     {
       id: 'table-parity',
-      label: 'table parity',
+      label: dogfoodText(undefined, 'release.title.v7.proofLane.tableParity', 'table parity'),
       localizationKey: 'release.title.v7.proofLane.tableParity',
     },
     {
       id: 'scoped-node-io',
-      label: 'scoped Node I/O',
+      label: dogfoodText(undefined, 'release.title.v7.proofLane.scopedNodeIo', 'scoped Node I/O'),
       localizationKey: 'release.title.v7.proofLane.scopedNodeIo',
     },
     {
       id: 'blocklab',
-      label: 'BlockLab',
+      label: dogfoodText(undefined, 'release.title.v7.proofLane.blocklab', 'BlockLab'),
       localizationKey: 'release.title.v7.proofLane.blocklab',
     },
     {
       id: 'release-title',
-      label: 'release title',
+      label: dogfoodText(undefined, 'release.title.v7.proofLane.releaseTitle', 'release title'),
       localizationKey: 'release.title.v7.proofLane.releaseTitle',
     },
   ]),
@@ -78,43 +78,42 @@ export const V7_LAUNCH_DOGFOOD_RELEASE_TITLE: DogfoodReleaseTitle =
       'V7 Launch Wake',
     ),
     titleKey: 'release.title.v7Launch.title',
-    summary:
-      'Post-release title treatment, visible release proof, and lower-mode facts for DOGFOOD.',
+    summary: dogfoodText(undefined, 'release.title.v7Launch.summary', 'Post-release title treatment, visible release proof, and lower-mode facts for DOGFOOD.'),
     summaryKey: 'release.title.v7Launch.summary',
-    subtitle: 'A released line leaves a readable trail.',
+    subtitle: dogfoodText(undefined, 'release.title.v7Launch.subtitle', 'A released line leaves a readable trail.'),
     subtitleKey: 'release.title.v7Launch.subtitle',
-    gate: 'v7.0.0 released, patch lane open',
+    gate: dogfoodText(undefined, 'release.title.v7Launch.gate', 'v7.0.0 released, patch lane open'),
     gateKey: 'release.title.v7Launch.gate',
-    navigation: ['Release Notes', 'Migration', 'DOGFOOD', 'BlockLab'],
+    navigation: dogfoodText(undefined, 'release.title.v7Launch.navigation', 'Release Notes | Migration | DOGFOOD | BlockLab').split(' | '),
     navigationKey: 'release.title.v7Launch.navigation',
-    motif: 'Wake lines, not fireworks: proof remains visible after ship.',
+    motif: dogfoodText(undefined, 'release.title.v7Launch.motif', 'Wake lines, not fireworks: proof remains visible after ship.'),
     motifKey: 'release.title.v7Launch.motif',
     proofLanes: Object.freeze([
       {
         id: 'published-release',
-        label: 'published release',
+        label: dogfoodText(undefined, 'release.title.v7Launch.proofLane.publishedRelease', 'published release'),
         localizationKey: 'release.title.v7Launch.proofLane.publishedRelease',
       },
       {
         id: 'follow-up-patch',
-        label: 'follow-up patch',
+        label: dogfoodText(undefined, 'release.title.v7Launch.proofLane.followUpPatch', 'follow-up patch'),
         localizationKey: 'release.title.v7Launch.proofLane.followUpPatch',
       },
       {
         id: 'title-gallery',
-        label: 'title gallery',
+        label: dogfoodText(undefined, 'release.title.v7Launch.proofLane.titleGallery', 'title gallery'),
         localizationKey: 'release.title.v7Launch.proofLane.titleGallery',
       },
       {
         id: 'main-ci',
-        label: 'green main CI',
+        label: dogfoodText(undefined, 'release.title.v7Launch.proofLane.mainCi', 'green main CI'),
         localizationKey: 'release.title.v7Launch.proofLane.mainCi',
       },
     ]),
   });
 export const DOGFOOD_RELEASE_TITLE_GALLERY: readonly DogfoodReleaseTitle[] =
-  Object.freeze([V7_LAUNCH_DOGFOOD_RELEASE_TITLE, V7_DOGFOOD_RELEASE_TITLE]);
-export const CURRENT_DOGFOOD_RELEASE_TITLE = V7_LAUNCH_DOGFOOD_RELEASE_TITLE;
+  Object.freeze([V8_DOGFOOD_RELEASE_TITLE, V7_LAUNCH_DOGFOOD_RELEASE_TITLE, V7_DOGFOOD_RELEASE_TITLE]);
+export const CURRENT_DOGFOOD_RELEASE_TITLE = V8_DOGFOOD_RELEASE_TITLE;
 export function dogfoodReleaseTitleFacts(
   release: DogfoodReleaseTitle = CURRENT_DOGFOOD_RELEASE_TITLE,
 ): readonly DogfoodReleaseTitleFact[] {
