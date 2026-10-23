@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `@flyingrobots/bijou-tui` exports immutable raster fonts, code-point text layout, RGBA text rasterization and font-to-surface rendering through the existing raster pipeline.
+
+- DOGFOOD's V8 landing title rolls actual Jacquard 12 glyphs around a cylinder, with offline font geometry and readable release facts in lower presentation modes.
+
 - DOGFOOD now defaults to a book-matched coral/warm-ink theme pair, with dark
   and light shell modes and landing colors that follow the selected mode.
   Previous neutral and alternate themes remain available.
@@ -51,10 +55,6 @@ the accumulated `main` work since `7.2.0`; the stable `8.0.0` header will
 consolidate them.
 
 ### Added
-
-- The TUI package adds immutable raster fonts, positioned text layout and font-to-surface rendering through the existing raster pipeline.
-
-- DOGFOOD's V8 landing title rolls actual Jacquard 12 glyphs around a cylinder, with offline font geometry and readable release facts in lower presentation modes.
 
 - **Profunctor Page terminal inspection target** —
   `lowerProfunctorPageArtifacts()` validates the canonical Keep
