@@ -881,11 +881,13 @@ The hashed object includes `receiptVersion`, `widthCells`, `heightCells`,
 are diagnostic conveniences; `sceneHash` alone does not authenticate ownership
 or focus metadata. Consumers recompute the complete digest after validation.
 
-Conformance must mutate each field independently, including a valid change to
-cell ownership or focus with unchanged bytes and `sceneHash`: the complete
-digest must change. Reordering object keys must retain the digest. Both
-languages must agree on committed JCS bytes and digest vectors before intake
-can claim conformance.
+Conformance must include an accepted mutation of each field that can vary while
+preserving the receipt laws. A valid change to cell ownership or focus with
+unchanged bytes and `sceneHash` must change the complete digest. Fixed literals
+and relationship-breaking mutations are rejection vectors, not accepted digest
+vectors. Reordering object keys must retain the digest. Both languages must
+agree on committed JCS bytes, accepted digest vectors and rejection results
+before intake can claim conformance.
 
 The exact GPU adapter and device description may be useful diagnostic facts but
 must not become a stable semantic identifier unless the target profile says so.
