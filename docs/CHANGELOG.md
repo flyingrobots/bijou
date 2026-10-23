@@ -6,8 +6,20 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- **Perceptual color and Sapphire reference APIs** — `@flyingrobots/bijou`
+  now exports dependency-free sRGB/OKLAB/OKLCH conversion, sRGB gamut-shell,
+  gamut-relative chroma, fast OKLAB distance, and circular hue-interpolation
+  helpers. `createSapphireReferencePalette()` exposes the deterministic seed
+  and mode references behind the first-party presets without broadening this
+  slice into the deferred interactive theme generator.
+
 ### Fixed
 
+- Reject overflowing perceptual-to-RGB conversions while preserving ordinary finite gamut clipping.
+- Reject unsupported hue interpolation paths instead of silently selecting the shorter arc.
+- Reject explicit null Sapphire hue seeds instead of silently selecting default hues.
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
@@ -24,6 +36,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   retaining live engineering policy, changelog, and the edited tutorial.
 
 ### Changed
+
+- **Sapphire Noir first-party palette** — `BIJOU_DARK` and `BIJOU_LIGHT` now
+  compile from one hue-anchored, gamut-relative reference system. Graphite and
+  ice lead dark mode; warm porcelain and sapphire ink lead light mode; focus,
+  warning, information, success, and error remain contrast-safe and distinct
+  in truecolor, ANSI-256, and ANSI-16 output. Legacy vivid presets are
+  unchanged.
 
 - Retired the duplicated filesystem backlog after verifying all 44 planning
   files against existing GitHub issues and preserving historical source text.

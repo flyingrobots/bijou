@@ -1,0 +1,23 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Reject explicitly null hue fields while preserving omitted and undefined Sapphire seed defaults",
+  "bytesConsumed": 196896,
+  "contextMeasurement": "Cumulative returned Graft read bytes at the retained slice checkpoint; source and test reads were shared with the ongoing PR audit",
+  "filesRead": [
+    "packages/bijou/src/core/theme/sapphire-palette.ts",
+    "packages/bijou/src/core/theme/sapphire-palette.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/theme/sapphire-palette.ts",
+    "packages/bijou/src/core/theme/sapphire-palette.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [],
+  "validation": {
+    "red": "Docker 517-null-red: two expected throw assertions fail for brandHue:null and lightSurfaceHue:null; nine existing/default tests pass",
+    "green": "The relevant theme group and normal pre-commit hooks must pass before commit creation; exact result retained with the PR audit"
+  }
+}
