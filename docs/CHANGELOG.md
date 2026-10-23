@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Wrap Theme Lab provenance entries before painting so candidate scores and
+  contrast ratios remain complete in narrow panels.
+
 - Keep foreground and background dependencies separate during transitive theme
   provenance traversal, so an unchanged field cannot create false propagation.
 

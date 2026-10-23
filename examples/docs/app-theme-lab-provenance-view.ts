@@ -1,5 +1,6 @@
 import {
   createSurface,
+  wrapToWidth,
   type Surface,
   type Theme,
   type ThemeMode,
@@ -54,16 +55,22 @@ export function renderThemeLabProvenanceSurface(
 ): Surface {
   const lines = themeLabProvenanceLines(theme, selectedPath, mode, localization, options);
   const safeWidth = Math.max(1, width);
-  const surface = createSurface(safeWidth, Math.max(1, lines.length));
+  const rows = lines.flatMap((entry) => {
+    const offset = entry.swatch !== undefined && safeWidth > SWATCH_WIDTH + TEXT_GAP
+      ? SWATCH_WIDTH + TEXT_GAP
+      : 0;
+    return wrapToWidth(entry.text, safeWidth - offset).map((text, index) => ({
+      text,
+      tone: entry.tone,
+      offset,
+      swatch: offset > 0 && index === 0 ? entry.swatch : undefined,
+    }));
+  });
+  const surface = createSurface(safeWidth, Math.max(1, rows.length));
 
-  lines.forEach((entry, y) => {
-    const token = toneToken(entry.tone, tokens);
-    if (entry.swatch === undefined) {
-      writeText(surface, 0, y, entry.text, token);
-      return;
-    }
-    renderSwatch(surface, entry.swatch, 0, y, SWATCH_WIDTH);
-    writeText(surface, SWATCH_WIDTH + TEXT_GAP, y, entry.text, token);
+  rows.forEach((row, y) => {
+    if (row.swatch !== undefined) renderSwatch(surface, row.swatch, 0, y, SWATCH_WIDTH);
+    writeText(surface, row.offset, y, row.text, toneToken(row.tone, tokens));
   });
 
   return surface;
