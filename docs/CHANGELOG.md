@@ -11,6 +11,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
+- Release Dry Run rejects missing or blank `version` and `notes_tag` outputs in
+  the verification job, with a specific diagnostic before downstream jobs run
+  (#533).
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

@@ -1,0 +1,34 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Issue #533: reject empty Release Dry Run metadata in the producing job",
+  "bytesConsumed": 229851,
+  "filesRead": [
+    "AGENTS.md",
+    "docs/typescript-code-standards.editors-edition.md",
+    "docs/CHANGELOG.md",
+    ".github/workflows/release-dry-run.yml",
+    "scripts/workflow-shell-preflight.ts",
+    "scripts/workflow-shell-preflight.test.ts",
+    "scripts/release-workflow-output.test.ts"
+  ],
+  "filesModified": [
+    ".github/workflows/release-dry-run.yml",
+    "docs/CHANGELOG.md",
+    "scripts/release-workflow-output.test.ts"
+  ],
+  "tripwires": [],
+  "validation": {
+    "red": "Eight tests failed because the workflow had no metadata output guard.",
+    "focused": "15 tests across guard behavior and workflow shell validation passed before the final typed output-parser cleanup; normal commit and pre-push checks follow.",
+    "coverage": "Extract and execute the actual workflow shell; accept real CLI metadata plus stable/prerelease values; reject absent, empty and whitespace-only values for each required output.",
+    "independence": "Branched from main 0d03651c6adf4215e7bcceeae8328b1c0472049e, independently of issue 526. Reused the clean task worktree and installed toolchain."
+  },
+  "resource_policy": {
+    "build_budget_gib": 20,
+    "data_budget_gib": 4,
+    "logs_budget_mib": 128,
+    "guard": "Owned process-group timeout and aggregate disk/RSS/log/free-space monitor; no new worker or toolchain cache."
+  }
+}
