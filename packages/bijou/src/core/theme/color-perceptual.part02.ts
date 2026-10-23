@@ -68,8 +68,17 @@ export function interpolateHue(
   from: number,
   to: number,
   progress: number,
-  path: HueInterpolationPath = 'shorter',
+  path?: HueInterpolationPath,
+): number;
+export function interpolateHue(
+  from: number,
+  to: number,
+  progress: number,
+  path: unknown = 'shorter',
 ): number {
+  if (path !== 'shorter' && path !== 'longer') {
+    throw new Error('Unsupported hue interpolation path');
+  }
   assertFinite('Hue interpolation coordinates', [from, to, progress]);
   const start = normalizeHue(from);
   const end = normalizeHue(to);

@@ -52,6 +52,12 @@ describe('OKLCH sRGB gamut', () => {
 });
 
 describe('circular hue interpolation', () => {
+  it.each(['sideways', null])('rejects an unsupported runtime arc: %s', (path) => {
+    expect(() => {
+      Reflect.apply(interpolateHue, undefined, [20, 80, 0.5, path]);
+    }).toThrow('Unsupported hue interpolation path');
+  });
+
   it('takes the shorter arc through zero degrees', () => {
     expect(interpolateHue(350, 10, 0.5, 'shorter')).toBeCloseTo(0, 8);
   });
