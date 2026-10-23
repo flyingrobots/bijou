@@ -76,4 +76,15 @@ describe.skipIf(process.platform === 'win32')('DOGFOOD failure evidence from a r
     expect(result.output).toContain('exited with code 23');
     expect(result.output).not.toContain('Captured output');
   }, 20_000);
+
+  it('refuses oversized capture output even when required snippets are present', async () => {
+    const snippets = DOGFOOD_SCENARIOS.landing.requiredSnippets.join('\n');
+    const result = await runCapture(`
+      process.stdout.write(${JSON.stringify(snippets)} + '\\n');
+      process.stdout.write('x'.repeat(2 * 1024 * 1024), () => process.exit(0));
+    `);
+    expect(result.status).toBe(1);
+    expect(result.output).toContain('capture output exceeded 1048576 bytes');
+    expect(result.output.length).toBeLessThan(4500);
+  }, 20_000);
 });
