@@ -140,10 +140,11 @@ band and no overlap at AA:
 | 600 | 6.42 AA | 2.55 |
 | 700 | 9.10 AA | 1.80 |
 
-Stop `500` is the only stop passing AA on light, and it fails AA on dark.
-This is empirical proof that role binding must stay mode-dependent — which
-is what the existing `{ light, dark }` definitions and `minContrastWith`
-rules already express. The architecture is correct; the inputs are not.
+Stop `500` is the first listed stop passing AA on light; stops `600` and
+`700` also pass there. Stop `500` fails AA on dark, and no listed stop meets
+AA in both modes. These measurements support mode-dependent role binding,
+which the existing `{ light, dark }` definitions and `minContrastWith`
+rules already express.
 
 ## Recorded Campaign Phases
 
