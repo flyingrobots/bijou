@@ -597,6 +597,74 @@ renderer must not replace an unsupported grapheme with a space, drop a modifier,
 coerce terminal-default color to black, or truncate the grid and still emit a
 success receipt.
 
+### Typed Refusals
+
+Validation and capability failures emit this closed envelope instead of either
+success receipt. These are proposed protocol types, not implemented APIs:
+
+```typescript
+interface GeordiBijouCellsRefusal {
+  readonly receiptVersion: 'geordi-bijou-cells-refusal/1';
+  readonly result: 'refused';
+  readonly phase: 'input-validation' | 'capability-validation';
+  readonly code:
+    | 'malformed-input'
+    | 'unsupported-input-profile'
+    | 'invalid-target-profile'
+    | 'unsupported-capability'
+    | 'resource-limit';
+  readonly path: string; // RFC 6901 pointer; empty string denotes the root.
+  readonly inputIdentity:
+    | { readonly kind: 'validated'; readonly packedReceiptHash: string }
+    | {
+        readonly kind: 'observed-bytes';
+        readonly observedBytesHash: string;
+        readonly observedByteLength: number;
+        readonly complete: boolean;
+      };
+  readonly targetProfileIdentity: {
+    readonly profileId: string | null;
+    readonly profileArtifactHash: string;
+  };
+  readonly capability:
+    | 'receipt-version' | 'cell-format' | 'dimensions' | 'chroma'
+    | 'glyph' | 'modifier' | 'backend' | 'presentation' | null;
+  readonly evidence: readonly {
+    readonly kind: 'input' | 'profile' | 'capability' | 'limit';
+    readonly artifactHash: string;
+  }[];
+}
+```
+
+All fields are required; reject unknown fields and enum values. A missing or
+invalid input uses the hash of exactly the bounded bytes observed by intake,
+with their byte count and a truthful completeness flag. A partial input digest
+never identifies the unobserved remainder. Successfully validated input uses
+its complete packed-receipt digest. Bind the exact supplied target-profile
+artifact even when malformed; its profile ID is null unless validated. Never
+invent canonical identity for input or a profile that did not validate.
+
+`malformed-input` binds input evidence and the failing JSON pointer (root for
+parse failures). `unsupported-input-profile` binds input/profile evidence and
+the rejected version or format capability. `invalid-target-profile` binds the
+rejected profile artifact. `unsupported-capability` requires a non-null
+capability plus input, profile and capability evidence identifying requested
+and supported values. `resource-limit` requires input/profile and limit
+evidence identifying the observed quantity and configured bound. Evidence
+artifacts use closed, versioned schemas; expected/observed values must be
+machine-readable, not embedded only in prose.
+
+Malformed input and unsupported input profiles use `input-validation`; invalid
+target profiles, unsupported capabilities and resource limits use
+`capability-validation`. Reject any other code/phase pairing.
+
+These refusals finish before renderer buffer allocation or draw submission.
+They contain no render output, prepared buffers, GPU success claims or probe
+results. A later rendering/device failure needs a separately versioned failure
+contract; it must not be relabelled as pre-allocation validation. Slice 0 must
+commit accepted refusal vectors for every code and reject missing identities,
+missing code-specific evidence, unknown codes and contradictory phases.
+
 ## Receipt Contract
 
 Slice 0 uses a separate validation-only receipt:
