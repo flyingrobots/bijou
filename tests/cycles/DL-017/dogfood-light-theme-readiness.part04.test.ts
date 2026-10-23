@@ -10,7 +10,7 @@ import {
 describe('DL-017 DOGFOOD light theme readiness', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
   it('covers DOGFOOD light chrome tokens in safe-pair diagnostics', () => {
-      const lightTheme = DOGFOOD_SHELL_THEMES[0]?.modes?.find((mode) => mode.id === 'light')?.theme;
+      const lightTheme = DOGFOOD_SHELL_THEMES.find((theme) => theme.id === 'dogfood')?.modes?.find((mode) => mode.id === 'light')?.theme;
       expect(lightTheme?.name).toBe('dogfood-light');
 
       const requiredChromePairs = [

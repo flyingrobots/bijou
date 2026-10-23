@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- DOGFOOD now defaults to a book-matched coral/warm-ink theme pair, with dark
+  and light shell modes and landing colors that follow the selected mode.
+  Previous neutral and alternate themes remain available.
+
 ### Fixed
 
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for

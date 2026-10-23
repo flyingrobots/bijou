@@ -1,8 +1,9 @@
+import { BOOK_MODE_COLORS } from '../examples/docs/dogfood-book-palette.js';
 import { rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
 
 import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from '../examples/docs/svg-raster.js';
 
-import { V7_BIJOU_LOGO_LETTER_COUNT, V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS, V7_BIJOU_SVG_TEXT, V7_DEFAULT_BACKGROUND, V7_LANDING_WAKE_CHARS, V7_RASTER_TITLE_GLYPHS, V7_TITLE_CELL_ASPECT_RATIO, clamp01, sampleDefaultWaveRamp } from './docs-preview.test-support.part01.js';
+import { V7_BIJOU_LOGO_LETTER_COUNT, V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS, V7_BIJOU_SVG_TEXT, V7_LANDING_WAKE_CHARS, V7_RASTER_TITLE_GLYPHS, V7_TITLE_CELL_ASPECT_RATIO, clamp01, sampleDefaultWaveRamp } from './docs-preview.test-support.part01.js';
 
 import { landingWakeLayer } from './docs-preview.test-support.part03.js';
 export function expectedLandingWakeColorAt(x: number, y: number, width: number, height: number): string {
@@ -17,7 +18,7 @@ export function expectedLandingWakeColorAt(x: number, y: number, width: number, 
   const v = sampleY / heightDenominator;
   const layer = landingWakeLayer(sampleX, sampleY, width, 0, Math.max(0.35, Math.min(1.4, width / 120)));
   const char = V7_LANDING_WAKE_CHARS[layer] ?? ' ';
-  if (char === ' ') return V7_DEFAULT_BACKGROUND;
+  if (char === ' ') return BOOK_MODE_COLORS.dark.background;
   const colorT = clamp01(
     0.1
     + (layer * 0.16)

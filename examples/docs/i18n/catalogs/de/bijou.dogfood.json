@@ -2686,6 +2686,138 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.dark.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Korallenlicht auf warmer Holzkohle."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.dark.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Dunkel"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Koralle, Rosé und warme Tinte aus dem Bijou-Buch."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Bijou Book"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.light.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Roséfarbenes Papier mit dunklen weinroten Überschriften."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.light.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Hell"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.dark.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Neutrale Dokumentationsoberfläche mit hohem Kontrast für dunkle Terminals."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.dark.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Dunkel"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Neutrale Dokumentationsoberfläche mit hohem Kontrast und dunklem sowie hellem Modus."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "DOGFOOD"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.light.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Neutrale Dokumentationsoberfläche mit hohem Kontrast für helle Terminals."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.light.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Hell"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "stories.document.buildPlan.frameReplay"
       },
       "kind": "message",

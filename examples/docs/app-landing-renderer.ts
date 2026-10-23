@@ -46,7 +46,7 @@ export function createLandingRenderer(options: LandingRendererOptions): (model: 
     const ctx = getCtx();
     const width = Math.max(1, model.columns);
     const height = Math.max(1, model.rows);
-    const tokens = resolveLandingTheme(model.landingThemeIndex);
+    const tokens = options.resolveTheme?.(model) ?? resolveLandingTheme(model.landingThemeIndex);
     const qualityMode = resolveLandingQualityMode(model);
     const quality = resolveLandingQuality(width, height, qualityMode);
     const quantizedTimeMs = Math.floor(model.landingTimeMs / quality.frameStepMs) * quality.frameStepMs;

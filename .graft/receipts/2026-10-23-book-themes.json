@@ -1,0 +1,42 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "1dac3748-4a6a-4270-a526-fe205bafdf85",
+  "agent": "bijou-issue-remediation",
+  "task": "Implement issue #549: DOGFOOD book-matched dark/light themes with actual landing-mode propagation",
+  "bytesConsumed": 110036,
+  "filesRead": [
+    "examples/docs/dogfood-shell-themes.ts",
+    "examples/docs/app-landing-themes.ts",
+    "examples/docs/app-root.ts",
+    "examples/docs/app-docs-shell-theme.ts",
+    "examples/docs/app-landing-types.ts",
+    "examples/docs/app-landing-footer.ts",
+    "packages/bijou/src/core/theme/preset-authoring.ts",
+    "examples/docs/i18n/dogfood-authoring.ts",
+    "examples/docs/i18n-debt-source-scan.ts",
+    "examples/docs/i18n-debt-source-context.ts"
+  ],
+  "filesModified": [
+    "docs/CHANGELOG.md",
+    "examples/docs/app-landing-renderer.ts",
+    "examples/docs/app-landing-themes.ts",
+    "examples/docs/app-landing-types.ts",
+    "examples/docs/app-root.ts",
+    "examples/docs/dogfood-shell-themes.ts",
+    "examples/docs/i18n/catalogs/de/bijou.dogfood.json",
+    "examples/docs/i18n/catalogs/en/bijou.dogfood.json",
+    "examples/docs/i18n/catalogs/es/bijou.dogfood.json",
+    "examples/docs/i18n/catalogs/fr/bijou.dogfood.json",
+    "examples/docs/i18n/source/dogfood-strings.csv",
+    "examples/docs/book-themes.md",
+    "examples/docs/dogfood-book-palette.ts",
+    "examples/docs/dogfood-book-theme-spec.ts",
+    "examples/docs/dogfood-book-theme.ts",
+    "tests/dogfood-book-theme.test.ts"
+  ],
+  "tripwires": [
+    "Canonical book/preamble.tex anchors were inspected in the companion repository; the book is unchanged",
+    "Four behavioral RED cases preceded executing the implementation in Docker; measured semantic text and chrome contrast now passes in both modes",
+    "Mode identifiers use typed protocol literals; localization wrappers and all four catalogs follow existing policy without baseline growth"
+  ]
+}

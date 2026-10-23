@@ -4,6 +4,7 @@ import {
   defineThemeSafePairs,
   type Theme,
 } from '../../packages/bijou/src/index.js';
+import { DOGFOOD_BOOK_SHELL_THEME } from './dogfood-book-theme-spec.js';
 import type { FrameShellThemeSpec } from '../../packages/bijou-tui/src/index.js';
 import { dogfoodLocalizedText } from './localization.js';
 
@@ -72,6 +73,7 @@ dogfoodPairs.chrome('ui.focusGutter', 'ui.focusGutter.bg');
 export const DOGFOOD_THEME_SAFE_PAIRS = dogfoodPairs.build();
 
 export const DOGFOOD_SHELL_THEMES: readonly FrameShellThemeSpec[] = Object.freeze([
+  DOGFOOD_BOOK_SHELL_THEME,
   {
     id: 'dogfood',
     label: dogfoodText('shell.theme.dogfood.label', 'DOGFOOD'),
