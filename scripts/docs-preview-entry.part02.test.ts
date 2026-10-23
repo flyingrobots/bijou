@@ -33,7 +33,7 @@ describe('docs preview app', () => {
     expect(enteredText).toContain('Bijou Docs');
     expect(enteredText).toContain('Start Here');
     expect(enteredText).not.toContain('Press [Enter]');
-    expect(enteredText).not.toContain('V8 / Jacquard 12');
+    expect(enteredText).not.toContain('Bijou v8');
   });
 });
 
@@ -69,7 +69,7 @@ describe('docs preview app', () => {
     expect(text).not.toContain('Documentation coverage');
     expect(text).toContain('DOGFOOD');
     expect(text).toContain('Documentation Of Good');
-    expect(text).toContain('V8 / Jacquard 12');
+    expect(text).toContain('Bijou v8');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
     // Gradient background chars (█▓▒░·) require pulse-driven animation;

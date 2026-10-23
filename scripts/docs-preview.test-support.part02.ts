@@ -1,33 +1,10 @@
-import { BOOK_MODE_COLORS } from '../examples/docs/dogfood-book-palette.js';
 import { rasterToGlyphSurface } from '@flyingrobots/bijou-tui';
 
 import { rasterizeSvgToRgba, svgViewBoxAspectRatio } from '../examples/docs/svg-raster.js';
 
-import { V7_BIJOU_LOGO_LETTER_COUNT, V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS, V7_BIJOU_SVG_TEXT, V7_LANDING_WAKE_CHARS, V7_RASTER_TITLE_GLYPHS, V7_TITLE_CELL_ASPECT_RATIO, clamp01, sampleDefaultWaveRamp } from './docs-preview.test-support.part01.js';
+import { V7_BIJOU_LOGO_LETTER_COUNT, V7_BIJOU_LOGO_WAVE_AMPLITUDE_ROWS, V7_BIJOU_SVG_TEXT, V7_LANDING_WAKE_CHARS, V7_RASTER_TITLE_GLYPHS, V7_TITLE_CELL_ASPECT_RATIO } from './docs-preview.test-support.part01.js';
 
 import { landingWakeLayer } from './docs-preview.test-support.part03.js';
-export function expectedLandingWakeColorAt(x: number, y: number, width: number, height: number): string {
-  const tile = width * height <= 14_000 ? 1 : width * height <= 28_000 ? 2 : 3;
-  const tileX = Math.floor(x / tile) * tile;
-  const tileY = Math.floor(y / tile) * tile;
-  const sampleX = Math.min(width - 1, tileX + Math.floor(tile / 2));
-  const sampleY = Math.min(height - 1, tileY + Math.floor(tile / 2));
-  const widthDenominator = width - 1 || 1;
-  const heightDenominator = height - 1 || 1;
-  const u = sampleX / widthDenominator;
-  const v = sampleY / heightDenominator;
-  const layer = landingWakeLayer(sampleX, sampleY, width, 0, Math.max(0.35, Math.min(1.4, width / 120)));
-  const char = V7_LANDING_WAKE_CHARS[layer] ?? ' ';
-  if (char === ' ') return BOOK_MODE_COLORS.dark.background;
-  const colorT = clamp01(
-    0.1
-    + (layer * 0.16)
-    + (u * 0.26)
-    + (0.18 * (0.5 + (Math.sin(v * 5.2) * 0.5)))
-    + (0.06 * Math.sin(sampleX * 0.035)),
-  );
-  return sampleDefaultWaveRamp(colorT);
-}
 export function titleBackgroundGlyphCount(text: string): number {
   return Array.from(text).filter((char) => V7_RASTER_TITLE_GLYPHS.has(char)).length;
 }

@@ -6,7 +6,6 @@ import {
   createDocsApp,
   createTestContext,
   describe,
-  expectedLandingWakeColorAt,
   expect,
   FLYING_ROBOTS_LOGO_TEXT,
   FLYING_ROBOTS_TRANSPARENT_CELL,
@@ -65,38 +64,14 @@ describe('docs preview app', () => {
     const visiblePrefix = firstLogoLine.slice(0, transparentOffset);
     const logoY = lines.findIndex((line) => line.includes(visiblePrefix));
     const logoX = logoY >= 0 ? must(lines[logoY]).indexOf(visiblePrefix) : -1;
-    let wakeBackedLogoCell: { readonly x: number; readonly y: number } | undefined;
-
     expect(text).toContain('Quit?');
     expect(logoY).toBeGreaterThanOrEqual(0);
     expect(logoX).toBeGreaterThanOrEqual(0);
-    for (let y = 0; y < logoLines.length; y++) {
-      const logoLine = Array.from(logoLines[y] ?? '');
-      for (let x = 0; x < logoLine.length; x++) {
-        const char = logoLine[x];
-        if (char === ' ' || char === FLYING_ROBOTS_TRANSPARENT_CELL) continue;
-        const targetX = logoX + x;
-        const targetY = logoY + y;
-        if (expectedLandingWakeColorAt(targetX, targetY, frame.width, frame.height) !== BOOK_MODE_COLORS.dark.background) {
-          wakeBackedLogoCell = { x: targetX, y: targetY };
-          break;
-        }
-      }
-      if (wakeBackedLogoCell != null) break;
-    }
-
-    expect(wakeBackedLogoCell).toBeDefined();
-    const wakeCell = must(wakeBackedLogoCell);
-    const cell = frame.get(wakeCell.x, wakeCell.y);
-    const wakeBackedBg = expectedLandingWakeColorAt(
-      wakeCell.x,
-      wakeCell.y,
-      frame.width,
-      frame.height,
-    );
-    expect(colorHex(cell.bg)).toBe(wakeBackedBg);
-    expect(colorHex(cell.fg)).toBe(oppositeHexColor(wakeBackedBg));
+    const cell = frame.get(logoX, logoY);
+    expect(colorHex(cell.bg)).toBe(BOOK_MODE_COLORS.dark.background);
+    expect(colorHex(cell.fg)).toBe(oppositeHexColor(BOOK_MODE_COLORS.dark.background));
     expect(cell.modifiers ?? []).toContain('dim');
+
   });
 });
 

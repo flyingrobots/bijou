@@ -1,11 +1,10 @@
-import { BOOK_MODE_COLORS } from '../examples/docs/dogfood-book-palette.js';
 import { readFileSync } from 'node:fs';
 
 import { resolve } from 'node:path';
 
 import { expect } from 'vitest';
 
-import { colorHex, doctorTheme, lerp3, themeContrastRatio } from '@flyingrobots/bijou';
+import { colorHex, doctorTheme, themeContrastRatio } from '@flyingrobots/bijou';
 
 import type { ColorRef, Theme } from '@flyingrobots/bijou';
 
@@ -120,16 +119,4 @@ export function rgbHex(r: number, g: number, b: number): string {
 export function oppositeHexColor(hex: string): string {
   const [r, g, b] = hexToRgb(hex);
   return rgbHex(255 - r, 255 - g, 255 - b);
-}
-export function sampleDefaultWaveRamp(t: number): string {
-  const index = Math.max(0, Math.min(
-    V7_LANDING_COLOR_RAMP_SIZE - 1,
-    Math.round(clamp01(t) * (V7_LANDING_COLOR_RAMP_SIZE - 1)),
-  ));
-  const colors = [BOOK_MODE_COLORS.dark.surfaceMuted, BOOK_MODE_COLORS.dark.secondary, BOOK_MODE_COLORS.dark.chrome];
-  const stops = colors.map((color, stopIndex) => ({
-    pos: stopIndex / (colors.length - 1),
-    color: hexToRgb(color),
-  }));
-  return rgbHex(...lerp3(stops, index / (V7_LANDING_COLOR_RAMP_SIZE - 1)));
 }

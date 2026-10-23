@@ -36,3 +36,12 @@ human accessibility. Existing lower-mode/navigation checks remain relevant.
 The cylinder title is tracked separately in #502; this theme pair does not
 require it, the unfinished color generator, or a native renderer. The book and
 its archived source corpus are unchanged.
+
+## ASCII noise backdrop
+
+The title screen uses a fixed-seed, three-octave 3D gradient-noise field inspired
+by [PerlinASCII](https://github.com/Koalhack/PerlinASCII/tree/076e3c0f7990b4fc343d2a56fc4eaa4c19f0eda0).
+Character density carries the pattern; a single quiet foreground is sampled from
+the active theme’s decorative ramp over its explicit background. Terminal cell
+aspect ratio, existing quality tiles and quantized animation time are preserved.
+The field is decorative; panels and navigation retain their semantic text colors.

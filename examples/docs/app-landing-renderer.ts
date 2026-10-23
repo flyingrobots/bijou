@@ -67,7 +67,7 @@ export function createLandingRenderer(options: LandingRendererOptions): (model: 
     if (cache.key === cacheKey && cache.front != null) return cache.front;
 
     const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
-    paintLandingBackground(surface, quantizedTimeMs, tokens, quality, textModifiers);
+    paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
     paintCylinderTitle(surface, tokens, quantizedTimeMs);
 
     const wordmarkGlyphs = transparentLogoGlyphs(fitGlyphLinesToWidth(FLYING_ROBOTS_LOGO_LINES, Math.max(1, width - 4)));
@@ -93,6 +93,9 @@ export function createLandingRenderer(options: LandingRendererOptions): (model: 
       timeMs: quantizedTimeMs,
       modifiers: textModifiers,
     });
+    for (let x = 0; x < width; x++) {
+      surface.set(x, footerY, { char: ' ', bg: tokens.background, empty: false });
+    }
     surface.blit(staticSurfaces.footerControls, 0, footerY);
     placeFooterBadges(surface, staticSurfaces.footerControls.width, staticSurfaces.footerVersion, fpsBadge, footerY);
 
