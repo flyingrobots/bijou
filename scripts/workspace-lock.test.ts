@@ -15,10 +15,10 @@ describe('workspace lock-step contract', () => {
 
   it('rejects a stale lock version even while every manifest agrees', () => {
     const root = makeLockedWorkspace();
-    writeJson(root, 'package-lock.json', {
-      lockfileVersion: 3, packages: { '': {}, 'packages/core': { version: '0.9.0' } },
-    });
-    expect(validateWorkspaceVersion(root, '1.0.0').errors.join('\n')).toContain('package-lock.json');
+    patchLockedPackage(root, 'packages/core', { version: '0.9.0' });
+    expect(validateWorkspaceVersion(root, '1.0.0').errors).toEqual([
+      'package-lock.json packages/core version (0.9.0) does not match expected (1.0.0)',
+    ]);
   });
 
   it('rejects missing, malformed and legacy locks', () => {
@@ -51,11 +51,15 @@ describe('workspace lock-step contract', () => {
     expect(validateWorkspaceVersion(root, '1.0.0').errors.join('\n')).toContain(`${path} ${group} ${name}`);
   });
 
-  it.each([{}, { '@flyingrobots/bijou': '1.0.0', '@flyingrobots/bijou-ghost': '1.0.0' }])(
-    'rejects missing and unknown internal lock pins', (dependencies) => {
+  it.each([
+    { dependencies: {}, error: 'package-lock.json packages/node dependencies @flyingrobots/bijou (undefined) must match manifest and release (1.0.0)' },
+    { dependencies: { '@flyingrobots/bijou': '1.0.0', '@flyingrobots/bijou-ghost': '1.0.0' },
+      error: 'package-lock.json packages/node references unknown internal package @flyingrobots/bijou-ghost' },
+  ])(
+    'rejects missing and unknown internal lock pins', ({ dependencies, error }) => {
       const root = makeLockedWorkspace();
       patchLockedPackage(root, 'packages/node', { dependencies });
-      expect(validateWorkspaceVersion(root, '1.0.0').errors.join('\n')).toContain('package-lock.json');
+      expect(validateWorkspaceVersion(root, '1.0.0').errors).toEqual([error]);
     },
   );
 
