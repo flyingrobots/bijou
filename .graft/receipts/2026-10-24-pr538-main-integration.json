@@ -1,0 +1,27 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Reconcile PR 538 MCP runtime security with current main",
+  "bytesConsumed": 888831,
+  "counterScope": "Graft cumulative session counter through dependency-floor and stdio test audit",
+  "filesRead": [
+    ".github/workflows/ci.yml",
+    "docs/CHANGELOG.md",
+    "packages/bijou-mcp/src/stdio.test.ts",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts"
+  ],
+  "filesModified": [
+    ".github/workflows/ci.yml",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative session warning; progress reported and reads kept bounded"
+  ],
+  "integration": {
+    "priorHead": "675999162a5e76587caeefdc88bf367bbc16f031",
+    "incomingMain": "ca12aac656d8d36d8d9cf505cc5b5a9b624c564c",
+    "resolution": "Retain stdio compatibility, both hyperlink tests, dependency security test and all three workspace-lock tests in portable CI. Retain all Unreleased notes and describe PR 530 as already merged. Dependency graph unchanged from PR 538."
+  },
+  "validation": "Existing host installed graph refreshed through bounded runner so ordinary commit hooks validate current overrides. Tests remain Docker-only; fresh graph RED/GREEN, production audit and normal Docker pre-push follow."
+}
