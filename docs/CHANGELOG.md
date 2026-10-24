@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DOGFOOD publishes translated Latest Features and MCP package guides, labels
+  archive-backed reader articles, and follows the running release version in
+  its Current Release Story. Orientation distinguishes live references from
+  frozen evidence and preview features from publication.
+
 - DOGFOOD’s interactive title-screen “Press [Enter]” prompt uses offline Space
   Grotesk glyphs with theme-color animation, and retains localized text in
   static, pipe, accessible, small, and unsupported-glyph presentations.

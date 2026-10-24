@@ -1835,6 +1835,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Polices, typographie Markdown, animation, thèmes du livre et portée de la documentation actuelle."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Fonctionnalités récentes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.guides.navigate.summary"
       },
       "kind": "message",
@@ -1874,6 +1896,28 @@
       "sourceLocale": "en",
       "values": {
         "fr": "Commencer ici"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.historicalSourceNotice"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Référence historique de l’archive préservée. Fonctionnalités récentes et les README actuels décrivent les changements postérieurs à cette source."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.packages.mcp.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Outils MCP, sorties sémantiques, configuration et limites actuelles."
       }
     },
     {
@@ -2237,7 +2281,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "fr": "Le parcours de version v7.2 à travers Nouveautés, preuve et historique du changelog."
+        "fr": "Le parcours de version v{releaseLine} à travers Nouveautés, preuve et historique du changelog."
       }
     },
     {

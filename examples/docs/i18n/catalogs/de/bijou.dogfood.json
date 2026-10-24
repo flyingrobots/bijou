@@ -1835,6 +1835,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Schriften, Markdown-Typografie, Theme-Animation, Buch-Themes und der Geltungsbereich aktueller Dokumentation."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Neueste Funktionen"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.guides.navigate.summary"
       },
       "kind": "message",
@@ -1874,6 +1896,28 @@
       "sourceLocale": "en",
       "values": {
         "de": "Start hier"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.historicalSourceNotice"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Historische Referenz aus dem bewahrten Dokumentationsarchiv. Neueste Funktionen und aktuelle Paket-READMEs beschreiben spätere Änderungen."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.packages.mcp.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "MCP-Rendering-Werkzeuge, semantische Ausgabemodi, Konfiguration und aktuelle Grenzen."
       }
     },
     {
@@ -2237,7 +2281,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "de": "Der v7.2-Release-Pfad durch Was ist neu, Proof und Changelog-Verlauf."
+        "de": "Der Release-Pfad v{releaseLine} durch Was ist neu, Proof und Changelog-Verlauf."
       }
     },
     {

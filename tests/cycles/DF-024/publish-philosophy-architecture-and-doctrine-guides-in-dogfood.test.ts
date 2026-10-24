@@ -33,7 +33,8 @@ describe('DF-024 publish philosophy, architecture, and doctrine guides in DOGFOO
   });
 
   it('publishes doctrine and architecture pages in the Philosophy section', async () => {
-    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+    // Reserve space for the historical-source notice as well as the original article.
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 48 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'philosophy' });
     const opened = await runScript(app, [], { ctx });
     const overviewText = frameText(must(opened.frames.at(-1)));
@@ -49,6 +50,7 @@ describe('DF-024 publish philosophy, architecture, and doctrine guides in DOGFOO
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'philosophy-system-style-javascript' } } },
     ], { ctx });
     const systemStyleText = frameText(must(systemStyle.frames.at(-1)));
+    expect(systemStyleText).toContain('Historical reference');
     expect(systemStyleText).toContain('Bijou Adaptation');
     expect(systemStyleText).toContain('TypeScript is a useful dialect');
 

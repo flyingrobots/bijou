@@ -20,6 +20,8 @@ const SECTIONS: readonly InventorySection[] = [
       'docs/code-dojo-exceptions.md',
       'docs/CHANGELOG.md',
       'docs/guides/framed-app-tutorial.md',
+      'examples/docs/content/guides-latest-features.md',
+      'examples/docs/content/package-mcp.md',
     ],
   },
   {

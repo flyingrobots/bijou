@@ -5,6 +5,15 @@ import type { DocsPageId } from './app-ids.js';
 import type { DocsExplorerModel } from './app-model.js';
 import { guideDocsForPage } from './app-guide-catalog.js';
 import { dogfoodText } from './app-localization.js';
+import { BIJOU_RELEASE_LINE } from './app-release-line.js';
+
+const HISTORICAL_GUIDES = new Set([
+  'secondary-example-map', 'blocks-what-are-blocks',
+  'philosophy-system-style-javascript', 'philosophy-architecture',
+  'philosophy-ux-doctrine', 'philosophy-invariants', 'philosophy-design-system',
+  `release-whats-new-${BIJOU_RELEASE_LINE.replaceAll('.', '-')}`,
+  `release-migration-${BIJOU_RELEASE_LINE.replaceAll('.', '-')}`,
+]);
 
 export function guideDocTitle(
   doc: GuideDoc,
@@ -24,7 +33,10 @@ export function guideDocBody(
   doc: GuideDoc,
   localization?: LocalizationPort,
 ): string {
-  const body = doc.localizedBody?.(localization) ?? doc.body;
+  const sourceBody = doc.localizedBody?.(localization) ?? doc.body;
+  const body = HISTORICAL_GUIDES.has(doc.id)
+    ? `${dogfoodText(localization, 'docs.historicalSourceNotice', 'Historical reference from the preserved documentation archive. Check Latest Features and current package READMEs for behavior added since this source was frozen.')}\n\n---\n\n${sourceBody}`
+    : sourceBody;
   if (
     localization !== undefined &&
     localization.locale !== DEFAULT_LOCALE.id &&

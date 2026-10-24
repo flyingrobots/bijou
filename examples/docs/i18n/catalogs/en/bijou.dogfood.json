@@ -2039,6 +2039,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Fonts, Markdown typography, theme animation, book themes, and current documentation boundaries."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Latest Features"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.guides.navigate.summary"
       },
       "kind": "message",
@@ -2078,6 +2100,28 @@
       "sourceLocale": "en",
       "values": {
         "en": "Start Here"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.historicalSourceNotice"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Historical reference from the preserved documentation archive. Check Latest Features and current package READMEs for behavior added since this source was frozen."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.packages.mcp.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "MCP rendering tools, semantic output modes, configuration, and current limits."
       }
     },
     {
@@ -2495,7 +2539,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "The v7.2 release path through What's New, proof, and changelog history."
+        "en": "The v{releaseLine} release path through What's New, proof, and changelog history."
       }
     },
     {

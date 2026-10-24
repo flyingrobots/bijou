@@ -1,12 +1,15 @@
 # Start Here
 
-Bijou is an industrial-grade TypeScript engine for terminal software where runtime truth, design language, and documentation are unified.
+Bijou is a TypeScript toolkit for terminal interfaces, from printable components
+to fullscreen applications with layout, input, themes, and localization.
 
 DOGFOOD is the canonical terminal documentation surface for the repository. Built in Bijou itself, the docs shell, interaction model, and examples all exercise the same medium the framework provides to users.
 
 ## What is Bijou?
 
-Bijou is a high-fidelity engine for building terminal applications with explicit surfaces, deterministic runtime behavior, and a shell that remains truthful under pressure.
+Bijou combines explicit surfaces, mode-aware components, a fullscreen app
+runtime, and host adapters. Applications retain their text and semantic data
+when lowering visual output for different terminal capabilities.
 
 ## Documentation Map
 
@@ -18,4 +21,15 @@ Bijou is a high-fidelity engine for building terminal applications with explicit
 
 ## Current Posture
 
-The rendering foundation is byte-packed, zero-allocation, and optimized for high-performance TUIs. DOGFOOD reflects the repository's real-time state, including the latest release and migration truth.
+The rendering foundation uses byte-packed surfaces. Allocation and performance
+depend on the rendering path and application workload.
+
+DOGFOOD combines generated component documentation, live package READMEs,
+maintained guides, and historical articles from the preserved documentation
+archive. Historical articles are labeled in the reader; their claims retain
+their original scope. The reader is not an automatic mirror of every code change.
+
+Open **Latest Features** for raster fonts, Markdown typography, animated theme
+colors, book-matched themes, and presentation fallbacks. Open **Current Release
+Story** for the running package version and release-evidence boundary. A preview
+feature in this checkout does not establish stable publication.

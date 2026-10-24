@@ -106,7 +106,6 @@ See [docs](./docs/) for the first living-docs preview built from those shared st
 | [`dag-stats`](./dag-stats/) | `dagStats()` | Graph health and structural metrics |
 | [`enumerated-list`](./enumerated-list/) | `enumeratedList()` | Ordered/unordered lists with 6 bullet styles |
 | [`markdown`](./markdown/) | `markdown()` | Bounded structured prose with mode-aware lowering |
-| [`markdown-font`](./markdown-font/) | `RasterFont`, `rasterTextSurface()` | Render a Markdown filepath with Google Fonts H1 lettering |
 | [`logo`](./logo/) | `loadRandomLogo()` | ASCII brand treatment for splash and docs moments |
 | [`custom-component`](./custom-component/) | `renderByMode()` | App-authored mode-aware primitive example |
 | [`hyperlink`](./hyperlink/) | `hyperlink()` | Trusted terminal links with explicit fallback behavior |
@@ -132,6 +131,7 @@ See [docs](./docs/) for the first living-docs preview built from those shared st
 
 | Example | Component | Description |
 |---------|-----------|-------------|
+| [`markdown-font`](./markdown-font/) | `RasterFont`, `rasterTextSurface()` | Markdown reader with Google/local fonts, per-element sizes, theme-color animation, and text fallbacks |
 | [`counter`](./counter/) | `startApp()`, `App`, `Cmd` | Minimal counter — hello world of TEA |
 | [`spinner`](./spinner/) | `spinnerFrame()`, `tick()` | Indeterminate activity with phase transitions |
 | [`progress-animated`](./progress-animated/) | `progressBar()`, `tick()` | TEA-driven animated determinate progress |

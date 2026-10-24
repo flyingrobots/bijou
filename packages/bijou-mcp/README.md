@@ -5,7 +5,8 @@ components as rendering tools over stdio.
 
 Any MCP client — Claude Code, Cursor, or a custom integration — can
 call these tools to get Unicode box-drawing output that renders cleanly
-in monospace chat contexts. No ANSI escape codes, no terminal required.
+in monospace chat contexts without requiring a terminal. Most tools use plain
+styling; `bijou_hyperlink` currently emits OSC 8 controls (issue #545, PR #546).
 
 ## Install
 
@@ -151,8 +152,10 @@ bijou_alert
 
 The server creates a Bijou context using `createTestContext` with
 `mode: 'interactive'` and `plainStyle()`. This gives full Unicode
-box-drawing layout without ANSI escape codes — structured text that
-renders correctly in any monospace context.
+box-drawing layout with plain styling. This does not select pipe lowering:
+`bijou_hyperlink` can still emit OSC 8 controls in this checkout. The open fix is
+tracked in [#545](https://github.com/flyingrobots/bijou/issues/545) and
+[PR #546](https://github.com/flyingrobots/bijou/pull/546).
 
 Each tool accepts structured JSON input, renders via the corresponding
 Bijou component, and returns the result as a plain text string.
