@@ -389,6 +389,13 @@ Empty text produces a transparent 1 × 1 RGBA frame, so it can pass directly
 through `rasterToGlyphSurface()`. Surface colors come from `fg` and `bg`;
 coverage is monochrome and does not use the image renderer’s color sampling.
 
+When reducing glyph coverage, the text rasterizer preserves every covered atlas
+texel by marking the output pixels it overlaps. Thin stems and bars therefore
+survive between output-pixel centers. At small sizes this can round a stroke
+up to one pixel or close a gap smaller than one pixel. Enlargement retains
+nearest-neighbor coverage. The work budget includes atlas visits and projected
+pixel writes as well as output sampling.
+
 Supply precompiled coverage; the renderer does not load TTF files, install fonts
 or make network requests. DOGFOOD’s Jacquard 12 generator demonstrates offline
 OpenType extraction and preserves the font’s license under `assets/fonts/`.

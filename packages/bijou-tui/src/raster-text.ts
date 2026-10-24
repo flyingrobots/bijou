@@ -1,6 +1,7 @@
 import { createSurface, type ColorRef, type Surface } from '@flyingrobots/bijou';
 import { rasterToGlyphSurface, type RasterToGlyphSurfaceOptions, type RgbaFrame } from './raster-glyph.js';
 import { layoutRasterText, type RasterFont, type RasterTextLayout } from './raster-font.js';
+import { paintMinifiedGlyph } from './raster-text-coverage.js';
 
 /** Output ink height in pixels. Coverage is opaque black on transparent background. */
 export interface RasterizeTextOptions { readonly height: number }
@@ -39,7 +40,26 @@ function paintCoverage(layout: RasterTextLayout, scale: number, width: number, h
   if (boxes.reduce((sum, box) => sum + (box.right - box.left) * (box.bottom - box.top), 0) > 16777216) {
     throw new RangeError('Raster text exceeds the 16777216-sample work limit.');
   }
+  const sourceWork = boxes.reduce((sum, box) => {
+    const g = box.glyph.geometry;
+    return sum + (g.width * scale < g.columns || g.height * scale < g.rows
+      ? g.columns * g.rows : (box.right - box.left) * (box.bottom - box.top));
+  }, 0);
+  if (sourceWork > 16777216) throw new RangeError('Raster text exceeds the 16777216-sample work limit.');
+  let work = 0;
+  const spend = (samples: number): void => {
+    work += samples;
+    if (work > 16777216) throw new RangeError('Raster text exceeds the 16777216-sample work limit.');
+  };
+  const target = { width, height, data };
   for (const { glyph, penX, penY, left, top, right, bottom } of boxes) {
+    const g = glyph.geometry;
+    if (g.width * scale < g.columns || g.height * scale < g.rows) {
+      spend(g.columns * g.rows);
+      paintMinifiedGlyph(glyph, penX - layout.left, penY - layout.top, scale, target, spend);
+      continue;
+    }
+    spend((right - left) * (bottom - top));
     for (let y = top; y < bottom; y++) {
       for (let x = left; x < right; x++) {
         if (glyph.sample((x + 0.5) / scale + layout.left - penX, (y + 0.5) / scale + layout.top - penY)) {

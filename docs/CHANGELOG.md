@@ -27,6 +27,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Raster-font minification preserves thin stems and horizontal bars that fell
+  between pixel-center samples, including Markdown font rendering. Coverage
+  projection remains subject to the existing raster-text work budget.
+
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
