@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `npm run markdown-font -- <document.md>` demonstrates font-rendered H1s with a
+  searchable Google Fonts selector, local TTF/OTF loading, bundled Space Grotesk
+  for offline use, and text headings for pipelines and accessible output.
+
 - `@flyingrobots/bijou-tui` exports immutable raster fonts, code-point text layout, RGBA text rasterization and font-to-surface rendering through the existing raster pipeline.
 
 - DOGFOOD's V8 landing title rolls actual Jacquard 12 glyphs around a cylinder, with offline font geometry and readable release facts in lower presentation modes.
