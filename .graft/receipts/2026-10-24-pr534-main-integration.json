@@ -3,7 +3,7 @@
   "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
   "agent": "codex-bijou",
   "task": "Reconcile PR 534 version-lock gates with merged MCP hyperlink fix",
-  "bytesConsumed": 710000,
+  "bytesConsumed": 822189,
   "filesRead": [
     "docs/CHANGELOG.md",
     "scripts/version.mjs",
@@ -12,7 +12,9 @@
     "scripts/check-staged-workspace.ts",
     "scripts/workspace-lock.test.ts",
     "scripts/workspace-version-cli.test.ts",
-    "scripts/staged-workspace.test.ts"
+    "scripts/staged-workspace.test.ts",
+    "scripts/workspace-lock.test-support.ts",
+    "scripts/release-metadata.part01.ts"
   ],
   "filesModified": [
     "docs/CHANGELOG.md"
@@ -25,5 +27,6 @@
     "incomingMain": "f37ed28eb4534c4ffc01c88ea1cf9327edb32b56",
     "resolution": "Retain staged/version-lock changelog entries and merged MCP hyperlink entry. Portable CI auto-merge retains both regression groups. No version-lock implementation edited."
   },
-  "validation": "Pre-commit gates run at commit; copy-isolated Docker red/green and full normal push gates follow before review/merge."
+  "validation": "Pre-commit gates run at commit; copy-isolated Docker red/green and full normal push gates follow before review/merge.",
+  "counterScope": "Graft cumulative session counter at sequence 227; replaces preliminary estimated counter"
 }
