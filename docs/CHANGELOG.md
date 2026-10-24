@@ -11,6 +11,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
+- The pre-commit version gate validates staged metadata, preserving partial
+  staging while rejecting stale index contents hidden by repaired working files
+  (#526).
+
+- Release version bumps update workspace manifests and lock metadata together,
+  refresh npm's cached workspace metadata, and restore the original manifests
+  and lock if regeneration fails. Pre-commit and release preflight now reject
+  stale or missing workspace lock versions and internal dependency pins,
+  including peer, dev and optional dependencies (#526).
+
 - MCP hyperlinks now honor the selected plain-text fallback in text and
   structured rendered output, preserving Unicode layout in other tools (#545).
 
