@@ -13,6 +13,7 @@ import {
 } from './docs-preview.test-support.js';
 
 import { must } from '@flyingrobots/bijou/adapters/test';
+import { findRasterPrompt } from './docs-preview-prompt.test-support.js';
 
 describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
@@ -58,7 +59,7 @@ describe('docs preview app', () => {
     const lines = text.split('\n');
     const footer = lines[frame.height - 1] ?? '';
 
-    expect(text).toContain('Press [Enter]');
+    expect(findRasterPrompt(frame)).toBeDefined();
     expect(footer).toContain('Esc/q quit');
     expect(footer).toContain('↑/↓ quality');
     expect(footer).toContain('←/→ theme');

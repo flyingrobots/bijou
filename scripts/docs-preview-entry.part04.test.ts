@@ -18,32 +18,28 @@ import {
 } from './docs-preview.test-support.js';
 
 import { must } from '@flyingrobots/bijou/adapters/test';
+import { findRasterPrompt } from './docs-preview-prompt.test-support.js';
 
 describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
 
-  it('uses a foreground gradient across the Enter prompt letters', async () => {
+  it('uses a foreground gradient across the raster Enter prompt', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 160, rows: 48, refreshRate: 60 } });
     const app = createDocsApp(ctx);
 
     const initial = await runScript(app, [], { ctx });
     const frame = must(initial.frames[0]);
-    const lines = frameText(frame).split('\n');
-    const promptY = lines.findIndex((line) => line.includes('Press [Enter]'));
-    const promptX = promptY >= 0 ? must(lines[promptY]).indexOf('Press [Enter]') : -1;
-    const prompt = 'Press [Enter]';
-    const enterStart = prompt.indexOf('Enter');
-
-    expect(promptY).toBeGreaterThanOrEqual(0);
-    expect(promptX).toBeGreaterThanOrEqual(0);
-
-    const enterColors = Array.from('Enter').map((_char, offset) => (
-      colorHex(frame.get(promptX + enterStart + offset, promptY).fg)
-    ));
-    const bodyColor = colorHex(frame.get(promptX, promptY).fg);
-
-    expect(new Set(enterColors).size).toBeGreaterThan(1);
-    expect(enterColors).not.toContain(bodyColor);
+    const prompt = must(findRasterPrompt(frame), 'composed raster prompt');
+    const inkColors: (string | undefined)[] = [];
+    for (let y = 0; y < prompt.height; y++) {
+      for (let x = 0; x < prompt.width; x++) {
+        const cell = frame.get(prompt.x + x, prompt.y + y);
+        if (cell.char !== '\u2800' && cell.char !== ' ') inkColors.push(colorHex(cell.fg));
+      }
+    }
+    expect(inkColors.length).toBeGreaterThan(10);
+    expect(inkColors).not.toContain(undefined);
+    expect(new Set(inkColors).size).toBeGreaterThan(1);
   });
 });
 
