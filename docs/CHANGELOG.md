@@ -21,6 +21,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   stale or missing workspace lock versions and internal dependency pins,
   including peer, dev and optional dependencies (#526).
 
+- MCP hyperlinks now honor the selected plain-text fallback in text and
+  structured rendered output, preserving Unicode layout in other tools (#545).
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

@@ -1,0 +1,29 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Reconcile PR 534 version-lock gates with merged MCP hyperlink fix",
+  "bytesConsumed": 710000,
+  "filesRead": [
+    "docs/CHANGELOG.md",
+    "scripts/version.mjs",
+    "scripts/version-lockfile.mjs",
+    "scripts/release-lockfile.ts",
+    "scripts/check-staged-workspace.ts",
+    "scripts/workspace-lock.test.ts",
+    "scripts/workspace-version-cli.test.ts",
+    "scripts/staged-workspace.test.ts"
+  ],
+  "filesModified": [
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "Large batched outline output truncated; repeated targeted reads used for actual audit"
+  ],
+  "integration": {
+    "priorHead": "56adeb3b42075ea4e9050970edeba3bf98c5e572",
+    "incomingMain": "f37ed28eb4534c4ffc01c88ea1cf9327edb32b56",
+    "resolution": "Retain staged/version-lock changelog entries and merged MCP hyperlink entry. Portable CI auto-merge retains both regression groups. No version-lock implementation edited."
+  },
+  "validation": "Pre-commit gates run at commit; copy-isolated Docker red/green and full normal push gates follow before review/merge."
+}
