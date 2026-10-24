@@ -76,9 +76,8 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     expect(leftBorder).toBeGreaterThanOrEqual(0);
     expect(rightBorder).toBeGreaterThan(contentStart + expansion.length);
 
-    const leftPadding = contentStart - leftBorder - 1;
-    const rightPadding = rightBorder - contentStart - expansion.length;
-    expect(Math.abs(leftPadding - rightPadding)).toBeLessThanOrEqual(2);
+    expect(Math.abs((contentStart - leftBorder - 1) - (rightBorder - contentStart - expansion.length)))
+      .toBeLessThanOrEqual(2);
 
     expect(prompt.y).toBeGreaterThan(expansionRow);
     expect(prompt.y - expansionRow).toBeGreaterThanOrEqual(3);
