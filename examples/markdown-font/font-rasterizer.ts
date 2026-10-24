@@ -16,7 +16,7 @@ export class FontRasterizer {
 
   /** Unsupported text stays readable through the normal Markdown heading renderer. */
   public forText(text: string): RasterFont | undefined {
-    if (text.length > 256 || text.trim() === '') return undefined;
+    if (text.length > 20_000 || text.trim() === '') return undefined;
     const glyphs = new Map<string, RasterFontGlyph>();
     for (const character of text) {
       const code = character.codePointAt(0) ?? 0;
@@ -27,6 +27,7 @@ export class FontRasterizer {
         if (this.#glyphs.size < 512) this.#glyphs.set(character, glyph);
       }
       glyphs.set(character, glyph);
+      if (glyphs.size > 4096) return undefined;
     }
     return new RasterFont({ family: this.#family, lineHeight: 48, glyphs });
   }

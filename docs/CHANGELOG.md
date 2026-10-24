@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The Markdown typography demo accepts independent fonts and pixel sizes for
+  H1–H4 and paragraphs through `--configure` or per-element font/size flags.
+  Its interactive view cycles font colors through the active theme’s brand
+  gradient, with scrolling, pause/resume, resize reflow, and static output options.
+
 - `npm run markdown-font -- <document.md>` demonstrates font-rendered H1s with a
   searchable Google Fonts selector, local TTF/OTF loading, bundled Space Grotesk
   for offline use, and text headings for pipelines and accessible output.

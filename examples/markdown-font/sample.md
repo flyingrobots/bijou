@@ -9,7 +9,8 @@ quotes, and code use Bijou’s existing Markdown renderer.
 
 - Pass your own Markdown filepath.
 - Search Google Fonts or pass `--font /path/to/font.ttf`.
-- Scroll using your terminal’s scrollback.
+- Use arrow keys to scroll, Space to pause colors, and q to quit.
+- Pass `--no-animation` to use terminal scrollback.
 - Pipe the output to keep ordinary text headings.
 
 > A typeface gives a page its voice.
@@ -21,3 +22,11 @@ quotes, and code use Bijou’s existing Markdown renderer.
 ## Further reading
 
 [Google Fonts: Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk)
+
+### A smaller heading
+
+Each heading level and paragraph can have its own font and size.
+
+#### The finest detail
+
+Use `--configure` to try a different typographic hierarchy.
