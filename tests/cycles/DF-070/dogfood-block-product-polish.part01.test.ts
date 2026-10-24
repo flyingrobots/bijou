@@ -80,7 +80,7 @@ describe('DF-070 DOGFOOD block product polish', () => {
     expect(guideModel.selectedGuideId).toBe('start-here');
     expect(guideModel.guideState.focusIndex).toBe(1);
     expect(text).toContain('- Start Here');
-    expect(text).toContain('> Navigate DOGFOOD');
+    expect(text).toContain('> Latest Features');
   });
 });
 
