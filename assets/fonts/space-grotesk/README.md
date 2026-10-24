@@ -10,3 +10,9 @@ SHA-256: `acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72`.
 The Markdown font demo loads the default outlines of this variable font
 (weight 300), compiles the heading characters to bit-packed coverage, and
 renders them with Bijou’s raster-font pipeline. It requires no network access.
+
+`npm run generate:dogfood:prompt` compiles printable ASCII coverage to
+`assets/space-grotesk-ascii.json`; `npm run check:dogfood:prompt` verifies it.
+DOGFOOD’s interactive “Press [Enter]” prompt reads this small atlas, with no
+runtime font decoder. It retains localized text in lower presentation modes,
+small layouts, and for characters absent from the atlas.

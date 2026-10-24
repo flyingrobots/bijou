@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DOGFOOD’s interactive title-screen “Press [Enter]” prompt uses offline Space
+  Grotesk glyphs with theme-color animation, and retains localized text in
+  static, pipe, accessible, small, and unsupported-glyph presentations.
+
 - The Markdown typography demo accepts independent fonts and pixel sizes for
   H1–H4 and paragraphs through `--configure` or per-element font/size flags.
   Its interactive view cycles font colors through the active theme’s brand

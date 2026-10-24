@@ -45,7 +45,6 @@ export function placeLandingCluster(
   }
   const promptY = Math.max(0, Math.min(placement.contentBottom - promptLine.height + 1, placement.contentTop));
   blitCentered(surface, promptLine, promptY);
-  if (placement.availableHeight >= dogfoodPanel.height) blitCentered(surface, dogfoodPanel, placement.contentTop);
 }
 
 export function placeFooterBadges(

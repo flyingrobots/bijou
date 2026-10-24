@@ -78,7 +78,9 @@
     "lint:eslint": "node scripts/code-dojo/check-eslint.mjs",
     "version": "node scripts/version.mjs",
     "generate:dogfood:title": "tsx scripts/generate-jacquard-title.ts",
-    "check:dogfood:title": "tsx scripts/generate-jacquard-title.ts --check"
+    "check:dogfood:title": "tsx scripts/generate-jacquard-title.ts --check",
+    "generate:dogfood:prompt": "tsx scripts/generate-space-grotesk-atlas.ts",
+    "check:dogfood:prompt": "tsx scripts/generate-space-grotesk-atlas.ts --check"
   },
   "overrides": {
     "fast-uri": "^3.1.9",

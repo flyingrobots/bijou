@@ -1,0 +1,62 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Font-rendered DOGFOOD Press Enter prompt with explicit text lowering",
+  "bytesConsumed": 441917,
+  "filesRead": [
+    "examples/docs/app-landing-footer.ts",
+    "examples/docs/app-landing-renderer.ts",
+    "examples/docs/app-landing-layout.ts",
+    "examples/docs/app-landing-text.ts",
+    "examples/docs/app-cylinder-font.ts",
+    "examples/docs/app-cylinder-title.ts",
+    "examples/docs/app-root.ts",
+    "examples/docs/app-root-view.ts",
+    "examples/docs/app-landing-types.ts",
+    "examples/docs/localization.ts",
+    "packages/bijou-i18n/src/localization.part01.ts",
+    "examples/docs/i18n-debt-source-context.ts",
+    "examples/docs/i18n-debt-source-exclusions.ts",
+    "tests/dogfood-title-contrast.test.ts",
+    "tests/dogfood-cylinder-title.test.ts"
+  ],
+  "filesModified": [
+    "examples/docs/app-landing-footer.ts",
+    "examples/docs/app-landing-renderer.ts",
+    "examples/docs/app-landing-layout.ts",
+    "examples/docs/app-prompt-font.ts",
+    "examples/docs/app-prompt-raster.ts",
+    "scripts/generate-space-grotesk-atlas.ts",
+    "assets/space-grotesk-ascii.json",
+    "assets/fonts/space-grotesk/README.md",
+    "tests/dogfood-prompt-font.test.ts",
+    "docs/CHANGELOG.md",
+    "package.json"
+  ],
+  "tripwires": [
+    "Graft cumulative session RUNAWAY_TOOLS advisory spans earlier user turns; fresh user request authorizes this change."
+  ],
+  "commit": "Included in implementation commit; resolve via git log -- .graft/receipts/2026-10-24-dogfood-prompt-font.json",
+  "validation": {
+    "tests": "44 focused tests passed across prompt lowering/layout, existing title contrast/cylinder/lower modes, release title, and raster-font coverage.",
+    "atlas": "generate:dogfood:prompt and check:dogfood:prompt passed; 95 printable ASCII glyphs; pinned unmodified source font; 53524-byte generated atlas.",
+    "localization": "dogfood:i18n:debt -- --base HEAD passed with no baseline growth. New font family metadata and hash source identifier are nonlocalizable protocol fields under existing scanner policy.",
+    "checks": "Focused ESLint, TypeScript test check, code:size, git diff --check passed before commit gates.",
+    "live": "80x24 DOGFOOD PTY entered alternate screen, accepted quit confirmation, restored terminal, exited 0. Rolling capture retained at most 128 KiB; total stream 242044 bytes.",
+    "limits": "First live smoke stopped its child process at a 1 MiB capture cap. Follow-up used a 128 KiB rolling buffer and 4 MiB total stream cap, with prompt quit and an 8-second deadline."
+  },
+  "behavior": {
+    "interactive": "Space Grotesk prompt at 2 or 3 terminal rows with theme sweep; geometry cached independently of theme/time.",
+    "lowerModes": "Static, pipe and accessible prompt presentations retain localized words and freeze prompt color time. Unsupported non-ASCII text, narrow width, or fewer than 2 rows retain text.",
+    "layout": "Reserves compact prompt height alongside the facts panel where possible. Omits panel when it would overwrite the prompt."
+  },
+  "resources": {
+    "heavyBuilds": false,
+    "hostFreeGiB": 641,
+    "atlasBytes": 53524,
+    "maxCachedPromptSurfaces": 16,
+    "maxRetainedSmokeBytes": 131072,
+    "backgroundProcessesRetained": false
+  }
+}
