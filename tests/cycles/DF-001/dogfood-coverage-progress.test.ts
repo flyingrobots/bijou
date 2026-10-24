@@ -6,7 +6,7 @@ import { resolveDogfoodDocsCoverage } from '../../../examples/docs/coverage.js';
 import { COMPONENT_STORIES } from '../../../examples/docs/stories.js';
 import { existsRepoPath, readRepoFile } from '../repo.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
-
+import { findRasterPrompt } from '../../../scripts/docs-preview-prompt.test-support.js';
 
 function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
   let text = '';
@@ -61,14 +61,13 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     const initialFrame = must(landing.frames[landing.frames.length - 1]);
     const text = frameText(initialFrame);
     const expansion = 'Documentation Of Good Foundational Onboarding and Discovery';
-    const prompt = 'Press [Enter]';
+    const prompt = must(findRasterPrompt(initialFrame));
     const lines = text.split('\n');
     const expansionRow = lines.findIndex((lineText) => lineText.includes(expansion));
     const expansionLine = expansionRow >= 0 ? lines[expansionRow] : undefined;
 
     expect(text).toContain('DOGFOOD');
     expect(text).toContain(expansion);
-    expect(text).toContain(prompt);
     expect(expansionLine).toBeDefined();
 
     const contentStart = must(expansionLine).indexOf(expansion);
@@ -81,21 +80,23 @@ describe('DF-001 DOGFOOD coverage progress cycle', () => {
     const rightPadding = rightBorder - contentStart - expansion.length;
     expect(Math.abs(leftPadding - rightPadding)).toBeLessThanOrEqual(2);
 
-    const promptRow = lines.findIndex((lineText) => lineText.includes(prompt));
-    expect(promptRow).toBeGreaterThan(expansionRow);
-    expect(promptRow - expansionRow).toBeGreaterThanOrEqual(3);
-
-    const promptStart = must(lines[promptRow]).indexOf(prompt);
-    const enterCellBefore = initialFrame.get(promptStart + 'Press ['.length, promptRow);
-    expect(enterCellBefore.char).toBe('E');
-    expect(enterCellBefore.fg).toBeDefined();
-
+    expect(prompt.y).toBeGreaterThan(expansionRow);
+    expect(prompt.y - expansionRow).toBeGreaterThanOrEqual(3);
     const pulsed = await runScript(app, [{ pulse: { dt: 0.6 } }], { ctx });
     const pulsedFrame = must(pulsed.frames[pulsed.frames.length - 1]);
-    const enterCellAfter = pulsedFrame.get(promptStart + 'Press ['.length, promptRow);
-    expect(enterCellAfter.char).toBe('E');
-    expect(enterCellAfter.fg).toBeDefined();
-    expect(enterCellAfter.fg).not.toBe(enterCellBefore.fg);
+    expect(findRasterPrompt(pulsedFrame)).toEqual(prompt);
+    let animatedInkCells = 0;
+    for (let y = prompt.y; y < prompt.y + prompt.height; y++) {
+      for (let x = prompt.x; x < prompt.x + prompt.width; x++) {
+        const before = initialFrame.get(x, y);
+        const after = pulsedFrame.get(x, y);
+        if (before.char === ' ' || before.char === '⠀') continue;
+        expect(before.fg).toBeDefined();
+        expect(after.fg).toBeDefined();
+        if (before.fg !== after.fg) animatedInkCells++;
+      }
+    }
+    expect(animatedInkCells).toBeGreaterThan(10);
   });
 
   it('toggles the perf HUD from the landing screen without entering docs', async () => {
