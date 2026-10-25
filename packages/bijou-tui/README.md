@@ -396,6 +396,10 @@ up to one pixel or close a gap smaller than one pixel. Enlargement retains
 nearest-neighbor coverage. The work budget includes atlas visits and projected
 pixel writes as well as output sampling.
 
+Braille and quadrant text surfaces default to retaining any nonzero coverage
+when fitting into the terminal grid. An explicit renderer `threshold` overrides
+that default. Custom character sets retain the image renderer's density mapping.
+
 Supply precompiled coverage; the renderer does not load TTF files, install fonts
 or make network requests. DOGFOOD’s Jacquard 12 generator demonstrates offline
 OpenType extraction and preserves the font’s license under `assets/fonts/`.

@@ -79,8 +79,13 @@ export function rasterTextSurface(text: string, font: RasterFont, options: Raste
   }
   if (columns === 0 || rows === 0) return createSurface(columns, rows);
   const frame = rasterizeText(text, font, { height: rows * 4 });
+  const renderer = options.renderer;
+  const textRenderer = renderer?.kind === 'braille' || renderer?.kind === 'quad'
+    ? { ...renderer, threshold: renderer.threshold ?? Number.EPSILON }
+    : renderer;
   const surface = rasterToGlyphSurface(frame, {
-    ...options, colorMode: 'none', fit: options.fit ?? 'contain', cellAspectRatio: options.cellAspectRatio ?? 0.5,
+    ...options, renderer: textRenderer, colorMode: 'none', fit: options.fit ?? 'contain',
+    cellAspectRatio: options.cellAspectRatio ?? 0.5,
   });
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {

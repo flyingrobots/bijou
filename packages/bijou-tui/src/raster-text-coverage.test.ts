@@ -16,6 +16,21 @@ function strokeFont(column: number, row?: number): RasterFont {
 }
 
 describe('font minification preserves thin strokes', () => {
+  it.each(['braille', 'quad'] as const)('retains visible ink when %s fits text into a narrow surface', (kind) => {
+    const surface = rasterTextSurface('llll', strokeFont(0), {
+      columns: 1, rows: 1, renderer: { kind },
+    });
+    expect(surface.get(0, 0).char).not.toMatch(/^[ \u2800]$/u);
+    const filtered = rasterTextSurface('llll', strokeFont(0), {
+      columns: 1, rows: 1, renderer: { kind, threshold: 0.5 },
+    });
+    expect(filtered.get(0, 0).char).toMatch(/^[ \u2800]$/u);
+    const blank = rasterTextSurface('', strokeFont(0), {
+      columns: 1, rows: 1, renderer: { kind },
+    });
+    expect(blank.get(0, 0).char).toMatch(/^[ \u2800]$/u);
+  });
+
   it.each([0, 1, 2, 3, 4, 5, 6, 7])('preserves a vertical stem in atlas column %i', (column) => {
     const frame = rasterizeText('l', strokeFont(column), { height: 4 });
     for (let y = 0; y < 4; y++) {
