@@ -29,7 +29,7 @@ const app: App<{ count: number }> = {
     if (isKeyMsg(msg) && msg.key === 'q') return [model, [quit()]];
     return [model, []];
   },
-  view: (model) => stringToSurface(`Count: ${model.count}\\nPress q to quit`, 16, 2),
+  view: (model) => stringToSurface(`Count: ${model.count}\nPress q to quit`, 16, 2),
 };
 
 await startApp(app);

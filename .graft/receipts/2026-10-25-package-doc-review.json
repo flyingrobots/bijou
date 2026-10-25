@@ -1,0 +1,65 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Review all ten current package READMEs for v8 acceptance, document border/semantic override contracts and repair the Node startup newline",
+  "bytesConsumed": 2474642,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou-i18n-tools-node/README.md",
+    "packages/bijou-i18n-tools-xlsx/README.md",
+    "packages/bijou-i18n-tools/README.md",
+    "packages/bijou-i18n/README.md",
+    "packages/bijou-mcp/README.md",
+    "packages/bijou-node/README.md",
+    "packages/bijou-tui-app/README.md",
+    "packages/bijou-tui/README.md",
+    "packages/bijou/README.md",
+    "packages/create-bijou-tui-app/README.md",
+    "packages/bijou/src/core/theme/extend.ts",
+    "examples/docs/content/guides-latest-features.md",
+    "examples/docs/content/package-mcp.md"
+  ],
+  "filesModified": [
+    "packages/bijou-node/README.md",
+    "packages/bijou/README.md",
+    ".graft/receipts/2026-10-25-package-doc-review.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "1f71b72377e861292119c8ec9cb2bdc2b04e9c37",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "reviewer": "Codex agent; not human release signoff",
+    "scope": "Full current package README texts; theme override declaration; live Latest Features and MCP guide. Broader API, migration, architecture and final release matrix remain separate.",
+    "checks": [
+      "Bounded source review",
+      "git diff --cached --check",
+      "Normal pre-commit gates; no new tests for prose-only edits"
+    ],
+    "behavior": "Document all six optional extendTheme groups and exact border/semantic Partial types, fixed keys, NO_COLOR semantics and unknown-status fallback. Correct Node example to use one newline escape. Other eight READMEs reviewed with no change. Runtime4,282-test validation predates these prose-only edits.",
+    "reviewedReadmeSha256": {
+      "packages/bijou-i18n-tools-node/README.md": "ce1f022ff50dbe336d732819b556331fc7afafb2000b59b3ad6788760b3fce56",
+      "packages/bijou-i18n-tools-xlsx/README.md": "89f3ea75970c8853d4ec44881e81730380d55843694fe2f22aef9da703d1fb29",
+      "packages/bijou-i18n-tools/README.md": "2a63fd9d438fa3928d27ed8188ec44c5eddb2b639048121cb80e7cfb20c756d5",
+      "packages/bijou-i18n/README.md": "c83f38bbda00a3be1bcac26187454765b49c4ec1c300cd0f3337ba8e42c3e3ac",
+      "packages/bijou-mcp/README.md": "9130a41524b62b37af984453152edf21ef531f0df17a327988010317f71d317e",
+      "packages/bijou-node/README.md": "645bbfa6657b6e7aba2165935a5767e7e22b5ec115c743cfacddff736a3b13f8",
+      "packages/bijou-tui-app/README.md": "4701f07dbb0067614784035f8abb7c3fd5ab821a69e358008f7c3e227c5031a0",
+      "packages/bijou-tui/README.md": "722c98fa4ea3ddf5cee3b2574883c0c44bdd693811b4f61d7697fa79400ed23b",
+      "packages/bijou/README.md": "081318023008303839c95e1365bc2afce06e6dc439130f733afde28c7011372d",
+      "packages/create-bijou-tui-app/README.md": "f6a51ac0ec79bc96138bcad1e49e352fa7f1f8a3ade7d9ff5c39f5702060f0c8"
+    },
+    "remaining": "Stable-commit replay, complete release evidence and explicit human review disposition are not claimed here."
+  }
+}
