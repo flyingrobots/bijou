@@ -129,4 +129,3 @@ See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for workflow and PR expectations.
 
 - Start with [GitHub issues](https://github.com/flyingrobots/bijou/issues) and
   the current [agent and contributor agreements](../AGENTS.md).
-

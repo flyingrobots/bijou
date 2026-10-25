@@ -143,4 +143,3 @@ The binding model is unidirectional:
 4) app update functions own state changes
 
 This model lets blocks reuse layout and behavior across apps while preserving deterministic render semantics.
-
