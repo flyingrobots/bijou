@@ -4,6 +4,12 @@ The default **Bijou Book** shell has dark and light modes. Change modes in the
 existing shell-theme settings. The previous neutral DOGFOOD theme and six
 alternate palettes remain available.
 
+The shell-theme picker, mode descriptions, Theme Lab and Inspector use the
+app's active locale, including changes made while the app is running. Separate
+apps keep independent locales; changing language preserves theme identity and
+colors. Runtime regressions cover English, German, Spanish and French through
+the actual picker and rendered panels.
+
 The reference is the companion teaching book's
 [pinned preamble](https://github.com/flyingrobots/bijou-job-monitor/blob/209732eeb17315892df25f4546ccb40d92bd3240/book/preamble.tex#L14-L18):
 

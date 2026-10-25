@@ -2171,6 +2171,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.separator.article"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "docs • {title}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.separator.welcome"
       },
       "kind": "message",

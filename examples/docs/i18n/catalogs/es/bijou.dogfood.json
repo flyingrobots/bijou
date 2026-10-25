@@ -1953,6 +1953,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.separator.article"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "docs • {title}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.separator.welcome"
       },
       "kind": "message",

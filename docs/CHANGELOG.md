@@ -14,6 +14,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- DOGFOOD's shell-theme picker, mode descriptions, Theme Lab and Inspector now
+  follow each app's live locale. Theme selection and resolved colors retain
+  their identity when the locale changes (#549).
+
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 

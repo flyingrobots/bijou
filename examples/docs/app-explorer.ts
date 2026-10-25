@@ -23,6 +23,8 @@ import type {
 } from './app-model.js';
 import { createDocsSettingsBuilder } from './app-settings.js';
 import { DOCS_SHELL_THEME_STATE } from './app-shell-theme-state.js';
+import { localizeDogfoodShellThemes } from './dogfood-theme-localization.js';
+import { DEFAULT_LOCALE } from './locale.js';
 import {
   resolveDocsVisualThemeByShellThemeId,
 } from './app-theme-state.js';
@@ -36,7 +38,7 @@ export function createDocsExplorerApp(
   i18n: I18nRuntime,
   localization: LocalizationPort,
   options: DocsAppOptions = {},
-  initialLocale = 'en',
+  initialLocale = DEFAULT_LOCALE.id,
 ): FramedApp<DocsExplorerModel, DocsMsg> {
   const context = getContext();
   return createFramedApp<DocsExplorerModel, DocsMsg>({
@@ -55,7 +57,7 @@ export function createDocsExplorerApp(
     initialRows: context.runtime.rows,
     helpLineSource: ({ model }) =>
       buildDocsFooterHint(model, localization),
-    shellThemes: DOCS_SHELL_THEME_STATE.shellThemes,
+    shellThemes: localizeDogfoodShellThemes(DOCS_SHELL_THEME_STATE.shellThemes, localization),
     pages: DOCS_SITE_PAGES.map((page) =>
       page.id === COMPONENTS_PAGE_ID
         ? createComponentsPage(

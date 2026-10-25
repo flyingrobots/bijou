@@ -40,6 +40,8 @@ import { renderThemeLabPane } from './app-theme-lab.js';
 import { resolveDocsShellThemeById } from './app-theme-state.js';
 import { countMarkdownHeadings } from './app-markdown.js';
 import { documentationArticleBlock } from './dogfood-blocks.js';
+import { localizedDocsShellThemeChoice } from './dogfood-theme-localization.js';
+import { dogfoodText } from './app-localization.js';
 
 export function renderGuideReaderPane(
   pageId: DocsPageId,
@@ -86,8 +88,8 @@ export function renderGuideReaderPane(
       width,
       ctx: context,
       landingTheme: theme,
-      activeTheme: resolveDocsShellThemeById(model.activeShellThemeId),
-      shellThemes: DOCS_SHELL_THEME_CHOICES,
+      activeTheme: localizedDocsShellThemeChoice(resolveDocsShellThemeById(model.activeShellThemeId), localization),
+      shellThemes: DOCS_SHELL_THEME_CHOICES.map(choice => localizedDocsShellThemeChoice(choice, localization)),
       editorState: model.themeLabEditor,
       localization,
     });
@@ -106,7 +108,7 @@ export function renderGuideReaderPane(
   return insetPaneSurface(
     column([
       themedSeparatorSurface(
-        `docs • ${title}`,
+        dogfoodText(localization, 'docs.separator.article', 'docs • {title}', { title }),
         paneWidth,
         context,
         theme,

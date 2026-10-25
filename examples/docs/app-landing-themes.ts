@@ -35,7 +35,7 @@ function dogfoodText(
   return dogfoodLocalizedText(localization, id, fallback, values);
 }
 
-function landingThemeLabel(id: string, localization?: LocalizationPort): string {
+export function landingThemeLabel(id: string, localization?: LocalizationPort): string {
   switch (id) {
     case 'blocklab-workstation':
       return dogfoodText(localization, 'landing.theme.blocklabWorkstation', 'BlockLab Workstation');
