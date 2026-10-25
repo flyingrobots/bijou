@@ -6,7 +6,7 @@ The `examples/` tree is runnable secondary/internal reference material; DOGFOOD 
 
 ## Prerequisites
 
-- Node.js 20.19 or newer, or Node.js 22.12 or newer
+- Node.js 20.19.0 or newer in the 20.x line, or Node.js 22.12.0 or newer
 - Node.js 22.12 or newer is recommended for local development
 - npm 8+ (or your preferred npm-compatible package manager)
 

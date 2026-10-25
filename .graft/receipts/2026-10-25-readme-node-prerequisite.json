@@ -1,0 +1,28 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Resolve CodeRabbit prerequisite ambiguity in moved contributor documentation",
+  "bytesConsumed": 2716975,
+  "metricScope": "Cumulative bounded-read snapshot at Graft seq688",
+  "filesRead": [
+    "docs/development.md",
+    "package.json",
+    "scripts/check-node-version.mjs"
+  ],
+  "filesModified": [
+    "docs/development.md",
+    ".graft/receipts/2026-10-25-readme-node-prerequisite.json"
+  ],
+  "tripwires": [
+    "SESSION_LONG diagnostic; maintainer requested finite README revision"
+  ],
+  "baseCommit": "87e1626efc993bfd3b0687c871a0fa85150a5658",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "source": "CodeRabbit PR558 thread PRRT_kwDORXMffc6wF5Bd, docs/development.md:9",
+    "red": "The copied prerequisite sentence says Node20.19 or newer, which ambiguously permits Node21; package engine ^20.19.0 || >=22.12.0 and isSupportedNodeVersion both exclude Node21. This is a prose correction, not a new runtime behavior.",
+    "green": "Explicitly restrict the first alternative to20.x and retain22.12.0-or-newer support; no engine, source, or test assertion changes. Existing Node-version suite and native commit hooks run in Docker before publication.",
+    "reviewBoundary": "The live old-head independent review was intentionally stopped after this valid new finding; it is not an approval. Old-head dry-run was canceled as superseded. Fresh current-head review and CI/dry-run are required after publication."
+  }
+}
