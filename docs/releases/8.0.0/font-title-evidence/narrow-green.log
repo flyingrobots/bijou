@@ -1,0 +1,57 @@
+COMMAND ['docker', 'update', '--memory', '3g', '--memory-swap', '3g', '--cpus', '2', 'bijou-pr-validation']
+bijou-pr-validation
+COMMAND ['docker', 'start', 'bijou-pr-validation']
+bijou-pr-validation
+COMMAND ['docker', 'exec', 'bijou-pr-validation', 'sh', '-c', 'df -Pk /; mkdir -p /work/repo /data/tmp']
+Filesystem     1024-blocks     Used Available Capacity Mounted on
+overlay          686096384 57781876 628314508       9% /
+b915c24a92eed74654d42bc68aa6cc1f64e8438d
+
+> preinstall
+> node scripts/check-node-version.mjs
+
+
+> prepare
+> node scripts/install-githooks.mjs
+
+Code Dojo: Git hooks installed via core.hooksPath=.githooks
+
+added 239 packages in 3s
+npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn allow-scripts   esbuild@0.28.1 (postinstall: node install.js)
+npm warn allow-scripts
+npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+npm notice
+npm notice New major version of npm available! 11.16.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+
+> build
+> tsc -b
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.8 [39m[90m/work/repo[39m
+
+ [32m✓[39m packages/bijou-tui/src/raster-glyph.part01.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m packages/bijou-tui/src/raster-glyph.part02.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m packages/bijou-tui/src/raster-text.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m packages/bijou-tui/src/raster-text-coverage.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m packages/bijou-tui/src/raster-font-glyph.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m packages/bijou-tui/src/raster-glyph.part03.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+[2m      Tests [22m [1m[32m50 passed[39m[22m[90m (50)[39m
+[2m   Start at [22m 03:43:21
+[2m   Duration [22m 1.30s[2m (transform 1.45s, setup 0ms, import 2.27s, tests 23ms, environment 0ms)[22m
+
+
+> typecheck:test
+> tsc --noEmit -p tsconfig.tests.json
+
+
+> lint:eslint
+> node scripts/code-dojo/check-eslint.mjs
+
+Code Dojo: ESLint ok (0 baselined findings held or reduced)
+bijou-pr-validation

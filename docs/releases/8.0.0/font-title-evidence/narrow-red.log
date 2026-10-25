@@ -1,0 +1,101 @@
+COMMAND ['docker', 'update', '--memory', '3g', '--memory-swap', '3g', '--cpus', '2', 'bijou-pr-validation']
+bijou-pr-validation
+COMMAND ['docker', 'start', 'bijou-pr-validation']
+bijou-pr-validation
+COMMAND ['docker', 'exec', 'bijou-pr-validation', 'sh', '-c', 'df -Pk /; mkdir -p /work/repo /data/tmp']
+Filesystem     1024-blocks     Used Available Capacity Mounted on
+overlay          686096384 57782724 628313660       9% /
+b915c24a92eed74654d42bc68aa6cc1f64e8438d
+
+> preinstall
+> node scripts/check-node-version.mjs
+
+
+> prepare
+> node scripts/install-githooks.mjs
+
+Code Dojo: Git hooks installed via core.hooksPath=.githooks
+
+added 239 packages in 3s
+npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn allow-scripts   esbuild@0.28.1 (postinstall: node install.js)
+npm warn allow-scripts
+npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+npm notice
+npm notice New major version of npm available! 11.16.0 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+
+> build
+> tsc -b
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.8 [39m[90m/work/repo[39m
+
+ [31m❯[39m packages/bijou-tui/src/raster-text-coverage.test.ts [2m([22m[2m17 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 7[2mms[22m[39m
+[31m     [31m×[31m retains visible ink when braille fits text into a narrow surface[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m retains visible ink when quad fits text into a narrow surface[39m[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a vertical stem in atlas column 0[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a vertical stem in atlas column 1[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a vertical stem in atlas column 2[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a vertical stem in atlas column 3[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a vertical stem in atlas column 4[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a vertical stem in atlas column 5[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a vertical stem in atlas column 6[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a vertical stem in atlas column 7[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a horizontal stroke in atlas row 0[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a horizontal stroke in atlas row 2[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a horizontal stroke in atlas row 4[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a horizontal stroke in atlas row 6[32m 0[2mms[22m[39m
+     [32m✓[39m carries the entire thin stem into the expected Braille dots[32m 0[2mms[22m[39m
+     [32m✓[39m preserves a minified stem with negative bearings[32m 0[2mms[22m[39m
+     [32m✓[39m bounds source-coverage work even when the output is tiny[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m packages/bijou-tui/src/raster-text-coverage.test.ts[2m > [22mfont minification preserves thin strokes[2m > [22mretains visible ink when braille fits text into a narrow surface
+[31m[1mAssertionError[22m: expected '⠀' not to match /^[ \u2800]$/u[39m
+
+[32m- Expected:[39m
+/^[ \u2800]$/u
+
+[31m+ Received:[39m
+"⠀"
+
+[36m [2m❯[22m packages/bijou-tui/src/raster-text-coverage.test.ts:[2m23:40[22m[39m
+    [90m 21|[39m       columns[33m:[39m [34m1[39m[33m,[39m rows[33m:[39m [34m1[39m[33m,[39m renderer[33m:[39m { kind }[33m,[39m
+    [90m 22|[39m     })[33m;[39m
+    [90m 23|[39m     [34mexpect[39m(surface[33m.[39m[35mget[39m([34m0[39m[33m,[39m [34m0[39m)[33m.[39mchar)[33m.[39mnot[33m.[39m[34mtoMatch[39m([36m/^[ \u2800]$/u[39m)[33m;[39m
+    [90m   |[39m                                        [31m^[39m
+    [90m 24|[39m   })[33m;[39m
+    [90m 25|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m packages/bijou-tui/src/raster-text-coverage.test.ts[2m > [22mfont minification preserves thin strokes[2m > [22mretains visible ink when quad fits text into a narrow surface
+[31m[1mAssertionError[22m: expected ' ' not to match /^[ \u2800]$/u[39m
+
+[32m- Expected:[39m
+/^[ \u2800]$/u
+
+[31m+ Received:[39m
+" "
+
+[36m [2m❯[22m packages/bijou-tui/src/raster-text-coverage.test.ts:[2m23:40[22m[39m
+    [90m 21|[39m       columns[33m:[39m [34m1[39m[33m,[39m rows[33m:[39m [34m1[39m[33m,[39m renderer[33m:[39m { kind }[33m,[39m
+    [90m 22|[39m     })[33m;[39m
+    [90m 23|[39m     [34mexpect[39m(surface[33m.[39m[35mget[39m([34m0[39m[33m,[39m [34m0[39m)[33m.[39mchar)[33m.[39mnot[33m.[39m[34mtoMatch[39m([36m/^[ \u2800]$/u[39m)[33m;[39m
+    [90m   |[39m                                        [31m^[39m
+    [90m 24|[39m   })[33m;[39m
+    [90m 25|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m15 passed[39m[22m[90m (17)[39m
+[2m   Start at [22m 03:42:33
+[2m   Duration [22m 942ms[2m (transform 735ms, setup 0ms, import 889ms, tests 7ms, environment 0ms)[22m
+
+bijou-pr-validation
