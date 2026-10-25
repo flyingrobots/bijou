@@ -34,7 +34,7 @@ describe('DF-025 make DOGFOOD the only human-facing docs surface', () => {
     const examples = readRepoFile('examples/README.md');
 
     expect(root).toContain('[Read the complete Bijou documentation book](docs/book/bijou-designs.pdf)');
-    expect(root).toContain('examples/` tree is');
+    expect(readRepoFile('docs/development.md')).toContain('examples/` tree is');
     expect(docs).toContain('[Read the complete book](./book/bijou-designs.pdf)');
     expect(release).toContain('smoke:dogfood');
     expect(examples).toContain('secondary/internal inventory');

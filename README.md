@@ -1,431 +1,62 @@
 # Bijou
 
-[Read the teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf) ·
-[Design Archive](docs/book/bijou-archive.pdf) ·
-[Read the complete Bijou documentation book](docs/book/bijou-designs.pdf).
-The teaching book builds a reproducible job monitor; historical source documents
-live in the archive and the complete edition's appendices.
+Build terminal applications in TypeScript, from a small CLI to a full-screen workbench.
 
-Bijou is a TypeScript toolkit for building serious terminal software. It treats the terminal as a real two-dimensional character grid of cells, each cell carrying a glyph, color, and style, so you can reason about layout, diffing, and accessibility as first-class concerns instead of post-processing escape strings.
+[Read the teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf) · [Design Archive](docs/book/bijou-archive.pdf) · [Read the complete Bijou documentation book](docs/book/bijou-designs.pdf)
 
-[![npm version](https://img.shields.io/npm/v/@flyingrobots/bijou)](https://www.npmjs.com/package/@flyingrobots/bijou)
-[![License](https://img.shields.io/github/license/flyingrobots/bijou)](./LICENSE)
+![DOGFOOD component explorer showing a data table, component navigation, and keyboard controls in the dark theme](assets/screenshots/dogfood-components.png)
 
-![Bijou demo](https://github.com/user-attachments/assets/8117f6ad-41e0-470f-aeb6-6722ec44fa2c)
+![DOGFOOD Theme Lab showing the light theme and its colour tokens](assets/screenshots/dogfood-themes.png)
 
-## Prerequisites
+DOGFOOD is built with Bijou: a component explorer, live documentation, and a place to try layouts and themes.
 
-- Node.js 20.19 or newer, or Node.js 22.12 or newer
-- Node.js 22.12 or newer is recommended for local development
-- npm 8+ (or your preferred npm-compatible package manager)
+## Try Bijou
 
-The repository development toolchain is tested against Node.js 20 and 22 in
-CI. Newer Node.js versions are supported by policy; the repository enforces the
-same `^20.19.0 || >=22.12.0` floor before install because Vitest 4.1 and its
-Vite/Rolldown runtime require that range.
+Use Node.js 22.12 or newer and npm, then run the application shown above:
 
-Core build and unit-test coverage runs on Ubuntu for Node 20/22, with focused
-Ubuntu and Windows Node 22 lanes for portable path and bootstrap checks.
-Contributor-facing root scripts such as `npm run clean` and
-`npm run version` are Node scripts so they do not require a Unix shell.
-macOS validation is expected to run locally on maintainer development machines
-instead of on higher-cost GitHub-hosted macOS runners. Release, publish, and
-benchmark workflows may still use Linux-hosted Bash where the workflow itself is
-intentionally platform-specific.
-
-The repo's primary human-facing guide is [DOGFOOD](docs/book/bijou-designs.pdf#page=292).
-The `examples/` tree is for runnable examples and is intentionally maintained as secondary/internal reference material.
-
-## Start Here
-
-The fastest path is to get to the first visible output in under a minute.
-
-1. Clone and install once:
-
-   ```bash
-   git clone https://github.com/flyingrobots/bijou.git
-   cd bijou
-   npm install
-   ```
-
-2. Run the hello example (instant terminal output):
-
-   ```bash
-   npm run hello
-   ```
-
-3. Run the counter example (slightly richer interactive surface):
-
-   ```bash
-   npm run counter
-   ```
-
-4. Run DOGFOOD, Bijou's live documentation and proving surface:
-
-   ```bash
-   npm run dogfood
-   ```
-
-   This launches a full-screen interactive TUI application. Press `q` or `Ctrl-C` to exit.
-
-## Where To Read Next
-
-| Need | Go to |
-| :--- | :--- |
-| Fast orientation after the first commands | [`GUIDE.md`](docs/book/bijou-designs.pdf#page=271) |
-| Complete documentation map | [`docs/README.md`](./docs/README.md) |
-| Middle path between counter and DOGFOOD | [Framed app tutorial](./docs/guides/framed-app-tutorial.md) |
-| Live documentation app | [`docs/DOGFOOD.md`](docs/book/bijou-designs.pdf#page=292) |
-
-## What You Can Build
-
-Bijou is split into packages to make intent clear.
-
-| Need | Start with |
-| :--- | :--- |
-| Prompts, boxes, plain CLI output | [`@flyingrobots/bijou`](./packages/bijou/) |
-| A hosted Node TUI app | [`@flyingrobots/bijou-node`](./packages/bijou-node/) and [`@flyingrobots/bijou-tui`](./packages/bijou-tui/) |
-| A framed application shell | [`@flyingrobots/bijou-tui-app`](./packages/bijou-tui-app/) or `create-bijou-tui-app` |
-| Runtime localization | [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) |
-| CSV/TSV/JSON localization workflow tools | [`@flyingrobots/bijou-i18n-tools`](./packages/bijou-i18n-tools/) |
-| Story and component preview work | `npm run blocklab` |
-| Performance and long-running stability checks | `npm run bench` and `npm run soak` |
-| MCP integration | [`@flyingrobots/bijou-mcp`](./packages/bijou-mcp/) |
-
-## Quick Start: Tiny Interactive App
-
-This is the minimal app shape: initialize state, update on messages, render from model.
-
-```ts
-import { stringToSurface } from '@flyingrobots/bijou';
-import { startApp } from '@flyingrobots/bijou-node';
-import { isKeyMsg, quit, type App } from '@flyingrobots/bijou-tui';
-
-interface Model {
-  readonly text: string;
-}
-
-const app: App<Model, never> = {
-  init: () => [{ text: 'Hello, Bijou!' }, []],
-
-  update: (msg, model) => {
-    if (isKeyMsg(msg) && msg.key === 'q') {
-      return [model, [quit()]];
-    }
-    return [model, []];
-  },
-
-  view: (model) =>
-    stringToSurface(`${model.text}\n\nPress q to exit.`, Math.max(24, model.text.length), 3),
-};
-
-await startApp(app);
+```sh
+git clone https://github.com/flyingrobots/bijou.git
+cd bijou
+npm ci
+npm run dogfood
 ```
 
-The important rule is simple: input creates messages, update computes state + commands, and view is pure.
+Press **Enter** at the title screen. Explore with the arrow keys and **Tab**, open settings with **F2**, and quit with **q** or **Ctrl-C**.
 
-The imports stay split because each package owns a different boundary:
+For a smaller first example, run `npm run hello` or `npm run counter`.
 
-- `@flyingrobots/bijou` creates pure renderable values such as `Surface`.
-- `@flyingrobots/bijou-node` owns the Node host setup and terminal adapters.
-- `@flyingrobots/bijou-tui` owns the interactive app loop, messages, commands,
-  and key handling.
+## Build your own app
 
-## Core Concepts In Stages
+Create a starter project with the published scaffolder:
 
-You do not need the whole architecture to build the first app.
-
-| Stage | Concept | Why it appears |
-| :--- | :--- | :--- |
-| 1 | `Surface` | A terminal-sized cell grid, not a string with escape codes. |
-| 2 | `App<Model, Msg>` | The tiny app contract: initialize, update, and render. |
-| 3 | `Msg` | Input and async results become typed messages. |
-| 4 | `Cmd<Msg>` | Runtime effects, timers, async work, and quit requests return messages later. |
-| 5 | `LayoutNode` / framed shell | Larger apps describe panes, headers, overlays, and navigation before painting cells. |
-
-The counter example stops at stages 1-4. The framed app tutorial adds stage 5.
-DOGFOOD uses all of them because it is Bijou's documentation product.
-
-## Scaffolder: Fastest Path to Your App
-
-If you want a complete starter project instead of editing the repo examples directly, use the scaffolder:
-
-```bash
+```sh
 npm create bijou-tui-app@latest my-app
 cd my-app
 npm install
 npm run dev
 ```
 
-The generated project wires a modern host context and includes a working baseline app.
+Follow the **[Job Monitor tutorial](https://github.com/flyingrobots/bijou-job-monitor)** to build, test, and ship a complete application alongside the teaching book. For a tiny app and package guidance, see [Build your first Bijou app](docs/guides/getting-started.md).
 
-## Intermediate: Framed App
+## Features
 
-After the counter, use the compact framed-shell demo before reading DOGFOOD:
-
-```bash
-npm run app-frame
-```
-
-The tutorial explains the same app in smaller steps:
-
-- [Framed app tutorial](./docs/guides/framed-app-tutorial.md)
-- [Compact app-frame example](./examples/app-frame/README.md)
-
-Use this path when you want header/status chrome, tabs, panes, overlays, or a
-command palette without reverse-engineering the full DOGFOOD app.
-
-## Dogfood Orientation and Controls
-
-DOGFOOD is the canonical proof surface for real architecture behavior, covering:
-
-- component explorer navigation and nested layout states,
-- Blocks section and binding demos,
-- locale switching in the settings pane,
-- shell status handling,
-- interactive smoke surfaces,
-- and performance instrumentation.
-
-You should see:
-
-- component explorer navigation model
-- component pages for Blocks and block previews
-- a settings drawer opened with `F2`
-- a performance HUD toggled with the backtick key `` ` ``
-
-Useful keys in DOGFOOD:
-
-| Key | Action |
-| :--- | :--- |
-| `F2` | Open or close settings drawer. |
-| `` ` `` | Toggle performance HUD. |
-| `Tab` | Move focus through panes. |
-| `j`, `k`, arrow keys | Navigate in lists and docs. |
-| `q` | Quit. |
-
-If you need to reset after a bad input sequence, use `Ctrl-C` to hard-exit.
-
-## Package Map
-
-| Package | Role |
-| :--- | :--- |
-| [`@flyingrobots/bijou`](./packages/bijou/) | Core toolkit: prompts, surfaces, components, themes, blocks, ports, and pure contracts. |
-| [`@flyingrobots/bijou-tui`](./packages/bijou-tui/) | Interactive runtime: TEA loop, input, layout, motion, overlays, and shell support. |
-| [`@flyingrobots/bijou-node`](./packages/bijou-node/) | Node.js adapters for IO, terminal hosting, styling, and worker helpers. |
-| [`@flyingrobots/bijou-tui-app`](./packages/bijou-tui-app/) | Batteries-included framed shell and higher-level app composition. |
-| [`create-bijou-tui-app`](./packages/create-bijou-tui-app/) | Project scaffolder for hosted Bijou TUI apps. |
-| [`@flyingrobots/bijou-mcp`](./packages/bijou-mcp/) | MCP server package for exposing Bijou-backed tools and structured output. |
-| [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) | Localization runtime, fallback handling, and locale port. |
-| [`@flyingrobots/bijou-i18n-tools`](./packages/bijou-i18n-tools/) | Provider-neutral localization workflow tools for source tables, catalogs, and pseudo-localization. |
-| [`@flyingrobots/bijou-i18n-tools-node`](./packages/bijou-i18n-tools-node/) | Node-hosted localization file and bundle loaders. |
-| [`@flyingrobots/bijou-i18n-tools-xlsx`](./packages/bijou-i18n-tools-xlsx/) | Spreadsheet adapters for localization workflows. |
-
-## Choosing Your Path
-
-Bijou exposes three API tiers that match common project needs.
-
-| Tier | Entry Point | Package | Use When |
-| :--- | :--- | :--- | :--- |
-| 1 | `startApp(app)` | `@flyingrobots/bijou-node` | Simple CLI output, prompts, scripted interactive flow, or tiny apps that do not need custom pipeline wiring. |
-| 2 | `run(app, { ctx })` | `@flyingrobots/bijou-tui` | Custom pipeline stages, advanced host initialization, locale port wiring, mouse input, or custom startup state handling. |
-| 3 | `createFramedApp(config)` | `@flyingrobots/bijou-tui` | Framed shell with panes, overlays and navigation; `@flyingrobots/bijou-tui-app` supplies the opinionated starter. |
-
-Tier 1 is the easiest path to first output. The counter example uses tier 1. The DOGFOOD application uses tier 2 because it initializes context and locale before starting the core loop.
-
-Most production apps eventually move to tier 2 or tier 3.
-
-## Documentation Map
-
-| Document | Use it for |
-| :--- | :--- |
-| [`GUIDE.md`](docs/book/bijou-designs.pdf#page=271) | Orientation, fast paths, and monorepo workflow. |
-| [`ADVANCED_GUIDE.md`](docs/book/bijou-designs.pdf#page=304) | Deeper runtime, rendering, shader, and proving workflows. |
-| [`docs/guides/render-pipeline.md`](docs/book/bijou-designs.pdf#page=332) | Render pipeline internals and middleware extension patterns. |
-| [`docs/DOGFOOD.md`](docs/book/bijou-designs.pdf#page=292) | DOGFOOD command surface, keyboard orientation, and command coverage notes. |
-| [`DOGFOOD`](docs/book/bijou-designs.pdf#page=292) | Human-facing walkthrough and interactive proof surface. |
-| [`ARCHITECTURE.md`](docs/book/bijou-designs.pdf#page=137) | Ports, adapters, package stack, and structural rules. |
-| [`docs/typescript-code-standards.editors-edition.md`](./docs/typescript-code-standards.editors-edition.md) | Verbatim Code Dojo doctrine for TypeScript, tests, adapters, scripts, and architecture changes. |
-| [`docs/code-dojo-exceptions.md`](./docs/code-dojo-exceptions.md) | Standards-debt ledger and 50-violation-per-goalpost burndown policy. |
-| [`docs/VISION.md`](docs/book/bijou-designs.pdf#page=125) | Project identity and long-term product intent. |
-| [GitHub issues](https://github.com/flyingrobots/bijou/issues) | Roadmap and work scope. |
-| [GitHub milestones](https://github.com/flyingrobots/bijou/milestones) | Planned releases. |
-| [Current working agreements](./AGENTS.md) | Execution rules and Linear migration status. |
-| [`docs/design-system/README.md`](docs/book/bijou-designs.pdf#page=338) | Design language, components, and UI foundations. |
-| [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) | Historical truth of merged behavior. |
-
-## Running Tests
-
-Before running tests, build first:
-
-```bash
-npm run build
-npm test
-```
-
-`npm test` runs the unit and contract suite. For the complete local release
-sequence, run `npm run release:readiness`; it also runs:
-
-- DOGFOOD coverage gate
-- interactive example smoke checks
-- canary smoke tests
-- PTY smoke tests
-
-For long-running verification runs:
-
-- `npm run soak`
-- `npm run bench`
-
-To skip PTY tests in non-TTY environments, set:
-
-```bash
-BIJOU_SKIP_PTY_TESTS=1
-```
-
-The suite will print an explicit warning and continue without PTY checks.
-
-## Localization And i18n
-
-Localization is split into runtime and tooling packages.
-
-- [`@flyingrobots/bijou-i18n`](./packages/bijou-i18n/) resolves catalog lookup, fallback behavior, and missing-string policy.
-- [`@flyingrobots/bijou-i18n-tools`](./packages/bijou-i18n-tools/) handles source tables, hashing, diffing, pseudo-localization, and validation.
-
-DOGFOOD localization source lives in:
-
-```text
-examples/docs/i18n/source/dogfood-strings.csv
-```
-
-Useful scripts:
-
-```bash
-npm run dogfood:i18n:build
-npm run dogfood:i18n:check
-npm run dogfood:i18n:complete
-npm run dogfood:i18n:coverage
-```
-
-Runtime uses English as fallback and overlays the selected locale. Development mode keeps missing translations visible instead of silently hiding them.
-
-Policy: when a branch adds, edits, or removes a DOGFOOD localization key, it
-must apply the semantic change across every supported DOGFOOD locale (`en`,
-`fr`, `es`, and `de`). `npm run dogfood:i18n:complete` checks changed
-localization keys against `origin/main` and ratchets the full missing
-translation count. `npm run dogfood:i18n:debt` also enforces the touched-file
-rule: if a branch touches a DOGFOOD TypeScript source file with raw visible-copy
-debt, that file must be cleaned instead of merely keeping the global ratchet
-flat. Pre-push and CI run those gates with `npm run dogfood:i18n:check` so new
-strings cannot land with missing generated catalogs, untranslated
-supported-locale rows, or newly touched raw-string debt.
-
-## Blocks
-
-Blocks are higher-level reusable building blocks introduced in v5. They are reusable layout and behavior contracts for terminal components with explicit data bindings. Instead of hand-assembling raw `LayoutNode` trees for every screen, blocks provide a small vocabulary of typed, testable authoring units.
-
-The binding model is unidirectional:
-
-1) providers create immutable snapshots
-2) snapshots are rendered through binding-aware components
-3) components emit intent via commands
-4) app update functions own state changes
-
-This model lets blocks reuse layout and behavior across apps while preserving deterministic render semantics.
-
-## BlockLab And Preview Workflow
-
-Run focused previews without entering the full DOGFOOD structure:
-
-```bash
-npm run blocklab
-npm run blocklab:index
-```
-
-`blocklab:index` is especially useful for deterministic fixture capture and
-API review. The older `storybook`, `storybook:index`, and `dogfood:storybook`
-script names remain as compatibility aliases during the rename window.
+- **Components:** prompts, forms, tables, trees, charts, and reusable Blocks.
+- **Application layouts:** panes, tabs, drawers, overlays, and command palettes.
+- **Typed application state:** model, update, and view, with commands for effects.
+- **Motion and typography:** springs, transitions, gradients, and raster fonts.
+- **Themes and localization:** semantic colour tokens, dark and light themes, and translation tooling.
+- **Output for different environments:** interactive terminals, pipes, and accessible text.
 
 ## What's New in v8.0.0
 
-This checkout prepares `8.0.0`. The [live acceptance packet](docs/releases/8.0.0/stable-acceptance.md)
-records candidate evidence and release-review requirements. A version bump does not
-assert a published stable tag or npm release. The earlier `v8.0.0-rc.1` remains
-historical prerelease evidence.
+Configurable Markdown fonts, an animated DOGFOOD title, book-inspired dark and light themes, broader theme overrides, and corrected `NO_COLOR` behaviour. Try the typography demo with:
 
-**Breaking.** `NO_COLOR` no longer changes the detected output mode. It disables
-colour, which is all [no-color.org](https://no-color.org) asks for — previously
-it also forced `'pipe'`, so a terminal with `NO_COLOR=1` in the environment lost
-the whole TUI rather than only its colour. Also, an unknown status key now
-resolves to `semantic.muted` rather than `status.muted`, so a mistyped or
-undefined key no longer renders struck through. See
-[`DX-052`](docs/book/bijou-designs.pdf#page=928).
-
-- `extendTheme()` now reaches all six token groups — `border` and `semantic`
-  join `status`, `ui`, `gradient`, and `surface`.
-- Immutable raster fonts and `rasterTextSurface()` support terminal lettering.
-  Try configurable Markdown typography with
-  `npm run markdown-font -- examples/markdown-font/sample.md --configure`.
-- DOGFOOD adds font-rendered title geometry and an animated prompt, book-matched
-  dark/light themes, and current translated feature and MCP guides.
-- MCP retains plain hyperlink fallbacks and structured output with refreshed
-  runtime dependencies. Version tooling keeps workspace manifests and lock
-  metadata aligned; Code Dojo's aggregate standards-debt ceiling is zero.
-- The Profunctor Page terminal inspection target validates the canonical
-  `profunctor-page/0` family and emits deterministic scene IR, surfaces,
-  receipts, and cell source maps across six inspection modes.
-- `createVisorArtifactBundleFromGraphql()` and the `visor-artifact-bundle/1`
-  types land the VISOR artifact bundle proof.
-- `RE-036` adds packed-cell receipt validation and `Surface` adaptation.
-- Dependency-security closeout, roadmap milestone authority, and Code Dojo
-  ratchet progress across tranches A–E.
-
-Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
-[What's New guide](docs/book/bijou-designs.pdf#page=1576), the
-[migration guide](docs/book/bijou-designs.pdf#page=1528), and the
-[historical RC evidence packet](docs/book/bijou-designs.pdf#page=1489). Current
-release evidence lives in the [stable acceptance packet](docs/releases/8.0.0/stable-acceptance.md).
-
-## Tests, Soak, and Performance
-
-Useful command set while working:
-
-```bash
-npm run lint
-npm run typecheck:test
-npm test
-npm run docs:inventory
-npm run verify:interactive-examples
-npm run smoke:dogfood
-npm run smoke:dogfood:landing
-npm run smoke:dogfood:docs
-npm run soak
-npm run bench
+```sh
+npm run markdown-font -- examples/markdown-font/sample.md --configure
 ```
 
-`npm run bench` runs core rendering and diff benchmarks for short-cycle comparisons. `npm run soak` keeps the runtime under longer, stress-oriented load.
+See the [changelog](docs/CHANGELOG.md) for release details and compatibility changes.
 
-## Contributing
+## Keep going
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for workflow and PR expectations.
-
-- Start with [GitHub issues](https://github.com/flyingrobots/bijou/issues) and
-  the current [agent and contributor agreements](./AGENTS.md).
-
-## Future Direction
-
-Bijou is moving from architecture-heavy foundations into more visible product proof. The next areas of investment are:
-
-- more complete first-party Blocks and rendered block previews
-- richer DOGFOOD coverage for Blocks, localization, BlockLab, and examples
-- stronger localization workflows, including broader catalog coverage and better translator ergonomics
-- replay and scenario pipelines for deterministic debugging
-- lower-allocation rendering and more soak/performance gates
-- richer MCP and machine-readable interactivity
-- more mature data visualization components
-- ecosystem adapters for additional hosts and workflows
-
-The durable goal is straightforward: build terminal apps that stay inspectable,
-mode-aware, localized, testable, and fast without sacrificing product quality.
-
----
-
-Built with terminal ambition by [FLYING ROBOTS](https://github.com/flyingrobots).
+[Documentation](docs/README.md) · [Application guide](docs/guides/getting-started.md) · [Contributor guide](docs/development.md) · [Issues](https://github.com/flyingrobots/bijou/issues) · [License](LICENSE)
