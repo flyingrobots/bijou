@@ -1,0 +1,48 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating soak configuration, model, scenario operations, frame update and app composition",
+  "bytesConsumed": 2299184,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "bench/src/soak-runner.ts",
+    "bench/src/soak-update.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "bench/src/soak-app.ts",
+    "bench/src/soak-config.ts",
+    "bench/src/soak-model.ts",
+    "bench/src/soak-runner.ts",
+    "bench/src/soak-scenarios.ts",
+    "bench/src/soak-update.ts",
+    ".graft/receipts/2026-10-25-soak-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "5a3bdde85edde928be821de05492db986f1b7fa8",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "067c13c835c03f9c705c8eb9f8b58020f6fdca0c",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests or soak campaign",
+    "checks": [
+      "9 tests in 3 existing scenario, JSONL formatting and module-cycle files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "All six soak modules below150 lines. Aggregate baseline remains12 until final ratchet cleanup.",
+    "behavior": "Original CLI defaults, log-file initialization, warmup, timing, shared frameTimes array, resize reinitialization, dimensions shared across app construction and perf overlay rendering retained. After validation, only the extracted update body was outdented; stripped-line equality verified. Final zero-debt and full validation follow."
+  }
+}
