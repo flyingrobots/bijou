@@ -80,16 +80,16 @@ describe('DOGFOOD i18n debt inventory', () => {
       const result = evaluateDogfoodI18nDebtRatchet(inventory);
       const surfaces = inventory.bySurface.map((surface) => surface.surface);
 
-      // #549 removes the raw locale identifier and localizes the article
-      // separator in touched readers. Tighten the ratchet by those two entries.
-      expect(inventory.total).toBe(2314);
-      expect(surfaces).toContain('app-root-view');
+      // Keep #549's two removals, 24 localized release entries, and the typed
+      // root-route identifier removed while wiring actual landing lowering.
+      expect(inventory.total).toBe(2289);
+      expect(surfaces).not.toContain('app-root-view');
       expect(surfaces).toContain('stories-story-guided-flow');
       expect(surfaces).not.toContain('docs-app');
       expect(surfaces).not.toContain('component-stories');
       expect(inventory.bySurface).toContainEqual({
         surface: 'release-title',
-        count: 32,
+        count: 8,
       });
       expect(result.ok).toBe(true);
       expect(result.violations).toEqual([]);

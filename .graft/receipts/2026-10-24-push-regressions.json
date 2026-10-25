@@ -1,0 +1,40 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Repair stale preview integration tests found by authorized full push",
+  "bytesConsumed": 620596,
+  "filesRead": [
+    ".githooks/pre-push",
+    "scripts/hooks/pre-push",
+    "scripts/docs-preview-entry.part02.test.ts",
+    "scripts/docs-preview-entry.part04.test.ts",
+    "scripts/docs-preview-search.part01.test.ts"
+  ],
+  "filesModified": [
+    "scripts/docs-preview-entry.part02.test.ts",
+    "scripts/docs-preview-entry.part04.test.ts",
+    "scripts/docs-preview-search.part01.test.ts",
+    "scripts/docs-preview-prompt.test-support.ts"
+  ],
+  "tripwires": [],
+  "commit": "Included in implementation commit; resolve via git log -- .graft/receipts/2026-10-24-push-regressions.json",
+  "validation": {
+    "red": "Normal pre-push failed 3 preview tests: two expected literal Press [Enter] characters instead of composed raster geometry; one assumed the Documentation Map was always two Down keys from Start Here.",
+    "green": "22 focused tests across the failing preview files, prompt lowering, and current guides passed; focused ESLint and diff whitespace check passed.",
+    "behavior": "Retains actual keyboard/route and composed-frame checks. Finds complete prompt geometry in the full frame, checks multiple ink colors, and navigates to the Documentation Map's actual catalog position.",
+    "push": "Initial push was rejected by normal hooks; no publication occurred before this repair. Full gated push will be retried."
+  },
+  "resources": {
+    "runner": "Reused /tmp/bijou-issue-guard.py plus write-containment sandbox; host/heavy-work and named validation cache locks",
+    "buildLimitGiB": 20,
+    "dataLimitGiB": 4,
+    "logLimitMiB": 128,
+    "rssLimitGiB": 4,
+    "nodeHeapMiB": 2048,
+    "timeoutSeconds": 1200,
+    "firstAttemptSeconds": 93.7,
+    "firstAttemptBuildBytes": 751296512,
+    "firstAttemptDataBytes": 869322752
+  }
+}

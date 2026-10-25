@@ -9,6 +9,7 @@ en cours d'exécution est {{RELEASE_VERSION}}.
 - `Guide de migration` explique comment mettre à jour une application existante.
 - `Parcours de preuve GraphQL` suit l'exemple réel NavigationListBlock.
 - L'historique `CHANGELOG` conserve les limites des versions précédentes.
+- `Guides → Fonctionnalités récentes` décrit les ajouts locaux postérieurs aux notes de version préservées.
 
 ## Preuves et état de la version
 

@@ -1835,6 +1835,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Fuentes, tipografía Markdown, animación, temas del libro y alcance de la documentación actual."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Funciones recientes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.guides.navigate.summary"
       },
       "kind": "message",
@@ -1874,6 +1896,28 @@
       "sourceLocale": "en",
       "values": {
         "es": "Empieza aquí"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.historicalSourceNotice"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Referencia histórica del archivo preservado. Funciones recientes y los README actuales describen los cambios posteriores a esta fuente."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.packages.mcp.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Herramientas MCP, salidas semánticas, configuración y límites actuales."
       }
     },
     {
@@ -2469,6 +2513,105 @@
       "sourceLocale": "en",
       "values": {
         "es": "Estela de lanzamiento V7"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Cierre de la versión V8 en curso"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.motif"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Los glifos Jacquard 12 giran sobre un cilindro; el significado se conserva sin animación."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Documentación | Blocks | BlockLab | Notas de versión"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.lowerModes"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "modos reducidos legibles"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "navegación por teclado"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.offlineFont"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "geometría de fuente sin conexión"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Una aplicación para cada terminal."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Un título giratorio Jacquard 12 con datos legibles de la versión en cada presentación."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Bijou v8"
       }
     },
     {

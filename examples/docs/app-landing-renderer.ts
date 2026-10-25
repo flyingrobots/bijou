@@ -17,7 +17,7 @@ import {
   resolveLandingQuality,
   resolveLandingQualityMode,
 } from './app-landing-quality.js';
-import { paintV7TitleArt } from './app-landing-title-art.js';
+import { paintCylinderTitle } from './app-cylinder-title.js';
 import {
   createWordmarkSurface,
   fitGlyphLinesToWidth,
@@ -58,6 +58,7 @@ export function createLandingRenderer(options: LandingRendererOptions): (model: 
       width,
       height,
       tokens.id,
+      localization.locale,
       qualityMode,
       quality.id,
       quantizedTimeMs,
@@ -67,19 +68,22 @@ export function createLandingRenderer(options: LandingRendererOptions): (model: 
     if (cache.key === cacheKey && cache.front != null) return cache.front;
 
     const surface = prepareLandingSurface(cache.back, width, height, tokens.background);
-    paintLandingBackground(surface, quantizedTimeMs, tokens, quality, textModifiers);
-    paintV7TitleArt(surface, tokens, textModifiers, quantizedTimeMs);
+    paintLandingBackground(surface, quantizedTimeMs, tokens, quality);
+    paintCylinderTitle(surface, tokens, quantizedTimeMs);
 
     const wordmarkGlyphs = transparentLogoGlyphs(fitGlyphLinesToWidth(FLYING_ROBOTS_LOGO_LINES, Math.max(1, width - 4)));
     const wordmark = createWordmarkSurface(wordmarkGlyphs, textModifiers);
     const staticSurfaces = getLandingStaticSurfaces(tokens, localization, textModifiers, versionText);
-    const promptLine = createLandingPromptSurface(tokens, textModifiers, quantizedTimeMs, localization);
     const fpsBadge = getLandingFpsBadge(tokens, fpsBadgeValue, quality, qualityMode, textModifiers, localization);
     const dogfoodPanel = getLandingDogfoodPanel(Math.max(28, Math.min(width - 6, 88)), ctx, tokens, textModifiers, localization);
     const footerY = Math.max(0, height - 1);
     const contentTop = Math.min(height - 1, Math.max(1, Math.floor(height * 0.68)));
     const contentBottom = Math.max(contentTop, footerY - 2);
     const availableHeight = Math.max(0, contentBottom - contentTop + 1);
+    const promptLine = createLandingPromptSurface(tokens, textModifiers, quantizedTimeMs, localization, {
+      mode: ctx.mode, width: Math.max(1, width - 4),
+      rows: availableHeight >= dogfoodPanel.height + 3 ? availableHeight - dogfoodPanel.height - 1 : availableHeight,
+    });
     const fullClusterHeight = dogfoodPanel.height + promptLine.height + wordmark.height + 2;
     const compactClusterHeight = dogfoodPanel.height + promptLine.height + 1;
 
@@ -93,6 +97,9 @@ export function createLandingRenderer(options: LandingRendererOptions): (model: 
       timeMs: quantizedTimeMs,
       modifiers: textModifiers,
     });
+    for (let x = 0; x < width; x++) {
+      surface.set(x, footerY, { char: ' ', bg: tokens.background, empty: false });
+    }
     surface.blit(staticSurfaces.footerControls, 0, footerY);
     placeFooterBadges(surface, staticSurfaces.footerControls.width, staticSurfaces.footerVersion, fpsBadge, footerY);
 

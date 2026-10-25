@@ -10,6 +10,7 @@ This section is the package guide for Bijou's published workspace.
 - `@flyingrobots/bijou-tui-app` — app helpers and shell scaffolding
 - `create-bijou-tui-app` — project template and starter workflow
 - `@flyingrobots/bijou-i18n*` — localization runtime, tools, and adapters
+- `@flyingrobots/bijou-mcp` — component rendering and semantic data for MCP clients
 
 ## How to use this section
 
@@ -20,3 +21,8 @@ This section is the package guide for Bijou's published workspace.
 The package pages in this section are published from the repo's real
 workspace docs so DOGFOOD can act like a proper package guide instead of
 just a placeholder home.
+
+The TUI package owns the immutable raster-font API. Font decoding, Google Fonts
+downloads, and per-element typography controls live in the Markdown example;
+they are not automatic TTF-loading features of the pure renderer. See
+**Guides → Latest Features** and `examples/markdown-font/README.md`.

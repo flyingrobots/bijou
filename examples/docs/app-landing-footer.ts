@@ -1,4 +1,4 @@
-import type { Surface } from '../../packages/bijou/src/index.js';
+import type { OutputMode, Surface } from '../../packages/bijou/src/index.js';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { dogfoodLocalizedText } from './localization.js';
 import {
@@ -7,6 +7,7 @@ import {
 } from './app-landing-colors.js';
 import { landingQualityBadgeLabel } from './app-landing-quality.js';
 import { createTransparentTextSurface } from './app-landing-text.js';
+import { createRasterPrompt } from './app-prompt-raster.js';
 import type {
   LandingQualityMode,
   LandingQualityProfile,
@@ -64,13 +65,18 @@ export function createLandingPromptSurface(
   modifiers: LandingTextModifiers,
   timeMs: number,
   localization?: LocalizationPort,
+  presentation: { readonly mode: OutputMode; readonly width: number; readonly rows: number } = { mode: 'interactive', width: 80, rows: 3 },
 ): Surface {
   const promptText = dogfoodText(localization, 'landing.prompt.enter', 'Press [Enter]');
+  if (presentation.mode === 'interactive') {
+    const raster = createRasterPrompt(promptText, tokens, timeMs, presentation.width, presentation.rows);
+    if (raster !== undefined) return raster;
+  }
   const highlightStart = promptText.indexOf('[');
   const highlightEnd = promptText.indexOf(']');
   const enterStart = highlightStart >= 0 && highlightEnd > highlightStart ? highlightStart + 1 : -1;
   const enterEnd = highlightEnd > enterStart ? highlightEnd - 1 : -1;
-  const time = timeMs / 1000;
+  const time = presentation.mode === 'interactive' ? timeMs / 1000 : 0;
 
   return createTransparentTextSurface(promptText, {
     bg: tokens.background,

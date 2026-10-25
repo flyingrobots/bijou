@@ -4,7 +4,7 @@ Dieser Bereich veröffentlicht die Release-Geschichte der aktuellen Linie und
 die Migrationshinweise in DOGFOOD. Die Versionsnummer wird beim Start aus
 package.json gelesen; die Release-Seiten zeigen die aktuelle Version.
 
-## Jetzt veröffentlicht
+## In diesem Reader verfügbar
 
 - `Was ist neu` für das aktuelle Release
 - `Aktuelle Release-Geschichte` für den Release-Story-Lesepfad
@@ -18,10 +18,15 @@ package.json gelesen; die Release-Seiten zeigen die aktuelle Version.
 
 - Lies zuerst die Übersicht, wenn du Release-Grenze und Geschichte brauchst.
 - Öffne `Was ist neu` für die ausführliche Erklärung der Release-Linie.
-- Öffne `Aktuelle Release-Geschichte`, wenn du den v7.2-Demo-Integritätspfad
-  präsentierst.
+- Öffne `Aktuelle Release-Geschichte` für die laufende Version und die Grenze der Release-Belege.
+- Öffne `Guides → Neueste Funktionen` für neue Schrift-, Typografie- und Theme-Funktionen.
 - Öffne `GraphQL-Proof-Walkthrough`, um das eingecheckte GraphQL SDL,
   `bijou-block/1`, `ui-scene-ir/1`, Terminal-Proof und Debug-Fakten zu zeigen.
 - Öffne `CHANGELOG-Verlauf`, um durch Versionsgrenzen zu gehen.
 - Öffne `Migrationsleitfaden`, wenn du von einem früheren Major/Minor
   aktualisierst.
+
+Was ist neu und Migrationsleitfaden stammen derzeit aus bewahrten Archivquellen
+und sind als historische Referenzen markiert. Ihre Verfügbarkeit belegt keine
+stabile Veröffentlichung. Das Lehrbuch liegt jetzt im Job-Monitor-Begleitdepot;
+seine Lehranwendung auf Basis von 7.2.0 ist von der laufenden Paketversion getrennt.

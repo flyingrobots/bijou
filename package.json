@@ -16,6 +16,7 @@
     "pretest": "npm run build",
     "test:run": "node scripts/run-vitest.mjs",
     "hello": "node --import tsx examples/hello/hello.ts",
+    "markdown-font": "node --import tsx examples/markdown-font/main.ts",
     "counter": "node --import tsx examples/counter/main.ts",
     "app-frame": "node --import tsx examples/app-frame/main.ts",
     "test:frames": "vitest run --config vitest.config.ts scripts/frame-assertions.test.ts scripts/frame-regressions.test.ts",
@@ -76,7 +77,11 @@
     "pr:merge-readiness": "tsx scripts/pr-review-status.ts --merge-ready",
     "lint": "npm run lint --workspaces",
     "lint:eslint": "node scripts/code-dojo/check-eslint.mjs",
-    "version": "node scripts/version.mjs"
+    "version": "node scripts/version.mjs",
+    "generate:dogfood:title": "tsx scripts/generate-jacquard-title.ts",
+    "check:dogfood:title": "tsx scripts/generate-jacquard-title.ts --check",
+    "generate:dogfood:prompt": "tsx scripts/generate-space-grotesk-atlas.ts",
+    "check:dogfood:prompt": "tsx scripts/generate-space-grotesk-atlas.ts --check"
   },
   "overrides": {
     "body-parser": "^2.4.0",
@@ -97,7 +102,9 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.61.1",
     "vitest": "^4.1.8",
-    "yaml": "^2.9.0"
+    "yaml": "^2.9.0",
+    "opentype.js": "2.0.0",
+    "@types/opentype.js": "1.3.10"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

@@ -88,7 +88,7 @@ export function relativeLuminance(hex: string): number {
     + (0.0722 * srgbChannelToLinear(b));
 }
 
-function contrastRatio(a: string, b: string): number {
+export function contrastRatio(a: string, b: string): number {
   const lighter = Math.max(relativeLuminance(a), relativeLuminance(b));
   const darker = Math.min(relativeLuminance(a), relativeLuminance(b));
   return (lighter + 0.05) / (darker + 0.05);

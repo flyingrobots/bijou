@@ -23,6 +23,7 @@ This reader follows v{{RELEASE_LINE}}. The running package version is
 - `Migration Guide` explains how to update an existing application.
 - `GraphQL proof walkthrough` traces the real NavigationListBlock fixture.
 - `CHANGELOG` history keeps earlier version boundaries visible.
+- `Guides → Latest Features` covers local preview additions made after the preserved release notes.
 
 ## Evidence and Release Status
 

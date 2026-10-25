@@ -17,6 +17,7 @@ import {
 } from './docs-preview.test-support.js';
 
 import { must } from '@flyingrobots/bijou/adapters/test';
+import { guideDocsForPage } from '../examples/docs/app-guide-catalog.js';
 
 describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
@@ -76,10 +77,11 @@ describe('docs preview app', () => {
   it('renders the Documentation Map guide tables instead of leaking raw markdown', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
     const app = createDocsApp(ctx);
+    const mapIndex = guideDocsForPage('guides').findIndex((guide) => guide.id === 'documentation-map');
+    expect(mapIndex).toBeGreaterThanOrEqual(0);
     const result = await runScript(app, [
       { key: KEY_ENTER },
-      { key: KEY_DOWN },
-      { key: KEY_DOWN },
+      ...Array.from({ length: mapIndex }, () => ({ key: KEY_DOWN })),
       { key: KEY_ENTER },
     ], { ctx });
     const pageModel = docsPageModel(result.model, 'guides');

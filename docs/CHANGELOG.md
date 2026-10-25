@@ -8,15 +8,51 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DOGFOOD publishes translated Latest Features and MCP package guides, labels
+  archive-backed reader articles, and follows the running release version in
+  its Current Release Story. Orientation distinguishes live references from
+  frozen evidence and preview features from publication.
+
+- DOGFOOD’s interactive title-screen “Press [Enter]” prompt uses offline Space
+  Grotesk glyphs with theme-color animation, and retains localized text in
+  static, pipe, accessible, small, and unsupported-glyph presentations.
+
+- The Markdown typography demo accepts independent fonts and pixel sizes for
+  H1–H4 and paragraphs through `--configure` or per-element font/size flags.
+  Its interactive view cycles font colors through the active theme’s brand
+  gradient, with scrolling, pause/resume, resize reflow, and static output options.
+
+- `npm run markdown-font -- <document.md>` demonstrates font-rendered H1s with a
+  searchable Google Fonts selector, local TTF/OTF loading, bundled Space Grotesk
+  for offline use, and text headings for pipelines and accessible output.
+
+- `@flyingrobots/bijou-tui` exports immutable raster fonts, code-point text layout, RGBA text rasterization and font-to-surface rendering through the existing raster pipeline.
+
+- DOGFOOD's V8 landing title rolls actual Jacquard 12 glyphs around a cylinder, with offline font geometry and readable release facts in lower presentation modes.
+
 - DOGFOOD now defaults to a book-matched coral/warm-ink theme pair, with dark
   and light shell modes and landing colors that follow the selected mode.
   Previous neutral and alternate themes remain available.
 
 ### Fixed
 
+- DOGFOOD's actual landing route uses semantic release text in static, pipe
+  and accessible modes. Language changes invalidate the interactive prompt
+  cache immediately. Glyph construction validates an owned snapshot of every
+  required metric, including values supplied through JavaScript accessors.
+
 - DOGFOOD's shell-theme picker, mode descriptions, Theme Lab and Inspector now
   follow each app's live locale. Theme selection and resolved colors retain
   their identity when the locale changes (#549).
+
+- Raster-font minification preserves thin stems and horizontal bars that fell
+  between pixel-center samples, including Markdown font rendering. Coverage
+  projection remains subject to the existing raster-text work budget. Braille
+  and quadrant text fitting retains nonzero coverage by default; explicit
+  renderer thresholds and custom charset density mappings remain available.
+
+- Animated Markdown typography now expands when a terminal widens after a
+  narrow start. An explicit `--width` still caps the document width.
 
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).

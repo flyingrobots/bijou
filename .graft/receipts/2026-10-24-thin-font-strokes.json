@@ -1,0 +1,44 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Fix missing thin font stems during text raster minification",
+  "bytesConsumed": 341919,
+  "filesRead": [
+    "packages/bijou-tui/src/raster-text.ts",
+    "packages/bijou-tui/src/raster-font-glyph.ts",
+    "packages/bijou-tui/src/raster-glyph.part02.ts",
+    "packages/bijou-tui/src/raster-glyph.part03.ts",
+    "packages/bijou-tui/src/raster-glyph.part04.ts",
+    "packages/bijou-tui/src/raster-glyph.part05.ts",
+    "packages/bijou-tui/src/raster-text.test.ts",
+    "packages/bijou-tui/README.md",
+    "examples/markdown-font/font-rasterizer.ts",
+    "examples/markdown-font/render-text.ts"
+  ],
+  "filesModified": [
+    "packages/bijou-tui/src/raster-text.ts",
+    "packages/bijou-tui/src/raster-text-coverage.ts",
+    "packages/bijou-tui/src/raster-text-coverage.test.ts",
+    "packages/bijou-tui/README.md",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "Graft emitted RUNAWAY_TOOLS for cumulative session calls spanning prior user turns. A new user bug report authorized this bounded diagnosis and repair."
+  ],
+  "commit": "Included in the implementation commit; resolve via git log -- .graft/receipts/2026-10-24-thin-font-strokes.json",
+  "validation": {
+    "red": "9 of 13 stroke regressions failed: even-column vertical stems, horizontal bars, and Braille stem vanished under center sampling.",
+    "green": "68 tests passed across font coverage, raster-text, raster-glyph, and Markdown demo groups. Focused ESLint and test TypeScript checks passed.",
+    "manual": "Bundled Space Grotesk l: every RGBA row and every corresponding Braille dot row contains ink at heights 8, 12, 16, 24. Static CLI preview succeeded.",
+    "limits": "Minification checks total atlas visits before scanning and counts projected writes against the existing 16777216-sample cap. Dense atlas/tiny-output regression rejects excess source work.",
+    "compatibility": "Nearest-neighbor enlargement unchanged. Minified strokes may round up to a pixel and subpixel gaps may close; documented in package README."
+  },
+  "resources": {
+    "heavyBuilds": false,
+    "hostFreeGiB": 635,
+    "maximumNewTestMaskBytes": 524288,
+    "scratchPreviewBytes": 2754,
+    "backgroundProcessesRetained": false
+  }
+}

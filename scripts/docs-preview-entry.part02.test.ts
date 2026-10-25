@@ -13,6 +13,7 @@ import {
 } from './docs-preview.test-support.js';
 
 import { must } from '@flyingrobots/bijou/adapters/test';
+import { findRasterPrompt } from './docs-preview-prompt.test-support.js';
 
 describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
@@ -33,7 +34,7 @@ describe('docs preview app', () => {
     expect(enteredText).toContain('Bijou Docs');
     expect(enteredText).toContain('Start Here');
     expect(enteredText).not.toContain('Press [Enter]');
-    expect(enteredText).not.toContain('V7 Launch Wake');
+    expect(enteredText).not.toContain('Bijou v8');
   });
 });
 
@@ -58,7 +59,7 @@ describe('docs preview app', () => {
     const lines = text.split('\n');
     const footer = lines[frame.height - 1] ?? '';
 
-    expect(text).toContain('Press [Enter]');
+    expect(findRasterPrompt(frame)).toBeDefined();
     expect(footer).toContain('Esc/q quit');
     expect(footer).toContain('↑/↓ quality');
     expect(footer).toContain('←/→ theme');
@@ -69,7 +70,7 @@ describe('docs preview app', () => {
     expect(text).not.toContain('Documentation coverage');
     expect(text).toContain('DOGFOOD');
     expect(text).toContain('Documentation Of Good');
-    expect(text).toContain('V7 Launch Wake');
+    expect(text).toContain('Bijou v8');
     expect(text).not.toContain('What is Bijou?');
     expect(text).not.toContain('How to use these docs');
     // Gradient background chars (█▓▒░·) require pulse-driven animation;

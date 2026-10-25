@@ -1,0 +1,31 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "1dac3748-4a6a-4270-a526-fe205bafdf85",
+  "agent": "bijou-issue-remediation",
+  "task": "Local title-screen iteration: coherent ASCII noise in place of wave bands",
+  "bytesConsumed": 310630,
+  "filesRead": [
+    "examples/docs/app-landing-background.ts",
+    "examples/docs/app-landing-renderer.ts",
+    "examples/docs/app-landing-quality.ts",
+    "examples/docs/app-landing-types.ts",
+    "examples/docs/book-themes.md",
+    "scripts/docs-preview-entry.part03.test.ts",
+    "scripts/docs-preview-entry.part04.test.ts"
+  ],
+  "filesModified": [
+    "examples/docs/app-landing-background.ts",
+    "examples/docs/app-landing-renderer.ts",
+    "examples/docs/book-themes.md",
+    "scripts/docs-preview-entry.part03.test.ts",
+    "scripts/docs-preview-entry.part04.test.ts",
+    "scripts/docs-preview.test-support.part01.ts",
+    "scripts/docs-preview.test-support.part02.ts",
+    "scripts/docs-preview.test-support.ts",
+    "examples/docs/app-landing-noise.ts",
+    "scripts/docs-preview-noise.test-support.ts",
+    "tests/dogfood-noise-background.test.ts",
+    ".graft/receipts/2026-10-23-perlin-background.json"
+  ],
+  "tripwires": []
+}

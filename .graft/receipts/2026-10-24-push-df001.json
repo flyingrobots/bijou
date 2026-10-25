@@ -1,0 +1,25 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Update legacy landing coverage test for rendered raster prompt",
+  "bytesConsumed": 664664,
+  "filesRead": [
+    "tests/cycles/DF-001/dogfood-coverage-progress.test.ts",
+    "scripts/docs-preview-prompt.test-support.ts",
+    "tests/cycles/DF-070/dogfood-block-product-polish.part01.test.ts"
+  ],
+  "filesModified": [
+    "tests/cycles/DF-001/dogfood-coverage-progress.test.ts",
+    "tests/cycles/DF-070/dogfood-block-product-polish.part01.test.ts"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS: user kept informed of blocking push checks and milestone findings"
+  ],
+  "validation": {
+    "red": "Full normal pre-push reached chunk 16/20 and failed the old literal Press [Enter] assertion.",
+    "green": "14 focused tests passed across DF-001 landing coverage and prompt lowering; focused ESLint passed.",
+    "behavior": "Checks exact glyph region, placement below expansion, and more than ten animated ink cells.",
+    "catalog": "Full push later reached DF-070: expected Navigate DOGFOOD in row 2, now Latest Features. Updated displayed focus marker while retaining selected-guide and focus-index assertions."
+  }
+}

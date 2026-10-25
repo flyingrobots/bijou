@@ -1835,6 +1835,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Polices, typographie Markdown, animation, thèmes du livre et portée de la documentation actuelle."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Fonctionnalités récentes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.guides.navigate.summary"
       },
       "kind": "message",
@@ -1874,6 +1896,28 @@
       "sourceLocale": "en",
       "values": {
         "fr": "Commencer ici"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.historicalSourceNotice"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Référence historique de l’archive préservée. Fonctionnalités récentes et les README actuels décrivent les changements postérieurs à cette source."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.packages.mcp.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Outils MCP, sorties sémantiques, configuration et limites actuelles."
       }
     },
     {
@@ -2469,6 +2513,105 @@
       "sourceLocale": "en",
       "values": {
         "fr": "Sillage de lancement V7"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Finalisation de la version V8 en cours"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.motif"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Les glyphes Jacquard 12 tournent autour d’un cylindre ; le sens reste intact sans animation."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Documentation | Blocks | BlockLab | Notes de version"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.lowerModes"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "modes simplifiés lisibles"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "navigation au clavier"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.offlineFont"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "géométrie de police hors ligne"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Une application pour chaque terminal."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Un titre Jacquard 12 en rotation avec des informations de version lisibles dans chaque présentation."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Bijou v8"
       }
     },
     {

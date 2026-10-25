@@ -2,7 +2,7 @@ import type { DogfoodI18nDebtBaseline } from './i18n-debt.js';
 import { DOGFOOD_STORY_I18N_DEBT_BASELINE } from './i18n-debt-baseline-stories.js';
 
 export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze({
-  total: 2314,
+  total: 2289,
   bySurface: Object.freeze({
     'app-components-layout': 4,
     'app-components-page': 1,
@@ -23,7 +23,6 @@ export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze
     'app-mouse-routes': 3,
     'app-root-initial': 1,
     'app-root-update': 1,
-    'app-root-view': 1,
     'app-shell-theme-state': 4,
     'app-story-pane': 4,
     'app-variants-pane': 7,
@@ -62,7 +61,7 @@ export const DOGFOOD_I18N_DEBT_BASELINE: DogfoodI18nDebtBaseline = Object.freeze
     'dogfood-locale': 7,
     'i18n-dogfood-authoring': 1,
     'i18n-missing-localization': 3,
-    'release-title': 32,
+    'release-title': 8,
     'storybook-app': 31,
     'storybook-workstation': 2,
     ...DOGFOOD_STORY_I18N_DEBT_BASELINE,

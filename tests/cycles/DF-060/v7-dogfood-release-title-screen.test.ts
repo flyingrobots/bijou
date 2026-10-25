@@ -1,3 +1,4 @@
+import { V8_DOGFOOD_RELEASE_TITLE } from '../../../examples/docs/release-title-v8.js';
 import { describe, expect, it } from 'vitest';
 import {
   CURRENT_DOGFOOD_RELEASE_TITLE,
@@ -62,8 +63,9 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
   });
 
   it('publishes a latest-first release-title gallery with a unique post-release treatment', () => {
-    expect(CURRENT_DOGFOOD_RELEASE_TITLE).toBe(V7_LAUNCH_DOGFOOD_RELEASE_TITLE);
+    expect(CURRENT_DOGFOOD_RELEASE_TITLE).toBe(V8_DOGFOOD_RELEASE_TITLE);
     expect(DOGFOOD_RELEASE_TITLE_GALLERY.map((release) => release.id)).toEqual([
+      'v8',
       'v7-launch',
       'v7',
     ]);
@@ -92,7 +94,7 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
     expect(output).toContain('V7 Launch Wake');
   });
 
-  it('renders the post-release title as the first DOGFOOD Release guide', async () => {
+  it('keeps the post-release title selectable behind the current DOGFOOD Release guide', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 42 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
     const result = await runScript(app, [{
@@ -104,8 +106,9 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
     const text = frameText(must(result.frames.at(-1)));
     const releaseModel = releasePageModel(result.model);
 
-    expect(releaseModel.guideState.items[0].value).toBe('release-title-v7-launch');
-    expect(releaseModel.guideState.items[1].value).toBe('release-title-v7');
+    expect(releaseModel.guideState.items[0].value).toBe('release-title-v8');
+    expect(releaseModel.guideState.items[1].value).toBe('release-title-v7-launch');
+    expect(releaseModel.guideState.items[2].value).toBe('release-title-v7');
     expect(releaseModel.selectedGuideId).toBe('release-title-v7-launch');
     expect(text).toContain('V7 Launch Wake');
     expect(text).toContain('A released line leaves a readable trail.');

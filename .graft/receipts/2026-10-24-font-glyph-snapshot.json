@@ -1,0 +1,20 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Validate and retain the same owned glyph metric snapshot",
+  "bytesConsumed": 1866186,
+  "filesRead": [
+    "packages/bijou-tui/src/raster-font-glyph.ts",
+    "packages/bijou-tui/src/raster-font-glyph.test.ts"
+  ],
+  "filesModified": [
+    "packages/bijou-tui/src/raster-font-glyph.ts",
+    "packages/bijou-tui/src/raster-font-glyph.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative warning; bounded follow-up for the glyph ownership invariant"
+  ],
+  "validation": "Guarded Docker sourceTree86c70b34f75e04029fbb9bbd98fcd5c0b2ce7e02 at parent4c3b8225: one expected accessor/snapshot assertion fails, eight controls pass. Snapshot each required metric once before validation and retention; sourceTree0f3b4debdeb78fd8927c63879823f0e7bc287200 passes32tests/3files plus typecheck:test and ESLint. No host tests, API exports or dimension/work limits change. Final committed-candidate captures, CLI smoke, normal full push and exact-head review remain required."
+}
