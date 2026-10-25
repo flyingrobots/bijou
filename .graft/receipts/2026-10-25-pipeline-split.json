@@ -1,0 +1,45 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt release acceptance by separating render pipeline execution and diagnostics with unchanged public contracts",
+  "bytesConsumed": 2065804,
+  "metricScope": "Cumulative bounded-read bytes in this ongoing Bijou session; not bytes unique to this refactor",
+  "filesRead": [
+    "packages/bijou-tui/src/pipeline/pipeline.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou-tui/src/pipeline/pipeline.ts",
+    "packages/bijou-tui/src/pipeline/pipeline-keys.ts",
+    "packages/bijou-tui/src/pipeline/pipeline-diagnostics.ts",
+    "packages/bijou-tui/src/pipeline/pipeline-execution.ts",
+    ".graft/receipts/2026-10-25-pipeline-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "f143f13c4ea1146195765e1a990942db26e466db",
+  "commit": "Identified by the Git commit containing this receipt",
+  "verification": {
+    "sourceTreeWithoutReceipt": "67a55cacb2f5e9f09962c35b6832a816c881e990",
+    "environment": "Guarded copy-only Docker node24.18.0; reused worker; no host tests",
+    "checks": [
+      "19 tests in eight files passed (pipeline, RE-017, and existing DX-050 module-cycle checks)",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "Original pipeline module 72 lines; execution 146; diagnostics 35; metadata keys 6. Aggregate baseline remains 12 until complete cleanup.",
+    "behavior": "Preserve public types and functions, metadata key values, stage order/cache invalidation, observer delivery, guarded next, asynchronous middleware warnings/rejection handling, and injected timing. The original metadata getters remain in their original module."
+  }
+}

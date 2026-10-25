@@ -1,0 +1,47 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating showcase category pages, views and app assembly",
+  "bytesConsumed": 2251864,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "examples/showcase/app.ts",
+    "tests/cycles/DX-033/remove-showcase-layout-sludge.test.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "examples/showcase/app-category.ts",
+    "examples/showcase/app-utils.ts",
+    "examples/showcase/app-views.ts",
+    "examples/showcase/app.ts",
+    "tests/cycles/DX-033/remove-showcase-layout-sludge.test.ts",
+    ".graft/receipts/2026-10-25-showcase-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "154c8e96881abcdba7c2e3a947c0dadfedabb1e8",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "33d45d6e0d708ad39299fea017446e34b609bc08",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "checks": [
+      "156 tests in 70 DX-033, app-frame, browsable-list and module-cycle files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "All four showcase modules below150 lines. Aggregate baseline remains12 until full cleanup.",
+    "behavior": "Original category initialization/update/layout, drawer animation generations, sidebar surfaces, previews and quit modal retained. Historical DX-033 source assertions now inspect extracted start-app and app-views modules; no expectation removed."
+  }
+}

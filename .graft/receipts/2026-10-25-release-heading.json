@@ -1,0 +1,47 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Restore the established version-heading format detected by the full normal pre-push verification",
+  "bytesConsumed": 2540935,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "README.md",
+    "tests/cycles/WF-006/cut-clean-4-1-0-release-boundary.test.ts"
+  ],
+  "filesModified": [
+    "README.md",
+    ".graft/receipts/2026-10-25-release-heading.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "14644386aca8d09a6b3d69916a16585290bfcc48",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "be31a935171300ebbe304773dcaf83dda845a1e9",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "red": {
+      "sourceCommit": "14644386aca8d09a6b3d69916a16585290bfcc48",
+      "command": "Normal BIJOU_FULL_PUSH=1 git push with repository pre-push hooks",
+      "failure": "WF-006 release boundary contract requires the established What's New in v<SemVer> heading; for v8.0.0 did not match. Push was rejected before publication."
+    },
+    "checks": [
+      "WF-006 and release-readiness focused tests passed",
+      "npm run docs:inventory",
+      "npm run docs:design-system:preflight",
+      "npm run lint",
+      "npm run code-dojo:verify"
+    ],
+    "behavior": "Change only the heading preposition back to in. Stable preparation and publication boundaries remain explicit. No test expectation or policy relaxed; complete normal push will be rerun."
+  }
+}

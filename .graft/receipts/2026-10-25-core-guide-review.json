@@ -1,0 +1,43 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Correct current core guide mode-detection priority, color separation, preset inventory and six-group extension guidance for v8 acceptance",
+  "bytesConsumed": 2509101,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou/GUIDE.md:1-115",
+    "packages/bijou/ADVANCED_GUIDE.md:69-88",
+    "packages/bijou/src/core/detect/tty.ts",
+    "packages/bijou/src/core/theme/presets.part03.ts",
+    "packages/bijou/src/core/theme/extend.ts"
+  ],
+  "filesModified": [
+    "packages/bijou/GUIDE.md",
+    ".graft/receipts/2026-10-25-core-guide-review.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "f1d1ebc928b360d84d9f2af29b7ce7075b808c5c",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "reviewer": "Codex agent; not human release signoff",
+    "scope": "Bounded setup/mode/theme sections; no claim of full advanced-guide review",
+    "checks": [
+      "Direct source comparison with detectOutputMode, PRESETS and extendTheme",
+      "git diff --cached --check",
+      "Normal pre-commit gates"
+    ],
+    "behavior": "Describe accessibility/TERM/redirect/CI priority, CI-defined TTY behavior and independent NO_COLOR suppression. Remove ASCII-only pipe promise; list all six existing presets and distinguish DOGFOOD themes. Explain fixed/extensible override keys and status fallback. Prose-only edit; release gauntlet currently running against preceding exact commitf1d1ebc9, not relabeled as this later documentation commit."
+  }
+}

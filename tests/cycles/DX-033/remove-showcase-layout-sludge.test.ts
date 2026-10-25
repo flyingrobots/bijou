@@ -16,7 +16,7 @@ describe('DX-033 remove showcase layout sludge', () => {
   });
 
   it('tightens the Node startApp convenience type away from any', () => {
-    const source = readRepoFile('packages/bijou-node/src/index.ts');
+    const source = readRepoFile('packages/bijou-node/src/start-app.ts');
     const test = readRepoFile('packages/bijou-node/src/index.part04.test.ts');
     const testSupport = readRepoFile('packages/bijou-node/src/index.test-support.part01.ts');
 
@@ -28,7 +28,7 @@ describe('DX-033 remove showcase layout sludge', () => {
   });
 
   it('moves showcase sidebar clipping to the shared browsable-list surface', () => {
-    const source = readRepoFile('examples/showcase/app.ts');
+    const source = readRepoFile('examples/showcase/app-views.ts');
 
     expect(source).toContain('browsableListSurface');
     expect(source).toContain('showScrollbar: state.items.length > state.height');

@@ -1,0 +1,47 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating notification geometry, visible selection, overflow exits, trimming and overlay layout",
+  "bytesConsumed": 2245592,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou-tui/src/notification-stack.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou-tui/src/notification-stack-layout.ts",
+    "packages/bijou-tui/src/notification-stack-overflow.ts",
+    "packages/bijou-tui/src/notification-stack-placement.ts",
+    "packages/bijou-tui/src/notification-stack-selection.ts",
+    "packages/bijou-tui/src/notification-stack-trim.ts",
+    "packages/bijou-tui/src/notification-stack.ts",
+    ".graft/receipts/2026-10-25-notification-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "2090ff7e84e172828954cd6a747fabb94995c637",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "f1debbad4494a81eec6d16b1917e59e4b3da3618",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "checks": [
+      "49 tests in 18 notification, app-frame notification, DF-062, spacing and module-cycle files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "All six modules below150 lines. Aggregate baseline remains12 until full cleanup.",
+    "behavior": "Original function bodies and public exports retained, including creation/exit ordering, viewport eviction, focus normalization, placement animation offsets, reverse-order hit testing and plain/styled output."
+  }
+}

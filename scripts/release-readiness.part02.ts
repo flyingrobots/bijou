@@ -19,6 +19,7 @@ export function buildReleaseReadinessReport(options: {
 }): ReleaseReadinessReport {
   const milestone = options.milestone;
   const version = milestone.replace(/^v/, '');
+  const releasePacketPath = options.docs.releasePacketPath ?? `docs/releases/${version}/README.md`;
   const plan = options.plan ?? buildReleaseReadinessPlan();
   const openTrackerItems = options.trackerItems.filter(
     (item) => !isClosedTrackerItem(item),
@@ -62,8 +63,8 @@ export function buildReleaseReadinessReport(options: {
       label: 'release-packet',
       status: options.docs.releasePacketExists ? 'pass' : 'fail',
       summary: options.docs.releasePacketExists
-        ? `docs/releases/${version}/README.md exists`
-        : `docs/releases/${version}/README.md release evidence packet is missing`,
+        ? `${releasePacketPath} exists`
+        : `${releasePacketPath} live release evidence packet is missing`,
     },
     {
       label: 'package-smoke',

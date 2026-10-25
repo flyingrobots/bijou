@@ -1,37 +1,12 @@
-import type { FieldOptions } from './types.js';
 import type { BijouContext } from '../../ports/context.js';
-import {
-  formatFormTitle,
-  terminalRenderer,
-  createStyledFn,
-  isKey,
-  isPrintableKey,
-  subscribeFormKeyInput,
-} from './form-utils.js';
-import { sanitizeOptionalNonNegativeInt, sanitizePositiveInt } from '../numeric.js';
+import type { TextareaOptions } from './textarea-options.js';
+import { isKey, isPrintableKey, subscribeFormKeyInput } from './form-utils.js';
+import { createTextareaView } from './textarea-view.js';
 
-export interface TextareaOptions extends FieldOptions<string> {
-  /** Placeholder text shown when the textarea is empty. */
-  placeholder?: string;
-  /** Maximum character count (including newlines). */
-  maxLength?: number;
-  /** Display line numbers in the gutter. Default: false. */
-  showLineNumbers?: boolean;
-  /** Visible editor height in lines. Default: 6. */
-  height?: number;
-  /** Render width in columns. Default: 80. */
-  width?: number;
-  /** Bijou context for IO, styling, and mode detection. */
-  ctx?: BijouContext;
-}
+export type { TextareaOptions } from './textarea-options.js';
 
 export async function interactiveTextarea(options: TextareaOptions, ctx: BijouContext): Promise<string> {
-  const styledFn = createStyledFn(ctx);
-  const height = sanitizePositiveInt(options.height, 6);
-  const renderWidth = sanitizePositiveInt(options.width, 80);
-  const maxLength = sanitizeOptionalNonNegativeInt(options.maxLength);
-  const showLineNumbers = options.showLineNumbers ?? false;
-  const term = terminalRenderer(ctx);
+  const { height, maxLength, render, clearRender, cleanup, hideCursor } = createTextareaView(options, ctx, () => ({ lines, cursorRow, cursorCol, scrollY, totalLength }));
 
   const lines: string[] = [''];
   let cursorRow = 0;
@@ -43,66 +18,12 @@ export async function interactiveTextarea(options: TextareaOptions, ctx: BijouCo
     return lines[index] ?? '';
   }
 
-  function visibleLines(): string[] {
-    return lines.slice(scrollY, scrollY + height);
-  }
-
   function ensureCursorVisible(): void {
     if (cursorRow < scrollY) scrollY = cursorRow;
     if (cursorRow >= scrollY + height) scrollY = cursorRow - height + 1;
   }
 
-  function render(): void {
-    const label = formatFormTitle(options.title, ctx);
-    const hint = styledFn(ctx.semantic('muted'), ' (Ctrl+D to submit, Ctrl+C/Esc to cancel)');
-    term.writeLine(`${label}${hint}`);
-
-    const vis = visibleLines();
-    const numWidth = showLineNumbers ? String(lines.length).length : 0;
-    const prefixWidth = showLineNumbers ? numWidth + 3 : 2; // " N │ " or "  "
-    const contentWidth = Math.max(1, renderWidth - prefixWidth);
-    for (let i = 0; i < height; i++) {
-      const lineIdx = scrollY + i;
-      const rawLine = vis[i] ?? '';
-      const line = rawLine.length > contentWidth ? rawLine.slice(0, contentWidth) : rawLine;
-      const prefix = showLineNumbers
-        ? styledFn(ctx.semantic('muted'), `${String(lineIdx + 1).padStart(numWidth)} │ `)
-        : '  ';
-
-      if (lineIdx === 0 && options.placeholder && lines.length === 1 && lines[0] === '') {
-        ctx.io.write(`\x1b[K${prefix}${styledFn(ctx.semantic('muted'), options.placeholder)}\n`);
-      } else {
-        ctx.io.write(`\x1b[K${prefix}${line}\n`);
-      }
-    }
-
-    // Status line
-    const pos = `Ln ${String(cursorRow + 1)}, Col ${String(cursorCol + 1)}`;
-    const lenInfo = maxLength != null ? ` | ${String(totalLength)}/${String(maxLength)}` : '';
-    ctx.io.write(`\x1b[K${styledFn(ctx.semantic('muted'), pos + lenInfo)}\n`);
-  }
-
-  function clearRender(): void {
-    const totalLines = height + 2; // header + visible lines + status
-    term.moveUp(totalLines);
-  }
-
-  function cleanup(value: string, cancelled: boolean): void {
-    clearRender();
-    const totalLines = height + 2;
-    term.clearBlock(totalLines);
-
-    const summary = cancelled
-      ? '(cancelled)'
-      : (value
-        ? (value.includes('\n') ? `${String(value.split('\n').length)} lines` : value)
-        : '(empty)');
-    const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), summary);
-    ctx.io.write(`\x1b[K${label}\n`);
-    term.showCursor();
-  }
-
-  term.hideCursor();
+  hideCursor();
   render();
 
   return new Promise<string>((resolve) => {

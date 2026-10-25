@@ -1,0 +1,47 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating Surface table contracts, width fitting, cell preparation, layout and rendering",
+  "bytesConsumed": 2201659,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou/src/core/components/table-v3.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/components/table-v3-cells.ts",
+    "packages/bijou/src/core/components/table-v3-contracts.ts",
+    "packages/bijou/src/core/components/table-v3-layout.ts",
+    "packages/bijou/src/core/components/table-v3-render.ts",
+    "packages/bijou/src/core/components/table-v3-widths.ts",
+    "packages/bijou/src/core/components/table-v3.ts",
+    ".graft/receipts/2026-10-25-table-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "690e47cf9256443d0caf28b66c752cfa11de9f6a",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "7a78a28fe7e9b63cf94c4f05606d12f35ccbfd24",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "checks": [
+      "171 tests in 21 table, Markdown, raster-font, typography/animation, real CLI-resize and module-cycle files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "Facade37; contracts9; widths146; cells44; layout58; renderer111 lines. Aggregate baseline remains12 until full cleanup.",
+    "behavior": "Preserve overloads, empty/inferred columns, context/BCSS resolution, width budgeting, wrapping, row and header dimensions, packed RGB border fast path, styles and cell blits. Preparation returns the original local state to the original drawing sequence."
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare stable8.0.0 workspace versions and internal pins with the actual version command, retaining unchanged external dependency records",
+  "bytesConsumed": 2474642,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "scripts/version.mjs",
+    "scripts/version-lockfile.mjs",
+    "scripts/run-vitest.mjs"
+  ],
+  "filesModified": [
+    "bench/package.json",
+    "package-lock.json",
+    "packages/bijou-i18n-tools-node/package.json",
+    "packages/bijou-i18n-tools-xlsx/package.json",
+    "packages/bijou-i18n-tools/package.json",
+    "packages/bijou-i18n/package.json",
+    "packages/bijou-mcp/package.json",
+    "packages/bijou-node/package.json",
+    "packages/bijou-tui-app/package.json",
+    "packages/bijou-tui/package.json",
+    "packages/bijou/package.json",
+    "packages/create-bijou-tui-app/package.json",
+    ".graft/receipts/2026-10-25-stable-version-preparation.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "6d3578400d40e89f53daa91d745a585498804c4a",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "3eb21a16918ff17910be1c2e6c95f3220fe889d3",
+    "copiedBaseTree": "668ba60c011609c8ce72e1215b749c11005dafd6",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "commands": [
+      "npm run version -- 8.0.0",
+      "npm run build",
+      "npm run release:preflight",
+      "npm run test:run"
+    ],
+    "tests": 4282,
+    "testFiles": 957,
+    "chunks": 20,
+    "workspacePackages": 11,
+    "publishablePackages": 10,
+    "lockSha256": "545a8af17520154abe556f39d9063caa7f73c41c1aec2d4bf9937e7125341ef1",
+    "externalLockRecords": "All keys and non-workspace package records exactly unchanged; verified in Docker export runner and before applying owned files.",
+    "bounds": "Guarded full suite168.8 seconds; read-only-root reusable worker stopped; no tag or registry publication.",
+    "behavior": "All manifests and lock metadata copied from successful actual version-tool output. Package README prose currently unstaged and outside this source validation. Stable-commit witness replay and broader release gates remain outstanding."
+  }
+}

@@ -1,4 +1,5 @@
-import { documentationFileExists as existsSync, readDocumentationFile as readFileSync } from './documentation-corpus.js';
+import { statSync } from 'node:fs';
+import { readDocumentationFile as readFileSync } from './documentation-corpus.js';
 import { resolve } from 'node:path';
 import { readMilestoneTrackerItems } from './release-readiness-tracker.js';
 import {
@@ -83,12 +84,15 @@ export function readReleaseReadinessDocs(
   milestone: string,
 ): ReleaseReadinessDocsSnapshot {
   const version = milestone.replace(/^v/, '');
+  const releasePacketPath = [
+    `docs/releases/${version}/stable-acceptance.md`,
+    `docs/releases/${version}/README.md`,
+  ].find((path) => statSync(resolve(cwd, path), { throwIfNoEntry: false })?.isFile() === true);
   return Object.freeze({
     changelog: readFileSync(resolve(cwd, 'docs/CHANGELOG.md'), 'utf8'),
     releaseGuide: readFileSync(resolve(cwd, 'docs/release.md'), 'utf8'),
-    releasePacketExists: existsSync(
-      resolve(cwd, 'docs/releases', version, 'README.md'),
-    ),
+    releasePacketExists: releasePacketPath !== undefined,
+    releasePacketPath,
   });
 }
 export function main(): void {

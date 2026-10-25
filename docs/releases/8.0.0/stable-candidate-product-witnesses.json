@@ -1,0 +1,105 @@
+{
+  "schema": "bijou-product-witness-replay/1",
+  "scope": "product-witnesses-only",
+  "sourceCommit": "f1d1ebc928b360d84d9f2af29b7ce7075b808c5c",
+  "packageVersion": "8.0.0",
+  "nodeVersion": "v24.18.0",
+  "lockSha256": "545a8af17520154abe556f39d9063caa7f73c41c1aec2d4bf9937e7125341ef1",
+  "files": [
+    {
+      "path": "examples/docs/fixtures/graphql/navigation-list.graphql",
+      "sha256": "7075ba7a417e810464333009afddd8213d12e3ff5a75879c222b3f860de58795"
+    },
+    {
+      "path": "fixtures/profunctor-page/project-keep/generated/page.bijou.map.json",
+      "sha256": "191b5ff59880f776e58bd37babbebb8331c0bfec3d56c3b86c251d36fc732143"
+    },
+    {
+      "path": "fixtures/profunctor-page/project-keep/generated/page.bijou.receipt.json",
+      "sha256": "688c741b6121846a116ffc2500ae9b6bc6561456959723b0623f5ed6eb710c19"
+    },
+    {
+      "path": "fixtures/profunctor-page/project-keep/generated/page.bijou.scene.json",
+      "sha256": "c3d025783ec7cd133062ec947e35f02ad1a4698d2db4b7df5d408203e638f580"
+    },
+    {
+      "path": "fixtures/profunctor-page/project-keep/generated/page.bijou.txt",
+      "sha256": "04da1974e3fd3203e48d5de8831c360a1ad3fe76937988b273b8048bb452bc9d"
+    },
+    {
+      "path": "fixtures/profunctor-page/project-keep/input/page.profunctor.build.json",
+      "sha256": "975efc9c701cbd7a6981787150748b76d1e53fd83cd424128667bc8014687ab7"
+    },
+    {
+      "path": "fixtures/profunctor-page/project-keep/input/page.profunctor.json",
+      "sha256": "12b90184b4e238bc6bd7db944af8651900b830ea76ba775ab7c7ee20be051e73"
+    },
+    {
+      "path": "fixtures/profunctor-page/project-keep/input/page.profunctor.map.json",
+      "sha256": "a40e97f2fd513519092d2a131c0d7107517b92bd7e9cfd5e79df70a65a3fe044"
+    },
+    {
+      "path": "tests/fixtures/RE-036/packed-bijou-cells.v1.json",
+      "sha256": "44bdac709151e09a080e5f6966b82f3ce7734f65e35b9ea616fdec989a5a1ded"
+    }
+  ],
+  "checks": [
+    {
+      "label": "fresh-build",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-b",
+        "--force"
+      ],
+      "status": "pass"
+    },
+    {
+      "label": "DX-050-generated-artifacts",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/generate-profunctor-page-target.ts",
+        "--check"
+      ],
+      "status": "pass"
+    },
+    {
+      "label": "DX-050-product-contract-tests",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/cycles/DX-050",
+        "--maxWorkers",
+        "2"
+      ],
+      "status": "pass"
+    },
+    {
+      "label": "DX-049-product-contract-tests",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/cycles/DX-049",
+        "--maxWorkers",
+        "2"
+      ],
+      "status": "pass"
+    },
+    {
+      "label": "RE-036-product-contract-tests",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/cycles/RE-036",
+        "--maxWorkers",
+        "2"
+      ],
+      "status": "pass"
+    }
+  ]
+}

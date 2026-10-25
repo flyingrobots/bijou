@@ -1,0 +1,48 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating filter option contracts, matching, state transitions and terminal presentation",
+  "bytesConsumed": 2284761,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou/src/core/forms/filter-interactive.ts",
+    "packages/bijou/src/core/forms/filter-controller.ts",
+    "packages/bijou/src/core/forms/filter-view.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/forms/filter-controller.ts",
+    "packages/bijou/src/core/forms/filter-interactive.ts",
+    "packages/bijou/src/core/forms/filter-match.ts",
+    "packages/bijou/src/core/forms/filter-options.ts",
+    "packages/bijou/src/core/forms/filter-view.ts",
+    ".graft/receipts/2026-10-25-filter-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "8a5ef933f8eba0d4563df0be1c88f2773681696a",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "1bca388a716f444cda0b7876af287c6808d99a54",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "checks": [
+      "85 tests in 12 filter, DX-049, Markdown font and module-cycle files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "All five filter modules below150 lines. Aggregate baseline remains12 until full cleanup.",
+    "behavior": "Original matching, scrolling, navigation, mode transitions, fallbacks, subscription disposal and output bodies retained. Former mutable closure variables live in one internal state object shared by controller, view and key handler; TypeScript identifier positions were used for the mechanical reference rewrite, followed by bounded source review."
+  }
+}

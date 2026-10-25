@@ -1,0 +1,46 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating Markdown block rendering, table fitting, inline wrapping, control tokenization and styled slicing",
+  "bytesConsumed": 2160652,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou/src/core/components/markdown-render.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/components/markdown-inline-slice.ts",
+    "packages/bijou/src/core/components/markdown-inline-tokens.ts",
+    "packages/bijou/src/core/components/markdown-inline-wrap.ts",
+    "packages/bijou/src/core/components/markdown-render.ts",
+    "packages/bijou/src/core/components/markdown-table-widths.ts",
+    ".graft/receipts/2026-10-25-markdown-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "a5932a81ffe742c345733ca2a524a6bff5617867",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "bddb16d6bb3be3cef8d8a25470a3855650a7bc1b",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "checks": [
+      "54 tests in 5 Markdown rendering and module-cycle files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "All five modules below150 lines. Aggregate baseline remains12 until full cleanup.",
+    "behavior": "Original function bodies retained, including Unicode widths, styled line wrapping, OSC8 closure/reopening and table width allocation. Public renderBlocks entry point unchanged. Font-specific suites are reserved for broader validation; this focused run executed the four existing Markdown suites and module-cycle suite."
+  }
+}

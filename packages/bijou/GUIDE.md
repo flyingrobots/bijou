@@ -17,7 +17,9 @@ import { box, headerBox, table, badge } from '@flyingrobots/bijou';
 initDefaultContext();
 ```
 
-`initDefaultContext()` auto-detects your environment (TTY, CI, pipe, NO_COLOR) and sets the global context. All components use it automatically.
+`initDefaultContext()` detects the output mode from TTY and environment facts
+and sets the global context. Color suppression through `NO_COLOR` is independent
+of mode detection. All components use the context automatically.
 
 ## Output Modes
 
@@ -25,10 +27,13 @@ Every component checks `ctx.mode` and adapts its rendering:
 
 | Mode | Trigger | Behavior |
 | :--- | :--- | :--- |
-| **`interactive`** | TTY detected | Full RGB colors, Unicode borders, animations. |
-| **`static`** | `CI=true` | Single-frame rendering; no animations. |
-| **`pipe`** | Piped stdout or `TERM=dumb` | Plain text, ASCII-only fallback. |
+| **`interactive`** | TTY, without an earlier mode override | Interactive layouts, Unicode borders, animations; color follows theme settings. |
+| **`static`** | TTY with `CI` defined | Single-frame rendering; no animations. |
+| **`pipe`** | Piped stdout or `TERM=dumb` | Plain text with component-specific layout fallbacks. |
 | **`accessible`** | `BIJOU_ACCESSIBLE=1` | Linearized, screen-reader-friendly output. |
+
+Detection checks accessibility first, then `TERM=dumb`, redirected stdout,
+and CI, in that order. `NO_COLOR` does not change the selected mode.
 
 ## Components: String vs. Surface
 
@@ -85,7 +90,9 @@ would only create fake API duplication.
 ## Themes
 
 ### Presets
-`cyan-magenta` (default), `nord`, `catppuccin`.
+`cyan-magenta` (library default), `bijou-dark`, `bijou-light`,
+`teal-orange-pink`, `nord`, and `catppuccin`. DOGFOOD's book-matched shell
+themes are application choices and do not change the library default.
 
 ### Lookups
 Use token helpers on the context to avoid coupling to theme structure:
@@ -94,6 +101,12 @@ const primary = ctx.semantic('primary');
 const border = ctx.border('muted');
 const success = ctx.status('success');
 ```
+
+Use `extendTheme(base, overrides)` to customize any of the six token groups:
+`status`, `ui`, `gradient`, `surface`, `border`, and `semantic`. Each group is
+optional; omitted tokens keep their base values. `border`, `semantic`, and
+`surface` retain their fixed keys, while the other three groups can add keys.
+An unknown status key resolves to `semantic.muted`.
 
 For the canonical meaning of each token family and the first-party usage rules,
 read [Theme Token Vocabulary](../../docs/book/bijou-designs.pdf#page=440).

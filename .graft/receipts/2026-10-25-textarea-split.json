@@ -1,0 +1,44 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating textarea options and terminal presentation from input editing",
+  "bytesConsumed": 2251864,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou/src/core/forms/textarea-editor.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/forms/textarea-editor.ts",
+    "packages/bijou/src/core/forms/textarea-options.ts",
+    "packages/bijou/src/core/forms/textarea-view.ts",
+    ".graft/receipts/2026-10-25-textarea-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "33872dc00e0ad1b7194061eeccb731e96d0f2fea",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "d9eab05417c446903871cc4ee3607d1d9805b40b",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "checks": [
+      "36 tests in 7 textarea, DX-049 and module-cycle files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "Editor149; options17; view74 lines. Aggregate baseline remains12 until full cleanup.",
+    "behavior": "Original editing and key subscription bodies retained. View reads current buffer/cursor/scroll/length through a snapshot closure at each render and preserves terminal cleanup and summaries. Initial run passed all tests but failed void-expression lint; callback block corrected and complete focused validation rerun successfully."
+  }
+}

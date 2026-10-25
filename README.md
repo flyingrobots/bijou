@@ -228,7 +228,7 @@ Bijou exposes three API tiers that match common project needs.
 | :--- | :--- | :--- | :--- |
 | 1 | `startApp(app)` | `@flyingrobots/bijou-node` | Simple CLI output, prompts, scripted interactive flow, or tiny apps that do not need custom pipeline wiring. |
 | 2 | `run(app, { ctx })` | `@flyingrobots/bijou-tui` | Custom pipeline stages, advanced host initialization, locale port wiring, mouse input, or custom startup state handling. |
-| 3 | `createFramedApp(config)` | `@flyingrobots/bijou-tui-app` | Full framed shell with header, status line, navigation model, and settings drawer. |
+| 3 | `createFramedApp(config)` | `@flyingrobots/bijou-tui` | Framed shell with panes, overlays and navigation; `@flyingrobots/bijou-tui-app` supplies the opinionated starter. |
 
 Tier 1 is the easiest path to first output. The counter example uses tier 1. The DOGFOOD application uses tier 2 because it initializes context and locale before starting the core loop.
 
@@ -249,7 +249,7 @@ Most production apps eventually move to tier 2 or tier 3.
 | [`docs/VISION.md`](docs/book/bijou-designs.pdf#page=125) | Project identity and long-term product intent. |
 | [GitHub issues](https://github.com/flyingrobots/bijou/issues) | Roadmap and work scope. |
 | [GitHub milestones](https://github.com/flyingrobots/bijou/milestones) | Planned releases. |
-| [Workflow](docs/book/bijou-designs.pdf#page=1467) | Execution process and Linear migration status. |
+| [Current working agreements](./AGENTS.md) | Execution rules and Linear migration status. |
 | [`docs/design-system/README.md`](docs/book/bijou-designs.pdf#page=338) | Design language, components, and UI foundations. |
 | [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) | Historical truth of merged behavior. |
 
@@ -262,9 +262,9 @@ npm run build
 npm test
 ```
 
-The full suite includes:
+`npm test` runs the unit and contract suite. For the complete local release
+sequence, run `npm run release:readiness`; it also runs:
 
-- unit tests
 - DOGFOOD coverage gate
 - interactive example smoke checks
 - canary smoke tests
@@ -344,11 +344,12 @@ npm run blocklab:index
 API review. The older `storybook`, `storybook:index`, and `dogfood:storybook`
 script names remain as compatibility aliases during the rename window.
 
-## What's New in v8.0.0-rc.1
+## What's New in v8.0.0
 
-Bijou `v8.0.0-rc.1` is a release candidate. It is published so downstream
-consumers can validate two breaking changes before the stable `8.0.0` tag; treat
-it as a preview rather than a supported line.
+This checkout prepares `8.0.0`. The [live acceptance packet](docs/releases/8.0.0/stable-acceptance.md)
+records candidate evidence and release-review requirements. A version bump does not
+assert a published stable tag or npm release. The earlier `v8.0.0-rc.1` remains
+historical prerelease evidence.
 
 **Breaking.** `NO_COLOR` no longer changes the detected output mode. It disables
 colour, which is all [no-color.org](https://no-color.org) asks for — previously
@@ -360,6 +361,14 @@ undefined key no longer renders struck through. See
 
 - `extendTheme()` now reaches all six token groups — `border` and `semantic`
   join `status`, `ui`, `gradient`, and `surface`.
+- Immutable raster fonts and `rasterTextSurface()` support terminal lettering.
+  Try configurable Markdown typography with
+  `npm run markdown-font -- examples/markdown-font/sample.md --configure`.
+- DOGFOOD adds font-rendered title geometry and an animated prompt, book-matched
+  dark/light themes, and current translated feature and MCP guides.
+- MCP retains plain hyperlink fallbacks and structured output with refreshed
+  runtime dependencies. Version tooling keeps workspace manifests and lock
+  metadata aligned; Code Dojo's aggregate standards-debt ceiling is zero.
 - The Profunctor Page terminal inspection target validates the canonical
   `profunctor-page/0` family and emits deterministic scene IR, surfaces,
   receipts, and cell source maps across six inspection modes.
@@ -372,7 +381,8 @@ undefined key no longer renders struck through. See
 Read the short-form [changelog](./docs/CHANGELOG.md), the long-form
 [What's New guide](docs/book/bijou-designs.pdf#page=1576), the
 [migration guide](docs/book/bijou-designs.pdf#page=1528), and the
-[release evidence packet](docs/book/bijou-designs.pdf#page=1489).
+[historical RC evidence packet](docs/book/bijou-designs.pdf#page=1489). Current
+release evidence lives in the [stable acceptance packet](docs/releases/8.0.0/stable-acceptance.md).
 
 ## Tests, Soak, and Performance
 
@@ -397,8 +407,8 @@ npm run bench
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for workflow and PR expectations.
 
-- For contributions, start with the GitHub issue tracker and `docs/WORKFLOW.md`.
-- If you want beginner-friendly tickets, start from [`GOOD_FIRST_ISSUES.md`](./GOOD_FIRST_ISSUES.md).
+- Start with [GitHub issues](https://github.com/flyingrobots/bijou/issues) and
+  the current [agent and contributor agreements](./AGENTS.md).
 
 ## Future Direction
 

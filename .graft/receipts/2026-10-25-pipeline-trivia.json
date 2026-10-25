@@ -1,0 +1,39 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Normalize only the extracted pipeline helpers' EOF trivia after a staged whitespace-check finding",
+  "bytesConsumed": 2070539,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou-tui/src/pipeline/pipeline-keys.ts",
+    "packages/bijou-tui/src/pipeline/pipeline-diagnostics.ts"
+  ],
+  "filesModified": [
+    "packages/bijou-tui/src/pipeline/pipeline-keys.ts",
+    "packages/bijou-tui/src/pipeline/pipeline-diagnostics.ts",
+    ".graft/receipts/2026-10-25-pipeline-trivia.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "744626f1",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "change": "Remove one trailing empty line from each helper; all non-trailing source bytes unchanged",
+    "checks": [
+      "Exact equality after stripping trailing whitespace",
+      "git diff --cached --check"
+    ],
+    "tests": "No application tests repeated for this whitespace-only correction; the preceding pipeline extraction passed 19 focused tests, type checking and lint."
+  }
+}

@@ -77,7 +77,12 @@ fake duplication rather than a real second API.
 - **`stepper()`**: Ordered stages in a linear process.
 
 ### Theme Authoring
-- **`extendTheme()`**: Build a custom theme from a known-good preset.
+- **`extendTheme(base, extensions)`**: Build a custom theme from a known-good
+  preset. All six groups are optional overrides: `status`, `ui`, `gradient`,
+  `surface`, `border`, and `semantic`. The latter two accept
+  `Partial<Theme['border']>` and `Partial<Theme['semantic']>` and preserve
+  omitted preset tokens. Their keys are fixed; `status`, `ui`, and `gradient`
+  also support additional keys.
 - **`defineThemeSafePairs()`**: Declare reusable foreground/background
   contrast matrices for `doctorTheme()` and inspector surfaces.
 - **`doctorTheme()`**: Structured checks for invalid colors, weak contrast,
@@ -86,6 +91,10 @@ fake duplication rather than a real second API.
   calculation for token-pair tests.
 
 ### Mode-Aware Authoring
+
+`NO_COLOR` disables color without changing detected interactivity. Unknown
+status keys fall back to `semantic.muted`.
+
 - **`renderByMode()`**: Dispatch a component to the current output contract.
 - **`lintModeLowering()`**: Compare explicit semantic facts across output modes.
 - **`modeLoweringReportText()`**: Render a compact lowering report for tests,

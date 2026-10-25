@@ -51,10 +51,17 @@ The glossary and topic finder support practical lookup.
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)
 - [Changelog](./CHANGELOG.md)
 - [V8 product witness replay](./releases/8.0.0/product-witness-replay.md)
+- [V8 stable acceptance packet](./releases/8.0.0/stable-acceptance.md)
 - [Framed app tutorial](./guides/framed-app-tutorial.md)
 
 GitHub issues and milestones own current scope. Historical proposals in the book
 retain their original status. Linear migration still requires a connected team.
+
+`npm run release:readiness -- --milestone v8.0.0` requires a live release
+packet at `docs/releases/8.0.0/stable-acceptance.md` or the legacy `README.md`
+path in that directory. An archived packet remains available for historical
+reading, but cannot satisfy the current release-evidence check. The report names
+the live packet it found; its presence does not replace review of its evidence.
 
 DOGFOOD labels its archive-backed articles as historical references. Its live
 Latest Features guide covers later font, typography, animation, and theme work;

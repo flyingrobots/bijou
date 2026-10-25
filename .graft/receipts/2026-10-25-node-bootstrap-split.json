@@ -1,0 +1,45 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt release acceptance by separating Node bootstrap concerns without changing the public entry point",
+  "bytesConsumed": 2065804,
+  "metricScope": "Cumulative bounded-read bytes in this ongoing Bijou session; not bytes unique to this refactor",
+  "filesRead": [
+    "packages/bijou-node/src/index.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou-node/src/index.ts",
+    "packages/bijou-node/src/bootstrap-error.ts",
+    "packages/bijou-node/src/node-default-context.ts",
+    "packages/bijou-node/src/start-app.ts",
+    ".graft/receipts/2026-10-25-node-bootstrap-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "3badb1ba3ab31aa431972ff43330badc704084e9",
+  "commit": "Identified by the Git commit containing this receipt",
+  "verification": {
+    "sourceTreeWithoutReceipt": "bb6d98048f1ab47602c436dc9474d18c52732558",
+    "environment": "Guarded copy-only Docker node24.18.0; reused worker; no host tests",
+    "checks": [
+      "99 tests in 17 files passed (all Node adapter tests and the real Markdown CLI PTY resize regression)",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "All four family modules remain below 150 lines and 12000 bytes; aggregate baseline remains 12 until complete cleanup",
+    "behavior": "Retain initialization state shared by initDefaultContext and startApp; retain root-only initializer registration after module dependencies; preserve all original public exports and bootstrap error identity"
+  }
+}

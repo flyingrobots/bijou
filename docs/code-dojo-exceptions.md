@@ -24,11 +24,17 @@ Current count:
 
 | Source                |   Count | Meaning                                                           |
 | :-------------------- | ------: | :---------------------------------------------------------------- |
-| File/context baseline |      12 | Files over the Code Dojo context threshold.                       |
+| File/context baseline |       0 | Files over the Code Dojo context threshold.                       |
 | Mock-ban baseline     |       0 | Existing test mock/spy violations.                                |
 | Code-size baseline    |       0 | Files over 500 lines; none exceed the 1000-line hard limit.       |
 | ESLint baseline       |       0 | Type-aware ESLint findings after the WF-160 focused cleanup pass. |
-| **Total**             |  **12** | Aggregate Code Dojo standards debt.                               |
+| **Total**             |   **0** | Aggregate Code Dojo standards debt.                               |
+
+Issue #527 clears the remaining twelve file/context entries through focused
+module extractions that preserve the public entrypoints. The aggregate count
+and encoded ceiling reach `0`, satisfying the final goalpost burndown without
+raising thresholds or adding exceptions. Historical tranche counts below remain
+the evidence for their original boundaries. The next target remains `0`.
 
 WF-165 tranches A through E split twenty-five double-counted roots into focused
 modules behind their existing public entrypoints. Tranche A lowers file/context
@@ -171,8 +177,9 @@ The current ceiling is encoded in `package.json`:
 npm run code-dojo:debt
 ```
 
-The encoded ceiling is `12`. WF-165 began at `62` and reaches its required
-`12`-or-lower goalpost without resetting the denominator between tranches.
+The encoded ceiling is `0`. WF-165 originally reached its required `12`-or-lower
+goalpost from `62`; issue #527 clears the final twelve violations. Future
+goalposts must retain zero debt without resetting the denominator.
 
 ## Updating The Ceiling
 
