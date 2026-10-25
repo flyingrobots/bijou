@@ -38,7 +38,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 - DOGFOOD's actual landing route uses semantic release text in static, pipe
   and accessible modes. Language changes invalidate the interactive prompt
-  cache immediately. Glyph construction rejects omitted required metrics.
+  cache immediately. Glyph construction validates an owned snapshot of every
+  required metric, including values supplied through JavaScript accessors.
 
 - DOGFOOD's shell-theme picker, mode descriptions, Theme Lab and Inspector now
   follow each app's live locale. Theme selection and resolved colors retain

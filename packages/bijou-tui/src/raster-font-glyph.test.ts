@@ -20,4 +20,13 @@ describe('raster glyph construction boundary', () => {
     expect(glyph.sample(0.5, 0.5)).toBe(true);
     expect(Object.isFrozen(glyph.geometry)).toBe(true);
   });
+
+  it('validates the same owned metric values that it retains', () => {
+    const geometry = { advance: 2, left: 0, top: 0, width: 2, height: 2, columns: 2, rows: 2 };
+    let reads = 0;
+    Object.defineProperty(geometry, 'left', { get: () => reads++ === 0 ? 0 : NaN });
+    const glyph = new RasterFontGlyph(geometry, new Uint8Array([9]));
+    expect(glyph.geometry.left).toBe(0);
+    expect(reads).toBe(1);
+  });
 });

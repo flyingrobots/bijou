@@ -14,17 +14,18 @@ export class RasterFontGlyph {
   readonly #mask: Uint8Array;
 
   public constructor(geometry: RasterFontGlyphGeometry, mask: Uint8Array) {
-    for (const value of [geometry.advance, geometry.left, geometry.top,
-      geometry.width, geometry.height, geometry.columns, geometry.rows]) {
+    const { advance, left, top, width, height, columns, rows } = geometry;
+    const owned = { advance, left, top, width, height, columns, rows };
+    for (const value of Object.values(owned)) {
       if (!Number.isFinite(value)) throw new Error('Non-finite font glyph geometry.');
     }
-    if (geometry.width <= 0 || geometry.height <= 0 || geometry.advance < 0
-      || !Number.isInteger(geometry.columns) || !Number.isInteger(geometry.rows)
-      || geometry.columns < 1 || geometry.rows < 1 || geometry.columns > 2048 || geometry.rows > 2048
-      || mask.length !== Math.ceil(geometry.columns * geometry.rows / 8)) {
+    if (width <= 0 || height <= 0 || advance < 0
+      || !Number.isInteger(columns) || !Number.isInteger(rows)
+      || columns < 1 || rows < 1 || columns > 2048 || rows > 2048
+      || mask.length !== Math.ceil(columns * rows / 8)) {
       throw new Error('Invalid font glyph coverage dimensions.');
     }
-    this.geometry = Object.freeze({ ...geometry });
+    this.geometry = Object.freeze(owned);
     this.#mask = new Uint8Array(mask);
     Object.freeze(this);
   }
