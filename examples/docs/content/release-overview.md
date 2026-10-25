@@ -18,7 +18,7 @@ This section publishes the current-line release story and migration
 guidance inside DOGFOOD. The version number is read from package.json
 at startup — see the Release pages for the current version.
 
-## Published now
+## Available in this reader
 
 - `What's New` for the current release
 - `Current Release Story` for the release-story reader path
@@ -32,8 +32,14 @@ at startup — see the Release pages for the current version.
 
 - read the overview first if you want the release boundary and story
 - open `What's New` for the long-form explanation of the release line
-- open `Current Release Story` when presenting the v7.2 demo-integrity path
+- open `Current Release Story` for the running version and release-evidence boundary
+- open `Guides → Latest Features` for the recent font, typography, and theme additions
 - open `GraphQL Proof Walkthrough` to show the checked-in GraphQL SDL,
   `bijou-block/1`, `ui-scene-ir/1`, terminal proof, and debug facts
 - open `CHANGELOG History` to move through release version boundaries
 - open `Migration Guide` if you are upgrading from a prior major/minor
+
+What’s New and migration currently come from preserved archive records and are
+labeled as historical references. Their availability is not a stable-release
+claim. The teaching book now lives in the job-monitor companion repository;
+its 7.2.0 teaching application is distinct from the running package version.

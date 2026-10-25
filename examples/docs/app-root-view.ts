@@ -22,6 +22,10 @@ import type {
   RootModel,
 } from './app-model.js';
 import { renderThemeInspectorDrawer } from './app-theme-inspector-render.js';
+import { renderLoweredLanding } from './app-landing-lowering.js';
+
+type RootRouteId = RootModel['route'];
+const LANDING_ROUTE = 'landing' satisfies RootRouteId;
 
 interface RootViewServices {
   readonly getContext: () => BijouContext;
@@ -35,7 +39,11 @@ export function renderRootApp(
   model: RootModel,
   services: RootViewServices,
 ): ViewOutput {
-  if (model.route === 'landing') {
+  if (model.route === LANDING_ROUTE) {
+    const context = services.getContext();
+    if (context.mode !== 'interactive') {
+      return renderLoweredLanding(context.mode, model.columns, services.localization);
+    }
     const landing = services.renderLanding(model);
     const overlays = landingOverlays(model, services);
     return overlays.length === 0

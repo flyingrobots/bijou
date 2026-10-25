@@ -11,13 +11,18 @@ documentation as a proving surface.
 - docs should exercise the real framework
 - shell chrome should teach rather than obscure
 
-## Published now
+## Preserved design references
 
 - `System-Style JavaScript`
 - `Architecture`
 - `Bijou UX Doctrine`
 - `Invariants`
 - `Design System Overview`
+
+These articles are historical archive sources, labeled in the reader. The live
+engineering policy is `AGENTS.md` and `docs/typescript-code-standards.editors-edition.md`.
+Use **Latest Features** and package READMEs for current behavior; archive access
+preserves evidence rather than updating every old design claim.
 
 ## How to use this section
 

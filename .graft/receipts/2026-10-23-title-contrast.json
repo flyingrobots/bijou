@@ -1,0 +1,28 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "1dac3748-4a6a-4270-a526-fe205bafdf85",
+  "agent": "bijou-issue-remediation",
+  "task": "Color Expert refinement: quieter ASCII texture, soft title halo and full-strength lettering",
+  "bytesConsumed": 326736,
+  "filesRead": [
+    "examples/docs/app-landing-background.ts",
+    "examples/docs/app-cylinder-title.ts",
+    "examples/docs/app-landing-colors.ts"
+  ],
+  "filesModified": [
+    "examples/docs/app-cylinder-title.ts",
+    "examples/docs/app-landing-background.ts",
+    "examples/docs/app-landing-colors.ts",
+    "examples/docs/book-themes.md",
+    "tests/dogfood-noise-background.test.ts",
+    "examples/docs/app-landing-backdrop-ink.ts",
+    "tests/dogfood-title-contrast.test.ts",
+    ".graft/receipts/2026-10-23-title-contrast.json"
+  ],
+  "tripwires": [
+    {
+      "signal": "RUNAWAY_TOOLS",
+      "note": "Graft cumulative session counter spans prior user turns; this refinement follows the current explicit user request."
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Add Markdown filepath demo with local fonts and searchable Google Fonts selection",
+  "bytesConsumed": 207835,
+  "filesRead": [
+    "scripts/generate-jacquard-title.ts",
+    "examples/docs/app-cylinder-font.ts",
+    "examples/docs/app-markdown.ts",
+    "examples/docs/svg-raster.ts",
+    "examples/docs/svg-geometry.ts",
+    "examples/docs/svg-path.ts",
+    "packages/bijou/src/core/components/markdown.ts",
+    "packages/bijou/src/core/components/markdown-parse.part01.ts",
+    "packages/bijou/src/core/components/markdown-parse.part02.ts",
+    "packages/bijou/src/core/components/markdown-parse.part03.ts",
+    "packages/bijou/src/core/components/markdown-render.ts",
+    "packages/bijou-tui/src/raster-text.ts",
+    "packages/bijou-tui/src/raster-font.ts",
+    "packages/bijou-tui/src/raster-font-glyph.ts",
+    "packages/bijou/src/core/forms/filter.ts",
+    "packages/bijou/src/core/forms/select.ts",
+    "docs/typescript-code-standards.editors-edition.md",
+    "package.json",
+    "eslint.config.mjs",
+    "tsconfig.tests.json",
+    "tsconfig.code-standards.json"
+  ],
+  "filesModified": [
+    "assets/fonts/space-grotesk/OFL.txt",
+    "assets/fonts/space-grotesk/README.md",
+    "assets/fonts/space-grotesk/SpaceGrotesk.ttf",
+    "examples/markdown-font/README.md",
+    "examples/markdown-font/sample.md",
+    "examples/markdown-font/font-rasterizer.ts",
+    "examples/markdown-font/google-fonts.ts",
+    "examples/markdown-font/load-font.ts",
+    "examples/markdown-font/main.ts",
+    "examples/markdown-font/options.ts",
+    "examples/markdown-font/read-file.ts",
+    "examples/markdown-font/render.ts",
+    "tests/markdown-font.test.ts",
+    "tests/markdown-font-files.test.ts",
+    "package.json",
+    "examples/README.md",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "Initial package.json and standards reads used raw shell before the Graft mandate was read; subsequent repository source reads used Graft safe_read and bounded ranges."
+  ],
+  "commit": "This receipt is included in the implementation commit; resolve via git log -- .graft/receipts/2026-10-23-markdown-font.json",
+  "validation": {
+    "tests": "21 passed across demo and raster-text tests",
+    "lint": "npm run lint passed; focused type-aware ESLint passed; npm run typecheck passed; code:size passed",
+    "manual": "PTY catalog: 1950 families; typed Lora, selected with arrows/Enter, downloaded and rendered. Explicit Lora and local Jacquard TTF CLI smoke passed."
+  },
+  "resources": {
+    "fontAssetBytes": 136676,
+    "catalogLimitBytes": 8388608,
+    "fontLimitBytes": 8388608,
+    "documentLimitBytes": 1048576,
+    "persistentFontCache": false,
+    "heavyBuilds": false,
+    "hostFreeGiB": 635
+  }
+}

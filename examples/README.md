@@ -131,6 +131,7 @@ See [docs](./docs/) for the first living-docs preview built from those shared st
 
 | Example | Component | Description |
 |---------|-----------|-------------|
+| [`markdown-font`](./markdown-font/) | `RasterFont`, `rasterTextSurface()` | Markdown reader with Google/local fonts, per-element sizes, theme-color animation, and text fallbacks |
 | [`counter`](./counter/) | `startApp()`, `App`, `Cmd` | Minimal counter — hello world of TEA |
 | [`spinner`](./spinner/) | `spinnerFrame()`, `tick()` | Indeterminate activity with phase transitions |
 | [`progress-animated`](./progress-animated/) | `progressBar()`, `tick()` | TEA-driven animated determinate progress |

@@ -43,6 +43,8 @@ The glossary and topic finder support practical lookup.
 
 ## Current operating references
 
+- [Latest features in DOGFOOD](../examples/docs/content/guides-latest-features.md)
+- [MCP package guide](../examples/docs/content/package-mcp.md)
 - [Project front door](../README.md)
 - [Agent agreements](../AGENTS.md)
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
@@ -53,3 +55,7 @@ The glossary and topic finder support practical lookup.
 
 GitHub issues and milestones own current scope. Historical proposals in the book
 retain their original status. Linear migration still requires a connected team.
+
+DOGFOOD labels its archive-backed articles as historical references. Its live
+Latest Features guide covers later font, typography, animation, and theme work;
+the package READMEs and runnable examples provide the detailed current contracts.

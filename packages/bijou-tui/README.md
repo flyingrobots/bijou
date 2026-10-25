@@ -355,6 +355,58 @@ const report = focusMapText([
 expect(report).toContain('[1] *editor');
 ```
 
+## Raster Fonts
+
+`RasterFont` stores validated, immutable glyph coverage and advance metrics.
+`layoutRasterText()` exposes positioned glyphs for effects such as DOGFOOD’s
+cylinder. `rasterizeText()` returns a black-on-transparent RGBA frame, while
+`rasterTextSurface()` sends that coverage through the existing Braille, quadrant
+block or custom-character renderer.
+
+```typescript
+import { RasterFont, RasterFontGlyph, rasterTextSurface } from '@flyingrobots/bijou-tui';
+
+// A tiny bitmap fixture; production atlases use coverage compiled from a font.
+const glyph = new RasterFontGlyph({
+  advance: 3, left: 0, top: 0, width: 2, height: 2, columns: 2, rows: 2,
+}, new Uint8Array([0b1001]));
+const font = new RasterFont({
+  family: 'Demo', lineHeight: 3, glyphs: new Map([['A', glyph]]),
+});
+const title = rasterTextSurface('AAA', font, {
+  columns: 30, rows: 6, renderer: { kind: 'braille' },
+  fg: '#f7685f', bg: '#1c1716',
+});
+```
+
+Coverage bits run row by row, least-significant bit first. Metrics share one
+coordinate system: `left` and `top` are bearings relative to the glyph origin;
+`advance` moves the next origin. Negative bearings and multiline text are
+preserved. A font owns a copy of its lookup and each glyph owns its mask.
+Unknown code points throw unless the font explicitly names a fallback glyph.
+This first API performs code-point layout, without shaping, bidi or kerning.
+Empty text produces a transparent 1 × 1 RGBA frame, so it can pass directly
+through `rasterToGlyphSurface()`. Surface colors come from `fg` and `bg`;
+coverage is monochrome and does not use the image renderer’s color sampling.
+
+When reducing glyph coverage, the text rasterizer preserves every covered atlas
+texel by marking the output pixels it overlaps. Thin stems and bars therefore
+survive between output-pixel centers. At small sizes this can round a stroke
+up to one pixel or close a gap smaller than one pixel. Enlargement retains
+nearest-neighbor coverage. The work budget includes atlas visits and projected
+pixel writes as well as output sampling.
+
+Supply precompiled coverage; the renderer does not load TTF files, install fonts
+or make network requests. DOGFOOD’s Jacquard 12 generator demonstrates offline
+OpenType extraction and preserves the font’s license under `assets/fonts/`.
+Keep a readable textual alternative for essential information in pipe and
+accessible presentations: raster lettering is an illustration.
+
+Rendering rejects more than 20,000 input code units, 1,048,576 allocated pixels,
+or 16,777,216 glyph samples. Surface output is limited to 131,072 cells, 4,096
+columns and 1,024 rows. Output pixel height must be an integer from 1 to 4,096.
+The caller chooses its own caching policy; the library has no global font cache.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path for building apps.

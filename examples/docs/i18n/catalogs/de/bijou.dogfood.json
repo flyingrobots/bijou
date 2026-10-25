@@ -1835,6 +1835,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Schriften, Markdown-Typografie, Theme-Animation, Buch-Themes und der Geltungsbereich aktueller Dokumentation."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.guides.latestFeatures.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Neueste Funktionen"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.guides.navigate.summary"
       },
       "kind": "message",
@@ -1874,6 +1896,28 @@
       "sourceLocale": "en",
       "values": {
         "de": "Start hier"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.historicalSourceNotice"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Historische Referenz aus dem bewahrten Dokumentationsarchiv. Neueste Funktionen und aktuelle Paket-READMEs beschreiben spätere Änderungen."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.packages.mcp.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "MCP-Rendering-Werkzeuge, semantische Ausgabemodi, Konfiguration und aktuelle Grenzen."
       }
     },
     {
@@ -2469,6 +2513,105 @@
       "sourceLocale": "en",
       "values": {
         "de": "V7-Startspur"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.gate"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "V8-Release-Abschluss läuft"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.motif"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Jacquard-12-Glyphen rollen um einen Zylinder; die Bedeutung bleibt ohne Animation erhalten."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Dokumentation | Blocks | BlockLab | Versionshinweise"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.lowerModes"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "lesbare reduzierte Modi"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.navigation"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Tastaturnavigation"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.proofLane.offlineFont"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Offline-Schriftgeometrie"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.subtitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Eine Anwendung für jedes Terminal."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Ein rollender Jacquard-12-Titel mit lesbaren Release-Fakten in jeder Darstellung."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "release.title.v8.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Bijou v8"
       }
     },
     {

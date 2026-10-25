@@ -32,7 +32,7 @@ import { wrapPageMsg } from '../packages/bijou-tui/src/app-frame-types.js';
 import { QUIT } from '../packages/bijou-tui/src/types.js';
 import { normalizeViewOutput } from '../packages/bijou-tui/src/view-output.js';
 import { BIJOU_VERSION, FLYING_ROBOTS_LOGO_TEXT, FLYING_ROBOTS_TRANSPARENT_CELL, KEY_BACKTICK, KEY_CTRL_P, KEY_DOWN, KEY_ENTER, KEY_ESCAPE, KEY_F10, KEY_F2, KEY_LEFT, KEY_NEXT_TAB, KEY_RIGHT, KEY_TAB, KEY_UP, TOKEN_DOCTRINE_PATH, V7_DEFAULT_BACKGROUND, V7_RASTER_TITLE_GLYPHS, assertContrast, assertReadableDogfoodTheme, frameText, keyMsg, oppositeHexColor, serializeFrame } from './docs-preview.test-support.part01.js';
-import { bijouSvgOverlayMetrics, expectedBijouLogoYOffset, expectedBijouSvgOverlay, expectedLandingWakeColorAt, expectedStackedWakeChar, stackedWakeRowCount, titleBackgroundGlyphCount } from './docs-preview.test-support.part02.js';
+import { bijouSvgOverlayMetrics, expectedBijouLogoYOffset, expectedBijouSvgOverlay, expectedStackedWakeChar, stackedWakeRowCount, titleBackgroundGlyphCount } from './docs-preview.test-support.part02.js';
 import { activeDocsPageModel, cellsWithoutBackground, docsPageModel, matchingBijouSvgOverlayGlyphCount, withLocaleValues } from './docs-preview.test-support.part03.js';
 export {
   activeDocsPageModel,
@@ -60,7 +60,6 @@ export {
   execFileSync,
   expectedBijouLogoYOffset,
   expectedBijouSvgOverlay,
-  expectedLandingWakeColorAt,
   expectedStackedWakeChar,
   expect,
   FLYING_ROBOTS_LOGO_TEXT,

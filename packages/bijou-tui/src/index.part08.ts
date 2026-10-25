@@ -1,4 +1,7 @@
 // Raster glyph rendering — decoded/generated RGBA frames to terminal surfaces
+export { RasterFontGlyph, type RasterFontGlyphGeometry } from './raster-font-glyph.js';
+export { RasterFont, layoutRasterText, type RasterFontOptions, type PositionedRasterGlyph, type RasterTextLayout } from './raster-font.js';
+export { rasterizeText, rasterTextSurface, type RasterizeTextOptions, type RasterTextSurfaceOptions } from './raster-text.js';
 export {
   type RasterGlyphCharsetOrder,
   type RasterGlyphRenderer,

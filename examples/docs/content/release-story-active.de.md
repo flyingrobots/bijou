@@ -9,6 +9,7 @@ Paketversion ist {{RELEASE_VERSION}}.
 - `Migrationsleitfaden` erklärt die Aktualisierung einer bestehenden Anwendung.
 - `GraphQL-Proof-Walkthrough` verfolgt das echte NavigationListBlock-Fixture.
 - Der `CHANGELOG`-Verlauf hält frühere Versionsgrenzen sichtbar.
+- `Guides → Neueste Funktionen` beschreibt lokale Vorschaufunktionen, die nach den bewahrten Release-Notizen hinzugekommen sind.
 
 ## Nachweise und Release-Status
 

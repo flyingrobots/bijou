@@ -9,6 +9,7 @@ ejecución es {{RELEASE_VERSION}}.
 - `Guía de migración` explica cómo actualizar una aplicación existente.
 - `Recorrido de prueba GraphQL` sigue el ejemplo real NavigationListBlock.
 - El historial de `CHANGELOG` conserva los límites de versiones anteriores.
+- `Guides → Funciones recientes` describe las novedades locales posteriores a las notas de versión preservadas.
 
 ## Evidencia y estado del lanzamiento
 
