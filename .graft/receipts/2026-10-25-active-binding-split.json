@@ -1,0 +1,46 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating active-binding contracts, validated entries, collection storage and collection assembly",
+  "bytesConsumed": 2118901,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou/src/core/active-binding-collection.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/active-binding-collection.ts",
+    "packages/bijou/src/core/active-binding-contracts.ts",
+    "packages/bijou/src/core/active-binding-entry.ts",
+    "packages/bijou/src/core/active-binding-collection-model.ts",
+    "packages/bijou/src/core/active-binding-collector.ts",
+    ".graft/receipts/2026-10-25-active-binding-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "73a1124f1b86107ce3aea500de24c3dd191edb81",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "bd2ea6b99ba9899f1f0b64f63beadcebeea2b548",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "checks": [
+      "75 tests in 25 active-binding, binding/lifecycle, DX-034 and module-cycle files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "Facade20 lines; contracts83; entry65; collection142; collector124. Aggregate baseline remains12 until full cleanup.",
+    "behavior": "Preserve public exports, unique-symbol identity, array normalization, owner/requirement/provider validation, provider conflict/deduplication rules, frozen entries and collection views, lifecycle records and error text. Replace carrier assertions with unknown-valued object narrowing followed by the same hasOwnProperty and symbol read operations."
+  }
+}
