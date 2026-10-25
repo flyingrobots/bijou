@@ -32,4 +32,3 @@ export function writePipelineError(state: RenderState, message: string, detail?:
       : ` ${formatUnknownDetail(detail)}`;
   state.ctx.io.writeError(`${message}${suffix}\n`);
 }
-
