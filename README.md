@@ -344,7 +344,7 @@ npm run blocklab:index
 API review. The older `storybook`, `storybook:index`, and `dogfood:storybook`
 script names remain as compatibility aliases during the rename window.
 
-## What's New for v8.0.0
+## What's New in v8.0.0
 
 This checkout prepares `8.0.0`. The [live acceptance packet](docs/releases/8.0.0/stable-acceptance.md)
 records candidate evidence and release-review requirements. A version bump does not
