@@ -1,0 +1,55 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Clear fresh body-parser and Zod production audit findings in MCP runtime graph",
+  "bytesConsumed": 924304,
+  "filesRead": [
+    "docs/CHANGELOG.md",
+    "package.json",
+    "package-lock.json",
+    "packages/bijou-mcp/README.md",
+    "packages/bijou-mcp/package.json",
+    "packages/bijou-mcp/src/stdio.test.ts",
+    "packages/bijou-mcp/src/tools/docs.test.ts",
+    "packages/bijou-mcp/src/types.ts",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts"
+  ],
+  "filesModified": [
+    "docs/CHANGELOG.md",
+    "package.json",
+    "package-lock.json",
+    "packages/bijou-mcp/README.md",
+    "packages/bijou-mcp/package.json",
+    "packages/bijou-mcp/src/stdio.test.ts",
+    "packages/bijou-mcp/src/tools/docs.test.ts",
+    "packages/bijou-mcp/src/types.ts",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative session warning; bounded reads and progress updates retained"
+  ],
+  "validation": {
+    "baselineHead": "a94ef41a553fa6003f8c6168ea5c04e54ff0964b",
+    "baselineAudit": "0 critical / 2 high: body-parser 2.3.0 and Zod 3.25.76; independent JSON parsed without audit errors.",
+    "red": "Five security-floor assertions failed against the old current graph; 25 public-schema/stdio/handler compatibility tests passed with Zod 3 baseline.",
+    "green": "Patched graph passed 37 focused tests, build, typecheck, workspace lint and ESLint in copy-isolated Docker. Fresh production audit exit 0, empty vulnerability map and all severity totals zero.",
+    "compatibility": "SDK and zod-to-json-schema ranges admit v4. Replaced deprecated ZodTypeAny and passthrough fixture APIs with supported equivalents; retained public schema, output and error-survival behavior. Validation wording may differ, documented in README/changelog. No host tests.",
+    "testedOverlaySha256": "d87c7c1bf46d2d03d429d345169999f0bea759590f66c24ecf7cc41146f9d7c3",
+    "sourceFileSha256": {
+      "docs/CHANGELOG.md": "047e62f22e7ac1fbfecf994d6e958853c3b723f06f7dcbe396683f0735623da4",
+      "package.json": "bf996dd3844e80773b7ed7352e187b1dbfb2fd26e8aefa5b5463434f04af3fcd",
+      "package-lock.json": "2278ca5e204d1869451daa823ebf4043fa6bcd55b94b7850207f3532741cb92d",
+      "packages/bijou-mcp/README.md": "b8d7d702cc4958cea12da2af34cd123dc961079c05ae1a9e4ecfe50e8b054c9c",
+      "packages/bijou-mcp/package.json": "c1a3a8f745095b3e97917109039bcfa5e055cde8b4d64ef149b47ff171d03351",
+      "packages/bijou-mcp/src/stdio.test.ts": "f28e2a500748f7cce0f22b753bae2ea053a30f9ac93ce34de611ed50c8916048",
+      "packages/bijou-mcp/src/tools/docs.test.ts": "ecb89a6ba099f61ae33e8d3507670a2553e2c6d8e8faccfe991131b96894dde8",
+      "packages/bijou-mcp/src/types.ts": "c1caab37a930ceadf34f4520ffe49e6538d5fc930ce5395f2ca06596348b276c",
+      "tests/cycles/WF-166/dependency-security-closeout.test.ts": "fa5a82f0bfe34be51dae8a798a07b1652e729a81de4ebcbfc27a56df898b3014"
+    },
+    "auditSha256": "0743f63bf6218cff6e17c80c148edf90ded4c74a5b4f5295274133fb8972d386",
+    "greenLogSha256": "8e61003382eecc484e9587f4bb066a965339ca31e71c4265f0d31a9c13768434"
+  },
+  "scope": "MCP runtime security graph only: no workspace version bump, dev-tool upgrade, HTTP transport, release/tag/publication or claim of HTTP exploit exposure. Repository overrides do not bind independent downstream resolutions.",
+  "publication": "Normal Docker pre-push and a fresh independent exact-head review follow."
+}

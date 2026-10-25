@@ -1,0 +1,55 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Issue #536: refresh MCP runtime dependency security floors and prove stdio compatibility",
+  "bytesConsumed": 425344,
+  "filesRead": [
+    "AGENTS.md",
+    "docs/typescript-code-standards.editors-edition.md",
+    "package.json",
+    "packages/bijou-mcp/package.json",
+    "packages/bijou-mcp/src/server.ts",
+    "packages/bijou-mcp/src/output.ts",
+    "packages/bijou-mcp/src/tools/table.ts",
+    "packages/bijou-mcp/bin/bijou-mcp.js",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts",
+    ".github/workflows/ci.yml",
+    "packages/bijou-mcp/src/stdio.test.ts"
+  ],
+  "filesModified": [
+    "package.json",
+    "package-lock.json",
+    "packages/bijou-mcp/package.json",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts",
+    "packages/bijou-mcp/src/stdio.test.ts",
+    ".github/workflows/ci.yml",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "Lockfile context reads are refused by Graft; dependency resolution evidence uses npm metadata and programmatic comparisons rather than raw file dumps."
+  ],
+  "validation": {
+    "red": "Two existing floor regressions failed against five vulnerable resolved versions; the actual stdio round trip passed on the old SDK.",
+    "clean_install": "npm ci --ignore-scripts --no-audit --no-fund installed 236 packages; npm run build passed.",
+    "focused": "13 tests across dependency floors and the MCP package passed after clean install, before readability-only test formatting.",
+    "protocol": "Actual executable startup and SDK initialization, discovery, both/data rendering, invalid argument response and subsequent successful requests, docs structured output; per-request timeouts and transport cleanup.",
+    "production_audit": {
+      "critical": 0,
+      "high": 1,
+      "moderate": 0,
+      "remaining_package": "fast-uri",
+      "remaining_owner": "PR #530",
+      "audit_exit": 1,
+      "artifact": "536-audit-current.json",
+      "limitation": "No assertion that all dependency advisories are reachable through Bijou's stdio server. Root overrides constrain workspace installations, not downstream consumers' independent resolution policies."
+    },
+    "scope": "Nine runtime resolution updates including four qs helper packages. No workspace version changes; fast-uri and development-tool versions remain unchanged."
+  },
+  "resource_policy": {
+    "build_budget_gib": 20,
+    "data_budget_gib": 4,
+    "logs_budget_mib": 128,
+    "guard": "Reused host Node/npm toolchain, isolated worktree and bounded project cache. Process-group timeout and disk/RSS/log/free-space monitor; no Docker worker."
+  }
+}

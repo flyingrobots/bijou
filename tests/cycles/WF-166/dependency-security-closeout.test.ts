@@ -10,14 +10,17 @@ interface PatchedFloor {
 
 const PATCHED_FLOORS: readonly PatchedFloor[] = [
   { packageName: '@hono/node-server', minimum: '2.0.5' },
-  { packageName: '@modelcontextprotocol/sdk', minimum: '1.30.0' },
-  { packageName: 'body-parser', minimum: '2.3.0' },
+  { packageName: '@modelcontextprotocol/sdk', minimum: '1.32.1' },
+  { packageName: 'body-parser', minimum: '2.4.0' },
   { packageName: 'brace-expansion', minimum: '5.0.9' },
   { packageName: 'fast-uri', minimum: '3.1.9' },
-  { packageName: 'hono', minimum: '4.12.34' },
-  { packageName: 'ip-address', minimum: '10.3.1' },
+  { packageName: 'hono', minimum: '4.13.11' },
+  { packageName: 'ip-address', minimum: '10.7.4' },
+  { packageName: 'proxy-addr', minimum: '2.0.8' },
+  { packageName: 'qs', minimum: '6.16.0' },
   { packageName: 'nanoid', minimum: '3.3.18' },
   { packageName: 'postcss', minimum: '8.5.23' },
+  { packageName: 'zod', minimum: '4.6.6' },
 ];
 
 describe('WF-166 dependency security closeout', () => {
@@ -46,9 +49,18 @@ describe('WF-166 dependency security closeout', () => {
     expect(violations).toEqual([]);
   });
 
-  it('keeps clean installs on the patched Hono line', () => {
+  it.each(Object.entries({
+    'body-parser': '^2.4.0', hono: '^4.13.11', 'ip-address': '^10.7.4',
+    'proxy-addr': '^2.0.8', qs: '^6.16.0', zod: '^4.6.6',
+  }))('keeps %s workspace installs on the patched runtime line', (name, floor) => {
     const manifest = readJsonObject(resolve(process.cwd(), 'package.json'));
-    expect(readStringProperty(manifest.overrides, 'hono')).toBe('^4.13.0');
+    expect(readStringProperty(manifest.overrides, name)).toBe(floor);
+  });
+
+  it('keeps MCP direct dependencies on patched SDK and Zod lines', () => {
+    const mcp = readJsonObject(resolve(process.cwd(), 'packages/bijou-mcp/package.json'));
+    expect(readStringProperty(mcp.dependencies, '@modelcontextprotocol/sdk')).toBe('^1.32.1');
+    expect(readStringProperty(mcp.dependencies, 'zod')).toBe('^4.6.6');
   });
 
   it('keeps clean workspace installs on the patched fast-uri line', () => {
