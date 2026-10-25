@@ -1,0 +1,19 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Tighten raw-string ratchet after two real localization debt removals",
+  "bytesConsumed": 1481113,
+  "filesRead": [
+    "examples/docs/i18n-debt-baseline.ts",
+    "scripts/dogfood-i18n-debt.part02.test.ts"
+  ],
+  "filesModified": [
+    "examples/docs/i18n-debt-baseline.ts",
+    "scripts/dogfood-i18n-debt.part02.test.ts"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative warning; bounded reads and concrete remediation maintained"
+  ],
+  "validation": "Normal Docker prepush on42255fc5 refused publication because inventory asserted obsolete2316 against actual2314. Tighten baseline2316->2314 and remove the now-zero app-explorer and app-guide-reader-pane baseline entries; update exact-count oracle. Guarded Docker regression and i18n debt pass. Full normal prepush of the committed candidate still required. No threshold growth or scanner exclusions."
+}
