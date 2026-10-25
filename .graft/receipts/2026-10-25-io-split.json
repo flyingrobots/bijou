@@ -1,0 +1,46 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating Node terminal input, base IO and scoped filesystem IO",
+  "bytesConsumed": 2251864,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou-node/src/io.ts",
+    "packages/bijou-node/src/io-types.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou-node/src/io.ts",
+    "packages/bijou-node/src/node-input.ts",
+    "packages/bijou-node/src/node-io.ts",
+    "packages/bijou-node/src/scoped-node-io.ts",
+    ".graft/receipts/2026-10-25-io-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "000076d0741dd89f84504c64258321ca17c20839",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "d517876219d16737f701aa5f5d511836e86fc8bd",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "checks": [
+      "100 tests in 18 Node adapter, real CLI-resize and module-cycle files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "All four modules below150 lines. Aggregate baseline remains12 until full cleanup.",
+    "behavior": "Preserve public factory and error exports, captured stream/clock overrides, original input/resize cleanup, valid byte-prefix writes and realpath-based existing/nonexisting filesystem escape checks. Scoped IO imports base implementation directly to avoid a facade runtime cycle."
+  }
+}
