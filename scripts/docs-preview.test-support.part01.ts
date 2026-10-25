@@ -1,3 +1,4 @@
+import { BOOK_MODE_COLORS } from '../examples/docs/dogfood-book-palette.js';
 import { readFileSync } from 'node:fs';
 
 import { resolve } from 'node:path';
@@ -125,8 +126,9 @@ export function sampleDefaultWaveRamp(t: number): string {
     V7_LANDING_COLOR_RAMP_SIZE - 1,
     Math.round(clamp01(t) * (V7_LANDING_COLOR_RAMP_SIZE - 1)),
   ));
-  const stops = V7_DEFAULT_WAVE_GRADIENT.map((color, stopIndex) => ({
-    pos: stopIndex / (V7_DEFAULT_WAVE_GRADIENT.length - 1),
+  const colors = [BOOK_MODE_COLORS.dark.surfaceMuted, BOOK_MODE_COLORS.dark.secondary, BOOK_MODE_COLORS.dark.chrome];
+  const stops = colors.map((color, stopIndex) => ({
+    pos: stopIndex / (colors.length - 1),
     color: hexToRgb(color),
   }));
   return rgbHex(...lerp3(stops, index / (V7_LANDING_COLOR_RAMP_SIZE - 1)));

@@ -10,7 +10,7 @@ import { KEY_DOWN, KEY_ENTER, KEY_F2, assertBorderCellsPaintBackground, rightAnc
 
 describe('DL-017 DOGFOOD light theme readiness', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
-  it('paints DOGFOOD light settings drawer chrome with explicit backgrounds', async () => {
+  it('paints default book light settings drawer chrome with explicit backgrounds', async () => {
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 36 } });
       const app = createDocsApp(ctx, { initialRoute: 'docs' });
 
@@ -24,7 +24,7 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
         height: ctx.runtime.rows,
       }).surface;
 
-      expect(model.docsModel.activeShellThemeId).toBe('dogfood:light');
+      expect(model.docsModel.activeShellThemeId).toBe('book:light');
       assertBorderCellsPaintBackground(
         frame,
         rightAnchoredDrawerBorderCells(frame),

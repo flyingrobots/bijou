@@ -1,3 +1,4 @@
+import { BOOK_MODE_COLORS } from '../examples/docs/dogfood-book-palette.js';
 import {
   afterEach,
   cellsWithoutBackground,
@@ -14,7 +15,6 @@ import {
   KEY_ESCAPE,
   oppositeHexColor,
   runScript,
-  V7_DEFAULT_BACKGROUND,
   _resetDefaultContextForTesting,
 } from './docs-preview.test-support.js';
 
@@ -77,7 +77,7 @@ describe('docs preview app', () => {
         if (char === ' ' || char === FLYING_ROBOTS_TRANSPARENT_CELL) continue;
         const targetX = logoX + x;
         const targetY = logoY + y;
-        if (expectedLandingWakeColorAt(targetX, targetY, frame.width, frame.height) !== V7_DEFAULT_BACKGROUND) {
+        if (expectedLandingWakeColorAt(targetX, targetY, frame.width, frame.height) !== BOOK_MODE_COLORS.dark.background) {
           wakeBackedLogoCell = { x: targetX, y: targetY };
           break;
         }

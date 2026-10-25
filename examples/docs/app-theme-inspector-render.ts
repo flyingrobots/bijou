@@ -27,15 +27,16 @@ import {
 } from './app-theme-inspector-usage.js';
 import { renderThemeTokenPalette } from './app-theme-token-palette.js';
 import { dogfoodSafePairSummary } from './app-theme-diagnostics.js';
+import { localizedDocsShellThemeChoice } from './dogfood-theme-localization.js';
 
 export function renderThemeInspectorDrawer(
   model: RootModel,
   context: BijouContext,
   localization: LocalizationPort | undefined,
 ) {
-  const activeTheme = resolveDocsShellThemeById(
+  const activeTheme = localizedDocsShellThemeChoice(resolveDocsShellThemeById(
     model.docsModel.activeShellThemeId,
-  );
+  ), localization);
   const visualTheme = resolveDocsVisualThemeByShellThemeId(
     model.docsModel.activeShellThemeId,
   );

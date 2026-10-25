@@ -1,0 +1,42 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Retain real book-theme scene data and independently measured contrast evidence",
+  "bytesConsumed": 1284505,
+  "filesRead": [
+    "examples/docs/book-themes.md",
+    "examples/docs/app-root.ts",
+    "examples/docs/app-root-view.ts",
+    "examples/docs/app-landing-panel.ts",
+    "examples/docs/app-landing-renderer.ts",
+    "examples/docs/dogfood-book-palette.ts",
+    "examples/docs/dogfood-book-theme.ts"
+  ],
+  "filesModified": [
+    "examples/docs/book-themes.md",
+    "docs/releases/8.0.0/book-theme-evidence/measurements.json",
+    "docs/releases/8.0.0/book-theme-evidence/scenes.json",
+    "docs/releases/8.0.0/book-theme-evidence/book-dark-landing.svg",
+    "docs/releases/8.0.0/book-theme-evidence/book-light-landing.svg",
+    "docs/releases/8.0.0/book-theme-evidence/book-dark-theme-lab.svg",
+    "docs/releases/8.0.0/book-theme-evidence/book-light-theme-lab.svg"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative warning; bounded source reads and concrete progress maintained"
+  ],
+  "evidence": {
+    "renderSourceCommit": "32443ea26ffba95624dcd9916905764543dd1c52",
+    "canonicalBookCommit": "209732eeb17315892df25f4546ccb40d92bd3240",
+    "canonicalBookBlob": "601d05aaf7955967757d809f6b92d2333a1201b0",
+    "scenes": 20,
+    "focusedTests": 26,
+    "semanticSurfacePairsPerMode": 35,
+    "borderTrackPairsPerMode": 15,
+    "minimumSemanticRatio": {
+      "dark": 4.7253168424816145,
+      "light": 5.555720692788437
+    }
+  },
+  "validation": "Guarded Docker scoped RED: main registration fails book-default assertion; main landing renderer fails selected-mode background assertion. Restored source passes 26 focused tests. Real test-adapter scenes exported through scripted theme settings; landing route selected in model at time zero. Independent linearized-sRGB calculation passes semantic4.5/chrome3 thresholds. SVGs preserve glyph/colors but omit modifiers; no physical terminal or CVD/human usability claim. Final committed-candidate normal push and exact-head independent review follow."
+}

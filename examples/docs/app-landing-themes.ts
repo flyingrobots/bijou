@@ -35,7 +35,7 @@ function dogfoodText(
   return dogfoodLocalizedText(localization, id, fallback, values);
 }
 
-function landingThemeLabel(id: string, localization?: LocalizationPort): string {
+export function landingThemeLabel(id: string, localization?: LocalizationPort): string {
   switch (id) {
     case 'blocklab-workstation':
       return dogfoodText(localization, 'landing.theme.blocklabWorkstation', 'BlockLab Workstation');
@@ -105,7 +105,7 @@ function themeTokenBg(token: TokenValue | undefined, fallback: string): string {
 export function docsVisualThemeFromShellThemeChoice(shellTheme: LandingShellThemeChoice): LandingThemeTokens {
   const theme = shellTheme.theme;
   const background = themeTokenBg(theme.surface.primary, '#10131a');
-  return compileLandingTheme({
+  const visual = compileLandingTheme({
     id: shellTheme.id,
     background,
     waveGradient: [
@@ -119,4 +119,12 @@ export function docsVisualThemeFromShellThemeChoice(shellTheme: LandingShellThem
       themeTokenHex(theme.semantic.primary, '#f5f2e8'),
     ],
   });
+  return {
+    ...visual,
+    promptBodyColor: theme.semantic.primary.hex,
+    promptAccentColor: theme.semantic.accent.hex,
+    footerMutedColor: theme.semantic.muted.hex,
+    footerStrongColor: theme.semantic.accent.hex,
+    fpsColor: theme.semantic.muted.hex,
+  };
 }

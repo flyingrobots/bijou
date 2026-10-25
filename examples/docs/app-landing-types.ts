@@ -69,6 +69,7 @@ export interface LandingRendererOptions {
   readonly localization: LocalizationPort;
   readonly textModifiers: LandingTextModifiers;
   readonly versionText: string;
+  readonly resolveTheme?: (model: LandingModel) => LandingThemeTokens;
 }
 
 export interface LandingPerfHudModel {

@@ -7,11 +7,14 @@ describe('DL-018 first-party theme variant coverage', () => {
 
   it('classifies every DOGFOOD first-party shell theme as paired or single-mode from the shell spec', () => {
     const themes = docsShellThemesForTesting();
-    const [dogfood, ...singleModeThemes] = themes;
+    const pairedThemes = themes.filter((theme) => theme.modes !== undefined);
+    const singleModeThemes = themes.filter((theme) => theme.modes === undefined);
 
-    expect(dogfood?.id).toBe('dogfood');
-    expect(dogfood?.theme).toBeUndefined();
-    expect(dogfood?.modes?.map((mode) => mode.id)).toEqual(['dark', 'light']);
+    expect(pairedThemes.map((theme) => theme.id)).toEqual(['book', 'dogfood']);
+    for (const theme of pairedThemes) {
+      expect(theme.theme).toBeUndefined();
+      expect(theme.modes.map((mode) => mode.id)).toEqual(['dark', 'light']);
+    }
 
     expect(singleModeThemes.length).toBeGreaterThan(0);
     for (const theme of singleModeThemes) {

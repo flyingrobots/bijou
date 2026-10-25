@@ -35,7 +35,7 @@ describe('docs preview app', () => {
     const dark = dogfood?.modes?.find((mode) => mode.id === 'dark');
     const light = dogfood?.modes?.find((mode) => mode.id === 'light');
 
-    expect(shellThemes[0]?.id).toBe('dogfood');
+    expect(shellThemes[0]?.id).toBe('book');
     expect(dogfood?.label).toBe('DOGFOOD');
     expect(dark?.label).toBe('Dark');
     expect(light?.label).toBe('Light');
@@ -101,7 +101,7 @@ describe('docs preview app', () => {
     expect((opened.model).route).toBe('docs');
     expect((opened.model).themeInspectorOpen).toBe(true);
     expect(openedText).toContain('Theme Inspector');
-    expect(openedText).toContain('Active: DOGFOOD / Dark');
+    expect(openedText).toContain('Active: Bijou Book / Dark');
     expect(openedText).toContain('semantic.primary');
     expect(openedText).toContain('surface.primary');
     expect(openedText).toContain('safe pairs pass');

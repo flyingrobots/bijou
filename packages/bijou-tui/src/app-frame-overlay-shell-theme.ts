@@ -36,12 +36,12 @@ export function resolveFrameShellThemeChoices(
       assertUniqueChoice(seen, id);
       choices.push({
         id,
-        label: shellTheme.label,
-        description: shellTheme.description,
+        get label() { return shellTheme.label; },
+        get description() { return shellTheme.description; },
         shellTheme,
         shellThemeSpec: shellTheme,
         shellThemeId: shellTheme.id,
-        shellThemeLabel: shellTheme.label,
+        get shellThemeLabel() { return shellTheme.label; },
         resolvedTheme: createResolved(
           shellTheme.theme,
           ctx.theme.noColor,
@@ -53,23 +53,22 @@ export function resolveFrameShellThemeChoices(
     for (const mode of modes) {
       const id = frameShellThemeChoiceId(shellTheme.id, mode.id);
       assertUniqueChoice(seen, id);
-      const label = `${shellTheme.label} / ${mode.label}`;
-      const description = mode.description ?? shellTheme.description;
+      // Presentation may read a live locale; identity and resolved colors stay fixed.
       choices.push({
         id,
-        label,
-        description,
+        get label() { return `${shellTheme.label} / ${mode.label}`; },
+        get description() { return mode.description ?? shellTheme.description; },
         shellTheme: {
           id,
-          label,
-          description,
+          get label() { return `${shellTheme.label} / ${mode.label}`; },
+          get description() { return mode.description ?? shellTheme.description; },
           theme: mode.theme,
         },
         shellThemeSpec: shellTheme,
         shellThemeId: shellTheme.id,
-        shellThemeLabel: shellTheme.label,
+        get shellThemeLabel() { return shellTheme.label; },
         modeId: mode.id,
-        modeLabel: mode.label,
+        get modeLabel() { return mode.label; },
         resolvedTheme: createResolved(
           mode.theme,
           ctx.theme.noColor,

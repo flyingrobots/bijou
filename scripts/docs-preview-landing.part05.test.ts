@@ -1,6 +1,6 @@
+import { DOGFOOD_BOOK_LIGHT_THEME } from '../examples/docs/dogfood-book-theme-spec.js';
 import {
   afterEach,
-  BIJOU_LIGHT,
   createDocsApp,
   createTestContext,
   describe,
@@ -58,13 +58,13 @@ describe('docs preview app', () => {
     const text = frameText(must(result.frames.at(-1)));
     expect((result.model).docsModel.activePageId).toBe('themes');
     expect(text).toContain('Theme Lab');
-    expect(text).toContain('Active: DOGFOOD / Dark');
-    expect(text).toContain('Theme: dogfood-dark');
+    expect(text).toContain('Active: Bijou Book / Dark');
+    expect(text).toContain('Theme: dogfood-book-dark');
     expect(text).toContain('Default dark preset: bijou-dark');
     expect(text).toContain('Default light preset: bijou-light');
     expect(text).toContain('Color reuse: dark');
-    expect(text).toContain('* 1. DOGFOOD / Dark -> dogfood-dark');
-    expect(text).toContain('DOGFOOD / Dark');
+    expect(text).toContain('* 1. Bijou Book / Dark -> dogfood-book-dark');
+    expect(text).toContain('Bijou Book / Dark');
     expect(text).toContain('semantic.primary');
 
     const lightResult = await runScript(app, [
@@ -75,12 +75,12 @@ describe('docs preview app', () => {
     ], { ctx });
     const lightText = frameText(must(lightResult.frames.at(-1)));
 
-    expect(lightResult.model.docsModel.activeShellThemeId).toBe('dogfood:light');
-    expect(lightText).toContain('Active: DOGFOOD / Light');
-    expect(lightText).toContain('Theme: dogfood-light');
-    expect(lightText).toContain('* 2. DOGFOOD / Light -> dogfood-light');
-    expect(lightText).toContain('DOGFOOD / Light');
-    expect(lightText).toContain(BIJOU_LIGHT.semantic.primary.hex);
-    expect(lightText).not.toContain('Active: DOGFOOD / Dark');
+    expect(lightResult.model.docsModel.activeShellThemeId).toBe('book:light');
+    expect(lightText).toContain('Active: Bijou Book / Light');
+    expect(lightText).toContain('Theme: dogfood-book-light');
+    expect(lightText).toContain('* 2. Bijou Book / Light -> dogfood-book-light');
+    expect(lightText).toContain('Bijou Book / Light');
+    expect(lightText).toContain(DOGFOOD_BOOK_LIGHT_THEME.semantic.primary.hex);
+    expect(lightText).not.toContain('Active: Bijou Book / Dark');
   });
 });

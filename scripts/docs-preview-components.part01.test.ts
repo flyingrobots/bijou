@@ -46,7 +46,7 @@ describe('docs preview app', () => {
     expect(frameText(settingsFrame)).toContain('Show active-pane control');
     expect(frameText(settingsFrame)).toContain('cues in the footer');
     expect(frameText(settingsFrame)).toContain('↻ Shell theme');
-    expect(frameText(settingsFrame)).toContain('DOGFOOD / Dark');
+    expect(frameText(settingsFrame)).toContain('Bijou Book / Dark');
     expect(frameText(settingsFrame)).not.toContain('Landing theme');
     expect(frameText(settingsFrame)).toContain('Localization');
     expect(frameText(settingsFrame)).toContain('Preferred language');

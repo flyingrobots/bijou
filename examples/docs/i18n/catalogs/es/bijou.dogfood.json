@@ -1953,6 +1953,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.separator.article"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "docs • {title}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.separator.welcome"
       },
       "kind": "message",
@@ -2682,6 +2693,138 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {}
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.dark.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Luz coral sobre carbón cálido."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.dark.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Oscuro"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Coral, rosa y tinta cálida del libro de Bijou."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Bijou Book"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.light.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Papel rosa con títulos color vino oscuro."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.book.light.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Claro"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.dark.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Interfaz neutra de documentación de alto contraste para terminales oscuros."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.dark.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Oscuro"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Interfaz neutra de documentación de alto contraste con modos oscuro y claro."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "DOGFOOD"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.light.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Interfaz neutra de documentación de alto contraste para terminales claros."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "shell.theme.dogfood.light.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Claro"
+      }
     },
     {
       "key": {

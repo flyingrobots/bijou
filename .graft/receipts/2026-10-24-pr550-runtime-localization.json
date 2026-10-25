@@ -1,0 +1,56 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Fix PR550 runtime theme localization without shared app locale state",
+  "bytesConsumed": 1470593,
+  "filesRead": [
+    "examples/docs/dogfood-theme-localization.ts",
+    "examples/docs/app-explorer.ts",
+    "examples/docs/app-guide-reader-pane.ts",
+    "examples/docs/app-landing-themes.ts",
+    "examples/docs/app-theme-inspector-render.ts",
+    "examples/docs/app-localization.ts",
+    "examples/docs/localization.ts",
+    "examples/docs/locale.ts",
+    "examples/docs/dogfood-book-theme-spec.ts",
+    "examples/docs/dogfood-shell-themes.ts",
+    "examples/docs/i18n-debt-source-context.ts",
+    "examples/docs/i18n-debt-source-scan.ts",
+    "packages/bijou-tui/src/app-frame-overlay-shell-theme.ts",
+    "tests/dogfood-book-theme-localization.test.ts",
+    "docs/CHANGELOG.md",
+    "examples/docs/book-themes.md"
+  ],
+  "filesModified": [
+    "examples/docs/dogfood-theme-localization.ts",
+    "examples/docs/app-explorer.ts",
+    "examples/docs/app-guide-reader-pane.ts",
+    "examples/docs/app-landing-themes.ts",
+    "examples/docs/app-theme-inspector-render.ts",
+    "packages/bijou-tui/src/app-frame-overlay-shell-theme.ts",
+    "tests/dogfood-book-theme-localization.test.ts",
+    "examples/docs/i18n/source/dogfood-strings.csv",
+    "examples/docs/i18n/catalogs/de/bijou.dogfood.json",
+    "examples/docs/i18n/catalogs/en/bijou.dogfood.json",
+    "examples/docs/i18n/catalogs/es/bijou.dogfood.json",
+    "examples/docs/i18n/catalogs/fr/bijou.dogfood.json",
+    "docs/CHANGELOG.md",
+    "examples/docs/book-themes.md"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative warning; bounded source reads, progress updates and concrete changes maintained",
+    "Canonical standards were re-read through raw cat during recovery; subsequent source reads use Graft; no claim of exclusive Graft coverage"
+  ],
+  "evidence": {
+    "redCommit": "54acb91cf4aac1e93ff7799bbfe3918a3487aa13",
+    "redFailedTests": 5,
+    "redPassedTests": 1,
+    "greenFocusedTests": 44,
+    "greenFocusedFiles": 15,
+    "localizationRawDebt": 2314,
+    "localizationRawBaseline": 2316,
+    "newLocaleCases": 6
+  },
+  "validation": "Guarded Docker 76.8 seconds: expanded regression fails five expected actual-picker assertions on published head, English control passes; overlaid fix passes all six runtime cases and 38 existing focused tests. Full build, typecheck:test, lint, i18n debt/completeness pass. An earlier exploratory harness reused an app across independent runScript calls, producing four fixture-state failures; fresh app per independent scenario corrects the harness, and the separate actual locale-transition case remains one live app. Committed-candidate normal pre-push and fresh independent exact-head review remain required."
+}

@@ -70,14 +70,14 @@ describe('docs preview app', () => {
     const frame = must(result.frames.at(-1));
     const text = frameText(frame);
 
-    expect(result.model.docsModel.activeShellThemeId).toBe('dogfood:light');
+    expect(result.model.docsModel.activeShellThemeId).toBe('book:light');
     expect(result.model.themeInspectorOpen).toBe(true);
     expect(text).toContain('DOGFOOD usage');
     expect(text).toContain('drawer.border');
     expect(text).toContain('summary.copy');
     expect(text).toContain('Reference palette');
     expectReadableStyledText(frame, 'Theme Inspector', 3);
-    expectReadableStyledText(frame, 'Active: DOGFOOD / Light');
+    expectReadableStyledText(frame, 'Active: Bijou Book / Light');
     expectReadableStyledText(frame, 'DOGFOOD usage');
     expectReadableStyledText(frame, 'drawer.border');
 
