@@ -9,6 +9,21 @@ import { readReleaseReadinessDocs } from './release-readiness.part03.js';
 const ROOT = resolve(import.meta.dirname, '..');
 
 describe('current release evidence packet', () => {
+  it.each(['stable-acceptance.md', 'README.md'])('rejects a directory named %s', (name) => {
+    const cwd = mkdtempSync(join(tmpdir(), 'bijou-packet-directory-'));
+    try {
+      mkdirSync(join(cwd, 'docs/releases/8.0.0', name), { recursive: true });
+      writeFileSync(join(cwd, 'docs/CHANGELOG.md'), '## [Unreleased]');
+      writeFileSync(join(cwd, 'docs/release.md'), 'Release Dry Run');
+      const docs = readReleaseReadinessDocs(cwd, 'v8.0.0');
+      expect(docs.releasePacketExists).toBe(false);
+      expect(buildReleaseReadinessReport({ milestone: 'v8.0.0', trackerItems: [], docs }).status)
+        .toBe('blocked');
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
+  });
+
   it('blocks an archive-only packet even when the historical edition remains readable', () => {
     const historicalPacket = join(ROOT, 'docs/releases/7.2.0/README.md');
     expect(existsSync(historicalPacket)).toBe(false);

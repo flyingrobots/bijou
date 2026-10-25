@@ -1,0 +1,58 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Resolve Code Lawyer and PR557 finding that directory paths passed the live release evidence gate",
+  "bytesConsumed": 2542702,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "scripts/release-readiness.part03.ts",
+    "scripts/release-readiness-packet.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "filesModified": [
+    "docs/CHANGELOG.md",
+    "scripts/release-readiness-packet.test.ts",
+    "scripts/release-readiness.part03.ts",
+    ".graft/receipts/2026-10-25-packet-file-type.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "1428ff6c6c2fdc5ce66b07eff373c759b949aece",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "65edfde2a2a2156f435dca6ce607938f1402c85b",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "finding": {
+      "severity": "P2",
+      "sources": [
+        "Code Lawyer self-audit",
+        "PR review PRRT_kwDORXMffc6v_Gg3"
+      ],
+      "reviewUrl": "https://github.com/flyingrobots/bijou/pull/557#discussion_r4369949113"
+    },
+    "red": {
+      "sourceTree": "35d75199a94cdd7e11a900b0fd850b552c14138a",
+      "baseCommit": "1428ff6c6c2fdc5ce66b07eff373c759b949aece",
+      "command": "npx vitest run scripts/release-readiness-packet.test.ts",
+      "result": "Two real-directory assertions failed; existing archive-only and regular stable-file controls passed."
+    },
+    "checks": [
+      "19 tests in5 release-readiness and corpus files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run code-dojo:verify"
+    ],
+    "behavior": "Select only statSync targets whose isFile() is true; nonexistent paths and directories cannot count as packet documents. Legacy live README support and archived historical reads remain intact. The earlier exact-commit candidate receipts remain unchanged."
+  }
+}

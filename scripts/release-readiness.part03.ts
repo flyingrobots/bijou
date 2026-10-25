@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { statSync } from 'node:fs';
 import { readDocumentationFile as readFileSync } from './documentation-corpus.js';
 import { resolve } from 'node:path';
 import { readMilestoneTrackerItems } from './release-readiness-tracker.js';
@@ -87,7 +87,7 @@ export function readReleaseReadinessDocs(
   const releasePacketPath = [
     `docs/releases/${version}/stable-acceptance.md`,
     `docs/releases/${version}/README.md`,
-  ].find((path) => existsSync(resolve(cwd, path)));
+  ].find((path) => statSync(resolve(cwd, path), { throwIfNoEntry: false })?.isFile() === true);
   return Object.freeze({
     changelog: readFileSync(resolve(cwd, 'docs/CHANGELOG.md'), 'utf8'),
     releaseGuide: readFileSync(resolve(cwd, 'docs/release.md'), 'utf8'),

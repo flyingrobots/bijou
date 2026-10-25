@@ -45,6 +45,7 @@ separate gates. The historical `8.0.0-rc.1` entry below is preserved.
 - Release readiness requires a live release evidence packet. Archived editions
   no longer satisfy that check; a live `stable-acceptance.md` takes precedence
   over the legacy release-directory `README.md`, and the report names its path.
+  Directories with those names do not count as evidence files.
 
 - DOGFOOD's actual landing route uses semantic release text in static, pipe
   and accessible modes. Language changes invalidate the interactive prompt
