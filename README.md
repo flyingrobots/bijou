@@ -18,6 +18,7 @@ Use Node.js 22.12 or newer and npm, then run the application shown above:
 git clone https://github.com/flyingrobots/bijou.git
 cd bijou
 npm ci
+npm run build
 npm run dogfood
 ```
 
