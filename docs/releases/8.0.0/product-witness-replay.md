@@ -20,7 +20,8 @@ checkout so the output file itself does not make the source dirty.
 
 The command checks nine pinned input/generated files, forces a fresh TypeScript
 build, verifies the four generated Profunctor artifacts, and runs the DX-050,
-DX-049, and RE-036 test families serially with at most two test workers. Each
+DX-049, and RE-036 test families in separate sequential commands, each with at
+most two test workers. Each
 child command has a three-minute timeout and bounded captured output. The source
 checkout, HEAD, lockfile, and pinned files are checked again before a receipt is
 emitted. Use the shared host's resource guard when applicable.

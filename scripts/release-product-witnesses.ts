@@ -13,13 +13,10 @@ const STEPS: readonly { readonly label: string; readonly args: readonly string[]
     label: 'DX-050-generated-artifacts',
     args: ['--import', 'tsx', 'scripts/generate-profunctor-page-target.ts', '--check'],
   },
-  {
-    label: 'product-contract-tests',
-    args: [
-      'node_modules/vitest/vitest.mjs', 'run', 'tests/cycles/DX-050',
-      'tests/cycles/DX-049', 'tests/cycles/RE-036', '--maxWorkers', '2',
-    ],
-  },
+  ...['DX-050', 'DX-049', 'RE-036'].map((family) => ({
+    label: `${family}-product-contract-tests`,
+    args: ['node_modules/vitest/vitest.mjs', 'run', `tests/cycles/${family}`, '--maxWorkers', '2'],
+  })),
 ];
 
 export function replayReleaseProductWitnesses(root: string): ReleaseProductWitnessReceipt {

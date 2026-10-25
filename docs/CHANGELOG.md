@@ -36,7 +36,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 ### Added
 
 - Added `release:witnesses` to replay the inherited V8 product witness families
-  with pinned inputs, byte-exact generated artifacts, and a commit-bound receipt.
+  in separate sequential commands with pinned inputs, byte-exact generated
+  artifacts, and a commit-bound receipt.
   Dirty checkouts, fixture drift, or failed checks prevent a success receipt;
   final stable-release acceptance remains tracked separately.
 

@@ -1,48 +1,11 @@
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { RELEASE_WITNESS_FILES, verifyReleaseWitnessFiles } from './release-product-witness-files.js';
-
-const CLI = fileURLToPath(new URL('./release-product-witnesses.ts', import.meta.url));
-const LOADER = import.meta.resolve('tsx');
-
-function withCheckout(run: (root: string, env: NodeJS.ProcessEnv) => void): void {
-  const root = mkdtempSync(resolve(tmpdir(), 'bijou-witness-checkout-'));
-  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));
-  env.GIT_CONFIG_NOSYSTEM = '1';
-  env.GIT_CONFIG_GLOBAL = resolve(root, 'empty-git-config');
-  writeFileSync(env.GIT_CONFIG_GLOBAL, '');
-  mkdirSync(resolve(root, 'empty-hooks'));
-  const git = (args: readonly string[]): void => {
-    execFileSync('git', [...args], { cwd: root, env, timeout: 10_000, stdio: 'pipe' });
-  };
-  try {
-    for (const file of [...RELEASE_WITNESS_FILES, { path: 'package-lock.json' }, { path: '.gitattributes' }]) {
-      const target = resolve(root, file.path);
-      mkdirSync(dirname(target), { recursive: true });
-      writeFileSync(target, readFileSync(resolve(process.cwd(), file.path)));
-    }
-    git(['init', '-q']);
-    git(['config', 'user.name', 'Witness fixture']);
-    git(['config', 'user.email', 'witness@example.invalid']);
-    git(['config', 'commit.gpgsign', 'false']);
-    git(['config', 'core.hooksPath', resolve(root, 'empty-hooks')]);
-    git(['add', '.']);
-    git(['commit', '-qm', 'fixture']);
-    run(root, env);
-  } finally {
-    rmSync(root, { recursive: true, force: true });
-  }
-}
-
-function invoke(root: string, env: NodeJS.ProcessEnv, args: readonly string[] = []) {
-  return spawnSync(process.execPath, ['--import', LOADER, CLI, ...args], {
-    cwd: root, env, encoding: 'utf8', timeout: 20_000, maxBuffer: 1024 * 1024,
-  });
-}
+import { invoke, LOADER, withCheckout } from './release-product-witness-test-fixture.js';
 
 describe('release product witness CLI failures', () => {
   it('recognizes the repository root through a directory alias', () => {
@@ -107,5 +70,52 @@ describe('release product witness CLI failures', () => {
     expect(result.status).toBe(1);
     expect(result.stdout).toBe('');
     expect(result.stderr).toContain('Usage: release-product-witnesses.ts');
+  });
+});
+
+
+describe('release product witness execution', () => {
+  it('finishes each family before starting the next and reports each command', () => {
+    withCheckout((root, env) => {
+      // Real subprocess fixtures isolate the CLI scheduling/output contract.
+      // Product assertions themselves are exercised by the real release replay.
+      const files = {
+        '.gitignore': 'node_modules/\ninvocations.log\n',
+        'packages/bijou/package.json': '{"version":"8.0.0-rc.1"}',
+        'node_modules/typescript/bin/tsc': 'require("node:fs").appendFileSync("invocations.log", "build\\n");',
+        'scripts/generate-profunctor-page-target.ts': 'import { appendFileSync } from "node:fs"; appendFileSync("invocations.log", "generated\\n");',
+        'node_modules/vitest/vitest.mjs': `
+          import { appendFileSync } from 'node:fs';
+          const families = process.argv.slice(2).filter(arg => arg.startsWith('tests/cycles/'));
+          const family = families.map(path => path.split('/').at(-1)).join(',');
+          appendFileSync('invocations.log', 'start:' + family + '\\n');
+          setTimeout(() => appendFileSync('invocations.log', 'end:' + family + '\\n'), 10);
+        `,
+      };
+      for (const [path, content] of Object.entries(files)) {
+        mkdirSync(dirname(resolve(root, path)), { recursive: true });
+        writeFileSync(resolve(root, path), content);
+      }
+      symlinkSync(resolve(dirname(fileURLToPath(LOADER)), '..'), resolve(root, 'node_modules/tsx'), 'junction');
+      execFileSync('git', ['add', '.'], { cwd: root, env, stdio: 'pipe' });
+      execFileSync('git', ['commit', '-qm', 'execution fixture'], { cwd: root, env, stdio: 'pipe' });
+      const result = invoke(root, env);
+      expect(result.status, result.stderr).toBe(0);
+      expect(readFileSync(resolve(root, 'invocations.log'), 'utf8').trim().split('\n')).toEqual([
+        'build', 'generated', 'start:DX-050', 'end:DX-050',
+        'start:DX-049', 'end:DX-049', 'start:RE-036', 'end:RE-036',
+      ]);
+      expect(JSON.parse(result.stdout)).toMatchObject({
+        checks: [
+          { label: 'fresh-build', status: 'pass' },
+          { label: 'DX-050-generated-artifacts', status: 'pass' },
+          ...['DX-050', 'DX-049', 'RE-036'].map(family => ({
+            label: family + '-product-contract-tests',
+            command: ['node', 'node_modules/vitest/vitest.mjs', 'run', 'tests/cycles/' + family, '--maxWorkers', '2'],
+            status: 'pass',
+          })),
+        ],
+      });
+    });
   });
 });
