@@ -14,6 +14,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - DOGFOOD's Current Release Story now shows the running version and release line
   in English, German, Spanish and French. The live reader explains preview and
   evidence boundaries while the original V7.2 text remains archived unchanged.
+  Localization checks watch the live source and each translated target.
 
 - Raised the MCP SDK and affected runtime dependency floors, refreshed the
   lockfile, and added a real stdio client/server compatibility check (#536).

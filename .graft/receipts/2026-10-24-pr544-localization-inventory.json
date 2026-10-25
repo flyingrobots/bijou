@@ -1,0 +1,24 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Keep the new live release story and translations in localization inventory",
+  "bytesConsumed": 1179781,
+  "filesRead": [
+    "examples/docs/app-release-story.ts",
+    "examples/docs/i18n-debt-markdown-discovery.ts",
+    "examples/docs/i18n-debt-markdown-ratchet.ts",
+    "examples/docs/i18n-debt-contract.ts",
+    "examples/docs/i18n-debt-io.ts",
+    "examples/docs/i18n-debt-sources.ts"
+  ],
+  "filesModified": [
+    "examples/docs/app-release-story.ts",
+    "tests/cycles/DF-023/release-story-localization-inventory.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative warning; bounded source reads and task progress updates retained"
+  ],
+  "validation": "Four discovery/translation-availability assertions RED against 832318f63b0a30b985bfaf913b5ffb737e290156 in guarded Docker. Literal English fallback read makes scanner discover source; existing frontmatter watches de/es/fr targets. All 22 DF023 tests GREEN, English fallback body parity preserved, raw-string and missing-Markdown baselines unchanged. Translation-absence cases use the existing fileExists port rather than mutating shared source files. Committed-candidate full push and review follow."
+}

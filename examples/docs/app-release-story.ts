@@ -45,7 +45,8 @@ export const RELEASE_STORY_GUIDES: readonly ReleaseStoryGuideDoc[] = Object.free
     pageId: 'release',
     title: 'release-story-current',
     summary: '',
-    body: releaseStoryMarkdownBody(RELEASE_STORY_CURRENT_PATHS),
+    // Keep the English source discoverable by the localization inventory.
+    body: renderReleaseStoryMarkdown(readMarkdownDoc('./content/release-story-active.md'), BIJOU_VERSION),
     localizedTitle: (localization) => dogfoodText(
       localization,
       'release.story.current.title',
