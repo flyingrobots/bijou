@@ -36,6 +36,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Release readiness requires a live release evidence packet. Archived editions
+  no longer satisfy that check; a live `stable-acceptance.md` takes precedence
+  over the legacy release-directory `README.md`, and the report names its path.
+
 - DOGFOOD's actual landing route uses semantic release text in static, pipe
   and accessible modes. Language changes invalidate the interactive prompt
   cache immediately. Glyph construction validates an owned snapshot of every

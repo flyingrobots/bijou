@@ -1,0 +1,61 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Fix issue527 release acceptance so an archived packet cannot pass as current evidence; accept and identify a live stable acceptance packet",
+  "bytesConsumed": 2352287,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "scripts/release-readiness.part01.ts",
+    "scripts/release-readiness.part02.ts",
+    "scripts/release-readiness.part03.ts",
+    "scripts/release-readiness.part03.test.ts",
+    "scripts/documentation-corpus.ts",
+    "scripts/documentation-corpus.test.ts",
+    "docs/README.md",
+    "docs/CHANGELOG.md"
+  ],
+  "filesModified": [
+    "docs/CHANGELOG.md",
+    "docs/README.md",
+    "scripts/release-readiness-packet.test.ts",
+    "scripts/release-readiness.part01.ts",
+    "scripts/release-readiness.part02.ts",
+    "scripts/release-readiness.part03.ts",
+    ".graft/receipts/2026-10-25-live-release-packet.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "f4a36c546c49ceb525123d388ba059a17fda904c",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceiptAndProse": "9a1089b378a8a32442bedb1b33eb53af95643680",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "red": {
+      "sourceTree": "38729d2721411ea7e7a25abc4df2ce13100d33ee",
+      "command": "npx vitest run scripts/release-readiness-packet.test.ts",
+      "exitStatus": 1,
+      "expectedFailures": [
+        "Actual archived 7.2.0 packet incorrectly reported present",
+        "Live stable-acceptance.md packet incorrectly reported absent"
+      ]
+    },
+    "checks": [
+      "17 tests in 5 release-readiness and documentation-corpus files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run code-dojo:verify"
+    ],
+    "behavior": "Packet existence now uses physical filesystem lookup, preferring stable-acceptance.md then legacy README.md. Report carries the actual live path. Archived release guide and other historical documentation remain readable. Presence alone makes no claim of evidence review. Operating-reference and changelog prose added after source validation."
+  }
+}
