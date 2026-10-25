@@ -11,6 +11,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
+- DOGFOOD's Current Release Story now shows the running version and release line
+  in English, German, Spanish and French. The live reader explains preview and
+  evidence boundaries while the original V7.2 text remains archived unchanged.
+  Localization checks watch the live source and each translated target.
+
 - Raised the MCP SDK and affected runtime dependency floors, refreshed the
   lockfile, and added a real stdio client/server compatibility check (#536).
   Preserved the patched fast-uri floor from merged dependency PR #530.

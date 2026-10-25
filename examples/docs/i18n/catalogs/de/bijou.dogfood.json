@@ -2237,7 +2237,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "de": "Der v7.2-Release-Pfad durch Was ist neu, Proof und Changelog-Verlauf."
+        "de": "Der Release-Pfad v{releaseLine} durch Was ist neu, Proof und Changelog-Verlauf."
       }
     },
     {

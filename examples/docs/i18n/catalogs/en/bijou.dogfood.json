@@ -2495,7 +2495,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "The v7.2 release path through What's New, proof, and changelog history."
+        "en": "The v{releaseLine} release path through What's New, proof, and changelog history."
       }
     },
     {
