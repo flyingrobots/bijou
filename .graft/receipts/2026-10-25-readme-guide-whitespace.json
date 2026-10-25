@@ -1,0 +1,26 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Remove extra trailing blank lines found by final diff whitespace inspection",
+  "bytesConsumed": 2709044,
+  "metricScope": "Cumulative bounded-read snapshot at Graft seq683",
+  "filesRead": [
+    "docs/development.md",
+    "docs/guides/getting-started.md"
+  ],
+  "filesModified": [
+    "docs/development.md",
+    "docs/guides/getting-started.md",
+    ".graft/receipts/2026-10-25-readme-guide-whitespace.json"
+  ],
+  "tripwires": [
+    "SESSION_LONG diagnostic; finite README revision requested by maintainer"
+  ],
+  "baseCommit": "98cdcff548458b8ade1e4912981717e871102370",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "red": "git diff --check origin/main...HEAD reported a new blank line at EOF in each extracted guide. The in-progress first push was intentionally stopped before publication; remote branch absence verified.",
+    "green": "Remove only the extra terminal blank line in both guides; git diff --check HEAD passes. Native commit hooks and the full normal push are rerun on the corrected head."
+  }
+}

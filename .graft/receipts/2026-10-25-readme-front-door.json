@@ -1,0 +1,56 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Address maintainer rejection of the README: book links followed by DOGFOOD screenshots, focused onboarding, features and Job Monitor tutorial",
+  "bytesConsumed": 2701529,
+  "metricScope": "Cumulative bounded-read snapshot at Graft seq679",
+  "filesRead": [
+    "README.md",
+    "docs/README.md",
+    "docs/typescript-code-standards.editors-edition.md",
+    "examples/docs/app-root.ts",
+    "examples/docs/app-model.ts",
+    "examples/docs/app-components-page.ts",
+    "scripts/capture-font-title-evidence.ts",
+    "docs/releases/8.0.0/font-title-evidence/render.py",
+    "tests/cycles/DF-025/make-dogfood-the-only-human-facing-docs-surface.test.ts",
+    "tests/cycles/WF-006/cut-clean-4-1-0-release-boundary.test.ts"
+  ],
+  "filesModified": [
+    "README.md",
+    "docs/README.md",
+    "docs/development.md",
+    "docs/guides/getting-started.md",
+    "tests/cycles/DF-025/make-dogfood-the-only-human-facing-docs-surface.test.ts",
+    "assets/screenshots/README.md",
+    "assets/screenshots/SHA256SUMS",
+    "assets/screenshots/capture.ts",
+    "assets/screenshots/dogfood-components.png",
+    "assets/screenshots/dogfood-themes.png",
+    "assets/screenshots/render.py",
+    "assets/screenshots/scenes.json",
+    ".graft/receipts/2026-10-25-readme-front-door.json"
+  ],
+  "tripwires": [
+    "SESSION_LONG diagnostic; task explicitly continued by maintainer",
+    "RUNAWAY_TOOLS diagnostic; progress updates supplied"
+  ],
+  "baseCommit": "0d9a068c5bbae85a78ce64d5c905e8146a27f4c4",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "red": "Concrete before comparison: baseline README has 431 lines and does not place a screenshot immediately after the book links. No behavior defect or fabricated failing runtime test claimed.",
+    "green": "README has 62 lines; immediate repo-owned image after book links; all local Markdown targets exist; two PNGs visually inspected at 1260x648; companion repository and teaching PDF verified live.",
+    "capture": "Production DOGFOOD app views captured in guarded Docker at base runtime commit; glyph/colour cells retained; bounded static CoreText PNG rendering on macOS. No host application tests.",
+    "checks": [
+      "Guarded Docker build passed",
+      "12 focused documentation and release-line tests passed in 3 files",
+      "npm run lint passed",
+      "npm run code-dojo:verify passed with zero aggregate debt",
+      "npm run docs:inventory passed",
+      "npm run docs:design-system:preflight passed"
+    ],
+    "reviewBoundary": "Maintainer requested changes. This implementation is not human approval of the revised README or other release documentation.",
+    "greenSourceTreeWithoutUpdatedReceipt": "743d7e85dae56b4a5fcee403bb3282805feb0aad"
+  }
+}

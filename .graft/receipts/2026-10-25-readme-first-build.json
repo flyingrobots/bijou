@@ -1,0 +1,39 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Make README fresh-checkout commands build workspace exports before launching DOGFOOD",
+  "bytesConsumed": 2709044,
+  "metricScope": "Cumulative bounded-read snapshot at Graft seq683",
+  "filesRead": [
+    "README.md",
+    "examples/docs/main.ts",
+    "packages/bijou-node/package.json",
+    "packages/bijou-node/src/start-app.ts",
+    "tsconfig.json"
+  ],
+  "filesModified": [
+    "README.md",
+    ".graft/receipts/2026-10-25-readme-first-build.json"
+  ],
+  "tripwires": [
+    "SESSION_LONG diagnostic; maintainer explicitly requested this revision",
+    "RUNAWAY_TOOLS diagnostic; user updated on fresh-install finding"
+  ],
+  "baseCommit": "3cb2601ac68609a620e7d3106c4271646fc9c980",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "environment": "Guarded copy-only Docker Node24.18.0, two CPUs, 3 GiB combined memory/swap, bounded outputs; no host application tests",
+    "red": {
+      "sourceCommit": "3cb2601ac68609a620e7d3106c4271646fc9c980",
+      "command": "npm ci --no-audit --no-fund followed by npm run dogfood",
+      "failure": "ERR_MODULE_NOT_FOUND: missing @flyingrobots/bijou-tui/dist/index.js required by start-app.ts",
+      "rawLogSha256": "70eb237d013f9b6959d12930403faa366ce6de0902d869db872fa5125c6cb0c5"
+    },
+    "green": [
+      "npm run build passed",
+      "npm run smoke:dogfood -- --skip-build passed both landing and docs routes"
+    ],
+    "change": "Add npm run build between npm ci and npm run dogfood; no runtime code or tests changed."
+  }
+}

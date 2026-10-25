@@ -41,6 +41,12 @@ source diffs and an explained exercise answer key support the workshops. The hum
 walkthrough is prepared; the user will arrange an unfamiliar reader.
 The glossary and topic finder support practical lookup.
 
+## Getting started
+
+- [Build your first Bijou app](./guides/getting-started.md): minimal app, packages, layouts, and DOGFOOD controls.
+- [Job Monitor tutorial](https://github.com/flyingrobots/bijou-job-monitor): a complete application and the teaching book.
+- [Developing Bijou](./development.md): toolchain, testing, localization, and contribution workflow.
+
 ## Current operating references
 
 - [Latest features in DOGFOOD](../examples/docs/content/guides-latest-features.md)
