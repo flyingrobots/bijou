@@ -1,0 +1,53 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Finish issue527 mandatory goalpost burndown by clearing all twelve file/context exceptions and enforcing a zero aggregate ceiling",
+  "bytesConsumed": 2329072,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "scripts/code-dojo/baselines/file-context.json",
+    "docs/code-dojo-exceptions.md",
+    "tests/cycles/WF-165/code-dojo-ratchet-12.part01.test.ts",
+    "scripts/code-dojo-debt-baselines.ts"
+  ],
+  "filesModified": [
+    "docs/code-dojo-exceptions.md",
+    "package.json",
+    "scripts/code-dojo/baselines/file-context.json",
+    "tests/cycles/WF-165/code-dojo-ratchet-12.part01.test.ts",
+    ".graft/receipts/2026-10-25-zero-debt.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "b18c6ad1610bdee79da8ee9e24a29e75256beca0",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "3d960470a41daaf2c9c6d7c79553fd27d2ebbbbb",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "red": {
+      "sourceCommit": "3badb1ba3ab31aa431972ff43330badc704084e9",
+      "command": "node --import tsx scripts/code-dojo-debt.ts --max 0",
+      "exitStatus": 1,
+      "expectedFailure": "Code Dojo debt exceeds ceiling 0: 12"
+    },
+    "checks": [
+      "npm run code-dojo:verify: debt0, strict file/context and mock checks, code size and type-aware ESLint passed",
+      "Existing WF-165 and module-cycle suites passed",
+      "npm run typecheck:test",
+      "npm run lint"
+    ],
+    "bounds": "All twelve former root files and their extracted siblings are within150 lines/12000 bytes. File/context baseline now empty; no threshold or other baseline grew. Historical tranche ledger preserved.",
+    "behavior": "Tighten package script from max12 to max0 and existing live-ratchet assertions to exactly zero. This is standards preparation, not stable-release witness acceptance."
+  }
+}

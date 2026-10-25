@@ -17,7 +17,7 @@ import { TRANCHE_E_ROOTS } from './tranche-e-contract.js';
 import { TRANCHE_E_FAMILY_MEMBERS } from './tranche-e-families.js';
 
 describe('WF-165 Code Dojo tranche E debt contract', () => {
-  it('removes the final five double-counted roots and lowers debt to 12', () => {
+  it('keeps tranche E roots removed and reaches the final zero-debt ceiling', () => {
     const baseline = parseFileContextBaseline(
       read('scripts/code-dojo/baselines/file-context.json'),
     );
@@ -30,16 +30,16 @@ describe('WF-165 Code Dojo tranche E debt contract', () => {
     const measuredDebt = loadCodeDojoDebtSummary(ROOT);
 
     expect(TRANCHE_E_ROOTS).toHaveLength(5);
-    expect(contextPaths).toHaveLength(12);
+    expect(contextPaths).toHaveLength(0);
     expect(codeSizePaths).toHaveLength(0);
     expect(measuredDebt).toMatchObject({
-      fileContextViolations: 12,
+      fileContextViolations: 0,
       mockBanViolations: 0,
       codeSizeViolations: 0,
       eslintViolations: 0,
-      totalViolations: 12,
+      totalViolations: 0,
     });
-    expect(debtScript()).toBe('tsx scripts/code-dojo-debt.ts --max 12');
+    expect(debtScript()).toBe('tsx scripts/code-dojo-debt.ts --max 0');
     for (const root of TRANCHE_E_ROOTS) {
       expect(contextPaths, root).not.toContain(root);
       expect(codeSizePaths, root).not.toContain(root);
