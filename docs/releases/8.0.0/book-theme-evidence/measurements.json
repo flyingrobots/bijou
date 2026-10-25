@@ -1,0 +1,711 @@
+{
+  "schema": "bijou-book-theme-measurements/1",
+  "sourceCommit": "32443ea26ffba95624dcd9916905764543dd1c52",
+  "bookCommit": "209732eeb17315892df25f4546ccb40d92bd3240",
+  "captureProvenance": "Real test-adapter app rendering; modes selected with F2/Down/Enter/F2; landing scene selected through model route at time zero; not a physical terminal capture.",
+  "frames": 20,
+  "measurements": {
+    "dark": {
+      "semanticPairs": 35,
+      "chromePairs": 15,
+      "minimumSemantic": {
+        "foreground": "accent",
+        "surface": "elevated",
+        "fg": "#f7685f",
+        "bg": "#332a28",
+        "ratio": 4.7253168424816145
+      },
+      "minimumChrome": {
+        "foreground": "border.primary",
+        "surface": "elevated",
+        "fg": "#b68d85",
+        "bg": "#332a28",
+        "ratio": 4.750244803454441
+      }
+    },
+    "light": {
+      "semanticPairs": 35,
+      "chromePairs": 15,
+      "minimumSemantic": {
+        "foreground": "error",
+        "surface": "muted",
+        "fg": "#aa2f2e",
+        "bg": "#fbe6e3",
+        "ratio": 5.555720692788437
+      },
+      "minimumChrome": {
+        "foreground": "border.primary",
+        "surface": "muted",
+        "fg": "#815e58",
+        "bg": "#fbe6e3",
+        "ratio": 4.769459739650123
+      }
+    }
+  },
+  "images": [
+    {
+      "path": "book-dark-theme-lab.svg",
+      "sha256": "14e988272d0eb7dab6762357f492c090325b9f0d7c69754c613fe5bfa229bb1b"
+    },
+    {
+      "path": "book-dark-landing.svg",
+      "sha256": "d62a55de41aa5ed065c50ab61a313fde33c091650a97e226c4c72c8745564666"
+    },
+    {
+      "path": "book-light-theme-lab.svg",
+      "sha256": "158d23c33414a9114bb0580e73e44c5594277e752a8e88948a1c2edf5c794f4a"
+    },
+    {
+      "path": "book-light-landing.svg",
+      "sha256": "1efd76915e1a497569d03ae6d5c9dc355a200139b4a4f9586a834e6d4dafbcd9"
+    }
+  ],
+  "compiledThemes": {
+    "dark": {
+      "name": "dogfood-book-dark",
+      "semantic": {
+        "success": {
+          "hex": "#93cbb0",
+          "fgRGB": [
+            147,
+            203,
+            176
+          ]
+        },
+        "error": {
+          "hex": "#ffa39a",
+          "fgRGB": [
+            255,
+            163,
+            154
+          ]
+        },
+        "warning": {
+          "hex": "#e1b46b",
+          "fgRGB": [
+            225,
+            180,
+            107
+          ]
+        },
+        "info": {
+          "hex": "#c3b1e1",
+          "fgRGB": [
+            195,
+            177,
+            225
+          ]
+        },
+        "accent": {
+          "hex": "#f7685f",
+          "fgRGB": [
+            247,
+            104,
+            95
+          ]
+        },
+        "muted": {
+          "hex": "#c4ada9",
+          "fgRGB": [
+            196,
+            173,
+            169
+          ]
+        },
+        "primary": {
+          "hex": "#ffedeb",
+          "fgRGB": [
+            255,
+            237,
+            235
+          ]
+        }
+      },
+      "surface": {
+        "primary": {
+          "hex": "#ffedeb",
+          "bg": "#1c1716",
+          "fgRGB": [
+            255,
+            237,
+            235
+          ],
+          "bgRGB": [
+            28,
+            23,
+            22
+          ]
+        },
+        "secondary": {
+          "hex": "#ffedeb",
+          "bg": "#2d2726",
+          "fgRGB": [
+            255,
+            237,
+            235
+          ],
+          "bgRGB": [
+            45,
+            39,
+            38
+          ]
+        },
+        "elevated": {
+          "hex": "#ffedeb",
+          "bg": "#332a28",
+          "fgRGB": [
+            255,
+            237,
+            235
+          ],
+          "bgRGB": [
+            51,
+            42,
+            40
+          ]
+        },
+        "overlay": {
+          "hex": "#ffedeb",
+          "bg": "#151211",
+          "fgRGB": [
+            255,
+            237,
+            235
+          ],
+          "bgRGB": [
+            21,
+            18,
+            17
+          ]
+        },
+        "muted": {
+          "hex": "#c4ada9",
+          "bg": "#231c1b",
+          "fgRGB": [
+            196,
+            173,
+            169
+          ],
+          "bgRGB": [
+            35,
+            28,
+            27
+          ]
+        }
+      },
+      "border": {
+        "primary": {
+          "hex": "#b68d85",
+          "fgRGB": [
+            182,
+            141,
+            133
+          ]
+        },
+        "secondary": {
+          "hex": "#f7685f",
+          "fgRGB": [
+            247,
+            104,
+            95
+          ]
+        },
+        "success": {
+          "hex": "#93cbb0",
+          "fgRGB": [
+            147,
+            203,
+            176
+          ]
+        },
+        "warning": {
+          "hex": "#e1b46b",
+          "fgRGB": [
+            225,
+            180,
+            107
+          ]
+        },
+        "error": {
+          "hex": "#ffa39a",
+          "fgRGB": [
+            255,
+            163,
+            154
+          ]
+        },
+        "muted": {
+          "hex": "#b68d85",
+          "fgRGB": [
+            182,
+            141,
+            133
+          ]
+        }
+      },
+      "ui": {
+        "cursor": {
+          "hex": "#f7685f",
+          "fgRGB": [
+            247,
+            104,
+            95
+          ]
+        },
+        "focusGutter": {
+          "hex": "#f7685f",
+          "bg": "#1c1716",
+          "modifiers": [
+            "bold"
+          ],
+          "fgRGB": [
+            247,
+            104,
+            95
+          ],
+          "bgRGB": [
+            28,
+            23,
+            22
+          ]
+        },
+        "scrollThumb": {
+          "hex": "#f7685f",
+          "fgRGB": [
+            247,
+            104,
+            95
+          ]
+        },
+        "scrollTrack": {
+          "hex": "#b68d85",
+          "fgRGB": [
+            182,
+            141,
+            133
+          ]
+        },
+        "sectionHeader": {
+          "hex": "#f7685f",
+          "modifiers": [
+            "bold"
+          ],
+          "fgRGB": [
+            247,
+            104,
+            95
+          ]
+        },
+        "logo": {
+          "hex": "#f7685f",
+          "fgRGB": [
+            247,
+            104,
+            95
+          ]
+        },
+        "tableHeader": {
+          "hex": "#ffedeb",
+          "fgRGB": [
+            255,
+            237,
+            235
+          ]
+        },
+        "trackEmpty": {
+          "hex": "#b68d85",
+          "fgRGB": [
+            182,
+            141,
+            133
+          ]
+        }
+      },
+      "status": {
+        "success": {
+          "hex": "#93cbb0",
+          "fgRGB": [
+            147,
+            203,
+            176
+          ]
+        },
+        "error": {
+          "hex": "#ffa39a",
+          "fgRGB": [
+            255,
+            163,
+            154
+          ]
+        },
+        "warning": {
+          "hex": "#e1b46b",
+          "fgRGB": [
+            225,
+            180,
+            107
+          ]
+        },
+        "info": {
+          "hex": "#c3b1e1",
+          "fgRGB": [
+            195,
+            177,
+            225
+          ]
+        },
+        "pending": {
+          "hex": "#c4ada9",
+          "fgRGB": [
+            196,
+            173,
+            169
+          ]
+        },
+        "active": {
+          "hex": "#f7685f",
+          "fgRGB": [
+            247,
+            104,
+            95
+          ]
+        },
+        "muted": {
+          "hex": "#c4ada9",
+          "modifiers": [
+            "strikethrough"
+          ],
+          "fgRGB": [
+            196,
+            173,
+            169
+          ]
+        }
+      }
+    },
+    "light": {
+      "name": "dogfood-book-light",
+      "semantic": {
+        "success": {
+          "hex": "#256849",
+          "fgRGB": [
+            37,
+            104,
+            73
+          ]
+        },
+        "error": {
+          "hex": "#aa2f2e",
+          "fgRGB": [
+            170,
+            47,
+            46
+          ]
+        },
+        "warning": {
+          "hex": "#79500f",
+          "fgRGB": [
+            121,
+            80,
+            15
+          ]
+        },
+        "info": {
+          "hex": "#654a87",
+          "fgRGB": [
+            101,
+            74,
+            135
+          ]
+        },
+        "accent": {
+          "hex": "#83312c",
+          "fgRGB": [
+            131,
+            49,
+            44
+          ]
+        },
+        "muted": {
+          "hex": "#645452",
+          "fgRGB": [
+            100,
+            84,
+            82
+          ]
+        },
+        "primary": {
+          "hex": "#2d2726",
+          "fgRGB": [
+            45,
+            39,
+            38
+          ]
+        }
+      },
+      "surface": {
+        "primary": {
+          "hex": "#2d2726",
+          "bg": "#fff9f8",
+          "fgRGB": [
+            45,
+            39,
+            38
+          ],
+          "bgRGB": [
+            255,
+            249,
+            248
+          ]
+        },
+        "secondary": {
+          "hex": "#2d2726",
+          "bg": "#ffedeb",
+          "fgRGB": [
+            45,
+            39,
+            38
+          ],
+          "bgRGB": [
+            255,
+            237,
+            235
+          ]
+        },
+        "elevated": {
+          "hex": "#2d2726",
+          "bg": "#ffffff",
+          "fgRGB": [
+            45,
+            39,
+            38
+          ],
+          "bgRGB": [
+            255,
+            255,
+            255
+          ]
+        },
+        "overlay": {
+          "hex": "#2d2726",
+          "bg": "#fff9f8",
+          "fgRGB": [
+            45,
+            39,
+            38
+          ],
+          "bgRGB": [
+            255,
+            249,
+            248
+          ]
+        },
+        "muted": {
+          "hex": "#645452",
+          "bg": "#fbe6e3",
+          "fgRGB": [
+            100,
+            84,
+            82
+          ],
+          "bgRGB": [
+            251,
+            230,
+            227
+          ]
+        }
+      },
+      "border": {
+        "primary": {
+          "hex": "#815e58",
+          "fgRGB": [
+            129,
+            94,
+            88
+          ]
+        },
+        "secondary": {
+          "hex": "#83312c",
+          "fgRGB": [
+            131,
+            49,
+            44
+          ]
+        },
+        "success": {
+          "hex": "#256849",
+          "fgRGB": [
+            37,
+            104,
+            73
+          ]
+        },
+        "warning": {
+          "hex": "#79500f",
+          "fgRGB": [
+            121,
+            80,
+            15
+          ]
+        },
+        "error": {
+          "hex": "#aa2f2e",
+          "fgRGB": [
+            170,
+            47,
+            46
+          ]
+        },
+        "muted": {
+          "hex": "#815e58",
+          "fgRGB": [
+            129,
+            94,
+            88
+          ]
+        }
+      },
+      "ui": {
+        "cursor": {
+          "hex": "#83312c",
+          "fgRGB": [
+            131,
+            49,
+            44
+          ]
+        },
+        "focusGutter": {
+          "hex": "#83312c",
+          "bg": "#fff9f8",
+          "modifiers": [
+            "bold"
+          ],
+          "fgRGB": [
+            131,
+            49,
+            44
+          ],
+          "bgRGB": [
+            255,
+            249,
+            248
+          ]
+        },
+        "scrollThumb": {
+          "hex": "#83312c",
+          "fgRGB": [
+            131,
+            49,
+            44
+          ]
+        },
+        "scrollTrack": {
+          "hex": "#815e58",
+          "fgRGB": [
+            129,
+            94,
+            88
+          ]
+        },
+        "sectionHeader": {
+          "hex": "#83312c",
+          "modifiers": [
+            "bold"
+          ],
+          "fgRGB": [
+            131,
+            49,
+            44
+          ]
+        },
+        "logo": {
+          "hex": "#83312c",
+          "fgRGB": [
+            131,
+            49,
+            44
+          ]
+        },
+        "tableHeader": {
+          "hex": "#2d2726",
+          "fgRGB": [
+            45,
+            39,
+            38
+          ]
+        },
+        "trackEmpty": {
+          "hex": "#815e58",
+          "fgRGB": [
+            129,
+            94,
+            88
+          ]
+        }
+      },
+      "status": {
+        "success": {
+          "hex": "#256849",
+          "fgRGB": [
+            37,
+            104,
+            73
+          ]
+        },
+        "error": {
+          "hex": "#aa2f2e",
+          "fgRGB": [
+            170,
+            47,
+            46
+          ]
+        },
+        "warning": {
+          "hex": "#79500f",
+          "fgRGB": [
+            121,
+            80,
+            15
+          ]
+        },
+        "info": {
+          "hex": "#654a87",
+          "fgRGB": [
+            101,
+            74,
+            135
+          ]
+        },
+        "pending": {
+          "hex": "#645452",
+          "fgRGB": [
+            100,
+            84,
+            82
+          ]
+        },
+        "active": {
+          "hex": "#83312c",
+          "fgRGB": [
+            131,
+            49,
+            44
+          ]
+        },
+        "muted": {
+          "hex": "#645452",
+          "modifiers": [
+            "strikethrough"
+          ],
+          "fgRGB": [
+            100,
+            84,
+            82
+          ]
+        }
+      }
+    }
+  },
+  "cellRendering": "SVG uses captured glyph/foreground/background and a monospace font; text modifiers are omitted. Software fixture rendering, not a physical terminal capture.",
+  "sceneDataSha256": "432a94a3eb21e7dd2b9305065ac9f84af5dbca2a8e4f1459304f51a0dadc760f"
+}

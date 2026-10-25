@@ -22,6 +22,7 @@ import { renderRootApp } from './app-root-view.js';
 import { LANDING_TEXT_MODIFIERS } from './app-shell-theme-state.js';
 import {
   applyDocsShellThemeToContext,
+  resolveDocsVisualThemeByShellThemeId,
   resolveLandingThemeIndexForShellThemeId,
 } from './app-theme-state.js';
 import {
@@ -57,6 +58,7 @@ export function createDocsApp(
     localization,
     textModifiers: LANDING_TEXT_MODIFIERS,
     versionText: VERSION_TEXT,
+    resolveTheme: (model) => resolveDocsVisualThemeByShellThemeId(model.docsModel.activeShellThemeId),
   });
   const mapExplorer = (
     commands: Cmd<FramedAppMsg<DocsMsg>>[],

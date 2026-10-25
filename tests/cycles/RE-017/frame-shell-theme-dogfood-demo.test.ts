@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { BIJOU_LIGHT } from '@flyingrobots/bijou';
+import { DOGFOOD_BOOK_LIGHT_THEME } from '../../../examples/docs/dogfood-book-theme-spec.js';
 import { must, _resetDefaultContextForTesting  } from '@flyingrobots/bijou/adapters/test';
 import type { KeyMsg } from '@flyingrobots/bijou-tui';
 import {
@@ -63,11 +63,11 @@ describe('RE-017 framed shell theme demo', () => {
       height: ctx.runtime.rows,
     }).surface;
     expect(resultModel.landingThemeIndex).toBe(0);
-    expect(resultModel.docsModel.activeShellThemeId).toBe('dogfood:light');
+    expect(resultModel.docsModel.activeShellThemeId).toBe('book:light');
     expect(Object.values(resultModel.docsModel.pageModels).every((pageModel) => pageModel.landingThemeIndex === 0)).toBe(true);
-    expect(Object.values(resultModel.docsModel.pageModels).every((pageModel) => pageModel.activeShellThemeId === 'dogfood:light')).toBe(true);
+    expect(Object.values(resultModel.docsModel.pageModels).every((pageModel) => pageModel.activeShellThemeId === 'book:light')).toBe(true);
     expect(ctx.surface('primary').bg).toBe(originalBg);
-    expect(frame.get(frame.width - 2, 2).bg).toBe(BIJOU_LIGHT.surface.primary.bg);
+    expect(frame.get(frame.width - 2, 2).bg).toBe(DOGFOOD_BOOK_LIGHT_THEME.surface.primary.bg);
   });
 });
 

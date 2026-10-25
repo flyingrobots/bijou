@@ -16,8 +16,8 @@ import { MSG_CTRL_T, MSG_F10, assertTokenTextColors } from './dogfood-light-them
 describe('DL-017 DOGFOOD light theme readiness', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
   it('renders Theme Lab and Theme Inspector swatch text with readable light theme tokens', () => {
-      const lightTheme = DOGFOOD_SHELL_THEMES[0]?.modes?.find((mode) => mode.id === 'light')?.theme;
-      expect(lightTheme?.name).toBe('dogfood-light');
+      const lightTheme = DOGFOOD_SHELL_THEMES.find((theme) => theme.id === 'book')?.modes?.find((mode) => mode.id === 'light')?.theme;
+      expect(lightTheme?.name).toBe('dogfood-book-light');
       const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 180, rows: 56 } });
       const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'themes' });
 
@@ -37,8 +37,8 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
 
       const [inspectorModel] = app.update(MSG_F10, lightModel);
       const inspectorVisualTheme = docsVisualThemeFromShellThemeChoice({
-        id: 'dogfood:light',
-        label: 'DOGFOOD / Light',
+        id: 'book:light',
+        label: 'Bijou Book / Light',
         theme: must(lightTheme),
       });
       const inspectorFrame = normalizeViewOutput(app.view(inspectorModel), {
