@@ -1,3 +1,4 @@
+import { CLEAR_LINE } from '../ansi.js';
 import type { BijouContext } from '../../ports/context.js';
 import type { TextareaOptions } from './textarea-options.js';
 import { formatFormTitle, terminalRenderer, createStyledFn } from './form-utils.js';
@@ -38,16 +39,16 @@ export function createTextareaView(options: TextareaOptions, ctx: BijouContext, 
         : '  ';
 
       if (lineIdx === 0 && options.placeholder && lines.length === 1 && lines[0] === '') {
-        ctx.io.write(`\x1b[K${prefix}${styledFn(ctx.semantic('muted'), options.placeholder)}\n`);
+        ctx.io.write(`${CLEAR_LINE}${prefix}${styledFn(ctx.semantic('muted'), options.placeholder)}\n`);
       } else {
-        ctx.io.write(`\x1b[K${prefix}${line}\n`);
+        ctx.io.write(`${CLEAR_LINE}${prefix}${line}\n`);
       }
     }
 
     // Status line
     const pos = `Ln ${String(cursorRow + 1)}, Col ${String(cursorCol + 1)}`;
     const lenInfo = maxLength != null ? ` | ${String(totalLength)}/${String(maxLength)}` : '';
-    ctx.io.write(`\x1b[K${styledFn(ctx.semantic('muted'), pos + lenInfo)}\n`);
+    ctx.io.write(`${CLEAR_LINE}${styledFn(ctx.semantic('muted'), pos + lenInfo)}\n`);
   }
 
   function clearRender(): void {
@@ -66,7 +67,7 @@ export function createTextareaView(options: TextareaOptions, ctx: BijouContext, 
         ? (value.includes('\n') ? `${String(value.split('\n').length)} lines` : value)
         : '(empty)');
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), summary);
-    ctx.io.write(`\x1b[K${label}\n`);
+    ctx.io.write(`${CLEAR_LINE}${label}\n`);
     term.showCursor();
   }
 

@@ -33,7 +33,7 @@ export function createFilterController<T>(options: FilterOptions<T>, ctx: BijouC
   }
 
   // navigateUp/navigateDown use clearRender + render instead of clearAndRerender
-  // because render() uses per-line \x1b[K (clear-to-end-of-line), making a full
+  // because render() uses per-line CLEAR_LINE (clear-to-end-of-line), making a full
   // clearBlock unnecessary for a simple cursor position change.
   /** Move the cursor up one item, wrapping around at the top. */
   function navigateUp(): void {
@@ -64,7 +64,7 @@ export function createFilterController<T>(options: FilterOptions<T>, ctx: BijouC
   }
 
   // switchMode uses the same lightweight rerender pattern as navigate functions —
-  // only the mode indicator line changes, and render() clears each line with \x1b[K.
+  // only the mode indicator line changes, and render() clears each line with CLEAR_LINE.
   /** Toggle between normal and insert input modes and re-render. */
   function switchMode(newMode: 'normal' | 'insert'): void {
     state.mode = newMode;

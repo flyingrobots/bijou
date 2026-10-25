@@ -1,3 +1,4 @@
+import { CLEAR_LINE } from '../ansi.js';
 import type { BijouContext } from '../../ports/context.js';
 import type { FilterOption, FilterOptions, FilterState } from './filter-options.js';
 import { formatFormTitle, terminalRenderer, createStyledFn, createBoldFn } from './form-utils.js';
@@ -26,7 +27,7 @@ export function createFilterView<T>(options: FilterOptions<T>, ctx: BijouContext
     // Filter input with mode indicator (: normal, / insert)
     const indicator = state.mode === 'insert' ? '/' : ':';
     const filterDisplay = state.query || (options.placeholder ? styledFn(ctx.semantic('muted'), options.placeholder) : '');
-    ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('info'), indicator)} ${filterDisplay}\n`);
+    ctx.io.write(`${CLEAR_LINE}  ${styledFn(ctx.semantic('info'), indicator)} ${filterDisplay}\n`);
 
     const vis = visibleItems();
     for (let i = 0; i < vis.length; i++) {
@@ -35,14 +36,14 @@ export function createFilterView<T>(options: FilterOptions<T>, ctx: BijouContext
       const isCurrent = state.scrollOffset + i === state.cursor;
       const prefix = isCurrent ? '❯' : ' ';
       if (isCurrent && !noColor) {
-        ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('info'), prefix)} ${boldFn(opt.label)}\n`);
+        ctx.io.write(`${CLEAR_LINE}  ${styledFn(ctx.semantic('info'), prefix)} ${boldFn(opt.label)}\n`);
       } else {
-        ctx.io.write(`\x1b[K  ${prefix} ${opt.label}\n`);
+        ctx.io.write(`${CLEAR_LINE}  ${prefix} ${opt.label}\n`);
       }
     }
 
     const status = `${String(state.filtered.length)}/${String(options.options.length)} items`;
-    ctx.io.write(`\x1b[K  ${styledFn(ctx.semantic('muted'), status)}\n`);
+    ctx.io.write(`${CLEAR_LINE}  ${styledFn(ctx.semantic('muted'), status)}\n`);
   }
 
   /** Move the cursor up to overwrite the previous render. */
@@ -64,7 +65,7 @@ export function createFilterView<T>(options: FilterOptions<T>, ctx: BijouContext
     term.clearBlock(total);
 
     const label = formatFormTitle(options.title, ctx) + ' ' + styledFn(ctx.semantic('info'), selectedLabel);
-    ctx.io.write(`\x1b[K${label}\n`);
+    ctx.io.write(`${CLEAR_LINE}${label}\n`);
     term.showCursor();
   }
 

@@ -1,0 +1,52 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Preserve the existing raw-ANSI policy after form presentation extraction by using the shared line-clear control",
+  "bytesConsumed": 2411601,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "packages/bijou/src/core/ansi-lint.test.ts",
+    "packages/bijou/src/core/ansi.ts",
+    "packages/bijou/src/core/forms/filter-view.ts",
+    "packages/bijou/src/core/forms/filter-controller.ts",
+    "packages/bijou/src/core/forms/textarea-view.ts"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/forms/filter-controller.ts",
+    "packages/bijou/src/core/forms/filter-view.ts",
+    "packages/bijou/src/core/forms/textarea-view.ts",
+    ".graft/receipts/2026-10-25-form-ansi-controls.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "942e9e876097de640050ae8c47de77e0593a8d12",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeWithoutReceipt": "7684fb41fe33cb89bdc7507f2e0feb54162d303f",
+    "environment": "Reused guarded copy-only Docker worker Node24.18.0; no host tests",
+    "red": {
+      "baseCommit": "942e9e876097de640050ae8c47de77e0593a8d12",
+      "candidateMetadataVersion": "8.0.0",
+      "command": "npm run test:run",
+      "failure": "Chunk9 ANSI lint rejected literal controls in filter-controller, filter-view and textarea-view; full suite stopped at that failure."
+    },
+    "checks": [
+      "81 tests in 9 ANSI policy, filter and textarea files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run code-dojo:verify"
+    ],
+    "behavior": "Replace literal clear-to-end-of-line strings with existing CLEAR_LINE constant; emitted bytes stay the same. Refer to that constant in comments as well. No allowlist or threshold changed. Candidate version metadata from failed full run remains an external artifact and has not been applied to this checkout."
+  }
+}
