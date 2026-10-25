@@ -51,6 +51,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   and quadrant text fitting retains nonzero coverage by default; explicit
   renderer thresholds and custom charset density mappings remain available.
 
+- Animated Markdown typography now expands when a terminal widens after a
+  narrow start. An explicit `--width` still caps the document width.
+
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 

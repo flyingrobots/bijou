@@ -33,7 +33,7 @@ export async function main(args: readonly string[] = process.argv.slice(2)): Pro
   const animated = options.animate !== false && ctx.mode === 'interactive'
     && ctx.runtime.stdinIsTTY && ctx.runtime.stdoutIsTTY && !ctx.theme.noColor;
   if (animated) {
-    await run(createDocumentAnimation((columns) => renderMarkdownParts(source, ctx, { ...renderOptions, width: columns }), ctx, width), { ctx, mouse: true });
+    await run(createDocumentAnimation((columns) => renderMarkdownParts(source, ctx, { ...renderOptions, width: columns }), ctx, options.width ?? 100), { ctx, mouse: true });
   } else console.log(renderMarkdownFont(source, ctx, renderOptions));
 }
 

@@ -29,7 +29,8 @@ select one of Bijou’s registered themes.
 
 Pass `--no-animation` to print into normal terminal scrollback instead. Pipes,
 accessible mode, and `NO_COLOR` use static output. Resizing the animated view
-reflows the document to the available width.
+reflows the document to the available width, capped by `--width` (100 columns
+by default).
 
 Use `--configure` to edit each element, choose a Google Fonts family or local
 font file, and enter a size. Choose **Render document** when ready. The Google
