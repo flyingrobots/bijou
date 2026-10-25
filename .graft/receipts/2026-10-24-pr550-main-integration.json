@@ -1,0 +1,42 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Reconcile DOGFOOD book theme pair with current landed v8 fixes",
+  "bytesConsumed": 1258002,
+  "filesRead": [
+    "examples/docs/dogfood-book-palette.ts",
+    "examples/docs/dogfood-book-theme-spec.ts",
+    "examples/docs/dogfood-book-theme.ts",
+    "examples/docs/dogfood-shell-themes.ts",
+    "examples/docs/app-landing-renderer.ts",
+    "examples/docs/app-landing-themes.ts",
+    "examples/docs/app-docs-shell-theme.ts",
+    "examples/docs/app-theme-state.ts",
+    "examples/docs/book-themes.md",
+    "tests/dogfood-book-theme.test.ts",
+    "scripts/docs-preview-landing.part06.test.ts"
+  ],
+  "filesModified": [],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative session warning; bounded reads retained. Color-expert skill applied to anchored palette and actual rendered color verification."
+  ],
+  "integration": {
+    "priorHead": "9f661e3e7b4d1233509e8cc42cbe3a3f118159b1",
+    "incomingMain": "9ec74a82b87ac857036eef48c3fa6e919a618aea",
+    "resolution": "Automatic merge retains all changelog notes, current release-story catalog interpolation and new book labels. Preserve patched runtime graph, version lock, hyperlink fallback and serial witness replay. Isolated local integration branch leaves the existing title-screen worktree untouched."
+  },
+  "reference": {
+    "repository": "flyingrobots/bijou-job-monitor",
+    "commit": "209732eeb17315892df25f4546ccb40d92bd3240",
+    "path": "book/preamble.tex",
+    "anchors": {
+      "BookCoral": "#F7685F",
+      "BookInk": "#2D2726",
+      "BookHeading": "#83312C",
+      "BookMuted": "#645452",
+      "BookPanel": "#FFEDEB"
+    }
+  },
+  "validation": "Normal commit hooks before bounded Docker RED/GREEN, real semantic/chrome measurements, representative actual app Surface captures, full normal pre-push and fresh exact-head Code Lawyer review. Ratios alone do not establish CVD discrimination, physical terminal calibration or human usability."
+}

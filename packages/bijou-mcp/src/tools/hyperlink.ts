@@ -16,12 +16,14 @@ const inputSchema = z.object(inputShape);
 
 export const hyperlinkTool: ToolRegistration = withStructuredToolOutput({
   name: 'bijou_hyperlink',
-  description: 'Render a terminal hyperlink (OSC 8). Falls back to text + URL in plain mode.',
+  description: 'Render a plain-text link using the selected text, URL, or combined fallback.',
   inputSchema: inputShape,
   handler: (args) => {
     const input = inputSchema.parse(args);
     const ctx = mcpContext(input.terminalWidth);
-    const result = hyperlink(input.text, input.url, { fallback: input.fallback, ctx });
+    const result = hyperlink(input.text, input.url, {
+      fallback: input.fallback, ctx: { ...ctx, mode: 'pipe' },
+    });
     return { content: [{ type: 'text', text: result }] };
   },
 });

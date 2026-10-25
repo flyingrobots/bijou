@@ -155,8 +155,13 @@ jobs:
           packages/bijou-node/src/index.part02.test.ts
           packages/bijou-node/src/index.part03.test.ts
           packages/bijou-node/src/index.part04.test.ts
+          packages/bijou-mcp/src/stdio.test.ts
+          packages/bijou-mcp/src/tools/hyperlink.test.ts
+          packages/bijou-mcp/src/hyperlink-stdio.test.ts
           tests/cycles/WF-166/dependency-security-closeout.test.ts
           scripts/check-node-version.test.ts
+          scripts/release-product-witness-files.test.ts
+          scripts/release-product-witnesses.test.ts
           scripts/docs-preview-components.part01.test.ts
           scripts/docs-preview-components.part02.test.ts
           scripts/docs-preview-components.part03.test.ts
@@ -175,6 +180,9 @@ jobs:
           scripts/docs-preview-search.part02.test.ts
           scripts/docs-preview-search.part03.test.ts
           scripts/docs-preview-theme.part01.test.ts
+          scripts/workspace-lock.test.ts
+          scripts/staged-workspace.test.ts
+          scripts/workspace-version-cli.test.ts
           scripts/docs-preview-theme.part02.test.ts
           scripts/docs-preview-theme.part03.test.ts
           scripts/docs-preview-theme.part04.test.ts

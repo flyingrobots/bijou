@@ -17,6 +17,41 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Raised the fast-uri workspace floor to 3.1.9 and added regressions for
   encoded hostname normalization and scheme rejection (PR #530).
 
+- DOGFOOD's Current Release Story now shows the running version and release line
+  in English, German, Spanish and French. The live reader explains preview and
+  evidence boundaries while the original V7.2 text remains archived unchanged.
+  Localization checks watch the live source and each translated target.
+
+- Raised the MCP SDK and affected runtime dependency floors, refreshed the
+  lockfile, and added a real stdio client/server compatibility check (#536).
+  Preserved the patched fast-uri floor from merged dependency PR #530.
+
+- Moved MCP validation to patched Zod 4, raised body-parser to 2.4.0+ and
+  ip-address to 10.7.4+, and added public stdio schema regressions for newer
+  runtime advisories. Tool names, input fields and output modes are retained;
+  validation error wording may change with Zod 4 (#536).
+
+- The pre-commit version gate validates staged metadata, preserving partial
+  staging while rejecting stale index contents hidden by repaired working files
+  (#526).
+
+- Release version bumps update workspace manifests and lock metadata together,
+  refresh npm's cached workspace metadata, and restore the original manifests
+  and lock if regeneration fails. Pre-commit and release preflight now reject
+  stale or missing workspace lock versions and internal dependency pins,
+  including peer, dev and optional dependencies (#526).
+
+- MCP hyperlinks now honor the selected plain-text fallback in text and
+  structured rendered output, preserving Unicode layout in other tools (#545).
+
+### Added
+
+- Added `release:witnesses` to replay the inherited V8 product witness families
+  in separate sequential commands with pinned inputs, byte-exact generated
+  artifacts, and a commit-bound receipt.
+  Dirty checkouts, fixture drift, or failed checks prevent a success receipt;
+  final stable-release acceptance remains tracked separately.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

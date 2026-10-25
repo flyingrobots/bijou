@@ -1,6 +1,9 @@
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { readMarkdownDoc } from './app-markdown.js';
 import { dogfoodLocalizedText } from './localization.js';
+import { BIJOU_VERSION } from './app-ids.js';
+import { BIJOU_RELEASE_LINE } from './app-release-line.js';
+import { renderReleaseStoryMarkdown } from './app-release-story-render.js';
 
 export interface ReleaseStoryMarkdownPaths { readonly en: string; readonly de: string; readonly es: string; readonly fr: string; readonly [locale: string]: string; }
 
@@ -15,14 +18,11 @@ export interface ReleaseStoryGuideDoc {
   readonly localizedBody?: (localization: LocalizationPort | undefined) => string;
 }
 
-const CHANGELOG_BOUNDARY_MARKER = '{{CHANGELOG_VERSION_BOUNDARIES}}';
-const CHANGELOG_VERSION_HEADING = /^## \[([^\]]+)\](?:\s+[-\u2014]\s+(.+))?\s*$/gm;
-
 const RELEASE_STORY_CURRENT_PATHS: ReleaseStoryMarkdownPaths = Object.freeze({
-  en: './content/release-story-current.md',
-  de: './content/release-story-current.de.md',
-  es: './content/release-story-current.es.md',
-  fr: './content/release-story-current.fr.md',
+  en: './content/release-story-active.md',
+  de: './content/release-story-active.de.md',
+  es: './content/release-story-active.es.md',
+  fr: './content/release-story-active.fr.md',
 });
 
 const RELEASE_GRAPHQL_PROOF_PATHS: ReleaseStoryMarkdownPaths = Object.freeze({
@@ -45,7 +45,8 @@ export const RELEASE_STORY_GUIDES: readonly ReleaseStoryGuideDoc[] = Object.free
     pageId: 'release',
     title: 'release-story-current',
     summary: '',
-    body: releaseStoryMarkdownBody(RELEASE_STORY_CURRENT_PATHS),
+    // Keep the English source discoverable by the localization inventory.
+    body: renderReleaseStoryMarkdown(readMarkdownDoc('./content/release-story-active.md'), BIJOU_VERSION),
     localizedTitle: (localization) => dogfoodText(
       localization,
       'release.story.current.title',
@@ -54,7 +55,8 @@ export const RELEASE_STORY_GUIDES: readonly ReleaseStoryGuideDoc[] = Object.free
     localizedSummary: (localization) => dogfoodText(
       localization,
       'release.story.current.summary',
-      'The v7.2 release path through What\'s New, proof, and changelog history.',
+      'The v{releaseLine} release path through What\'s New, proof, and changelog history.',
+      { releaseLine: BIJOU_RELEASE_LINE },
     ),
     localizedBody: localizedReleaseStoryMarkdownBody(RELEASE_STORY_CURRENT_PATHS),
   },
@@ -101,7 +103,7 @@ export function releaseStoryMarkdownBody(
   localization?: LocalizationPort,
 ): string {
   const locale = releaseStoryMarkdownLocale(localization?.locale);
-  return injectChangelogVersionBoundaries(readMarkdownDoc(paths[locale ?? 'en']));
+  return renderReleaseStoryMarkdown(readMarkdownDoc(paths[locale ?? 'en']), BIJOU_VERSION);
 }
 
 export function localizedReleaseStoryMarkdownBody(
@@ -126,21 +128,4 @@ function releaseStoryMarkdownLocale(locale: string | undefined): string | undefi
 
 function defaultReleaseStoryMarkdownLocale(): string | undefined {
   return Object.keys(RELEASE_STORY_CURRENT_PATHS)[0];
-}
-
-function injectChangelogVersionBoundaries(markdown: string): string {
-  if (!markdown.includes(CHANGELOG_BOUNDARY_MARKER)) return markdown;
-  return markdown.replaceAll(CHANGELOG_BOUNDARY_MARKER, changelogVersionBoundariesMarkdown());
-}
-
-function changelogVersionBoundariesMarkdown(): string {
-  const boundaries: string[] = [];
-  const changelog = readMarkdownDoc('../../docs/CHANGELOG.md');
-  for (const match of changelog.matchAll(CHANGELOG_VERSION_HEADING)) {
-    const version = match[1];
-    if (version == null) continue;
-    const suffix = match[2]?.trim();
-    boundaries.push(`- [${version}]${suffix == null || suffix.length === 0 ? '' : ` - ${suffix}`}`);
-  }
-  return boundaries.join('\n');
 }

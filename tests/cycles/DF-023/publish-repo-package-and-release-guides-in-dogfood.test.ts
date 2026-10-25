@@ -100,7 +100,7 @@ describe('DF-023 publish repo, package, and release guides in DOGFOOD', () => {
     expect(frameText(must(migration.frames.at(-1)))).toContain(`Migrating to Bijou ${BIJOU_VERSION}`);
   });
 
-  it('publishes the v7.2 release-story proof chain in the main reader flow', async () => {
+  it('keeps the release-story proof chain in the main reader flow', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 48 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
 

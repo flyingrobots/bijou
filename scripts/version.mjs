@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { regenerateWorkspaceLock } from './version-lockfile.mjs';
 import { join } from 'node:path';
 import process from 'node:process';
 
@@ -79,37 +80,53 @@ if (!/^[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha)\.[0-9]+)?$/.test(version)) {
 
 const root = process.cwd();
 const packages = workspaceManifestPaths(root);
+const rootPath = join(root, 'package.json');
+const lockPath = join(root, 'package-lock.json');
+const originals = new Map([rootPath, ...packages].map((path) => [path, readFileSync(path)]));
+const originalLock = existsSync(lockPath) ? readFileSync(lockPath) : undefined;
+const internalNames = new Set(packages.map((path) => readJson(path).name));
 
-console.log(`Bumping all packages to ${version}`);
-console.log('');
+try {
+  console.log(`Bumping all packages to ${version}`);
+  console.log('');
 
-for (const manifestPath of packages) {
-  const manifest = readJson(manifestPath);
-  manifest.version = version;
-  writeJson(manifestPath, manifest);
-  console.log(`  ${manifest.name} -> ${version}`);
-}
+  for (const manifestPath of packages) {
+    const manifest = readJson(manifestPath);
+    manifest.version = version;
+    writeJson(manifestPath, manifest);
+    console.log(`  ${manifest.name} -> ${version}`);
+  }
 
-console.log('');
-console.log('Pinning cross-dependencies...');
+  console.log('');
+  console.log('Pinning cross-dependencies...');
 
-for (const manifestPath of packages) {
-  const manifest = readJson(manifestPath);
-  let changed = false;
+  for (const manifestPath of [rootPath, ...packages]) {
+    const manifest = readJson(manifestPath);
+    let changed = false;
 
-  for (const depType of ['dependencies', 'devDependencies', 'peerDependencies']) {
-    if (manifest[depType] == null) continue;
-    for (const name of Object.keys(manifest[depType])) {
-      if (!name.startsWith('@flyingrobots/bijou')) continue;
-      manifest[depType][name] = version;
-      changed = true;
+    for (const depType of ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies']) {
+      if (manifest[depType] == null) continue;
+      for (const name of Object.keys(manifest[depType])) {
+        if (!internalNames.has(name) && !name.startsWith('@flyingrobots/bijou')) continue;
+        manifest[depType][name] = version;
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      writeJson(manifestPath, manifest);
+      console.log(`  ${manifest.name}: pinned internal deps -> ${version}`);
     }
   }
 
-  if (changed) {
-    writeJson(manifestPath, manifest);
-    console.log(`  ${manifest.name}: pinned internal deps -> ${version}`);
-  }
+  console.log('Regenerating package-lock.json...');
+  regenerateWorkspaceLock(root, packages);
+} catch (error) {
+  for (const [path, bytes] of originals) writeFileSync(path, bytes);
+  if (originalLock === undefined) rmSync(lockPath, { force: true });
+  else writeFileSync(lockPath, originalLock);
+  console.error(`Version bump failed; manifests and lockfile restored: ${error instanceof Error ? error.message : String(error)}`);
+  process.exit(1);
 }
 
 console.log('');

@@ -1,0 +1,29 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Reconcile product witness replay helper with landed v8 release/security fixes",
+  "bytesConsumed": 995120,
+  "filesRead": [
+    "scripts/release-product-witnesses.ts",
+    "scripts/release-product-witness-files.ts",
+    "scripts/release-product-witnesses.test.ts",
+    "scripts/release-product-witness-files.test.ts",
+    "docs/releases/8.0.0/product-witness-replay.md",
+    "docs/CHANGELOG.md",
+    ".gitattributes",
+    "docs/README.md"
+  ],
+  "filesModified": [
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative session warning; bounded source reads and progress updates retained"
+  ],
+  "integration": {
+    "priorHead": "fa930390dcf12700e750f9138a91572ef3bbb1a0",
+    "incomingMain": "ecfd53c08e1705c6fa3b0f87f8df1b4c15ef669b",
+    "resolution": "Retain all Fixed release/security notes and the Added witness replay note. Automatic merges preserve replay script entry, portable witness tests and all landed security/hyperlink/version-lock regression entries. Frozen corpus and all nine witness pins unchanged."
+  },
+  "validation": "Normal commit hooks run before Docker mutation RED/GREEN, actual clean-checkout replay with independent receipt validation, full normal Docker pre-push and fresh exact-head review."
+}

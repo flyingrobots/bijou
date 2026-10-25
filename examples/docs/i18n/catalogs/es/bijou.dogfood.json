@@ -2237,7 +2237,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "es": "La ruta de lanzamiento v7.2 por Novedades, prueba e historial del changelog."
+        "es": "La ruta de lanzamiento v{releaseLine} por Novedades, prueba e historial del changelog."
       }
     },
     {

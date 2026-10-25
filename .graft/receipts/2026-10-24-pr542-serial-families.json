@@ -1,0 +1,24 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Enforce serial witness-family replay required by issue 541",
+  "bytesConsumed": 1069789,
+  "filesRead": [
+    "scripts/release-product-witnesses.ts",
+    "scripts/release-product-witnesses.test.ts",
+    "docs/releases/8.0.0/product-witness-replay.md",
+    "docs/CHANGELOG.md"
+  ],
+  "filesModified": [
+    "scripts/release-product-witnesses.ts",
+    "scripts/release-product-witnesses.test.ts",
+    "docs/releases/8.0.0/product-witness-replay.md",
+    "docs/CHANGELOG.md",
+    "scripts/release-product-witness-test-fixture.ts"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative warning; retained bounded reads and user progress updates"
+  ],
+  "validation": "Real process-boundary regression RED on fb7e1ff6421bea4f5fcda7afc6b382f3ada319e6: combined family start/end differs from required non-overlapping sequence. Separate sequential family commands GREEN; all 13 helper tests pass in bounded Docker worker. Actual committed-candidate product replays and normal push gates follow. Initial pre-commit correctly refused a 158-line test; extracted its shared real Git/CLI fixture without growing any baseline."
+}

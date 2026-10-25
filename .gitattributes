@@ -4,3 +4,9 @@ docs/book/build-report.json -text
 docs/book/reader-delivery.json -text
 docs/book/history/2026-10-20-before-progressive-build-report.json -text
 docs/book/history/2026-10-20-before-progressive-reader-delivery.json -text
+
+# Release witness hashes bind original bytes, including on CRLF-configured hosts.
+fixtures/profunctor-page/project-keep/input/* -text
+fixtures/profunctor-page/project-keep/generated/* -text
+examples/docs/fixtures/graphql/navigation-list.graphql -text
+tests/fixtures/RE-036/packed-bijou-cells.v1.json -text

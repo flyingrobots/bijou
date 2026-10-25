@@ -1,0 +1,27 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Repair weak workspace-lock regression oracles from PR 534 review",
+  "bytesConsumed": 830969,
+  "filesRead": [
+    "scripts/workspace-lock.test.ts",
+    "scripts/release-lockfile.ts",
+    "scripts/workspace-lock.test-support.ts",
+    ".coderabbit.yaml"
+  ],
+  "filesModified": [
+    "scripts/workspace-lock.test.ts"
+  ],
+  "tripwires": [],
+  "validation": {
+    "baselineHead": "0af7d33f08de8ef8e1da34f75679483a5bf14ae7",
+    "falseGreen": "Old stale-version test passed with only the workspace-version comparison removed.",
+    "red": "Updated isolated test failed under that identical production mutation on its precise version diagnostic.",
+    "green": "Comparison restored; 32 focused tests passed, typecheck and ESLint passed in copy-isolated Docker.",
+    "scope": "Test-only repair: preserve all valid sibling workspace lock entries, require exact stale-version and missing/unknown-pin diagnostics.",
+    "testOverlaySha256": "5dd6115c6e1c35373c0b4a8c8f08910ef55ffa84a43b3dbe1cd9099e2f24d437",
+    "rawLogSha256": "2f4f2270ea76e96e825ab5d9313428425b80113806fa4e6989003eceebf5394a"
+  },
+  "publication": "Normal Docker pre-push and a fresh independent exact-head review follow this commit."
+}

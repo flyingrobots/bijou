@@ -57,6 +57,12 @@ function makeWorkspace(packages: {
       'utf8',
     );
   }
+  writeFileSync(join(root, 'package-lock.json'), JSON.stringify({
+    lockfileVersion: 3, packages: { '': {}, ...Object.fromEntries(packages.map((pkg) => {
+      const { dir, ...manifest } = pkg;
+      return [`${workspaceRoot}/${dir}`, manifest];
+    })) },
+  }));
   return root;
 }
 

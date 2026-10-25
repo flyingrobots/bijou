@@ -2,9 +2,9 @@
  * Shared Bijou context for MCP tool rendering.
  *
  * Uses `createTestContext` with `mode: 'interactive'` to get Unicode
- * box-drawing layout. The default `plainStyle()` strips all ANSI escape
- * codes, producing clean structured text that renders in any monospace
- * context (chat, markdown, logs).
+ * box-drawing layout. The default `plainStyle()` adds no styling escapes.
+ * Components that generate terminal controls independently, such as hyperlinks,
+ * must explicitly select their plain-text fallback for chat, Markdown and logs.
  */
 
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
