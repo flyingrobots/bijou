@@ -1,0 +1,29 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex-bijou",
+  "task": "Reconcile localized current-release story with landed v8 fixes",
+  "bytesConsumed": 1127936,
+  "filesRead": [
+    "examples/docs/app-release-story.ts",
+    "examples/docs/app-release-story-render.ts",
+    "examples/docs/app-release-line.ts",
+    "examples/docs/content/release-story-active.md",
+    "examples/docs/content/release-story-active.de.md",
+    "examples/docs/content/release-story-active.es.md",
+    "examples/docs/content/release-story-active.fr.md",
+    "tests/cycles/DF-023/current-release-story.test.ts"
+  ],
+  "filesModified": [
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "RUNAWAY_TOOLS cumulative session warning; retained bounded source reads and progress updates"
+  ],
+  "integration": {
+    "priorHead": "24e5d2d8e93f53ef1ede4d628792d884d8d9b393",
+    "incomingMain": "615ddec58ec00455a0729d8927cd7537ecff59bc",
+    "resolution": "Retain current-story Fixed note plus all landed release/security Fixed notes and Added sequential witness replay note. Automatic merges preserve current release templates/catalogs, all main release/security/witness behavior, and frozen historical corpus."
+  },
+  "validation": "Normal commit hooks precede guarded Docker RED against main current-story source, restored candidate GREEN, localization gates, full ordinary Docker pre-push and independent exact-head review."
+}

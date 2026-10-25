@@ -31,6 +31,7 @@
     "soak": "node --import tsx bench/src/soak-runner.ts",
     "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",
     "release:readiness": "tsx scripts/release-readiness.ts",
+    "release:witnesses": "tsx scripts/release-product-witnesses.ts",
     "docs:inventory": "tsx scripts/docs-inventory.ts",
     "generate:profunctor-page-target": "tsx scripts/generate-profunctor-page-target.ts",
     "check:profunctor-page-target": "tsx scripts/generate-profunctor-page-target.ts --check",
@@ -78,10 +79,15 @@
     "version": "node scripts/version.mjs"
   },
   "overrides": {
+    "body-parser": "^2.4.0",
     "fast-uri": "^3.1.9",
-    "hono": "^4.13.0",
+    "hono": "^4.13.11",
+    "ip-address": "^10.7.4",
     "picomatch": "^4.0.4",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+    "proxy-addr": "^2.0.8",
+    "qs": "^6.16.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

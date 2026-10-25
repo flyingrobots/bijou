@@ -1,0 +1,66 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Issue #526: enforce coherent workspace versions and npm lock metadata in the version CLI, pre-commit hook and release preflight",
+  "bytesConsumed": 161876,
+  "filesRead": [
+    "AGENTS.md",
+    "docs/typescript-code-standards.editors-edition.md",
+    "docs/CHANGELOG.md",
+    ".github/workflows/ci.yml",
+    "scripts/version.mjs",
+    "scripts/release-metadata.part01.ts",
+    "scripts/release-metadata.part02.ts",
+    "scripts/release-metadata.part03.ts",
+    "scripts/release-metadata.part04.ts",
+    "scripts/hooks.test.ts",
+    "scripts/release-metadata.part02.test.ts",
+    "scripts/release-metadata.part03.test.ts",
+    "scripts/release-metadata.part04.test.ts",
+    "scripts/release-metadata.part05.test.ts",
+    "tests/cycles/DX-052/release-metadata-entrypoint.test.ts"
+  ],
+  "filesModified": [
+    ".github/workflows/ci.yml",
+    "docs/CHANGELOG.md",
+    "scripts/hooks/pre-commit",
+    "scripts/release-metadata.part01.ts",
+    "scripts/release-metadata.part02.test.ts",
+    "scripts/release-metadata.part03.test.ts",
+    "scripts/release-metadata.part03.ts",
+    "scripts/release-metadata.part04.test.ts",
+    "scripts/release-metadata.part05.test.ts",
+    "scripts/version.mjs",
+    "scripts/release-lockfile.ts",
+    "scripts/version-lockfile.mjs",
+    "scripts/workspace-lock.test-support.ts",
+    "scripts/workspace-lock.test.ts",
+    "scripts/workspace-version-cli.test.ts",
+    "scripts/check-staged-workspace.ts",
+    "scripts/staged-workspace.test.ts"
+  ],
+  "tripwires": [],
+  "validation": {
+    "red": "Five regressions failed on original code: stale lock accepted, malformed/missing lock accepted, release outputs emitted on stale lock, version CLI left stale lock, pre-commit lacked lock diagnostic.",
+    "intermediate": "Real npm 11.19.1 retained old workspace versions on plain package-lock-only regeneration; targeted owned metadata refresh repairs this without discarding third-party resolutions.",
+    "green": "Initial full pre-push passed 4114 tests across 931 files and all normal gates. Review follow-up passed 21 focused tests across three files; new full verification follows.",
+    "review_fix": "CodeRabbit identified that working-tree validation could miss a stale index. The hook now validates immutable staged metadata blobs in an owned temporary snapshot, preserves partial staging, honors GIT_INDEX_FILE, and cleans the snapshot. Real Git/process regressions cover repaired working copies, deleted indexed lock, manifest mismatch, unchanged index/worktree, and alternate index.",
+    "fixture_isolation": "Full pre-push exposed an inherited GIT_DIR in test child processes. Reproduced four failures with explicit parent GIT_DIR; 17 tests passed after isolating fixture environments. Production validation continues to honor the caller's Git context and alternate index.",
+    "full_workspace_rehearsal": {
+      "packages": 11,
+      "version": "8.0.0",
+      "offline": true,
+      "third_party_resolutions_preserved": 280,
+      "source_manifests_modified": false
+    },
+    "standards": "npm run build then npm run code-dojo:precommit passed; fresh worktree required local declarations before lint",
+    "environment": "Initial shared node_modules symlink passed typechecks but made npm ls report invalid workspace links. Reused its exact installed contents via APFS clone, preserving relative links inside the worktree; no package versions changed."
+  },
+  "resource_policy": {
+    "build_budget_gib": 20,
+    "data_budget_gib": 4,
+    "logs_budget_mib": 128,
+    "guard": "Owned process-group timeout, aggregate disk/RSS/log/free-space monitor; shared existing Node toolchain; no Docker outputs."
+  }
+}

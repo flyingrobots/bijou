@@ -3,20 +3,20 @@ import { describe, expect, it } from 'vitest';
 import { createDocsTool, MCP_DOCS_CATALOG } from './docs.js';
 import { ALL_TOOLS } from './docs.test-support.js';
 
-const docsPayloadEntrySchema = z.object({
+const docsPayloadEntrySchema = z.looseObject({
   tool: z.string(),
   mcpExposed: z.boolean(),
   family: z.string(),
   exampleOutput: z.string().optional(),
-}).passthrough();
-const docsPayloadSchema = z.object({
+});
+const docsPayloadSchema = z.looseObject({
   documentedEntries: z.number().optional(),
   documentedTools: z.number().optional(),
   docsOnlyEntries: z.number().optional(),
   returnedEntries: z.number(),
   includeExamples: z.boolean().optional(),
   entries: z.array(docsPayloadEntrySchema),
-}).passthrough();
+});
 
 function parseDocsPayload(result: Awaited<ReturnType<ReturnType<typeof createDocsTool>['handler']>>) {
   const text = result.content[0]?.text;

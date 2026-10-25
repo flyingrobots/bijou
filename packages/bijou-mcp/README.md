@@ -93,7 +93,7 @@ Or point directly at a local checkout:
 | Tool | What it renders |
 | --- | --- |
 | `bijou_kbd` | Keyboard key indicator |
-| `bijou_hyperlink` | Terminal hyperlink (OSC 8) |
+| `bijou_hyperlink` | Plain link text and URL, with configurable fallback |
 | `bijou_skeleton` | Placeholder loading block |
 | `bijou_docs` | Machine-readable docs for the MCP surface plus the full first-party component-family field guide |
 
@@ -157,11 +157,29 @@ renders correctly in any monospace context.
 Each tool accepts structured JSON input, renders via the corresponding
 Bijou component, and returns the result as a plain text string.
 
+`bijou_hyperlink` uses the component's plain-text fallback rather than OSC 8
+terminal controls: `both` (default) returns `text (url)`, `text` returns only
+the label, and `url` returns only the target. This also applies to the
+`structuredContent.rendered` field; the semantic payload keeps the original
+text and URL.
+
 All tools also accept an optional `output` field:
 
 - `text` (default): return the rendered plain-text output in `content`
 - `data`: return only MCP `structuredContent` with machine-readable semantic payload
 - `both`: return both the rendered text and the structured payload
+
+## Runtime compatibility
+
+MCP uses SDK 1.32.1+ and Zod 4.6.6+. The Zod 4 migration retains tool names,
+input fields, and the `text`, `data`, and `both` output modes. Validation error
+wording may differ from Zod 3. The stdio regression checks discovery, public
+input/output schemas, rejected arguments, and successful subsequent requests.
+
+Repository overrides constrain this workspace's runtime dependency graph,
+including body-parser 2.4.0+ and ip-address 10.7.4+. Downstream consumers
+resolve their own dependency trees. This server uses stdio; dependency audit
+results do not establish exposure or mitigation for hypothetical HTTP servers.
 
 ## License
 
