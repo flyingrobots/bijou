@@ -33,6 +33,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - MCP hyperlinks now honor the selected plain-text fallback in text and
   structured rendered output, preserving Unicode layout in other tools (#545).
 
+### Added
+
+- Added `release:witnesses` to replay the inherited V8 product witness families
+  in separate sequential commands with pinned inputs, byte-exact generated
+  artifacts, and a commit-bound receipt.
+  Dirty checkouts, fixture drift, or failed checks prevent a success receipt;
+  final stable-release acceptance remains tracked separately.
+
 ### Documentation book consolidation
 
 - Added a general Preface, seven reader-facing parts with introductions, and

@@ -48,6 +48,7 @@ The glossary and topic finder support practical lookup.
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)
 - [Changelog](./CHANGELOG.md)
+- [V8 product witness replay](./releases/8.0.0/product-witness-replay.md)
 - [Framed app tutorial](./guides/framed-app-tutorial.md)
 
 GitHub issues and milestones own current scope. Historical proposals in the book
