@@ -1,0 +1,63 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Retain exact stable-version candidate receipts and prepare the live five-row acceptance packet and explicit human review matrix",
+  "bytesConsumed": 2535399,
+  "metricScope": "Cumulative session bounded-read metric",
+  "filesRead": [
+    "README.md",
+    "docs/README.md",
+    "docs/CHANGELOG.md",
+    "docs/releases/8.0.0/product-witness-replay.md",
+    "scripts/release-readiness.part03.ts",
+    "scripts/release-product-witness-files.ts",
+    "docs/book/source-manifest.json"
+  ],
+  "filesModified": [
+    "README.md",
+    "docs/CHANGELOG.md",
+    "docs/README.md",
+    "docs/releases/8.0.0/stable-acceptance.md",
+    "docs/releases/8.0.0/stable-candidate-product-witnesses.json",
+    "docs/releases/8.0.0/stable-candidate-runtime-audit.json",
+    "docs/releases/8.0.0/stable-candidate-validation.json",
+    ".graft/receipts/2026-10-25-stable-acceptance-packet.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "4e7d020a2ca182c8cbe96c56292e00c0db4b93c5",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "sourceTreeBeforeFinalProseAndReceipt": "a9f94b06cfc3267589a034262e80e39638a18ae3",
+    "reviewer": "Codex agent; no human approval asserted",
+    "archivedReading": [
+      "R1 docs/VISION.md in full",
+      "R4 ARCHITECTURE.md in full",
+      "R5 docs/ARCHITECTURE.md in full",
+      "R40 docs/DOGFOOD.md in full",
+      "R261 release packet lines1-150 plus earlier bounded review",
+      "R273 release law lines90-199 plus earlier bounded review"
+    ],
+    "checks": [
+      "49 tests in12 release-readiness, corpus, DX-052, DF-023 and WF-167 files passed in guarded Docker",
+      "npm run docs:inventory",
+      "npm run docs:design-system:preflight",
+      "npm run lint",
+      "npm run code-dojo:verify",
+      "Host static SHA-256 verification of9 pinned inputs, current lockfile and both retained receipt artifacts",
+      "git diff --cached --check"
+    ],
+    "behavior": "Preserve candidate sourcef1d1ebc9, full fifteen-step gauntlet4282/957 and zero-vulnerability runtime audit. Add current architecture/DOGFOOD addendum and prepared review matrix; retain human signoff and final source replay as explicit requirements. Later PR evidence supersedes pending snapshot statuses without relabeling candidate receipts. Root API ownership, test-command scope, current working-agreement links and release framing corrected; dated stable preparation boundary added. Final prose wording clarifying supersession followed the targeted source validation."
+  }
+}

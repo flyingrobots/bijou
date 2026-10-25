@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+## [8.0.0] - 2026-10-24
+
+Stable release preparation. The live acceptance packet records candidate
+validation; a stable tag, human release signoff and registry publication remain
+separate gates. The historical `8.0.0-rc.1` entry below is preserved.
+
 ### Added
 
 - DOGFOOD publishes translated Latest Features and MCP package guides, labels
@@ -109,6 +115,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   retaining live engineering policy, changelog, and the edited tutorial.
 
 ### Changed
+
+- Cleared the final twelve Code Dojo file/context exceptions through focused
+  module extraction, preserving public entrypoints, and tightened the aggregate
+  standards-debt ceiling from twelve to zero.
 
 - Retired the duplicated filesystem backlog after verifying all 44 planning
   files against existing GitHub issues and preserving historical source text.

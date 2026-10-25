@@ -1,0 +1,134 @@
+{
+  "schema": "bijou-release-candidate-validation/1",
+  "sourceCommit": "f1d1ebc928b360d84d9f2af29b7ce7075b808c5c",
+  "sourceTree": "1d6a43bbbdab0c6dd80c639b948c325b39960bba",
+  "packageVersion": "8.0.0",
+  "nodeVersion": "v24.18.0",
+  "stage": "prep-pr",
+  "releaseReadiness": {
+    "command": [
+      "npm",
+      "run",
+      "release:readiness"
+    ],
+    "status": "pass",
+    "milestoneChecks": "Not requested for prep-pr; issue527 is still open. Final milestone-aware replay is required after merge.",
+    "steps": [
+      {
+        "label": "build",
+        "status": "pass"
+      },
+      {
+        "label": "lint",
+        "status": "pass"
+      },
+      {
+        "label": "code:size",
+        "status": "pass"
+      },
+      {
+        "label": "typecheck:test",
+        "status": "pass"
+      },
+      {
+        "label": "docs:design-system:preflight",
+        "status": "pass"
+      },
+      {
+        "label": "dogfood:coverage:gate",
+        "status": "pass"
+      },
+      {
+        "label": "dogfood:i18n:check",
+        "status": "pass"
+      },
+      {
+        "label": "dogfood:i18n:debt",
+        "status": "pass"
+      },
+      {
+        "label": "workflow:shell:preflight",
+        "status": "pass"
+      },
+      {
+        "label": "release:preflight",
+        "status": "pass"
+      },
+      {
+        "label": "test:frames",
+        "status": "pass"
+      },
+      {
+        "label": "verify:interactive-examples",
+        "status": "pass"
+      },
+      {
+        "label": "smoke:canaries",
+        "status": "pass"
+      },
+      {
+        "label": "smoke:dogfood",
+        "status": "pass"
+      },
+      {
+        "label": "test",
+        "status": "pass"
+      }
+    ],
+    "fullSuite": {
+      "testFiles": 957,
+      "tests": 4282,
+      "status": "pass"
+    }
+  },
+  "runtimeAudit": {
+    "command": [
+      "npm",
+      "audit",
+      "--omit=dev",
+      "--audit-level=high",
+      "--json"
+    ],
+    "status": "pass",
+    "observedVulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  "localizationDebt": {
+    "rawStrings": 2289,
+    "missingMarkdownLocalizations": 78,
+    "ratchet": "pass; existing baseline retained"
+  },
+  "artifacts": {
+    "stable-candidate-product-witnesses.json": "89461a18f27aac2d8491c9e7e985dfdde4fca405fd42f0434845321e5f0b0243",
+    "stable-candidate-runtime-audit.json": "24fe9b824768fb6dff8d8516d35dd574d76e8923b0b38731f3f72e5d1d9a3a54"
+  },
+  "rawValidationLog": {
+    "sha256": "673248ce27618f34efac15daa72797b55b47d3292808c153dc0eb894a2af12db",
+    "bytes": 155517,
+    "retention": "Operator evidence retained outside the checkout; rerun the commands to reproduce observations."
+  },
+  "executionBounds": {
+    "worker": "bijou-pr-validation",
+    "cpuLimit": 2,
+    "memoryAndSwapGiB": 3,
+    "readOnlyRoot": true,
+    "bindMounts": false,
+    "dataBudgetGiB": 4,
+    "logBudgetMiB": 128,
+    "deadlineSeconds": 1800,
+    "monitorSeconds": 2,
+    "workerStoppedAfterRun": true
+  },
+  "limitations": [
+    "Candidate source only; no stable tag or registry publication asserted.",
+    "No human signoff asserted.",
+    "Later documentation commits are not relabeled as this tested source.",
+    "Product witness receipt covers only DX-050, DX-049 and RE-036."
+  ]
+}
