@@ -1,0 +1,46 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Prepare issue527 zero-debt acceptance by separating DAG source contracts, array adaptation, traversal and slice views without changing the public facade",
+  "bytesConsumed": 2087116,
+  "metricScope": "Cumulative bounded-read metric for the ongoing Bijou session",
+  "filesRead": [
+    "packages/bijou/src/core/components/dag-source.ts",
+    "docs/typescript-code-standards.editors-edition.md"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/components/dag-source.ts",
+    "packages/bijou/src/core/components/dag-source-model.ts",
+    "packages/bijou/src/core/components/dag-source-array.ts",
+    "packages/bijou/src/core/components/dag-source-traversal.ts",
+    "packages/bijou/src/core/components/dag-source-slice.ts",
+    ".graft/receipts/2026-10-25-dag-source-split.json"
+  ],
+  "tripwires": [
+    {
+      "_brand": "Tripwire",
+      "signal": "SESSION_LONG",
+      "recommendation": "Session exceeds 500 messages. Use state_save to persist context and start a new session."
+    },
+    {
+      "_brand": "Tripwire",
+      "signal": "RUNAWAY_TOOLS",
+      "recommendation": "Over 80 tool calls without user input. Pause and check in with the user."
+    }
+  ],
+  "baseCommit": "0e4ce3a3fcc3cfdb0fa1cb6a32d2681904be5f11",
+  "commit": "Identified by the Git commit containing this receipt",
+  "verification": {
+    "sourceTreeWithoutReceipt": "dbcc2b32dae36a0359706523476befb9f03dfb4a",
+    "environment": "Reused bounded copy-only Docker worker, Node24.18.0; no host tests",
+    "checks": [
+      "218 tests across 37 DAG and DX-050 files passed",
+      "npm run typecheck:test",
+      "npm run lint",
+      "npm run lint:eslint"
+    ],
+    "bounds": "Facade4 lines; model107; array adapter83; traversal96; slice115. Aggregate baseline remains12 until full cleanup.",
+    "behavior": "Preserve original root exports, graph access order and parent binding, ancestor/descendant direction handling, frozen missing-focus singleton and IDs, ghost prefixes/labels/metadata, derived reverse edges, array materialization, and optional styling methods."
+  }
+}
