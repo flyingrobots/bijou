@@ -29,6 +29,15 @@ describe('MCP stdio compatibility', () => {
       expect(tools.map(({ name }) => name)).toEqual(
         expect.arrayContaining(['bijou_table', 'bijou_docs']),
       );
+      const tableSchema = tools.find(({ name }) => name === 'bijou_table');
+      expect(tableSchema).toHaveProperty('inputSchema.required', expect.arrayContaining(['columns', 'rows']));
+      expect(tableSchema).toHaveProperty('inputSchema.properties.rows.items.items.type', 'string');
+      expect(tableSchema).toHaveProperty('outputSchema.required', expect.arrayContaining(['output', 'data']));
+      expect(tableSchema).toHaveProperty('outputSchema.properties.rendered.type', 'string');
+      expect(tableSchema).toHaveProperty('outputSchema.properties.data.type', 'object');
+      const linkSchema = tools.find(({ name }) => name === 'bijou_hyperlink');
+      expect(linkSchema).toHaveProperty('inputSchema.required', expect.arrayContaining(['text', 'url']));
+      expect(linkSchema).toHaveProperty('inputSchema.properties.fallback.enum', ['url', 'text', 'both']);
       const input = { columns: [{ header: 'Job' }], rows: [['compile']] };
       const table = await client.callTool(
         { name: 'bijou_table', arguments: { ...input, output: 'both' } },

@@ -15,6 +15,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   lockfile, and added a real stdio client/server compatibility check (#536).
   Preserved the patched fast-uri floor from merged dependency PR #530.
 
+- Moved MCP validation to patched Zod 4, raised body-parser to 2.4.0+ and
+  ip-address to 10.7.4+, and added public stdio schema regressions for newer
+  runtime advisories. Tool names, input fields and output modes are retained;
+  validation error wording may change with Zod 4 (#536).
+
 - The pre-commit version gate validates staged metadata, preserving partial
   staging while rejecting stale index contents hidden by repaired working files
   (#526).

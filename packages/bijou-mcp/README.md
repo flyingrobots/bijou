@@ -169,6 +169,18 @@ All tools also accept an optional `output` field:
 - `data`: return only MCP `structuredContent` with machine-readable semantic payload
 - `both`: return both the rendered text and the structured payload
 
+## Runtime compatibility
+
+MCP uses SDK 1.32.1+ and Zod 4.6.6+. The Zod 4 migration retains tool names,
+input fields, and the `text`, `data`, and `both` output modes. Validation error
+wording may differ from Zod 3. The stdio regression checks discovery, public
+input/output schemas, rejected arguments, and successful subsequent requests.
+
+Repository overrides constrain this workspace's runtime dependency graph,
+including body-parser 2.4.0+ and ip-address 10.7.4+. Downstream consumers
+resolve their own dependency trees. This server uses stdio; dependency audit
+results do not establish exposure or mitigation for hypothetical HTTP servers.
+
 ## License
 
 Apache-2.0
