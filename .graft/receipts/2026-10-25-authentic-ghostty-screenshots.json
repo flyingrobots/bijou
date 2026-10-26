@@ -1,0 +1,75 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Replace reconstructed README artwork with maintainer supplied authentic Ghostty screenshots",
+  "bytesConsumed": 2762666,
+  "metricScope": "Cumulative bounded-read snapshot at Graft seq705",
+  "filesRead": [
+    "README.md",
+    "assets/screenshots/README.md",
+    "assets/screenshots/capture.ts",
+    "assets/screenshots/render.py"
+  ],
+  "filesModified": [
+    "README.md",
+    "assets/screenshots/README.md",
+    "assets/screenshots/SHA256SUMS",
+    "assets/screenshots/capture.ts",
+    "assets/screenshots/render.py",
+    "assets/screenshots/scenes.json",
+    "assets/screenshots/dogfood-components.png",
+    "assets/screenshots/dogfood-themes.png",
+    "assets/screenshots/dogfood-landing.png",
+    "assets/screenshots/dogfood-settings.png",
+    ".graft/receipts/2026-10-25-authentic-ghostty-screenshots.json"
+  ],
+  "tripwires": [
+    "SESSION_LONG diagnostic; maintainer explicitly supplied replacement captures",
+    "RUNAWAY_TOOLS diagnostic; progress updates and bounded reads supplied"
+  ],
+  "baseCommit": "27cf900fc31e32ecb94214b9f3d63cfd83f853c4",
+  "commit": "Identified by containing Git commit",
+  "verification": {
+    "before": "The previous images reconstructed app cells in Menlo, omitted text modifiers, and used a plain-style test adapter. The maintainer reported that colours and fonts did not match Ghostty and supplied five original PNGs.",
+    "after": "Selected four original PNGs, visually inspected all five inputs, copied the four byte for byte, verified SHA-256 equality and 4096x2304 dimensions, and checked local documentation links. The image containing the macOS screenshot thumbnail overlay was not selected.",
+    "sources": [
+      {
+        "file": "dogfood-landing.png",
+        "sourceName": "Screenshot 2026-10-25 at 5.07.42\u202fPM.png",
+        "sha256": "242a2a68b53297c821e4546ff26e3638d6892985978d0b3432e5800a2a8fb8a1",
+        "bytes": 1756751,
+        "width": 4096,
+        "height": 2304
+      },
+      {
+        "file": "dogfood-components.png",
+        "sourceName": "Screenshot 2026-10-25 at 5.08.38\u202fPM.png",
+        "sha256": "00621cdd8961a3b4591aca2a1cb7d7ede168b029e90b02eb62503d4ddf0dd880",
+        "bytes": 1340695,
+        "width": 4096,
+        "height": 2304
+      },
+      {
+        "file": "dogfood-themes.png",
+        "sourceName": "Screenshot 2026-10-25 at 5.08.46\u202fPM.png",
+        "sha256": "6c1e5d04a6618eaad72ae5eb1e4eff9c93f224ff14710e0ca1d025506bc51567",
+        "bytes": 1201177,
+        "width": 4096,
+        "height": 2304
+      },
+      {
+        "file": "dogfood-settings.png",
+        "sourceName": "Screenshot 2026-10-25 at 5.09.04\u202fPM.png",
+        "sha256": "c7a9cd35f8928e7df3a3cb65eac648fbc04bc6af1813564795ebd1fee959090d",
+        "bytes": 1312113,
+        "width": 4096,
+        "height": 2304
+      }
+    ],
+    "sourceScope": "The capture commit was not independently recorded. The title displays v8.0.0; no commit-bound test or performance claim is inferred from these images. Desktop source files are preserved.",
+    "removal": "Delete only the obsolete README-specific capture.ts, render.py, and scenes.json. Frozen font evidence, production runtime, tests, and version metadata are unchanged.",
+    "checks": "Focused documentation tests and normal commit/push hook results are recorded in guarded Docker logs after this staged snapshot. No new runtime tests are added for an image-only/documentation correction.",
+    "humanReview": "Supplying these screenshots authorizes this replacement, not approval of all remaining release documentation."
+  }
+}

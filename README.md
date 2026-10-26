@@ -4,11 +4,11 @@ Build terminal applications in TypeScript, from a small CLI to a full-screen wor
 
 [Read the teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf) · [Design Archive](docs/book/bijou-archive.pdf) · [Read the complete Bijou documentation book](docs/book/bijou-designs.pdf)
 
-![DOGFOOD component explorer showing a data table, component navigation, and keyboard controls in the dark theme](assets/screenshots/dogfood-components.png)
+![DOGFOOD running in Ghostty, showing the component explorer, performance overlay, and braille chart](assets/screenshots/dogfood-components.png)
 
-![DOGFOOD Theme Lab showing the light theme and its colour tokens](assets/screenshots/dogfood-themes.png)
+![DOGFOOD Theme Lab running in Ghostty with the Bijou Book dark theme](assets/screenshots/dogfood-themes.png)
 
-DOGFOOD is built with Bijou: a component explorer, live documentation, and a place to try layouts and themes.
+DOGFOOD is built with Bijou: a component explorer, live documentation, and a place to try layouts and themes. These are real Ghostty screenshots; [see the title screen and settings](assets/screenshots/README.md).
 
 ## Try Bijou
 
