@@ -1,0 +1,31 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "fix(deps): refresh dependencies while preserving Node 20 support",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    ".github/workflows/ci.yml",
+    ".graft/receipts/2026-10-22-pr548-node20-compatibility.json",
+    "bench/package.json",
+    "docs/CHANGELOG.md",
+    "package-lock.json",
+    "package.json",
+    "packages/bijou-i18n-tools-node/package.json",
+    "packages/bijou-i18n-tools-xlsx/package.json",
+    "packages/bijou-i18n-tools/package.json",
+    "packages/bijou-i18n/package.json",
+    "packages/bijou-tui-app/package.json",
+    "packages/bijou-tui/package.json",
+    "packages/bijou/package.json",
+    "packages/create-bijou-tui-app/package.json",
+    ".graft/receipts/2026-10-26-pr548-signed-integration.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Fresh integration binding has no substantive Graft reads at preparation; original source audits and historical receipts remain preserved. This is an integration provenance record, not a claim of a new Graft read.",
+  "baseCommit": "8a1bcd54382f03c9900425c53824da71957a5939",
+  "originalPr": 548,
+  "validation": "Preparatory static audit complete. Focused current-source checks and native commit hooks run immediately after this receipt is staged. Full combined pre-push and individual hosted CI remain pending. Historical receipts are not relabelled as new validation.",
+  "publication": "Independent exact-head review and hosted checks remain required before merging; no tags or registry publication."
+}

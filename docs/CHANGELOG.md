@@ -25,6 +25,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   edited notices use their updated timestamp, and active limits keep merge
   readiness pending without changing the human-review requirement.
 
+- The supported Node 20/22 CI matrix rejects dependency engine mismatches.
+  Dependency refreshes retain the Node-20-compatible Vitest 4 line rather than
+  silently accepting an unsupported test-runner upgrade (PR #548).
+
 ## [8.0.0] - 2026-10-24
 
 Stable release preparation. The live acceptance packet records candidate

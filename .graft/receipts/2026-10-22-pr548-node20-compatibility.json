@@ -1,0 +1,37 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Preserve supported Node20 installation compatibility in dependency PR548 and enforce engine declarations in CI",
+  "bytesConsumed": 354644,
+  "filesRead": [
+    ".github/workflows/ci.yml",
+    "tests/cycles/WF-166/dependency-security-closeout.test.ts",
+    "bench/package.json"
+  ],
+  "filesModified": [
+    ".github/workflows/ci.yml",
+    "bench/package.json",
+    "docs/CHANGELOG.md",
+    "package.json",
+    "packages/bijou-i18n-tools-node/package.json",
+    "packages/bijou-i18n-tools-xlsx/package.json",
+    "packages/bijou-i18n-tools/package.json",
+    "packages/bijou-i18n/package.json",
+    "packages/bijou-tui-app/package.json",
+    "packages/bijou-tui/package.json",
+    "packages/bijou/package.json",
+    "packages/create-bijou-tui-app/package.json",
+    ".graft/receipts/2026-10-22-pr548-node20-compatibility.json",
+    "package-lock.json"
+  ],
+  "tripwires": [
+    "Original lock metadata declares Vitest5 unsupported on Node20; actual offline engine-strict npm install failed with EBADENGINE on checksum-verified Node20.20.2/npm10.8.2",
+    "Manifest and lock metadata were inspected through structural JSON projections; generated lockfile is not read as source prose",
+    "A first scoped manifest list omitted the explicit bench workspace; complete lock/workspace inspection found its retained Vitest5 and the bench manifest was included before rerunning verification"
+  ],
+  "validation": {
+    "red": "Original PR548 strict-engine offline install rejects vitest@5.0.5 on actual Node20.20.2; no runtime test failure is claimed",
+    "green": "Compatible graph regeneration, clean strict-engine install, full Node20 validation and normal commit/push hooks must pass before publication; exact execution receipts remain in PR activity evidence"
+  }
+}
