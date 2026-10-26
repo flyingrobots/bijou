@@ -1,5 +1,5 @@
 import { createTokenGraph, type ThemeMode } from './graph.js';
-import { collectFieldDependents } from './graph-field-dependents.js';
+import { collectFieldDependents, type FieldDependent } from './graph-field-dependents.js';
 import type { TokenDefinitions } from './graph-types.js';
 import { isNestedDefinitions, isTokenDefinition, isTokenValue } from './graph-guards.js';
 
@@ -98,15 +98,15 @@ export function collectTransitiveTokenDependents(
 
   for (const path of direct.keys()) {
     const reached = new Set<string>();
-    const visited = new Set<string>();
+    const visited = new Set<FieldDependent>();
     const queue = [...(direct.get(path) ?? [])];
     while (queue.length > 0) {
       const next = queue.shift();
       if (next === undefined || next === path || visited.has(next)) continue;
       visited.add(next);
-      const token = backgrounds.has(next) ? next.slice(0, -3) : next;
+      const token = typeof next === 'string' ? backgrounds.get(next) ?? next : next.owner;
       if (token !== path) reached.add(token);
-      queue.push(...(direct.get(next) ?? []));
+      if (typeof next === 'string') queue.push(...(direct.get(next) ?? []));
     }
     transitive.set(path, [...reached]);
   }

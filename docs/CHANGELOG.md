@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Reverse theme dependency scopes use authored tokens and preserve parent
+  background edges when an explicit dotted token shadows the virtual field.
+
 - Release Dry Run rejects missing or blank `version` and `notes_tag` outputs in
   the verification job, with a specific diagnostic before downstream jobs run
   (#533; signed integration of PR #535).
