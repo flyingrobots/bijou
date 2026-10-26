@@ -2000,7 +2000,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "{paneSwitch} • [/] color • r/g/b channel • -/+ nudge • 0 reset"
+        "en": "{paneSwitch} • n/p color • 1/2/3 channel • -/+ nudge • 0 reset"
       }
     },
     {
@@ -4492,6 +4492,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "themeLab.activeShell"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "* {label} -> {name}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.activeShell.numbered"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "* {index}. {label} -> {name}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeLab.body.inspectorHint"
       },
       "kind": "message",
@@ -4558,6 +4580,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "themeLab.editedName"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{name} (edited)"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeLab.editor.channel"
       },
       "kind": "message",
@@ -4607,7 +4640,7 @@
       "kind": "message",
       "sourceLocale": "en",
       "values": {
-        "en": "Controls: [/] color | r/g/b channel | -/+ nudge | 0 reset"
+        "en": "Controls: n/p color | 1/2/3 channel | -/+ nudge | 0 reset"
       }
     },
     {
@@ -4679,6 +4712,94 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "themeLab.keys.blue"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Blue channel"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.keys.green"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Green channel"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.keys.next"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Next editable color"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.keys.nudgeDown"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Nudge channel down"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.keys.nudgeUp"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Nudge channel up"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.keys.previous"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Previous editable color"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.keys.red"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Red channel"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.keys.reset"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Reset draft"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeLab.lightSwatchesTitle"
       },
       "kind": "message",
@@ -4690,12 +4811,265 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "themeLab.picker.hint"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "F2 opens the theme picker. {count} themes available."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.pickerTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Themes"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "themeLab.postureTitle"
       },
       "kind": "message",
       "sourceLocale": "en",
       "values": {
         "en": "theme posture"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.preview.accent"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "ACCENT"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.preview.alertWarning"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Two advisories remain open."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.preview.error"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "ERROR"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.preview.info"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "INFO"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.preview.separator"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "preview"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.preview.success"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "SUCCESS"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.preview.warning"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "WARNING"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.previewTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Live preview"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.considered"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "considered {count} candidates"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.defersTo"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "  defers to {dependency}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.field"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{path} is a field of a token, not a token with its own rule."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.literal"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "literal {hex}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.literalNote"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "A literal cannot re-decide when the palette moves."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.none"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "No provenance: this theme was authored as flat token values."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.override"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "{path} is a direct override: {hex}; base provenance follows."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.reference"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "reference {hex}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.rule"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "rule {rule} -> {hex}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.score"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "score"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.skipped"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "skip"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenance.won"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "WON "
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "themeLab.provenanceTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Why this value"
       }
     },
     {

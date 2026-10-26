@@ -1,0 +1,22 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Preserve complete Theme Lab provenance values at constrained widths",
+  "bytesConsumed": 427194,
+  "filesRead": [
+    "examples/docs/app-theme-lab-provenance-view.ts",
+    "examples/docs/app-theme-lab-editor-draw.ts",
+    "packages/bijou/src/core/text/wrap.ts",
+    "packages/bijou/src/ports/surface-contract.ts"
+  ],
+  "filesModified": [
+    "examples/docs/app-theme-lab-provenance-view.ts",
+    "tests/cycles/DL-024/theme-provenance-wrapping.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [
+    "Use the existing terminal-column wrapping primitive and allocate all wrapped rows before painting",
+    "Very narrow surfaces reserve their available width for text instead of clipping every character behind a swatch"
+  ]
+}
