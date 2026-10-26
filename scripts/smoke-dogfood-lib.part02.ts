@@ -10,6 +10,8 @@ import {
   missingRequiredSnippets,
   normalizeDogfoodOutput,
 } from './smoke-dogfood-lib.part01.js';
+// Oversized captures fail rather than validating silently truncated output.
+const MAX_CAPTURE_BYTES = 1024 * 1024;
 export function createDogfoodScenarioPlan(
   root: string,
   scenario: DogfoodScenario,
@@ -57,6 +59,7 @@ export async function runDogfoodScenario(
 
   return new Promise<SmokeDogfoodResult>((resolveResult) => {
     const chunks: Buffer[] = [];
+    let capturedBytes = 0;
     let settled = false;
 
     const finish = (status: SmokeDogfoodResult['status'], reason?: string) => {
@@ -79,14 +82,25 @@ export async function runDogfoodScenario(
       finish('error', `timed out after ${String(plan.timeoutMs)}ms`);
     }, plan.timeoutMs);
 
-    child.stdout.on('data', (chunk: Buffer) => chunks.push(chunk));
-    child.stderr.on('data', (chunk: Buffer) => chunks.push(chunk));
+    const capture = (chunk: Buffer) => {
+      if (settled) return;
+      if (capturedBytes + chunk.length > MAX_CAPTURE_BYTES) {
+        child.kill('SIGKILL');
+        finish('error', `capture output exceeded ${String(MAX_CAPTURE_BYTES)} bytes`);
+        return;
+      }
+      capturedBytes += chunk.length;
+      chunks.push(chunk);
+    };
+    child.stdout.on('data', capture);
+    child.stderr.on('data', capture);
 
     child.on('error', (error) => {
       finish('error', error.message);
     });
 
     child.on('close', (code) => {
+      if (settled) return;
       if (code !== 0) {
         finish(
           'error',

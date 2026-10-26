@@ -1,0 +1,26 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "fix(smoke): expose bounded DOGFOOD startup failure evidence",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    ".graft/receipts/2026-10-22-issue-523-diagnostics.json",
+    ".graft/receipts/2026-10-22-pr537-capture-limit.json",
+    ".graft/receipts/2026-10-26-pr537-signed-integration.json",
+    "docs/CHANGELOG.md",
+    "docs/README.md",
+    "scripts/release-docs-agreement.test.ts",
+    "scripts/smoke-dogfood-failure.test.ts",
+    "scripts/smoke-dogfood-lib.part02.ts",
+    "scripts/smoke-dogfood-lib.part03.ts",
+    ".graft/receipts/2026-10-26-pr537-signed-integration.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Fresh integration binding has no substantive Graft reads at preparation; original source audits and historical receipts remain preserved. This is an integration provenance record, not a claim of a new Graft read.",
+  "baseCommit": "1f2791f91d2e3d072a9986dceb298aad4935307a",
+  "originalPr": 537,
+  "validation": "Preparatory static audit complete. Focused current-source checks and native commit hooks run immediately after this receipt is staged. Full combined pre-push and individual hosted CI remain pending. Historical receipts are not relabelled as new validation.",
+  "publication": "Independent exact-head review and hosted checks remain required before merging; no tags or registry publication."
+}

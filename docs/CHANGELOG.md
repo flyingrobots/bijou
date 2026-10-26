@@ -12,6 +12,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   the verification job, with a specific diagnostic before downstream jobs run
   (#533; signed integration of PR #535).
 
+- DOGFOOD smoke scenarios refuse captures above 1 MiB across stdout and stderr,
+  stop retaining output after settlement, and report the capture limit instead
+  of validating truncated output or collecting it without a bound (#523).
+- DOGFOOD smoke failures include a normalized capture tail, limited to 40 lines
+  and 4096 characters, so startup errors show the failing path and stack (#523).
+  Documented the release-line path rule and cross-checked readiness against
+  DOGFOOD for alpha, beta, release-candidate, and stable versions.
+
 ## [8.0.0] - 2026-10-24
 
 Stable release preparation. The live acceptance packet records candidate

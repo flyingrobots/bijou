@@ -72,3 +72,10 @@ the live packet it found; its presence does not replace review of its evidence.
 DOGFOOD labels its archive-backed articles as historical references. Its live
 Latest Features guide covers later font, typography, animation, and theme work;
 the package READMEs and runnable examples provide the detailed current contracts.
+
+Release document paths use the release line: `8.0.0-alpha.1`, `8.0.0-beta.12`,
+`8.0.0-rc.1`, and stable `8.0.0` share `docs/releases/8.0.0/`. The readiness
+milestone is `v8.0.0`; DOGFOOD uses the same directory for its release guides.
+Prereleases keep their exact version in document content, without duplicating
+the directory. Preserved historical documents remain accessible through the
+bounded reading command above.
