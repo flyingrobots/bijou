@@ -30,7 +30,7 @@ export function renderThemeLabGraphSurface(
   mode: ThemeMode = DEFAULT_THEME_MODE.mode,
 ): Surface {
   const nodes = themeLabGraphNodes(baseTheme, draftTheme, mode);
-  const safeWidth = Math.max(32, width);
+  const safeWidth = Math.max(1, width);
   const stackedRows = shouldStackThemeLabRows(safeWidth);
   const nodeRowHeight = stackedRows ? 2 : 1;
   const height = nodes.reduce((sum, node) => sum + nodeRowHeight + node.edges.length, 0);

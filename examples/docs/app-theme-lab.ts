@@ -63,8 +63,8 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
 
   const leftWidth = themeLabColumnWidth(bodyWidth);
   const rightWidth = themeLabRightColumnWidth(bodyWidth);
-  const leftBody = Math.max(20, leftWidth - 2);
-  const rightBody = Math.max(18, rightWidth - 2);
+  const leftBody = Math.max(1, leftWidth - 4);
+  const rightBody = Math.max(1, rightWidth - 4);
   const selectedPath = themeLabEditorSelectedPath(editor);
   const selectedDraftHex = themeLabEditableHex(draftTheme, selectedPath);
   const selectedBaseHex = themeLabEditableHex(activeTheme.theme, selectedPath);

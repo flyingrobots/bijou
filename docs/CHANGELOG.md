@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Theme Lab wraps complete picker labels, hints and editor context before
+  painting, retaining long Book theme names in narrow columns. Column content
+  budgets include both the border and horizontal padding.
+
 - Theme Lab paints complete grapheme clusters at their terminal cell widths,
   preserving wide-character continuation cells and combining marks.
 
