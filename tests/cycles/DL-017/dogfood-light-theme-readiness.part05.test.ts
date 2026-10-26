@@ -33,6 +33,7 @@ describe('DL-017 DOGFOOD light theme readiness', () => {
         must(lightTheme).surface.primary.hex,
         must(lightTheme).surface.muted.hex,
         'Theme Lab',
+        true, // This viewport deliberately uses the two-line token row.
       );
 
       const [inspectorModel] = app.update(MSG_F10, lightModel);
