@@ -1,0 +1,18 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "docs(design): specify Geordi native GPU cell host",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    "docs/design/RE-510-geordi-native-gpu-host-for-bijou-cell-buffers.md",
+    ".graft/receipts/2026-10-26-pr511-signed-integration.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Fresh integration binding has no substantive Graft reads at preparation; original source audits and historical receipts remain preserved. This is an integration provenance record, not a claim of a new Graft read.",
+  "baseCommit": "7a49ae3d47d4b283ff82548aa12a66388b3b0932",
+  "originalPr": 511,
+  "validation": "Preparatory static audit complete. Focused current-source checks and native commit hooks run immediately after this receipt is staged. Full combined pre-push and individual hosted CI remain pending. Historical receipts are not relabelled as new validation.",
+  "publication": "Independent exact-head review and hosted checks remain required before merging; no tags or registry publication."
+}
