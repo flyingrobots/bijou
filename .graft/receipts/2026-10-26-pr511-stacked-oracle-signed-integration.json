@@ -1,0 +1,20 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Retain responsive light-theme readability proof with composed design candidate",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    ".graft/receipts/2026-10-26-pr517-stacked-readability-oracle.json",
+    "tests/cycles/DL-017/dogfood-light-theme-readiness.chrome-support.ts",
+    "tests/cycles/DL-017/dogfood-light-theme-readiness.part05.test.ts",
+    ".graft/receipts/2026-10-26-pr511-stacked-oracle-signed-integration.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Fresh integration binding has no substantive Graft reads at preparation; original source audits and historical receipts remain preserved. This is an integration provenance record, not a claim of a new Graft read.",
+  "baseCommit": "94fc4b3733ac176acb791623f63780c0396a67d2",
+  "originalPr": 511,
+  "validation": "Normal signed merge of the published-local source proof; focused app test and native hooks run before commit. No design bytes or production source changed by the oracle fix. Final combined native push/hostedCI/current-head reviews remain required.",
+  "publication": "Independent exact-head review and hosted checks remain required before merging; no tags or registry publication."
+}
