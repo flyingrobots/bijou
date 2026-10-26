@@ -1,22 +1,34 @@
-# README application captures
+# DOGFOOD in Ghostty
 
-The two PNGs show production DOGFOOD views: the table component explorer in the book dark theme and Theme Lab in the book light theme. They are software cell captures, not photographs of a physical terminal or design mockups.
+These screenshots were supplied by the maintainer from a live Ghostty session on macOS on 25 October 2026. The PNGs are copied byte for byte: no cropping, resizing, recolouring, font substitution, or cell reconstruction. Their fonts and colours reflect that terminal session.
 
-The application source was commit `0d9a068c5bbae85a78ce64d5c905e8146a27f4c4`. The capture adapter added here ran in the guarded `bijou-pr-validation` Docker worker against that source, at 140 columns by 36 rows. The light theme was selected through the settings keys. The retained `scenes.json` contains the actual glyphs and foreground/background colours returned by the application views.
+## Component explorer
 
-`render.py` renders those cells with macOS CoreText and Menlo at 15 points, using 9 × 18 pixel cells. Unspecified colours inherit the first header cell’s colours. Text modifiers are not rasterized. Each resulting PNG is 1260 × 648 pixels; this is documentation artwork, not a physical-terminal parity claim.
+![DOGFOOD component explorer with the performance overlay and braille chart](dogfood-components.png)
 
-To capture the current application again, run these commands inside the guarded worker after installing the committed lockfile:
+## Theme Lab
 
-```sh
-npm run build
-node --import tsx assets/screenshots/capture.ts > /data/scenes.json
-```
+![DOGFOOD Theme Lab in the Bijou Book dark theme](dogfood-themes.png)
 
-Export `/data/scenes.json` to this directory, then render the retained cells on macOS:
+## Title screen
 
-```sh
-python3 assets/screenshots/render.py
-```
+![DOGFOOD animated Bijou title and Press Enter prompt](dogfood-landing.png)
 
-The renderer uses only system frameworks and does not run the application. Keep the scenes, PNGs, and source coordinates together when refreshing these images.
+## Settings
+
+![DOGFOOD settings drawer with the Soft Arcade theme](dogfood-settings.png)
+
+## Provenance
+
+All four images are 4096 × 2304 pixels. The title screen displays version `8.0.0`; the capture commit was not independently recorded, so these images are not commit-bound test evidence. [SHA256SUMS](SHA256SUMS) pins the original PNG bytes.
+
+| Image | Supplied source filename |
+| :--- | :--- |
+| `dogfood-landing.png` | `Screenshot 2026-10-25 at 5.07.42 PM.png` |
+| `dogfood-components.png` | `Screenshot 2026-10-25 at 5.08.38 PM.png` |
+| `dogfood-themes.png` | `Screenshot 2026-10-25 at 5.08.46 PM.png` |
+| `dogfood-settings.png` | `Screenshot 2026-10-25 at 5.09.04 PM.png` |
+
+The second title capture at 5.07.44 PM was not selected because it includes the macOS screenshot thumbnail overlay.
+
+To refresh this gallery, capture the running application in Ghostty, retain the original PNGs, and update the hashes and source filenames. The former README cell-capture adapter, reconstructed scenes, and CoreText renderer have been removed because they did not preserve terminal appearance.
