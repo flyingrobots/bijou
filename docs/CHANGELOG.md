@@ -49,6 +49,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   colors authored as `TokenValue` literals, while absent backgrounds remain
   unresolved (PR #516).
 
+- Reject overflowing perceptual-to-RGB conversions while preserving ordinary finite gamut clipping.
+- Reject unsupported hue interpolation paths instead of silently selecting the shorter arc.
+- Reject explicit null Sapphire hue seeds instead of silently selecting default hues.
+
 ### Added
 
 - **Inspectable theme provenance and key-binding conflicts** — rule-authored
@@ -62,6 +66,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `findKeyBindingConflicts()` and `describeKeyBindingConflict()` with
   runtime-accurate enabled/disabled claim reporting.
 
+- **Perceptual color and Sapphire reference APIs** — `@flyingrobots/bijou`
+  now exports dependency-free sRGB/OKLAB/OKLCH conversion, sRGB gamut-shell,
+  gamut-relative chroma, fast OKLAB distance, and circular hue-interpolation
+  helpers. `createSapphireReferencePalette()` exposes the deterministic seed
+  and mode references behind the first-party presets without broadening this
+  slice into the deferred interactive theme generator.
+
 ### Changed
 
 - **Sapphire Theme Lab interaction pass** — DOGFOOD now opens Theme Lab with
@@ -71,6 +82,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   panels below the two-column width floor. Editor controls are declared as a
   real key map, use `n`/`p` and `1`/`2`/`3` without stealing frame keys, and
   publish matching localized editor and footer guidance.
+
+- **Sapphire Noir first-party palette** — `BIJOU_DARK` and `BIJOU_LIGHT` now
+  compile from one hue-anchored, gamut-relative reference system. Graphite and
+  ice lead dark mode; warm porcelain and sapphire ink lead light mode; focus,
+  warning, information, success, and error remain contrast-safe and distinct
+  in truecolor, ANSI-256, and ANSI-16 output. Legacy vivid presets are
+  unchanged.
 
 ## [8.0.0] - 2026-10-24
 

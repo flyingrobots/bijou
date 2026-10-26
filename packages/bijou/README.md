@@ -90,6 +90,78 @@ fake duplication rather than a real second API.
 - **`themeContrastRatio()`**: Deterministic foreground/background contrast
   calculation for token-pair tests.
 
+- **`createSapphireReferencePalette()`**: Inspect or explore the shared
+  hue-anchored references behind `BIJOU_DARK` and `BIJOU_LIGHT`.
+- **Perceptual color helpers**: Convert sRGB, OKLAB, and OKLCH with
+  `rgbToOklab()`, `rgbToOklch()`, `oklabToRgb()`, and `oklchToRgb()`; use
+  `gamutMapOklch()` or `gamutRelativeOklch()` to stay inside sRGB; compare
+  colors with `deltaEOk()`; and interpolate circular hue with
+  `interpolateHue()`.
+
+### Sapphire Noir First-Party Defaults
+
+The legacy `CYAN_MAGENTA` preset is useful as a vivid terminal-native preset,
+but it is not ideal as the model for dense product surfaces. It uses saturated
+terminal colors for many unrelated jobs: cyan appears as info, active state,
+cursor, scrollbar, logo, and primary border; magenta appears as accent,
+secondary border, and focus gutter. That makes the app energetic, but it also
+makes many regions compete at the same visual priority.
+
+Bijou's `BIJOU_DARK` and `BIJOU_LIGHT` defaults are one derived **Sapphire
+Noir** system. They use a calmer shell posture:
+
+- neutral surfaces carry most of the screen
+- one accent family carries local emphasis and shell selection
+- status colors remain distinct from focus and brand
+- muted text remains contrast-safe instead of merely dim
+- dark and light themes both satisfy readable foreground/background pairs
+
+The dark preset leads with low-chroma graphite surfaces, ice-neutral text, and
+a luminous sapphire focus color. The light preset keeps the intentional warm
+surface family as porcelain while using darker sapphire for interactive
+chrome. Amber is reserved for warning; green, red, and cool violet retain
+success, error, and information. Focus therefore no longer masquerades as a
+warning, and informational status no longer collapses into brand chrome.
+
+The optional `DOGFOOD` shell theme family exposes these library defaults in
+`Dark` and `Light` modes. The docs app opens with its separate Bijou Book theme
+family; selecting DOGFOOD demonstrates the first-party Sapphire palette.
+Both Sapphire modes target at least 4.5:1 contrast for surface text and common
+semantic foregrounds on every shell surface.
+
+#### Perceptual derivation
+
+The first-party references are generated from `SAPPHIRE_HUE` (`255` degrees)
+and mode-specific lightness/chroma curves. Chroma is expressed as a fraction
+of the sRGB gamut boundary at the chosen OKLCH lightness and hue. This keeps a
+relative chroma of `1` in gamut and avoids the hue shifts caused by clipping
+RGB channels after conversion.
+
+```ts
+import { createSapphireReferencePalette } from '@flyingrobots/bijou';
+
+const references = createSapphireReferencePalette('dark');
+const customReferences = createSapphireReferencePalette('light', {
+  brandHue: 265,
+});
+```
+
+The public color-math floor uses normalized OKLAB lightness (`0..1`), OKLCH
+chroma (`0` or greater), and hue in degrees. `gamutRelativeOklch()` clamps its
+relative-chroma argument to `0..1`; `gamutMapOklch()` preserves normalized
+lightness and hue while reducing out-of-gamut chroma. `interpolateHue()` takes
+a progress value clamped to `0..1` and an explicit `shorter` or `longer` arc;
+when longer-path endpoints normalize to the same hue, it travels one complete
+turn. Use `deltaEOk()` for fast ordinary design-distance checks, not
+high-precision colorimetry. Numeric helpers reject malformed tuples and
+non-finite channels rather than emitting an invalid color.
+
+The conversion matrices follow Björn Ottosson's
+[OKLAB reference](https://bottosson.github.io/posts/oklab/). The
+boundary-relative chroma model applies the same practical shell concept
+documented by [nutelch](https://github.com/meodai/nutelch), implemented here by
+a small deterministic binary search so Bijou keeps its zero-dependency core.
+
 Rule-authored themes retain inspectable authoring definitions.
 `renameRuleAuthoredTheme(theme, name)` creates a renamed theme while preserving
 that provenance; `ruleAuthoredDefinitions(theme)` returns its immutable

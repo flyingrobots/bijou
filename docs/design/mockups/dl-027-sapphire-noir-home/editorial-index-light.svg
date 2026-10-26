@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="880" viewBox="0 0 1500 880" role="img" aria-labelledby="editorial-index-light-title editorial-index-light-description" data-direction="editorial-index" data-theme="light" data-columns="150" data-rows="44" shape-rendering="crispEdges">
+  <title id="editorial-index-light-title">DOGFOOD Home — Editorial Index — DOGFOOD / LIGHT</title>
+  <desc id="editorial-index-light-description">A conceptual 150 by 44 terminal-cell DOGFOOD Home tab using the shipped Sapphire Noir light palette.</desc>
+  <rect width="1500" height="880" fill="#f6f5f3"/>
+  <g aria-hidden="true">
+    <rect x="0" y="0" width="150" height="20" fill="#ebe7e0"/>
+    <rect x="150" y="0" width="60" height="20" fill="#0f4f95"/>
+    <rect x="210" y="0" width="1290" height="20" fill="#ebe7e0"/>
+    <rect x="40" y="120" width="320" height="20" fill="#fcfcfb"/>
+    <rect x="40" y="140" width="320" height="20" fill="#fcfcfb"/>
+    <rect x="40" y="160" width="320" height="20" fill="#fcfcfb"/>
+    <rect x="440" y="720" width="310" height="20" fill="#0f4f95"/>
+    <rect x="0" y="860" width="1500" height="20" fill="#ebe7e0"/>
+  </g>
+  <g aria-hidden="true" font-family="SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace" font-size="15.5px">
+    <text x="10" y="15.5" fill="#1e2226" textLength="100" lengthAdjust="spacingAndGlyphs" font-weight="800">BIJOU DOCS</text>
+    <text x="150" y="15.5" fill="#f6f5f3" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">[HOME]</text>
+    <text x="230" y="15.5" fill="#4e5660" textLength="60" lengthAdjust="spacingAndGlyphs">GUIDES</text>
+    <text x="320" y="15.5" fill="#4e5660" textLength="100" lengthAdjust="spacingAndGlyphs">COMPONENTS</text>
+    <text x="450" y="15.5" fill="#4e5660" textLength="60" lengthAdjust="spacingAndGlyphs">BLOCKS</text>
+    <text x="540" y="15.5" fill="#4e5660" textLength="80" lengthAdjust="spacingAndGlyphs">PACKAGES</text>
+    <text x="640" y="15.5" fill="#4e5660" textLength="100" lengthAdjust="spacingAndGlyphs">PHILOSOPHY</text>
+    <text x="770" y="15.5" fill="#4e5660" textLength="60" lengthAdjust="spacingAndGlyphs">THEMES</text>
+    <text x="860" y="15.5" fill="#4e5660" textLength="70" lengthAdjust="spacingAndGlyphs">RELEASE</text>
+    <text x="1320" y="15.5" fill="#0f4f95" textLength="150" lengthAdjust="spacingAndGlyphs" font-weight="800">DOGFOOD / LIGHT</text>
+    <text x="0" y="35.5" fill="#616a75" textLength="1500" lengthAdjust="spacingAndGlyphs">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
+    <text x="20" y="55.5" fill="#4e5660" textLength="220" lengthAdjust="spacingAndGlyphs" opacity="0.68">home • editorial index</text>
+    <text x="20" y="95.5" fill="#0f4f95" textLength="20" lengthAdjust="spacingAndGlyphs">┌─</text>
+    <text x="50" y="95.5" fill="#0f4f95" textLength="50" lengthAdjust="spacingAndGlyphs" font-weight="800">INDEX</text>
+    <text x="110" y="95.5" fill="#0f4f95" textLength="270" lengthAdjust="spacingAndGlyphs">──────────────────────────┐</text>
+    <text x="390" y="95.5" fill="#616a75" textLength="20" lengthAdjust="spacingAndGlyphs">┌─</text>
+    <text x="420" y="95.5" fill="#616a75" textLength="40" lengthAdjust="spacingAndGlyphs" font-weight="800">HOME</text>
+    <text x="470" y="95.5" fill="#616a75" textLength="1010" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────────────────────────────┐</text>
+    <text x="20" y="115.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="115.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="115.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="115.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="135.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="135.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="135.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="135.5" fill="#0f4f95" textLength="140" lengthAdjust="spacingAndGlyphs" font-weight="800">DOGFOOD / HOME</text>
+    <text x="1470" y="135.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="155.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="40" y="155.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">▌</text>
+    <text x="70" y="155.5" fill="#1e2226" textLength="40" lengthAdjust="spacingAndGlyphs" font-weight="800">HOME</text>
+    <text x="370" y="155.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="155.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="155.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="175.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="175.5" fill="#4e5660" textLength="80" lengthAdjust="spacingAndGlyphs" opacity="0.68">overview</text>
+    <text x="370" y="175.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="175.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="470" y="175.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">▓▓▓▓▓▓▓▓▓▓▒░   ▓▓▓▓▓▓▓▓▓▓▓         ▒▓▓▓▓░  ░▒▓███████▓▒░  ░▓▓▓▓▒   ▓▓▓▓▓</text>
+    <text x="1470" y="175.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="195.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="195.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="195.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="470" y="195.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">███████████▒   ███████████         ▒████▒  █████████████  ▒████▒   █████</text>
+    <text x="1470" y="195.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="215.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="215.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="215.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="470" y="215.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████  ▒███▒   ░░░█████░░░         ▒████▒  ████▓░ ░▓████  ▒████▒   █████</text>
+    <text x="1470" y="215.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="235.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="235.5" fill="#2f3338" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">GUIDES</text>
+    <text x="370" y="235.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="235.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="470" y="235.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████▓█████▓░     █████     ░░░░░  ▒████▒  ████▒   ▒████  ▒████▒   █████</text>
+    <text x="1470" y="235.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="255.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="255.5" fill="#4e5660" textLength="100" lengthAdjust="spacingAndGlyphs" opacity="0.68">start here</text>
+    <text x="370" y="255.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="255.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="470" y="255.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████▓▓▓█████     █████     ████▒  ▒████▒  ████▒   ▒████  ▒████▒   █████</text>
+    <text x="1470" y="255.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="275.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="275.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="275.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="470" y="275.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████   ▒████  ░░░█████░░░  ████▓░░▓████▒  ████▓░ ░▓████  ▒████▓░ ░█████</text>
+    <text x="1470" y="275.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="295.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="295.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="295.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="470" y="295.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████████████  ███████████  ████████████░  █████████████   ████████████▓</text>
+    <text x="1470" y="295.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="315.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="315.5" fill="#2f3338" textLength="100" lengthAdjust="spacingAndGlyphs" font-weight="800">COMPONENTS</text>
+    <text x="370" y="315.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="315.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="470" y="315.5" fill="#0f4f95" textLength="710" lengthAdjust="spacingAndGlyphs" font-weight="800">▓▓▓▓▓▓▓▓▓▓▓▓░  ▓▓▓▓▓▓▓▓▓▓▓  ░▒▓██████▓▓░   ░▒▓███████▓▒░   ░▒▓███████▓▒</text>
+    <text x="1470" y="315.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="335.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="335.5" fill="#4e5660" textLength="120" lengthAdjust="spacingAndGlyphs" opacity="0.68">live catalog</text>
+    <text x="370" y="335.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="335.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="335.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="355.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="355.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="355.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="355.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="375.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="375.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="375.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="375.5" fill="#1e2226" textLength="270" lengthAdjust="spacingAndGlyphs" font-weight="800">DOCS THAT PROVE THEMSELVES.</text>
+    <text x="1470" y="375.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="395.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="395.5" fill="#2f3338" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">BLOCKS</text>
+    <text x="370" y="395.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="395.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="395.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="415.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="415.5" fill="#4e5660" textLength="90" lengthAdjust="spacingAndGlyphs" opacity="0.68">contracts</text>
+    <text x="370" y="415.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="415.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="415.5" fill="#1e2226" textLength="310" lengthAdjust="spacingAndGlyphs" font-weight="800">A living field guide for Bijou.</text>
+    <text x="1470" y="415.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="435.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="435.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="435.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="435.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="455.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="455.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="455.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="455.5" fill="#2f3338" textLength="570" lengthAdjust="spacingAndGlyphs">Every page exercises the same terminal system it teaches.</text>
+    <text x="1470" y="455.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="475.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="475.5" fill="#2f3338" textLength="80" lengthAdjust="spacingAndGlyphs" font-weight="800">PACKAGES</text>
+    <text x="370" y="475.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="475.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="475.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="495.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="495.5" fill="#4e5660" textLength="100" lengthAdjust="spacingAndGlyphs" opacity="0.68">boundaries</text>
+    <text x="370" y="495.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="495.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="495.5" fill="#616a75" textLength="980" lengthAdjust="spacingAndGlyphs">──────────────────────────────────────────────────────────────────────────────────────────────────</text>
+    <text x="1470" y="495.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="515.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="515.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="515.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="515.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="535.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="535.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="535.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="535.5" fill="#0f4f95" textLength="100" lengthAdjust="spacingAndGlyphs" font-weight="800">01  GUIDES</text>
+    <text x="640" y="535.5" fill="#4e5660" textLength="380" lengthAdjust="spacingAndGlyphs">Orientation, fast paths, and doctrine.</text>
+    <text x="1470" y="535.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="555.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="555.5" fill="#2f3338" textLength="100" lengthAdjust="spacingAndGlyphs" font-weight="800">PHILOSOPHY</text>
+    <text x="370" y="555.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="555.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="555.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="575.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="575.5" fill="#4e5660" textLength="80" lengthAdjust="spacingAndGlyphs" opacity="0.68">doctrine</text>
+    <text x="370" y="575.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="575.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="575.5" fill="#0f4f95" textLength="140" lengthAdjust="spacingAndGlyphs" font-weight="800">02  COMPONENTS</text>
+    <text x="640" y="575.5" fill="#4e5660" textLength="370" lengthAdjust="spacingAndGlyphs">Every family, rendered and explained.</text>
+    <text x="1470" y="575.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="595.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="595.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="595.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="595.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="615.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="615.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="615.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="615.5" fill="#0f4f95" textLength="100" lengthAdjust="spacingAndGlyphs" font-weight="800">03  BLOCKS</text>
+    <text x="640" y="615.5" fill="#4e5660" textLength="450" lengthAdjust="spacingAndGlyphs">Product semantics with inspectable contracts.</text>
+    <text x="1470" y="615.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="635.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="635.5" fill="#2f3338" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">THEMES</text>
+    <text x="370" y="635.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="635.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="635.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="655.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="655.5" fill="#4e5660" textLength="60" lengthAdjust="spacingAndGlyphs" opacity="0.68">tokens</text>
+    <text x="370" y="655.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="655.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="655.5" fill="#0f4f95" textLength="120" lengthAdjust="spacingAndGlyphs" font-weight="800">04  PACKAGES</text>
+    <text x="640" y="655.5" fill="#4e5660" textLength="400" lengthAdjust="spacingAndGlyphs">Ports, adapters, and package boundaries.</text>
+    <text x="1470" y="655.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="675.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="675.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="675.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="675.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="695.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="695.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="695.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="695.5" fill="#616a75" textLength="980" lengthAdjust="spacingAndGlyphs">──────────────────────────────────────────────────────────────────────────────────────────────────</text>
+    <text x="1470" y="695.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="715.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="715.5" fill="#2f3338" textLength="70" lengthAdjust="spacingAndGlyphs" font-weight="800">RELEASE</text>
+    <text x="370" y="715.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="715.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="715.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="735.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="735.5" fill="#4e5660" textLength="130" lengthAdjust="spacingAndGlyphs" opacity="0.68">current truth</text>
+    <text x="370" y="735.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="735.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="735.5" fill="#f6f5f3" textLength="310" lengthAdjust="spacingAndGlyphs" font-weight="800">[ ENTER ]  OPEN THE FIELD GUIDE</text>
+    <text x="1470" y="735.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="755.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="755.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="755.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="755.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="775.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="775.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="775.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="440" y="775.5" fill="#5a40aa" textLength="310" lengthAdjust="spacingAndGlyphs" font-weight="800">CURRENT RELEASE  V7 LAUNCH WAKE</text>
+    <text x="820" y="775.5" fill="#4e5660" textLength="400" lengthAdjust="spacingAndGlyphs" opacity="0.68">A released line leaves a readable trail.</text>
+    <text x="1470" y="775.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="795.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="370" y="795.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="390" y="795.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="795.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="20" y="815.5" fill="#0f4f95" textLength="360" lengthAdjust="spacingAndGlyphs">└──────────────────────────────────┘</text>
+    <text x="390" y="815.5" fill="#616a75" textLength="1090" lengthAdjust="spacingAndGlyphs">└───────────────────────────────────────────────────────────────────────────────────────────────────────────┘</text>
+    <text x="0" y="855.5" fill="#616a75" textLength="1500" lengthAdjust="spacingAndGlyphs">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
+    <text x="10" y="875.5" fill="#4e5660" textLength="280" lengthAdjust="spacingAndGlyphs">[NORMAL] page:home pane:home</text>
+    <text x="470" y="875.5" fill="#2f3338" textLength="560" lengthAdjust="spacingAndGlyphs">? Help • / Search • F2 Settings • q Quit • Tab next pane</text>
+    <text x="1420" y="875.5" fill="#1e2226" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">v7.2.0</text>
+  </g>
+</svg>

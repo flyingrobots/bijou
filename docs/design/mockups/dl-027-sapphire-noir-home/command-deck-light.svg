@@ -1,0 +1,232 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="880" viewBox="0 0 1500 880" role="img" aria-labelledby="command-deck-light-title command-deck-light-description" data-direction="command-deck" data-theme="light" data-columns="150" data-rows="44" shape-rendering="crispEdges">
+  <title id="command-deck-light-title">DOGFOOD Home — Command Deck — DOGFOOD / LIGHT</title>
+  <desc id="command-deck-light-description">A conceptual 150 by 44 terminal-cell DOGFOOD Home tab using the shipped Sapphire Noir light palette.</desc>
+  <rect width="1500" height="880" fill="#f6f5f3"/>
+  <g aria-hidden="true">
+    <rect x="0" y="0" width="150" height="20" fill="#ebe7e0"/>
+    <rect x="150" y="0" width="60" height="20" fill="#0f4f95"/>
+    <rect x="210" y="0" width="1290" height="20" fill="#ebe7e0"/>
+    <rect x="990" y="120" width="470" height="20" fill="#fcfcfb"/>
+    <rect x="990" y="140" width="470" height="20" fill="#fcfcfb"/>
+    <rect x="990" y="160" width="470" height="20" fill="#fcfcfb"/>
+    <rect x="990" y="180" width="470" height="20" fill="#fcfcfb"/>
+    <rect x="990" y="200" width="470" height="20" fill="#fcfcfb"/>
+    <rect x="70" y="600" width="290" height="20" fill="#0f4f95"/>
+    <rect x="70" y="620" width="290" height="20" fill="#0f4f95"/>
+    <rect x="70" y="640" width="290" height="20" fill="#0f4f95"/>
+    <rect x="0" y="860" width="1500" height="20" fill="#ebe7e0"/>
+  </g>
+  <g aria-hidden="true" font-family="SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace" font-size="15.5px">
+    <text x="10" y="15.5" fill="#1e2226" textLength="100" lengthAdjust="spacingAndGlyphs" font-weight="800">BIJOU DOCS</text>
+    <text x="150" y="15.5" fill="#f6f5f3" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">[HOME]</text>
+    <text x="230" y="15.5" fill="#4e5660" textLength="60" lengthAdjust="spacingAndGlyphs">GUIDES</text>
+    <text x="320" y="15.5" fill="#4e5660" textLength="100" lengthAdjust="spacingAndGlyphs">COMPONENTS</text>
+    <text x="450" y="15.5" fill="#4e5660" textLength="60" lengthAdjust="spacingAndGlyphs">BLOCKS</text>
+    <text x="540" y="15.5" fill="#4e5660" textLength="80" lengthAdjust="spacingAndGlyphs">PACKAGES</text>
+    <text x="640" y="15.5" fill="#4e5660" textLength="100" lengthAdjust="spacingAndGlyphs">PHILOSOPHY</text>
+    <text x="770" y="15.5" fill="#4e5660" textLength="60" lengthAdjust="spacingAndGlyphs">THEMES</text>
+    <text x="860" y="15.5" fill="#4e5660" textLength="70" lengthAdjust="spacingAndGlyphs">RELEASE</text>
+    <text x="1320" y="15.5" fill="#0f4f95" textLength="150" lengthAdjust="spacingAndGlyphs" font-weight="800">DOGFOOD / LIGHT</text>
+    <text x="0" y="35.5" fill="#616a75" textLength="1500" lengthAdjust="spacingAndGlyphs">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
+    <text x="20" y="55.5" fill="#4e5660" textLength="190" lengthAdjust="spacingAndGlyphs" opacity="0.68">home • command deck</text>
+    <text x="20" y="95.5" fill="#616a75" textLength="20" lengthAdjust="spacingAndGlyphs">┌─</text>
+    <text x="50" y="95.5" fill="#616a75" textLength="40" lengthAdjust="spacingAndGlyphs" font-weight="800">HOME</text>
+    <text x="100" y="95.5" fill="#616a75" textLength="860" lengthAdjust="spacingAndGlyphs">─────────────────────────────────────────────────────────────────────────────────────┐</text>
+    <text x="970" y="95.5" fill="#0f4f95" textLength="510" lengthAdjust="spacingAndGlyphs" font-weight="800">┌─ START HERE ────────────────────────────────────┐</text>
+    <text x="20" y="115.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="115.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="115.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="115.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="135.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="135.5" fill="#0f4f95" textLength="320" lengthAdjust="spacingAndGlyphs" font-weight="800">THE DOCUMENTATION PROVING GROUND</text>
+    <text x="950" y="135.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="135.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="990" y="135.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">▌</text>
+    <text x="1470" y="135.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="155.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="155.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="155.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1020" y="155.5" fill="#0f4f95" textLength="20" lengthAdjust="spacingAndGlyphs" font-weight="800">01</text>
+    <text x="1070" y="155.5" fill="#1e2226" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">GUIDES</text>
+    <text x="1470" y="155.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="175.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="100" y="175.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">▓▓▓▓▓▓▓▓▓▓▒░   ▓▓▓▓▓▓▓▓▓▓▓         ▒▓▓▓▓░  ░▒▓███████▓▒░  ░▓▓▓▓▒   ▓▓▓▓▓</text>
+    <text x="950" y="175.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="175.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="175.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="195.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="100" y="195.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">███████████▒   ███████████         ▒████▒  █████████████  ▒████▒   █████</text>
+    <text x="950" y="195.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="195.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1070" y="195.5" fill="#4e5660" textLength="250" lengthAdjust="spacingAndGlyphs">Start with the system map</text>
+    <text x="1400" y="195.5" fill="#285b9a" textLength="70" lengthAdjust="spacingAndGlyphs" font-weight="800">[ENTER]</text>
+    <text x="1470" y="195.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="215.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="100" y="215.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████  ▒███▒   ░░░█████░░░         ▒████▒  ████▓░ ░▓████  ▒████▒   █████</text>
+    <text x="950" y="215.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="215.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="215.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="235.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="100" y="235.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████▓█████▓░     █████     ░░░░░  ▒████▒  ████▒   ▒████  ▒████▒   █████</text>
+    <text x="950" y="235.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="235.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1010" y="235.5" fill="#616a75" textLength="430" lengthAdjust="spacingAndGlyphs">───────────────────────────────────────────</text>
+    <text x="1470" y="235.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="255.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="100" y="255.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████▓▓▓█████     █████     ████▒  ▒████▒  ████▒   ▒████  ▒████▒   █████</text>
+    <text x="950" y="255.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="255.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="255.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="275.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="100" y="275.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████   ▒████  ░░░█████░░░  ████▓░░▓████▒  ████▓░ ░▓████  ▒████▓░ ░█████</text>
+    <text x="950" y="275.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="275.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="275.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="295.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="100" y="295.5" fill="#0f4f95" textLength="720" lengthAdjust="spacingAndGlyphs" font-weight="800">█████████████  ███████████  ████████████░  █████████████   ████████████▓</text>
+    <text x="950" y="295.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="295.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1020" y="295.5" fill="#0f4f95" textLength="20" lengthAdjust="spacingAndGlyphs" font-weight="800">02</text>
+    <text x="1070" y="295.5" fill="#1e2226" textLength="100" lengthAdjust="spacingAndGlyphs" font-weight="800">COMPONENTS</text>
+    <text x="1470" y="295.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="315.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="100" y="315.5" fill="#0f4f95" textLength="710" lengthAdjust="spacingAndGlyphs" font-weight="800">▓▓▓▓▓▓▓▓▓▓▓▓░  ▓▓▓▓▓▓▓▓▓▓▓  ░▒▓██████▓▓░   ░▒▓███████▓▒░   ░▒▓███████▓▒</text>
+    <text x="950" y="315.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="315.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="315.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="335.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="335.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="335.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1070" y="335.5" fill="#4e5660" textLength="270" lengthAdjust="spacingAndGlyphs">Explore the live vocabulary</text>
+    <text x="1400" y="335.5" fill="#285b9a" textLength="30" lengthAdjust="spacingAndGlyphs" font-weight="800">[C]</text>
+    <text x="1470" y="335.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="355.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="355.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="355.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="355.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="375.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="375.5" fill="#2f3338" textLength="590" lengthAdjust="spacingAndGlyphs" font-weight="800">DOCUMENTATION OF GOOD FOUNDATIONAL ONBOARDING AND DISCOVERY</text>
+    <text x="950" y="375.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="375.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1010" y="375.5" fill="#616a75" textLength="430" lengthAdjust="spacingAndGlyphs">───────────────────────────────────────────</text>
+    <text x="1470" y="375.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="395.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="395.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="395.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="395.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="415.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="415.5" fill="#616a75" textLength="800" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────────</text>
+    <text x="950" y="415.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="415.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="415.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="435.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="435.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="435.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1020" y="435.5" fill="#0f4f95" textLength="20" lengthAdjust="spacingAndGlyphs" font-weight="800">03</text>
+    <text x="1070" y="435.5" fill="#1e2226" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">BLOCKS</text>
+    <text x="1470" y="435.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="455.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="455.5" fill="#1e2226" textLength="200" lengthAdjust="spacingAndGlyphs" font-weight="800">BUILD THE INTERFACE.</text>
+    <text x="950" y="455.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="455.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="455.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="475.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="475.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="475.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1070" y="475.5" fill="#4e5660" textLength="250" lengthAdjust="spacingAndGlyphs">Inspect product contracts</text>
+    <text x="1400" y="475.5" fill="#285b9a" textLength="30" lengthAdjust="spacingAndGlyphs" font-weight="800">[B]</text>
+    <text x="1470" y="475.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="495.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="495.5" fill="#1e2226" textLength="170" lengthAdjust="spacingAndGlyphs" font-weight="800">PROVE THE SYSTEM.</text>
+    <text x="950" y="495.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="495.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="495.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="515.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="515.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="515.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1010" y="515.5" fill="#616a75" textLength="430" lengthAdjust="spacingAndGlyphs">───────────────────────────────────────────</text>
+    <text x="1470" y="515.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="535.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="535.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="535.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="535.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="555.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="555.5" fill="#2f3338" textLength="670" lengthAdjust="spacingAndGlyphs">One terminal surface for docs, examples, Blocks, and release truth.</text>
+    <text x="950" y="555.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="555.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="555.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="575.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="575.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="575.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1020" y="575.5" fill="#0f4f95" textLength="20" lengthAdjust="spacingAndGlyphs" font-weight="800">04</text>
+    <text x="1070" y="575.5" fill="#1e2226" textLength="80" lengthAdjust="spacingAndGlyphs" font-weight="800">PACKAGES</text>
+    <text x="1470" y="575.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="595.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="595.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="595.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="595.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="615.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="615.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="615.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1070" y="615.5" fill="#4e5660" textLength="250" lengthAdjust="spacingAndGlyphs">Choose the right boundary</text>
+    <text x="1400" y="615.5" fill="#285b9a" textLength="30" lengthAdjust="spacingAndGlyphs" font-weight="800">[P]</text>
+    <text x="1470" y="615.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="635.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="90" y="635.5" fill="#f6f5f3" textLength="230" lengthAdjust="spacingAndGlyphs" font-weight="800">[ ENTER ]  OPEN DOGFOOD</text>
+    <text x="950" y="635.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="635.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="635.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="655.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="655.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="655.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="655.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="675.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="675.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="675.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="675.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="695.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="695.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="695.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="695.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="715.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="715.5" fill="#295a2c" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">● LIVE</text>
+    <text x="170" y="715.5" fill="#4e5660" textLength="400" lengthAdjust="spacingAndGlyphs">interactive • static • pipe • accessible</text>
+    <text x="950" y="715.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="715.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1000" y="715.5" fill="#5a40aa" textLength="20" lengthAdjust="spacingAndGlyphs">┌─</text>
+    <text x="1030" y="715.5" fill="#5a40aa" textLength="150" lengthAdjust="spacingAndGlyphs" font-weight="800">CURRENT RELEASE</text>
+    <text x="1190" y="715.5" fill="#5a40aa" textLength="260" lengthAdjust="spacingAndGlyphs">─────────────────────────┐</text>
+    <text x="1470" y="715.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="735.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="735.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="735.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1000" y="735.5" fill="#5a40aa" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1440" y="735.5" fill="#5a40aa" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="735.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="755.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="755.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="755.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1000" y="755.5" fill="#5a40aa" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1030" y="755.5" fill="#1e2226" textLength="140" lengthAdjust="spacingAndGlyphs" font-weight="800">V7 LAUNCH WAKE</text>
+    <text x="1350" y="755.5" fill="#5a40aa" textLength="80" lengthAdjust="spacingAndGlyphs" font-weight="800">[PROVEN]</text>
+    <text x="1440" y="755.5" fill="#5a40aa" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="1470" y="755.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="775.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="70" y="775.5" fill="#5a40aa" textLength="140" lengthAdjust="spacingAndGlyphs" font-weight="800">V7 LAUNCH WAKE</text>
+    <text x="250" y="775.5" fill="#4e5660" textLength="400" lengthAdjust="spacingAndGlyphs" opacity="0.68">A released line leaves a readable trail.</text>
+    <text x="950" y="775.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="775.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1000" y="775.5" fill="#5a40aa" textLength="450" lengthAdjust="spacingAndGlyphs">└───────────────────────────────────────────┘</text>
+    <text x="1470" y="775.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="795.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="950" y="795.5" fill="#616a75" textLength="10" lengthAdjust="spacingAndGlyphs">│</text>
+    <text x="970" y="795.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="1470" y="795.5" fill="#0f4f95" textLength="10" lengthAdjust="spacingAndGlyphs" font-weight="800">│</text>
+    <text x="20" y="815.5" fill="#616a75" textLength="940" lengthAdjust="spacingAndGlyphs">└────────────────────────────────────────────────────────────────────────────────────────────┘</text>
+    <text x="970" y="815.5" fill="#0f4f95" textLength="510" lengthAdjust="spacingAndGlyphs" font-weight="800">└─────────────────────────────────────────────────┘</text>
+    <text x="0" y="855.5" fill="#616a75" textLength="1500" lengthAdjust="spacingAndGlyphs">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
+    <text x="10" y="875.5" fill="#4e5660" textLength="280" lengthAdjust="spacingAndGlyphs">[NORMAL] page:home pane:home</text>
+    <text x="470" y="875.5" fill="#2f3338" textLength="560" lengthAdjust="spacingAndGlyphs">? Help • / Search • F2 Settings • q Quit • Tab next pane</text>
+    <text x="1420" y="875.5" fill="#1e2226" textLength="60" lengthAdjust="spacingAndGlyphs" font-weight="800">v7.2.0</text>
+  </g>
+</svg>

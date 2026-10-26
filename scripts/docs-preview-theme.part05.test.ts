@@ -31,7 +31,7 @@ describe('docs preview app', () => {
       { key: KEY_TAB },
       { key: 'n' },
       { key: '3' },
-      { key: '+' },
+      { key: '-' },
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
 
