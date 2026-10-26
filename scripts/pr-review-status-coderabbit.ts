@@ -1,14 +1,10 @@
 import type {
   CheckEntry,
-  CodeRabbitEventKind,
   CodeRabbitStatus,
   PullRequestComment,
   PullRequestReview,
 } from './pr-review-status-contract.js';
-import {
-  isCodeRabbitAuthor,
-  isSubmittedReview,
-} from './pr-review-status-authors.js';
+import { collectCodeRabbitEvents } from './pr-review-status-coderabbit-events.js';
 
 function staleNote(count: number): string {
   return `${String(count)} stale rate-limit comment${count === 1 ? '' : 's'} ignored`;
@@ -21,15 +17,13 @@ export function summarizeCodeRabbitStatus(
 ): CodeRabbitStatus {
   const events = collectCodeRabbitEvents(comments, reviews);
   const latestEvent = events[0] ?? null;
-  const latestNonRateLimitAt =
-    events.find((event) => event.kind !== 'rate_limit')?.at ?? null;
-  const hasPassingCheck = codeRabbitCheck?.bucket === 'pass';
+  const latestCompletionAt = events.find((event) =>
+    event.kind === 'clean' || event.kind === 'actionable' ||
+    (event.submitted && event.kind !== 'rate_limit'),
+  )?.at ?? null;
   const staleRateLimitCount = events.filter((event) => {
     if (event.kind !== 'rate_limit') return false;
-    return (
-      hasPassingCheck ||
-      (latestNonRateLimitAt != null && event.at < latestNonRateLimitAt)
-    );
+    return latestCompletionAt != null && event.at < latestCompletionAt;
   }).length;
   const activeRateLimitCount =
     events.filter((event) => event.kind === 'rate_limit').length -
@@ -40,7 +34,7 @@ export function summarizeCodeRabbitStatus(
     activeRateLimitCount,
   };
 
-  if (codeRabbitCheck?.bucket === 'pass') {
+  if (codeRabbitCheck?.bucket === 'pass' && activeRateLimitCount === 0) {
     return {
       state: 'pass',
       detail:
@@ -101,42 +95,4 @@ export function summarizeCodeRabbitStatus(
     };
   }
   return { state: 'missing', detail: 'missing', ...shared };
-}
-
-function collectCodeRabbitEvents(
-  comments: readonly PullRequestComment[],
-  reviews: readonly PullRequestReview[],
-): readonly { readonly at: string; readonly kind: CodeRabbitEventKind }[] {
-  const commentEvents = comments
-    .filter((comment) => isCodeRabbitAuthor(comment.author?.login))
-    .map((comment) => ({
-      at: comment.createdAt,
-      kind: classifyCodeRabbitBody(comment.body),
-    }));
-  const reviewEvents = reviews
-    .filter(isSubmittedReview)
-    .filter((review) => isCodeRabbitAuthor(review.author?.login))
-    .map((review) => ({
-      at: review.submittedAt,
-      kind: classifyCodeRabbitBody(review.body),
-    }));
-  return [...commentEvents, ...reviewEvents].sort((left, right) =>
-    right.at.localeCompare(left.at),
-  );
-}
-
-function classifyCodeRabbitBody(body: string): CodeRabbitEventKind {
-  const normalized = body.toLowerCase();
-  if (normalized.includes('rate limit exceeded')) return 'rate_limit';
-  if (
-    normalized.includes(
-      'no actionable comments were generated in the recent review',
-    )
-  )
-    return 'clean';
-  if (/\*\*actionable comments posted:\s*[1-9]/i.test(body)) {
-    return 'actionable';
-  }
-  if (/\*\*actionable comments posted:\s*0/i.test(body)) return 'clean';
-  return 'other';
 }

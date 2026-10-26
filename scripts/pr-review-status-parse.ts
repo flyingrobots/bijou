@@ -111,7 +111,9 @@ function isReviewThreadComment(value: unknown): value is ReviewThreadComment {
 }
 
 function isPullRequestComment(value: unknown): value is PullRequestComment {
-  return isRecord(value) && isOptionalAuthor(value.author) && typeof value.body === 'string' && typeof value.createdAt === 'string';
+  return isRecord(value) && isOptionalAuthor(value.author)
+    && typeof value.body === 'string' && typeof value.createdAt === 'string'
+    && (value.updatedAt === undefined || typeof value.updatedAt === 'string');
 }
 
 function isPullRequestReview(value: unknown): value is PullRequestReview {
