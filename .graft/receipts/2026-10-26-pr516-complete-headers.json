@@ -1,0 +1,22 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Preserve complete Theme Lab context and hints across narrow column wraps",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    "examples/docs/app-theme-lab-editor-graph-view.ts",
+    "examples/docs/app-theme-lab-editor-view.ts",
+    "examples/docs/app-theme-lab-picker.ts",
+    "examples/docs/app-theme-lab.ts",
+    "scripts/docs-preview-landing.part05.test.ts",
+    "tests/cycles/DL-024/theme-lab-complete-headers.test.ts",
+    "docs/CHANGELOG.md",
+    ".graft/receipts/2026-10-26-pr516-complete-headers.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Integration follow-up record; source was inspected through bounded CLI reads. No new substantive Graft-read metrics claimed.",
+  "baseCommit": "d19e4ebc152ae59e8a570bc59d1458a50a1e116e",
+  "validation": "Ordinary combined pre-push reproduced clipped Book identity in scripts/docs-preview-landing.part05.test.ts and published no branches. Four new source-surface cases fail expected assertions on parent (pr516-header-red.log); after wrapping before paint all four pass (pr516-header-green.log). Actual boxed app identity oracle now reconstructs only the Theme editor column across soft wraps and still requires the complete name. Fresh build/type/lint, app integration, native commit hooks and final full combined push remain required."
+}

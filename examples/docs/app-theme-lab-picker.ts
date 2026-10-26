@@ -1,4 +1,4 @@
-import { createSurface, type Surface } from '../../packages/bijou/src/index.js';
+import { createSurface, wrapToWidth, type Surface } from '../../packages/bijou/src/index.js';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import type { DocsShellThemeChoice } from './app-docs-shell-theme.js';
 import { renderSwatch, writeText } from './app-theme-lab-editor-draw.js';
@@ -26,31 +26,33 @@ export function renderThemeLabPickerSurface(
   tokens: ThemeLabEditorRenderTokens,
   localization?: LocalizationPort,
 ): Surface {
-  const safeWidth = Math.max(32, width);
-  const surface = createSurface(safeWidth, Math.max(1, choices.length + 1));
-
-  writeText(surface, 0, 0, dogfoodText(
+  const safeWidth = Math.max(1, width);
+  const labelX = Math.min(MARKER_WIDTH + (3 * SWATCH_WIDTH) + 1, safeWidth - 1);
+  const hint = wrapToWidth(dogfoodText(
     localization,
     'themeLab.picker.hint',
     'F2 opens the theme picker. {count} themes available.',
     { count: choices.length },
-  ), tokens.muted);
-
+  ), safeWidth);
+  const labels = choices.map((choice, index) =>
+    wrapToWidth(`${String(index + 1)}. ${choice.label}`, safeWidth - labelX));
+  const height = hint.length + labels.reduce((sum, rows) => sum + rows.length, 0);
+  const surface = createSurface(safeWidth, Math.max(1, height));
+  hint.forEach((line, y) => { writeText(surface, 0, y, line, tokens.muted); });
+  let y = hint.length;
   choices.forEach((choice, index) => {
-    const y = index + 1;
     const active = choice.id === activeId;
-    let x = 0;
-
-    writeText(surface, x, y, active ? '* ' : '  ', tokens.accent);
-    x += MARKER_WIDTH;
-
+    writeText(surface, 0, y, active ? '* ' : '  ', tokens.accent);
+    let swatchX = MARKER_WIDTH;
     for (const hex of swatchHexes(choice)) {
-      renderSwatch(surface, hex, x, y, SWATCH_WIDTH);
-      x += SWATCH_WIDTH;
+      renderSwatch(surface, hex, swatchX, y, SWATCH_WIDTH);
+      swatchX += SWATCH_WIDTH;
     }
-
-    x += 1;
-    writeText(surface, x, y, `${String(index + 1)}. ${choice.label}`, active ? tokens.accent : tokens.body);
+    const rows = labels[index] ?? [];
+    rows.forEach((line, offset) => {
+      writeText(surface, labelX, y + offset, line, active ? tokens.accent : tokens.body);
+    });
+    y += rows.length;
   });
 
   return surface;
