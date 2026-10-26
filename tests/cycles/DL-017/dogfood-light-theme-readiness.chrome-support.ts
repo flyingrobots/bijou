@@ -65,11 +65,15 @@ export function assertTokenTextColors(
   expectedLabelFg: string,
   expectedValueFg: string,
   surfaceLabel: string,
+  valueOnNextRow = false,
 ): void {
   const labelCell = firstTextCell(surface, tokenLabel);
   expect(labelCell.cell.fg, `${surfaceLabel} ${tokenLabel} label foreground`).toBe(expectedLabelFg);
 
-  const tokenValue = firstHexTokenCellAfter(surface, labelCell.y, labelCell.x + tokenLabel.length);
+  const valueY = labelCell.y + Number(valueOnNextRow);
+  const valueX = labelCell.x + (valueOnNextRow ? 10 : tokenLabel.length);
+  if (valueOnNextRow) expect(surface.get(valueX, valueY).char).toBe('#');
+  const tokenValue = firstHexTokenCellAfter(surface, valueY, valueX);
   expect(tokenValue.cell.fg, `${surfaceLabel} ${tokenLabel} value foreground`).toBe(expectedValueFg);
 }
 
