@@ -1,0 +1,25 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "fix(theme): retain complete headers with Sapphire",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    ".graft/receipts/2026-10-26-pr516-complete-headers.json",
+    ".graft/receipts/2026-10-26-pr517-header-merge-signed-integration.json",
+    "docs/CHANGELOG.md",
+    "examples/docs/app-theme-lab-editor-graph-view.ts",
+    "examples/docs/app-theme-lab-editor-view.ts",
+    "examples/docs/app-theme-lab-picker.ts",
+    "examples/docs/app-theme-lab.ts",
+    "scripts/docs-preview-landing.part05.test.ts",
+    "tests/cycles/DL-024/theme-lab-complete-headers.test.ts"
+  ],
+  "tripwires": [],
+  "metricsScope": "Fresh integration binding has no substantive Graft reads at preparation; original source audits and historical receipts remain preserved. This is an integration provenance record, not a claim of a new Graft read.",
+  "baseCommit": "7a49ae3d47d4b283ff82548aa12a66388b3b0932",
+  "originalPr": 517,
+  "validation": "Normal signed merge preserves the complete-header fix and its focused RED/GREEN record. Fresh composed build/focused checks and native hooks run before commit; final combined full pre-push and current-head independent review remain required.",
+  "publication": "Independent exact-head review and hosted checks remain required before merging; no tags or registry publication."
+}
