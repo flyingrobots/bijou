@@ -1,0 +1,31 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Signed independently mergeable integration of PR535 release metadata guard on current main",
+  "bytesConsumed": 2861329,
+  "filesRead": [
+    "docs/typescript-code-standards.editors-edition.md",
+    ".github/workflows/release-dry-run.yml",
+    "scripts/release-workflow-output.test.ts",
+    "docs/CHANGELOG.md",
+    ".graft/receipts/2026-10-22-issue-533-release-outputs.json"
+  ],
+  "filesModified": [
+    ".github/workflows/release-dry-run.yml",
+    "scripts/release-workflow-output.test.ts",
+    "docs/CHANGELOG.md",
+    ".graft/receipts/2026-10-22-issue-533-release-outputs.json",
+    ".graft/receipts/2026-10-26-pr535-signed-integration.json"
+  ],
+  "tripwires": [
+    "SESSION_LONG diagnostic; user authorized merging all pending PRs",
+    "RUNAWAY_TOOLS diagnostic; continuing with bounded reads and progress updates"
+  ],
+  "commit": "Identified by containing Git commit",
+  "baseCommit": "d1a85546eefe5def80205af08dd4eb237dd5ea07",
+  "originalPr": 535,
+  "originalHead": "f8d8cfa0de1d44bb96fd8bf3d070736a8eb69d38",
+  "integration": "Copy original net change without unsigned ancestry; resolve changelog by retaining exact current main and adding one Unreleased entry. Workflow, regression and historical receipt preserved byte for byte from original head. Original branch history remains unchanged.",
+  "validation": "Fresh focused Docker run: nine expected RED failures against current-main workflow and fifteen GREEN workflow/shell tests. Native commit correctly refused without workspace build artifacts; no commit or push completed. Initial macOS-cache copy failed before tests because Linux native bindings were absent and is not counted as RED. Fresh guarded full build, native commit/pre-push and exact-head review remain pending."
+}

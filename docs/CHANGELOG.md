@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- Release Dry Run rejects missing or blank `version` and `notes_tag` outputs in
+  the verification job, with a specific diagnostic before downstream jobs run
+  (#533; signed integration of PR #535).
+
 ## [8.0.0] - 2026-10-24
 
 Stable release preparation. The live acceptance packet records candidate
