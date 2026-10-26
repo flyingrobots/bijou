@@ -25,16 +25,20 @@ describe('docs preview app', () => {
       initialPageId: 'themes',
     });
 
+    // n/1/2/3 rather than ]/r/g/b: the frame owns [, ] and g, so the old
+    // editor bindings were shadowing tab navigation and scroll-to-top.
     const result = await runScript(app, [
       { key: KEY_TAB },
-      { key: ']' },
-      { key: 'b' },
+      { key: 'n' },
+      { key: '3' },
       { key: '+' },
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
 
     expect(text).toContain('Theme editor');
     expect(text).toContain('Live token graph');
+    expect(text).toContain('Controls: n/p color | 1/2/3 channel');
+    expect(text).not.toContain('Controls: [/] color');
     expect(text).toContain('Selected: semantic.accent');
     expect(text).toContain('Channel: blue');
     expect(text).toContain('semantic.accent');
@@ -51,7 +55,7 @@ describe('docs preview app', () => {
     });
 
     const result = await runScript(app, [
-      { key: 'b' },
+      { key: 'n' },
       { key: '+' },
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
@@ -72,12 +76,12 @@ describe('docs preview app', () => {
     const result = await runScript(app, [
       { key: KEY_TAB },
       { key: '/' },
-      { key: 'b' },
+      { key: 'n' },
     ], { ctx });
     const pageModel = result.model.docsModel.pageModels.themes;
 
     expect(result.model.docsModel.commandPaletteKind).toBe('search');
-    expect(result.model.docsModel.commandPalette?.query).toBe('b');
+    expect(result.model.docsModel.commandPalette?.query).toBe('n');
     expect(pageModel?.themeLabEditor).toBeUndefined();
   });
 
@@ -107,18 +111,18 @@ describe('docs preview app', () => {
     const settingsResult = await runScript(app, [
       { key: KEY_TAB },
       { key: KEY_F2 },
-      { key: 'b' },
+      { key: 'n' },
     ], { ctx });
     const paletteResult = await runScript(app, [
       { key: KEY_TAB },
       { key: KEY_CTRL_P },
-      { key: 'b' },
+      { key: 'n' },
     ], { ctx });
 
     expect(settingsResult.model.docsModel.settingsOpen).toBe(true);
     expect(settingsResult.model.docsModel.pageModels.themes?.themeLabEditor).toBeUndefined();
     expect(paletteResult.model.docsModel.commandPaletteKind).toBe('command');
-    expect(paletteResult.model.docsModel.commandPalette?.query).toBe('b');
+    expect(paletteResult.model.docsModel.commandPalette?.query).toBe('n');
     expect(paletteResult.model.docsModel.pageModels.themes?.themeLabEditor).toBeUndefined();
   });
 });

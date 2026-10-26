@@ -1,5 +1,6 @@
 import {
   createSurface,
+  wrapToWidth,
   type Surface,
   type Theme,
 } from '../../packages/bijou/src/index.js';
@@ -44,48 +45,35 @@ export function renderThemeLabEditorSurface(
   tokens: ThemeLabEditorRenderTokens,
   options: ThemeLabEditorSurfaceOptions = {},
 ): Surface {
-  const safeWidth = Math.max(32, width);
+  const safeWidth = Math.max(1, width);
+  const selectedPath = themeLabEditorSelectedPath(state);
   const contextLines = options.contextLines ?? [];
-  const editorRowsStart = contextLines.length + 4;
+  const headerRows = [
+    ...contextLines.map((text, index) => ({ text, token: index === 0 ? tokens.accent : tokens.muted })),
+    {
+      text: dogfoodText(localization, 'themeLab.editor.selected', 'Selected: {path}', { path: selectedPath }),
+      token: tokens.accent,
+    },
+    {
+      text: dogfoodText(localization, 'themeLab.editor.channel', 'Channel: {channel}', {
+        channel: channelLabel(state.channel, localization),
+      }),
+      token: tokens.body,
+    },
+    {
+      text: dogfoodText(localization, 'themeLab.editor.controls',
+        'Controls: n/p color | 1/2/3 channel | -/+ nudge | 0 reset'),
+      token: tokens.muted,
+    },
+  ].flatMap((row) => wrapToWidth(row.text, safeWidth).map((text) => ({ ...row, text })));
+  const editorRowsStart = headerRows.length + 1;
   const stackedRows = shouldStackThemeLabRows(safeWidth);
   const editorRowHeight = stackedRows ? 2 : 1;
   const surface = createSurface(
     safeWidth,
     editorRowsStart + (THEME_LAB_EDITABLE_PATHS.length * editorRowHeight),
   );
-  const selectedPath = themeLabEditorSelectedPath(state);
-  contextLines.forEach((line, index) => {
-    writeText(surface, 0, index, line, index === 0 ? tokens.accent : tokens.muted);
-  });
-  writeText(
-    surface,
-    0,
-    contextLines.length,
-    dogfoodText(localization, 'themeLab.editor.selected', 'Selected: {path}', {
-      path: selectedPath,
-    }),
-    tokens.accent,
-  );
-  writeText(
-    surface,
-    0,
-    contextLines.length + 1,
-    dogfoodText(localization, 'themeLab.editor.channel', 'Channel: {channel}', {
-      channel: channelLabel(state.channel, localization),
-    }),
-    tokens.body,
-  );
-  writeText(
-    surface,
-    0,
-    contextLines.length + 2,
-    dogfoodText(
-      localization,
-      'themeLab.editor.controls',
-      'Controls: [/] color | r/g/b channel | -/+ nudge | 0 reset',
-    ),
-    tokens.muted,
-  );
+  headerRows.forEach((row, index) => { writeText(surface, 0, index, row.text, row.token); });
   let rowY = editorRowsStart;
   for (const path of THEME_LAB_EDITABLE_PATHS) {
     rowY += renderEditorRow(

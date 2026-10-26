@@ -1,0 +1,20 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "fix(dogfood): paint complete provenance graphemes",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    "docs/CHANGELOG.md",
+    "examples/docs/app-theme-lab-editor-draw.ts",
+    "tests/cycles/DL-024/theme-provenance-graphemes.test.ts",
+    ".graft/receipts/2026-10-26-pr516-glyph-signed-integration.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Fresh integration binding has no substantive Graft reads at preparation; original source audits and historical receipts remain preserved. This is an integration provenance record, not a claim of a new Graft read.",
+  "baseCommit": "9b8fcc40502339e26d66172c7334c5b99c308649",
+  "originalPr": 516,
+  "validation": "Four expected assertion failures on original production source, four passing after fix: pr516-grapheme-red.log and corresponding green.log. Fresh staged candidate regression and native hooks run before commit; final combined checks and exact-head review remain required.",
+  "publication": "Independent exact-head review and hosted checks remain required before merging; no tags or registry publication."
+}

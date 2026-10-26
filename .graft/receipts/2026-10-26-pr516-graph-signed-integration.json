@@ -1,0 +1,21 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "fix(theme): preserve authored scope and shadowed background identity",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    "docs/CHANGELOG.md",
+    "packages/bijou/src/core/theme/graph-dependents.ts",
+    "packages/bijou/src/core/theme/graph-field-dependents.ts",
+    "tests/cycles/DL-024/theme-field-scope-identity.test.ts",
+    ".graft/receipts/2026-10-26-pr516-graph-signed-integration.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Fresh integration binding has no substantive Graft reads at preparation; original source audits and historical receipts remain preserved. This is an integration provenance record, not a claim of a new Graft read.",
+  "baseCommit": "4365e2d5ab2e649c934c2e75095a137fab7aa8e1",
+  "originalPr": 516,
+  "validation": "Four expected assertion failures on original production source, four passing after fix: pr516-graph-red.log and corresponding green.log. Fresh staged candidate regression and native hooks run before commit; final combined checks and exact-head review remain required.",
+  "publication": "Independent exact-head review and hosted checks remain required before merging; no tags or registry publication."
+}

@@ -26,8 +26,6 @@ function applyEditableHex(
   switch (path) {
     case 'semantic.primary':
       theme.semantic.primary = tokenWithHex(theme.semantic.primary, hex);
-      theme.surface.primary = tokenWithHex(theme.surface.primary, hex);
-      theme.ui.tableHeader = tokenWithHex(theme.ui.tableHeader, hex);
       return;
     case 'semantic.accent':
       theme.semantic.accent = tokenWithHex(theme.semantic.accent, hex);
@@ -49,7 +47,6 @@ function applyEditableHex(
       return;
     case 'border.primary':
       theme.border.primary = tokenWithHex(theme.border.primary, hex);
-      theme.ui.scrollThumb = tokenWithHex(theme.ui.scrollThumb, hex);
       return;
     case 'ui.cursor':
       theme.ui.cursor = tokenWithHex(theme.ui.cursor, hex);

@@ -8,6 +8,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Theme Lab wraps complete picker labels, hints and editor context before
+  painting, retaining long Book theme names in narrow columns. Column content
+  budgets include both the border and horizontal padding.
+
+- Theme Lab paints complete grapheme clusters at their terminal cell widths,
+  preserving wide-character continuation cells and combining marks.
+
+- Reverse theme dependency scopes use authored tokens and preserve parent
+  background edges when an explicit dotted token shadows the virtual field.
+
 - Release Dry Run rejects missing or blank `version` and `notes_tag` outputs in
   the verification job, with a specific diagnostic before downstream jobs run
   (#533; signed integration of PR #535).
@@ -28,6 +38,39 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - The supported Node 20/22 CI matrix rejects dependency engine mismatches.
   Dependency refreshes retain the Node-20-compatible Vitest 4 line rather than
   silently accepting an unsupported test-runner upgrade (PR #548).
+
+- Wrap Theme Lab provenance entries before painting so candidate scores and
+  contrast ratios remain complete in narrow panels.
+
+- Keep foreground and background dependencies separate during transitive theme
+  provenance traversal, so an unchanged field cannot create false propagation.
+
+- Dependency provenance retains direct and transitive consumers of background
+  colors authored as `TokenValue` literals, while absent backgrounds remain
+  unresolved (PR #516).
+
+### Added
+
+- **Inspectable theme provenance and key-binding conflicts** — rule-authored
+  presets retain their definitions when renamed, token graphs expose
+  mode-aware direct and transitive reverse dependents without resolving cyclic
+  values, and Theme Lab can explain a token's rule, winner, rejected
+  candidates, score, contrast, and direct draft override. `@flyingrobots/bijou`
+  adds `renameRuleAuthoredTheme()`, `ruleAuthoredDefinitions()`,
+  `collectTokenDependents()`, `collectTransitiveTokenDependents()`, and
+  `tokenDefinitionPaths()`; `@flyingrobots/bijou-tui` adds
+  `findKeyBindingConflicts()` and `describeKeyBindingConflict()` with
+  runtime-accurate enabled/disabled claim reporting.
+
+### Changed
+
+- **Sapphire Theme Lab interaction pass** — DOGFOOD now opens Theme Lab with
+  its full shell-theme picker and a live component specimen above the fold,
+  applies draft colours to the preview, marks edits across every editable
+  path, keeps provenance honest about direct overrides, and stacks complete
+  panels below the two-column width floor. Editor controls are declared as a
+  real key map, use `n`/`p` and `1`/`2`/`3` without stealing frame keys, and
+  publish matching localized editor and footer guidance.
 
 ## [8.0.0] - 2026-10-24
 

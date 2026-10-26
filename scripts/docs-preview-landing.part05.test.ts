@@ -18,6 +18,18 @@ import {
 
 import { must } from '@flyingrobots/bijou/adapters/test';
 
+function editorText(text: string): string {
+  const lines = text.split('\n');
+  const top = lines.findIndex((line) => line.includes('┌─ Theme editor'));
+  const header = lines[top];
+  if (header === undefined) throw new Error('Missing Theme editor panel.');
+  const left = header.indexOf('┌');
+  const right = header.indexOf('┐', left);
+  if (left < 0 || right < left) throw new Error('Missing Theme editor bounds.');
+  return lines.slice(top + 1).filter((line) => line[left] === '│')
+    .map((line) => line.slice(left + 1, right)).join('').replace(/\s/gu, '');
+}
+
 describe('docs preview app', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
 
@@ -63,7 +75,7 @@ describe('docs preview app', () => {
     expect(text).toContain('Default dark preset: bijou-dark');
     expect(text).toContain('Default light preset: bijou-light');
     expect(text).toContain('Color reuse: dark');
-    expect(text).toContain('* 1. Bijou Book / Dark -> dogfood-book-dark');
+    expect(editorText(text)).toContain('*1.BijouBook/Dark->dogfood-book-dark');
     expect(text).toContain('Bijou Book / Dark');
     expect(text).toContain('semantic.primary');
 
@@ -78,7 +90,7 @@ describe('docs preview app', () => {
     expect(lightResult.model.docsModel.activeShellThemeId).toBe('book:light');
     expect(lightText).toContain('Active: Bijou Book / Light');
     expect(lightText).toContain('Theme: dogfood-book-light');
-    expect(lightText).toContain('* 2. Bijou Book / Light -> dogfood-book-light');
+    expect(editorText(lightText)).toContain('*2.BijouBook/Light->dogfood-book-light');
     expect(lightText).toContain('Bijou Book / Light');
     expect(lightText).toContain(DOGFOOD_BOOK_LIGHT_THEME.semantic.primary.hex);
     expect(lightText).not.toContain('Active: Bijou Book / Dark');
