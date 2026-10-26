@@ -1,0 +1,25 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "fix(tooling): report quota-skipped CodeRabbit reviews accurately",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    ".graft/receipts/2026-10-22-issue-539-coderabbit-quota.json",
+    "docs/CHANGELOG.md",
+    "scripts/pr-review-status-coderabbit-events.ts",
+    "scripts/pr-review-status-coderabbit.ts",
+    "scripts/pr-review-status-contract.ts",
+    "scripts/pr-review-status-parse.ts",
+    "scripts/pr-review-status-queries.ts",
+    "scripts/pr-review-status-quota.test.ts",
+    ".graft/receipts/2026-10-26-pr540-signed-integration.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Fresh integration binding has no substantive Graft reads at preparation; original source audits and historical receipts remain preserved. This is an integration provenance record, not a claim of a new Graft read.",
+  "baseCommit": "198af81e032d49c10f1788bc57accc7d7aa91eaa",
+  "originalPr": 540,
+  "validation": "Preparatory static audit complete. Focused current-source checks and native commit hooks run immediately after this receipt is staged. Full combined pre-push and individual hosted CI remain pending. Historical receipts are not relabelled as new validation.",
+  "publication": "Independent exact-head review and hosted checks remain required before merging; no tags or registry publication."
+}

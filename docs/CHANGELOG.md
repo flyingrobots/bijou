@@ -20,6 +20,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   Documented the release-line path rule and cross-checked readiness against
   DOGFOOD for alpha, beta, release-candidate, and stable versions.
 
+- PR review reporting recognizes CodeRabbit quota notices even when its status
+  check succeeds. Only later review-completion evidence supersedes a notice;
+  edited notices use their updated timestamp, and active limits keep merge
+  readiness pending without changing the human-review requirement.
+
 ## [8.0.0] - 2026-10-24
 
 Stable release preparation. The live acceptance packet records candidate
