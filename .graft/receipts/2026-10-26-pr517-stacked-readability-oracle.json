@@ -1,0 +1,17 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "3af505b8-3569-4d17-a0ed-38ce2f13e6a6",
+  "agent": "codex",
+  "task": "Keep real-app light-theme foreground proof valid for responsive stacked token rows",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    "tests/cycles/DL-017/dogfood-light-theme-readiness.chrome-support.ts",
+    "tests/cycles/DL-017/dogfood-light-theme-readiness.part05.test.ts",
+    ".graft/receipts/2026-10-26-pr517-stacked-readability-oracle.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Test integration receipt; no new Graft read metrics claimed. Source/renderer geometry inspected with bounded CLI reads.",
+  "baseCommit": "21b777ce5efca4be578870a105b19e284ea0e6fe",
+  "validation": "Normal full native push failed existing real-app DL-017 test: no hex at label row38 afterx111 (pr-complete-headers-integration-4-docker.log). The responsive renderer intentionally draws the value on the next row at +10cells. Test now explicitly asserts that exact position and preserves both exact foreground assertions, while Inspector remains inline. Existing app test, previously unrun final test groups, native commit hooks and whole ordinary push remain required. No production source or viewport changed."
+}
