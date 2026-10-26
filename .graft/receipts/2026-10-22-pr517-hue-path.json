@@ -1,0 +1,23 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Reject unsupported runtime hue-path tags while preserving shorter/longer/default arc semantics",
+  "bytesConsumed": 196896,
+  "contextMeasurement": "Retained cumulative Graft read checkpoint shared with the ongoing PR audit",
+  "filesRead": [
+    "packages/bijou/src/core/theme/color-perceptual.part02.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part02.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/theme/color-perceptual.part02.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part02.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [],
+  "validation": {
+    "red": "Docker 517-hue-red: two expected throw assertions fail for sideways and null path tags; existing arc behavior remains green",
+    "green": "Relevant theme tests and normal pre-commit hooks are required before this commit is created"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Reconcile PR517 with current main without resurrecting compiled book chapters or mislabeling V9 changes as historical V8 release contents",
+  "bytesConsumed": 193901,
+  "filesRead": [
+    "docs/design/RE-510-geordi-native-gpu-host-for-bijou-cell-buffers.md",
+    "packages/bijou/src/core/theme/sapphire-palette.ts",
+    "packages/bijou/src/core/theme/sapphire-palette.test.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part01.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part02.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part01.test.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part02.test.ts",
+    "packages/bijou/src/core/theme/sapphire-presets.test.ts",
+    "packages/bijou/src/core/theme/index.ts",
+    "packages/bijou/src/index.ts",
+    "packages/bijou/src/index.part07.ts",
+    "packages/bijou/src/index.part08.ts",
+    "docs/CHANGELOG.md",
+    "scripts/docs-preview-theme.part01.test.ts",
+    "packages/bijou/README.md",
+    "docs/README.md",
+    "docs/design/DL-027-sapphire-noir-first-party-palette.md",
+    "scripts/code-dojo/check-graft-receipts.mjs"
+  ],
+  "filesModified": [
+    "docs/CHANGELOG.md",
+    "docs/design-system/theme-tokens.md",
+    "packages/bijou/README.md",
+    "scripts/docs-preview-theme.part01.test.ts",
+    "docs/design/DL-027-sapphire-noir-first-party-palette.md"
+  ],
+  "tripwires": [
+    "NOT_FOUND for initial unsplit color-perceptual test lookup and two incorrect core/index barrel paths; corrected to explicit PR-manifest paths",
+    "Old-parent staged whitespace check encounters main-owned frozen LaTeX EOF whitespace; current-main delta passes and docs/book remains byte-identical"
+  ],
+  "validation": {
+    "static": "Current-target staged diff check passed; docs/book subtree is identical to origin/main; historical evidence links checked with git cat-file",
+    "scope": "Only conflict resolutions and current documentation are authored here; incoming mainline source and archival bytes retain their existing provenance",
+    "execution": "Docker build, relevant tests and normal pre-commit hooks must pass before this merge commit is created; final SHA and execution result are recorded in PR activity evidence"
+  }
+}

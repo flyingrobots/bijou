@@ -1,0 +1,25 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "5c4a616a-62e8-4f35-bb6c-58686ba3775a",
+  "agent": "bijou-issue-remediation",
+  "task": "Reject non-finite RGB conversion results after finite-coordinate overflow while preserving clipping and false-returning gamut detection",
+  "bytesConsumed": 196896,
+  "contextMeasurement": "Retained cumulative Graft read checkpoint shared with the ongoing PR audit",
+  "filesRead": [
+    "packages/bijou/src/core/theme/color-perceptual.part01.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part01.test.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part02.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "filesModified": [
+    "packages/bijou/src/core/theme/color-perceptual.part01.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part01.test.ts",
+    "packages/bijou/src/core/theme/color-perceptual.part02.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [],
+  "validation": {
+    "red": "Docker 517-overflow-red: three expected throw assertions fail for huge finite l/a/b coordinates; ordinary clipping and existing reference tests pass",
+    "green": "Guard only the public clipped RGB boundary; leave isOklchInSrgb able to return false for impossible finite chroma; relevant theme tests and normal hooks must pass before commit"
+  }
+}

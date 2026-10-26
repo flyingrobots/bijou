@@ -26,3 +26,6 @@ export * from './index.part09.js';
 export * from './index.part10.js';
 
 export * from './index.part11.js';
+
+export { renameRuleAuthoredTheme, ruleAuthoredDefinitions } from './core/theme/preset-authoring.js';
+export { collectTokenDependents, collectTransitiveTokenDependents, tokenDefinitionPaths } from './core/theme/graph-dependents.js';
