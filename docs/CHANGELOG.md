@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Theme Lab paints complete grapheme clusters at their terminal cell widths,
+  preserving wide-character continuation cells and combining marks.
+
 - Reverse theme dependency scopes use authored tokens and preserve parent
   background edges when an explicit dotted token shadows the virtual field.
 
