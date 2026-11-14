@@ -1,73 +1,91 @@
-import {
-  areaY,
-  barY,
-  box,
-  dot,
-  lineY,
-  plot,
-  ruleY,
-  scaleLinear,
-  scaleOklch,
-} from '@flyingrobots/bijou';
+import { initDefaultContext } from '@flyingrobots/bijou-node';
+import { surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import {
+  isKeyMsg,
+  isResizeMsg,
+  quit,
+  run,
+  tick,
+  type App,
+} from '@flyingrobots/bijou-tui';
+import { renderDashboardSurface, type VizModel } from './plot-scene.js';
 
-const ctx = createTestContext({ mode: 'interactive' });
-
-const samples = 48;
-const p50: number[] = [];
-const p99: number[] = [];
-const requests: { readonly x: number; readonly y: number; readonly colorValue: number }[] = [];
-
-for (let i = 0; i < samples; i++) {
-  const t = i / (samples - 1);
-  const base = 24 + 12 * Math.sin(t * Math.PI * 3);
-  const tail = base * 2.1 + 18 * Math.cos(t * Math.PI * 5) ** 2;
-  p50.push(base);
-  p99.push(tail);
-  requests.push({
-    x: i,
-    y: 45 + 38 * Math.sin(t * Math.PI * 4) * Math.cos(t * Math.PI * 2),
-    colorValue: tail,
-  });
+interface Msg {
+  readonly type: 'tick';
 }
 
-const latencyChart = plot({
-  title: 'Service Latency (ms)',
-  width: 68,
-  height: 12,
-  ctx,
-  y: scaleLinear([0, 100]),
-  marks: [
-    areaY(p50, { label: 'p50', stroke: '#38bdf8' }),
-    lineY(p99, { label: 'p99', stroke: '#f43f5e' }),
-    ruleY(80, { label: 'SLO (80ms)', stroke: '#f59e0b' }),
-  ],
-});
+const FRAME_MS = 40;
+const stdout: { columns?: number; rows?: number; isTTY?: boolean } = process.stdout;
+const onceMode = process.argv.includes('--once') || !stdout.isTTY;
 
-const heatScale = scaleOklch(
-  [20, 95],
-  [
-    { l: 0.65, c: 0.14, h: 245 },
-    { l: 0.78, c: 0.18, h: 30 },
-  ],
-);
+if (onceMode) {
+  const ctx = createTestContext({ mode: 'interactive' });
+  const surface = renderDashboardSurface(
+    {
+      frame: 12,
+      paused: false,
+      cursorIdx: 24,
+      yMax: 100,
+      preset: 1,
+      cols: stdout.columns ?? 96,
+      rows: stdout.rows ?? 24,
+    },
+    ctx,
+  );
+  console.log(surfaceToString(surface, ctx.style));
+} else {
+  const ctx = initDefaultContext();
+  const app: App<VizModel, Msg> = {
+    init: () => [
+      {
+        frame: 0,
+        paused: false,
+        cursorIdx: 24,
+        yMax: 100,
+        preset: 1,
+        cols: stdout.columns ?? 96,
+        rows: stdout.rows ?? 24,
+      },
+      [tick(FRAME_MS, { type: 'tick' })],
+    ],
+    update: (msg, model) => {
+      if (isKeyMsg(msg)) {
+        if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) {
+          return [model, [quit()]];
+        }
+        if (msg.key === ' ' || msg.key === 'space') {
+          const paused = !model.paused;
+          return [{ ...model, paused }, paused ? [] : [tick(FRAME_MS, { type: 'tick' })]];
+        }
+        if (msg.key === 'left' || msg.key === 'h') {
+          return [{ ...model, cursorIdx: Math.max(0, model.cursorIdx - 1) }, []];
+        }
+        if (msg.key === 'right' || msg.key === 'l') {
+          return [{ ...model, cursorIdx: Math.min(47, model.cursorIdx + 1) }, []];
+        }
+        if (msg.key === '+' || msg.key === '=') {
+          return [{ ...model, yMax: Math.max(40, model.yMax - 20) }, []];
+        }
+        if (msg.key === '-' || msg.key === '_') {
+          return [{ ...model, yMax: Math.min(200, model.yMax + 20) }, []];
+        }
+        if (msg.key === '1' || msg.key === '2' || msg.key === '3') {
+          return [{ ...model, preset: Number(msg.key) }, []];
+        }
+        return [model, []];
+      }
+      if (isResizeMsg(msg)) {
+        return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
+      }
+      if (model.paused) return [model, []];
+      return [
+        { ...model, frame: model.frame + 1 },
+        [tick(FRAME_MS, { type: 'tick' })],
+      ];
+    },
+    view: (model) => renderDashboardSurface(model, ctx),
+  };
 
-const scatterAndBars = plot({
-  title: 'Throughput & Perceptual OKLCH Scatter',
-  width: 68,
-  height: 11,
-  ctx,
-  y: scaleLinear([0, 100]),
-  marks: [
-    barY(
-      p50.map((v, idx) => (idx % 3 === 0 ? v * 0.9 : 0)),
-      { label: 'batch rps', stroke: '#34d399' },
-    ),
-    dot(requests, {
-      label: 'trace sample',
-      colorScale: heatScale,
-    }),
-  ],
-});
-
-console.log(box(`${latencyChart}\n\n${scatterAndBars}`, { title: 'Bijou Declarative Viz (@flyingrobots/bijou/viz)', ctx }));
+  await run(app);
+}
