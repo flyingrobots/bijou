@@ -3,19 +3,14 @@ import { surfaceToString } from '@flyingrobots/bijou';
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import {
   isKeyMsg,
+  isPulseMsg,
   isResizeMsg,
   quit,
   run,
-  tick,
   type App,
 } from '@flyingrobots/bijou-tui';
 import { renderDashboardSurface, type VizModel } from './plot-scene.js';
 
-interface Msg {
-  readonly type: 'tick';
-}
-
-const FRAME_MS = 40;
 const stdout: { columns?: number; rows?: number; isTTY?: boolean } = process.stdout;
 const onceMode = process.argv.includes('--once') || !stdout.isTTY;
 
@@ -24,6 +19,7 @@ if (onceMode) {
   const surface = renderDashboardSurface(
     {
       frame: 12,
+      elapsedSec: 0.48,
       paused: false,
       cursorIdx: 24,
       yMax: 100,
@@ -36,10 +32,11 @@ if (onceMode) {
   console.log(surfaceToString(surface, ctx.style));
 } else {
   const ctx = initDefaultContext();
-  const app: App<VizModel, Msg> = {
+  const app: App<VizModel> = {
     init: () => [
       {
         frame: 0,
+        elapsedSec: 0,
         paused: false,
         cursorIdx: 24,
         yMax: 100,
@@ -47,7 +44,7 @@ if (onceMode) {
         cols: stdout.columns ?? 96,
         rows: stdout.rows ?? 24,
       },
-      [tick(FRAME_MS, { type: 'tick' })],
+      [],
     ],
     update: (msg, model) => {
       if (isKeyMsg(msg)) {
@@ -55,8 +52,7 @@ if (onceMode) {
           return [model, [quit()]];
         }
         if (msg.key === ' ' || msg.key === 'space') {
-          const paused = !model.paused;
-          return [{ ...model, paused }, paused ? [] : [tick(FRAME_MS, { type: 'tick' })]];
+          return [{ ...model, paused: !model.paused }, []];
         }
         if (msg.key === 'left' || msg.key === 'h') {
           return [{ ...model, cursorIdx: Math.max(0, model.cursorIdx - 1) }, []];
@@ -78,11 +74,17 @@ if (onceMode) {
       if (isResizeMsg(msg)) {
         return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
       }
-      if (model.paused) return [model, []];
-      return [
-        { ...model, frame: model.frame + 1 },
-        [tick(FRAME_MS, { type: 'tick' })],
-      ];
+      if (isPulseMsg(msg) && !model.paused) {
+        return [
+          {
+            ...model,
+            frame: model.frame + 1,
+            elapsedSec: model.elapsedSec + msg.dt,
+          },
+          [],
+        ];
+      }
+      return [model, []];
     },
     view: (model) => renderDashboardSurface(model, ctx),
   };

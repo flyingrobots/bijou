@@ -6,6 +6,7 @@ import {
 
 export interface VizModel {
   readonly frame: number;
+  readonly elapsedSec: number;
   readonly paused: boolean;
   readonly cursorIdx: number;
   readonly yMax: number;
@@ -23,7 +24,7 @@ const HEAT_SCALE = scaleOklch(
   ],
 );
 
-export function computeSeries(frame: number, preset: number): {
+export function computeSeries(phase: number, preset: number): {
   readonly p50: number[];
   readonly p99: number[];
   readonly bars: number[];
@@ -33,7 +34,6 @@ export function computeSeries(frame: number, preset: number): {
   const p99: number[] = [];
   const bars: number[] = [];
   const scatter: { readonly x: number; readonly y: number; readonly colorValue: number }[] = [];
-  const phase = frame * 0.08;
   const freq = preset === 1 ? 3 : preset === 2 ? 5 : 2;
 
   for (let i = 0; i < SAMPLES; i++) {
@@ -44,17 +44,17 @@ export function computeSeries(frame: number, preset: number): {
     const v99 = Math.min(98, v50 * 1.95 + 22 * burst);
     p50.push(v50);
     p99.push(v99);
-    bars.push(i % 2 === 0 ? v50 * 0.85 : 0);
+    bars.push(i % 2 === 0 ? Math.min(40, v50 * 0.85) : 0);
     scatter.push({
       x: i,
-      y: 48 + 38 * Math.sin(t * Math.PI * 4 + phase) * Math.cos(t * Math.PI * 2 - phase * 0.5),
+      y: 68 + 24 * Math.sin(t * Math.PI * 4 + phase) * Math.cos(t * Math.PI * 2 - phase * 0.5),
       colorValue: v99,
     });
   }
   return { p50, p99, bars, scatter };
 }
 
-function renderPhasePortrait(width: number, height: number, frame: number, preset: number, ctx: BijouContext): Surface {
+function renderPhasePortrait(width: number, height: number, phase: number, preset: number, ctx: BijouContext): Surface {
   const innerW = Math.max(4, width - 2);
   const innerH = Math.max(2, height - 2);
   const inner = createSurface(innerW, innerH);
@@ -65,7 +65,7 @@ function renderPhasePortrait(width: number, height: number, frame: number, prese
   const ry = Math.max(2, cy - 2);
   const a = preset + 2;
   const b = preset + 3;
-  const delta = frame * 0.05;
+  const delta = phase * 0.65;
   const steps = 160;
   let prevX = cx + rx * Math.sin(delta);
   let prevY = cy + ry * Math.sin(0);
@@ -86,7 +86,8 @@ export function renderDashboardSurface(model: VizModel, ctx: BijouContext): Surf
   const cols = Math.max(64, model.cols);
   const rows = Math.max(22, model.rows);
   const root = createSurface(cols, rows);
-  const { p50, p99, bars, scatter } = computeSeries(model.frame, model.preset);
+  const phase = model.elapsedSec * 2.0;
+  const { p50, p99, bars, scatter } = computeSeries(phase, model.preset);
   const rightW = Math.min(34, Math.max(26, Math.floor(cols * 0.34)));
   const leftW = Math.max(34, cols - rightW - 1);
   const topH = Math.max(10, Math.floor((rows - 2) / 2));
@@ -130,10 +131,10 @@ export function renderDashboardSurface(model: VizModel, ctx: BijouContext): Surf
     { label: 'p50 (ms)', value: curP50.toFixed(1), sparkline: p50.slice(-16) },
     { label: 'p99 (ms)', value: curP99.toFixed(1), sparkline: p99.slice(-16) },
     { label: 'y-domain', value: `[0, ${String(model.yMax)}]` },
-    { label: 'stream', value: model.paused ? 'PAUSED' : 'LIVE 25fps' },
+    { label: 'stream', value: model.paused ? 'PAUSED' : 'LIVE 60Hz' },
   ], { title: 'Inspector (scale.invert)', width: rightW, ctx });
   root.blit(stats, leftW + 1, 0);
-  root.blit(renderPhasePortrait(rightW, botH, model.frame, model.preset, ctx), leftW + 1, topH);
+  root.blit(renderPhasePortrait(rightW, botH, phase, model.preset, ctx), leftW + 1, topH);
 
   const footer = ' [Space] pause  [←/→] scrub cursor  [+/-] zoom Y  [1/2/3] preset  [q] quit ';
   writePlotText(root, 1, rows - 1, footer.slice(0, cols - 2), [148, 163, 184]);
