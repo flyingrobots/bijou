@@ -79,9 +79,9 @@ export function renderScopeSurface(model: VizModel, ctx: BijouContext): Surface 
     ch1.push(Math.sin(t * Math.PI * 4 + phase) * 65 + Math.cos(t * Math.PI * 10 - phase) * 22);
     ch2.push(Math.cos(t * Math.PI * 3 - phase * 0.8) * 52 + Math.sin(t * Math.PI * 7 + phase) * 18);
   }
-  const cursor = Math.max(0, Math.min(47, model.cursorIdx));
+  const cursor = Math.max(0, Math.min(47, model.cursorSampleIdx));
   const oscPlot = plotSurface({
-    title: `Dual-Trace Time-Domain (Ch1 ${(ch1[cursor] ?? 0).toFixed(1)}mV · Ch2 ${(ch2[cursor] ?? 0).toFixed(1)}mV)`,
+    title: `Synthetic Dual-Trace (Ch1 ${(ch1[cursor] ?? 0).toFixed(1)}mV · Ch2 ${(ch2[cursor] ?? 0).toFixed(1)}mV)`,
     width: leftW - 2, height: Math.max(6, topH - 2), ctx,
     y: scaleLinear([-100, 100]),
     marks: [
@@ -91,7 +91,7 @@ export function renderScopeSurface(model: VizModel, ctx: BijouContext): Surface 
       ruleX(cursor, { stroke: '#a78bfa' }),
     ],
   });
-  root.blit(boxSurface(oscPlot, { title: 'Deck 2 // DSP Oscilloscope (2x4 Braille)', width: leftW, ctx }), 0, 0);
+  root.blit(boxSurface(oscPlot, { title: 'Deck 2 [SYNTHETIC DEMO] // DSP Oscilloscope (2x4 Braille)', width: leftW, ctx }), 0, 0);
   root.blit(renderVectorscope(rightW, topH, phase, model, ctx), leftW + 1, 0);
 
   const fftBars: { x: number; y: number }[] = [];

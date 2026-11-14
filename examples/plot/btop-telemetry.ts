@@ -2,9 +2,10 @@ import { execFile, execFileSync } from 'node:child_process';
 import { statfsSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import type { CoreStat, CoreTickSnapshot, DiskStat, MemBreakdown, ProcEntry, TelemetryState } from './btop-types.js';
+import type { CoreStat, CoreTickSnapshot, DiskStat, MemBreakdown, ProcEntry, TelemetryCollector, TelemetrySample } from './btop-types.js';
 
-const HISTORY_LEN = 48;
+const MAX_SAMPLES = 240;
+const WINDOW_SIZE = 48;
 
 function readCoreSnapshots(): CoreTickSnapshot[] {
   return os.cpus().map((c) => {
@@ -12,15 +13,23 @@ function readCoreSnapshots(): CoreTickSnapshot[] {
     return { user, sys, idle: c.times.idle, total: user + sys + c.times.idle };
   });
 }
+
 function readDiskStat(): DiskStat {
   try {
     const s = statfsSync('/'), totalBytes = s.blocks * s.bsize, freeBytes = s.bavail * s.bsize;
-    return { totalBytes, usedBytes: Math.max(0, totalBytes - freeBytes), freeBytes };
-  } catch { return { totalBytes: 0, usedBytes: 0, freeBytes: 0 }; }
+    return { available: true, totalBytes, usedBytes: Math.max(0, totalBytes - freeBytes), freeBytes };
+  } catch { return { available: false, totalBytes: 0, usedBytes: 0, freeBytes: 0 }; }
 }
+
+function fallbackMem(): MemBreakdown {
+  const totalBytes = os.totalmem(), freeBytes = os.freemem();
+  return { totalBytes, usedBytes: Math.max(0, totalBytes - freeBytes), freeBytes, vmStatAvailable: false, appBytes: null, wiredBytes: null, compressedBytes: null, cachedBytes: null };
+}
+
 function parseVmStat(raw: string, totalBytes: number): MemBreakdown {
   const pageMatch = /page size of (\d+) bytes/.exec(raw);
-  const pageSize = pageMatch?.[1] ? Number(pageMatch[1]) : 16384;
+  if (!pageMatch) return fallbackMem();
+  const pageSize = Number(pageMatch[1]);
   const getPages = (label: string): number => {
     const m = new RegExp(`${label}:\\s+(\\d+)`).exec(raw);
     return m?.[1] ? Number(m[1]) * pageSize : 0;
@@ -28,7 +37,10 @@ function parseVmStat(raw: string, totalBytes: number): MemBreakdown {
   const appBytes = getPages('Anonymous pages'), wiredBytes = getPages('Pages wired down');
   const compressedBytes = getPages('Pages occupied by compressor'), cachedBytes = getPages('File-backed pages');
   const usedBytes = Math.min(totalBytes, appBytes + wiredBytes + compressedBytes);
-  return { totalBytes, usedBytes, appBytes, wiredBytes, compressedBytes, cachedBytes, freeBytes: Math.max(0, totalBytes - usedBytes) };
+  return {
+    totalBytes, usedBytes, freeBytes: Math.max(0, totalBytes - usedBytes),
+    vmStatAvailable: true, appBytes, wiredBytes, compressedBytes, cachedBytes,
+  };
 }
 
 function parsePsOutput(raw: string): ProcEntry[] {
@@ -42,105 +54,95 @@ function parsePsOutput(raw: string): ProcEntry[] {
   }
   return out;
 }
-export function togglePinnedPid(state: TelemetryState, proc: ProcEntry | undefined): void {
-  if (!proc || state.pinnedPid === proc.pid) {
-    state.pinnedPid = null; state.pinnedName = ''; state.pinnedDetail = '';
-    return;
+
+export function togglePinnedPid(collector: TelemetryCollector, proc: ProcEntry | undefined): void {
+  if (!proc || collector.pinnedPid === proc.pid) {
+    collector.pinnedPid = null; collector.pinnedName = ''; return;
   }
-  state.pinnedPid = proc.pid; state.pinnedName = proc.command;
-  state.pinnedDetail = `PID ${String(proc.pid)} · ${proc.command}`;
-  const seed = Math.min(100, proc.cpuPct);
-  state.pinnedCpuHistory = Array.from({ length: HISTORY_LEN }, (_, i) => Math.max(0, Math.min(100, seed + Math.sin(i * 0.3) * 4)));
+  collector.pinnedPid = proc.pid; collector.pinnedName = proc.command;
 }
 
-export function createInitialTelemetry(): TelemetryState {
+function buildSample(
+  seq: number, timestampSec: number, cores: readonly CoreStat[],
+  mem: MemBreakdown, disk: DiskStat, processes: readonly ProcEntry[], pinnedPid: number | null,
+): TelemetrySample {
+  const n = Math.max(1, cores.length);
+  const cpuUserPct = cores.reduce((a, c) => a + c.userPct, 0) / n, cpuSysPct = cores.reduce((a, c) => a + c.sysPct, 0) / n;
+  const cpuTotalPct = Math.min(100, cpuUserPct + cpuSysPct);
+  const pinnedProc = pinnedPid !== null ? processes.find((p) => p.pid === pinnedPid) : undefined;
+  const pinnedCpuPct = pinnedPid !== null ? (pinnedProc ? Math.min(100, pinnedProc.cpuPct) : Number.NaN) : null;
+  const load = os.loadavg();
+  return {
+    seq, timestampSec, cpuTotalPct, cpuUserPct, cpuSysPct, pinnedCpuPct, cores: [...cores],
+    loadAvg: [load[0] ?? 0, load[1] ?? 0, load[2] ?? 0], uptimeSec: os.uptime(), mem: { ...mem }, disk: { ...disk }, processes: [...processes],
+  };
+}
+
+export function createInitialTelemetry(): TelemetryCollector {
   const cpuModel = (os.cpus()[0]?.model ?? 'Host CPU').replace(/\s+/g, ' ').trim();
   const snap0 = readCoreSnapshots();
-  const totalBytes = os.totalmem();
-  const freeFallback = os.freemem(), usedFallback = totalBytes - freeFallback;
-  let mem: MemBreakdown = {
-    totalBytes, usedBytes: usedFallback, appBytes: usedFallback * 0.5,
-    wiredBytes: usedFallback * 0.2, compressedBytes: usedFallback * 0.3, cachedBytes: freeFallback, freeBytes: freeFallback,
-  };
-  let processes: ProcEntry[] = [];
-  try { mem = parseVmStat(execFileSync('vm_stat', [], { encoding: 'utf8', timeout: 400 }), totalBytes); } catch { /* fallback */ }
-  try { processes = parsePsOutput(execFileSync('ps', ['-Ao', 'pid=,pcpu=,pmem=,rss=,comm=', '-r'], { encoding: 'utf8', timeout: 400 })); } catch { /* fallback */ }
+  let latestMem = fallbackMem();
+  let latestProcesses: ProcEntry[] = [];
+  try { latestMem = parseVmStat(execFileSync('vm_stat', [], { encoding: 'utf8', timeout: 400 }), latestMem.totalBytes); } catch { /* unavailable */ }
+  try { latestProcesses = parsePsOutput(execFileSync('ps', ['-Ao', 'pid=,pcpu=,pmem=,rss=,comm=', '-r'], { encoding: 'utf8', timeout: 400 })); } catch { /* empty */ }
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 35);
   const snaps = readCoreSnapshots();
   const cores: CoreStat[] = snaps.map((curr, id) => {
     const prev = snap0[id] ?? curr, dTot = curr.total - prev.total;
-    const u = dTot > 0 ? ((curr.user - prev.user) / dTot) * 100 : (curr.user / Math.max(1, curr.total)) * 100;
-    const sy = dTot > 0 ? ((curr.sys - prev.sys) / dTot) * 100 : (curr.sys / Math.max(1, curr.total)) * 100;
-    const tot = Math.max(0, Math.min(100, u + sy));
-    return { id, totalPct: tot, userPct: Math.max(0, u), sysPct: Math.max(0, sy), peakPct: Math.min(98, Math.max(tot + 14, 22)) };
+    const u = dTot > 0 ? Math.max(0, Math.min(100, ((curr.user - prev.user) / dTot) * 100)) : 0;
+    const sy = dTot > 0 ? Math.max(0, Math.min(100, ((curr.sys - prev.sys) / dTot) * 100)) : 0;
+    const tot = Math.min(100, u + sy);
+    return { id, totalPct: tot, userPct: u, sysPct: sy, peakPct: tot };
   });
-  const avgUser = cores.reduce((a, c) => a + c.userPct, 0) / Math.max(1, cores.length);
-  const avgSys = cores.reduce((a, c) => a + c.sysPct, 0) / Math.max(1, cores.length);
-  const cpuTotalHistory: number[] = [], cpuUserHistory: number[] = [], cpuSysHistory: number[] = [];
-  for (let i = 0; i < HISTORY_LEN; i++) {
-    const wave = Math.sin(i * 0.26) * 8 + Math.cos(i * 0.14) * 5;
-    const u = Math.max(2, Math.min(92, avgUser + wave));
-    const s = Math.max(1, Math.min(90, avgSys + Math.abs(wave) * 0.45));
-    cpuUserHistory.push(u); cpuSysHistory.push(s); cpuTotalHistory.push(Math.min(100, u + s));
-  }
-  const memPct = totalBytes > 0 ? (mem.usedBytes / totalBytes) * 100 : 50;
-  const load = os.loadavg();
+  const latestDisk = readDiskStat();
+  const initialSample = buildSample(0, 0, cores, latestMem, latestDisk, latestProcesses, null);
   return {
-    cpuModel, coreCount: snaps.length, historyLen: HISTORY_LEN, prevCoreTicks: snaps, cores,
-    cpuTotalHistory, cpuUserHistory, cpuSysHistory,
-    memUsedPctHistory: Array.from({ length: HISTORY_LEN }, () => memPct),
-    pinnedPid: null, pinnedName: '', pinnedDetail: '',
-    pinnedCpuHistory: Array.from({ length: HISTORY_LEN }, () => 0),
-    loadAvg: [load[0] ?? 0, load[1] ?? 0, load[2] ?? 0],
-    uptimeSec: os.uptime(), mem, disk: readDiskStat(), processes,
-    sampleAccumSec: 0, slowAccumSec: 0, psInFlight: false, vmInFlight: false,
+    cpuModel, coreCount: snaps.length, maxSamples: MAX_SAMPLES, windowSize: WINDOW_SIZE,
+    prevCoreTicks: snaps, corePeaks: cores.map((c) => c.peakPct),
+    latestMem, latestDisk, latestProcesses, pinnedPid: null, pinnedName: '',
+    samples: [initialSample], sampleAccumSec: 0, slowAccumSec: 0, psInFlight: false, vmInFlight: false,
   };
 }
 
-export function stepTelemetry(state: TelemetryState, dt: number, sampleIntervalSec: number): void {
-  state.sampleAccumSec += dt;
-  state.slowAccumSec += dt;
-  if (state.sampleAccumSec >= sampleIntervalSec) {
-    state.sampleAccumSec = 0;
+export function stepTelemetry(collector: TelemetryCollector, elapsedSec: number, dt: number, sampleIntervalSec: number): boolean {
+  collector.sampleAccumSec += dt;
+  collector.slowAccumSec += dt;
+  let added = false;
+  if (collector.sampleAccumSec >= sampleIntervalSec) {
+    collector.sampleAccumSec = 0;
     const nextSnaps = readCoreSnapshots();
-    state.cores = nextSnaps.map((curr, id) => {
-      const prev = state.prevCoreTicks[id] ?? curr, dTot = Math.max(1, curr.total - prev.total);
+    const cores: CoreStat[] = nextSnaps.map((curr, id) => {
+      const prev = collector.prevCoreTicks[id] ?? curr, dTot = Math.max(1, curr.total - prev.total);
       const u = Math.max(0, Math.min(100, ((curr.user - prev.user) / dTot) * 100));
       const sy = Math.max(0, Math.min(100, ((curr.sys - prev.sys) / dTot) * 100));
       const tot = Math.min(100, u + sy);
-      const peakPct = Math.min(98, Math.max(tot + 12, (state.cores[id]?.peakPct ?? tot) * 0.94));
+      const peakPct = Math.max(collector.corePeaks[id] ?? 0, tot);
+      collector.corePeaks[id] = peakPct;
       return { id, totalPct: tot, userPct: u, sysPct: sy, peakPct };
     });
-    state.prevCoreTicks = nextSnaps;
-    const avgUser = state.cores.reduce((a, c) => a + c.userPct, 0) / Math.max(1, state.cores.length);
-    const avgSys = state.cores.reduce((a, c) => a + c.sysPct, 0) / Math.max(1, state.cores.length);
-    state.cpuUserHistory = [...state.cpuUserHistory.slice(1), avgUser];
-    state.cpuSysHistory = [...state.cpuSysHistory.slice(1), avgSys];
-    state.cpuTotalHistory = [...state.cpuTotalHistory.slice(1), Math.min(100, avgUser + avgSys)];
-    if (state.pinnedPid !== null) {
-      const pinned = state.processes.find((p) => p.pid === state.pinnedPid);
-      state.pinnedCpuHistory = [...state.pinnedCpuHistory.slice(1), Math.min(100, pinned?.cpuPct ?? 0)];
-    }
-    const load = os.loadavg();
-    state.loadAvg = [load[0] ?? 0, load[1] ?? 0, load[2] ?? 0];
-    state.uptimeSec = os.uptime();
+    collector.prevCoreTicks = nextSnaps;
+    const nextSeq = (collector.samples[collector.samples.length - 1]?.seq ?? 0) + 1;
+    const sample = buildSample(nextSeq, elapsedSec, cores, collector.latestMem, collector.latestDisk, collector.latestProcesses, collector.pinnedPid);
+    collector.samples = [...collector.samples.slice(-(collector.maxSamples - 1)), sample];
+    added = true;
   }
-  if (state.slowAccumSec >= 1.0) {
-    state.slowAccumSec = 0;
-    state.disk = readDiskStat();
-    if (!state.vmInFlight) {
-      state.vmInFlight = true;
+  if (collector.slowAccumSec >= 1.0) {
+    collector.slowAccumSec = 0;
+    collector.latestDisk = readDiskStat();
+    if (!collector.vmInFlight) {
+      collector.vmInFlight = true;
       execFile('vm_stat', [], { timeout: 500 }, (err, stdout) => {
-        state.vmInFlight = false;
-        if (!err && stdout) state.mem = parseVmStat(stdout, state.mem.totalBytes);
+        collector.vmInFlight = false;
+        if (!err && stdout) collector.latestMem = parseVmStat(stdout, collector.latestMem.totalBytes);
       });
     }
-    if (!state.psInFlight) {
-      state.psInFlight = true;
+    if (!collector.psInFlight) {
+      collector.psInFlight = true;
       execFile('ps', ['-Ao', 'pid=,pcpu=,pmem=,rss=,comm=', '-r'], { timeout: 500 }, (err, stdout) => {
-        state.psInFlight = false;
-        if (!err && stdout) state.processes = parsePsOutput(stdout);
+        collector.psInFlight = false;
+        if (!err && stdout) collector.latestProcesses = parsePsOutput(stdout);
       });
     }
   }
+  return added;
 }

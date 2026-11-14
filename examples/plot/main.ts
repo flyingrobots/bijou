@@ -4,7 +4,7 @@ import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { isKeyMsg, isPulseMsg, isResizeMsg, quit, run, type App } from '@flyingrobots/bijou-tui';
 import { sortProcesses } from './btop-panes.js';
 import { createInitialTelemetry, stepTelemetry, togglePinnedPid } from './btop-telemetry.js';
-import type { PaletteName, ProcSortKey, ViewMode, VizModel } from './btop-types.js';
+import type { PaletteName, ProcSortKey, TelemetrySample, ViewMode, VizModel } from './btop-types.js';
 import { getActiveFlameFrames } from './flame-scene.js';
 import { createWorkspaceForceSim } from './force-scene.js';
 import { renderDashboardSurface } from './plot-scene.js';
@@ -24,12 +24,17 @@ function resolveInitialView(): ViewMode {
   }
   return 'btop';
 }
+function activeSample(model: VizModel): TelemetrySample | undefined {
+  const s = model.telemetry.samples;
+  return s.length === 0 ? undefined : s[model.followLive ? s.length - 1 : Math.max(0, Math.min(s.length - 1, model.cursorSampleIdx))];
+}
 
 function createInitialModel(): VizModel {
   const telemetry = createInitialTelemetry();
   return {
     viewMode: resolveInitialView(), frame: 0, elapsedSec: 0, paused: false,
-    cursorIdx: telemetry.historyLen - 1, selectedProcIdx: 0, sortKey: 'cpu', palette: 'inferno',
+    followLive: true, cursorSampleIdx: Math.max(0, telemetry.samples.length - 1),
+    selectedProcIdx: 0, sortKey: 'cpu', palette: 'inferno',
     sampleIntervalSec: 0.15, cols: stdout.columns ?? 114, rows: stdout.rows ?? 30, telemetry,
     waterfall: createInitialWaterfall(56, 13), forceSim: createWorkspaceForceSim(),
     selectedNodeIdx: 0, flameZoomId: 'root', selectedFlameIdx: 0,
@@ -38,7 +43,9 @@ function createInitialModel(): VizModel {
 
 function handleEnterKey(model: VizModel): VizModel {
   if (model.viewMode === 'btop') {
-    const sorted = sortProcesses(model.telemetry.processes, model.sortKey);
+    const sample = activeSample(model);
+    if (!sample) return model;
+    const sorted = sortProcesses(sample.processes, model.sortKey);
     togglePinnedPid(model.telemetry, sorted[model.selectedProcIdx]);
     return { ...model };
   }
@@ -72,25 +79,24 @@ if (onceMode) {
           return [{ ...model, viewMode: next }, []];
         }
         if (msg.key === ' ' || msg.key === 'space') return [{ ...model, paused: !model.paused }, []];
+        if (msg.key === 'f') {
+          return [{ ...model, followLive: true, cursorSampleIdx: Math.max(0, model.telemetry.samples.length - 1) }, []];
+        }
         if (msg.key === 'enter' || msg.key === 'return') return [handleEnterKey(model), []];
         if (msg.key === 'u' || msg.key === 'backspace') return [{ ...model, flameZoomId: 'root', selectedFlameIdx: 0 }, []];
         if (msg.key === 'up' || msg.key === 'k') {
           return [{
-            ...model,
-            selectedProcIdx: Math.max(0, model.selectedProcIdx - 1),
-            selectedNodeIdx: Math.max(0, model.selectedNodeIdx - 1),
-            selectedFlameIdx: Math.max(0, model.selectedFlameIdx - 1),
+            ...model, selectedProcIdx: Math.max(0, model.selectedProcIdx - 1),
+            selectedNodeIdx: Math.max(0, model.selectedNodeIdx - 1), selectedFlameIdx: Math.max(0, model.selectedFlameIdx - 1),
           }, []];
         }
         if (msg.key === 'down' || msg.key === 'j') {
-          const maxP = Math.max(0, model.telemetry.processes.length - 1);
+          const maxP = Math.max(0, (activeSample(model)?.processes.length ?? 1) - 1);
           const maxN = Math.max(0, model.forceSim.nodes().length - 1);
           const maxF = Math.max(0, getActiveFlameFrames(model.flameZoomId).frames.length - 1);
           return [{
-            ...model,
-            selectedProcIdx: Math.min(maxP, model.selectedProcIdx + 1),
-            selectedNodeIdx: Math.min(maxN, model.selectedNodeIdx + 1),
-            selectedFlameIdx: Math.min(maxF, model.selectedFlameIdx + 1),
+            ...model, selectedProcIdx: Math.min(maxP, model.selectedProcIdx + 1),
+            selectedNodeIdx: Math.min(maxN, model.selectedNodeIdx + 1), selectedFlameIdx: Math.min(maxF, model.selectedFlameIdx + 1),
           }, []];
         }
         if (msg.key === 's') {
@@ -100,12 +106,16 @@ if (onceMode) {
         if (msg.key === 'left' || msg.key === 'h') {
           const node = model.forceSim.nodes()[model.selectedNodeIdx];
           if (model.viewMode === 'force' && node) model.forceSim.nudgeNode(node.id, -0.04, 0);
-          return [{ ...model, cursorIdx: Math.max(0, model.cursorIdx - 1) }, []];
+          const cur = model.followLive ? Math.max(0, model.telemetry.samples.length - 1) : model.cursorSampleIdx;
+          return [{ ...model, followLive: false, cursorSampleIdx: Math.max(0, cur - 1) }, []];
         }
         if (msg.key === 'right' || msg.key === 'l') {
           const node = model.forceSim.nodes()[model.selectedNodeIdx];
           if (model.viewMode === 'force' && node) model.forceSim.nudgeNode(node.id, 0.04, 0);
-          return [{ ...model, cursorIdx: Math.min(model.telemetry.historyLen - 1, model.cursorIdx + 1) }, []];
+          const maxIdx = Math.max(0, model.telemetry.samples.length - 1);
+          const cur = model.followLive ? maxIdx : model.cursorSampleIdx;
+          const nextIdx = Math.min(maxIdx, cur + 1);
+          return [{ ...model, followLive: nextIdx >= maxIdx, cursorSampleIdx: nextIdx }, []];
         }
         if (msg.key === '+' || msg.key === '=') {
           return [{ ...model, sampleIntervalSec: Math.max(0.05, Number((model.sampleIntervalSec - 0.05).toFixed(2))) }, []];
@@ -120,10 +130,14 @@ if (onceMode) {
       }
       if (isResizeMsg(msg)) return [{ ...model, cols: msg.columns, rows: msg.rows }, []];
       if (isPulseMsg(msg) && !model.paused) {
-        stepTelemetry(model.telemetry, msg.dt, model.sampleIntervalSec);
-        if (model.frame % 4 === 0) stepWaterfall(model.waterfall, model.elapsedSec * 2.4, model.palette);
+        const nextElapsed = model.elapsedSec + msg.dt;
+        const wasFull = model.telemetry.samples.length >= model.telemetry.maxSamples;
+        const added = stepTelemetry(model.telemetry, nextElapsed, msg.dt, model.sampleIntervalSec);
+        if (model.frame % 4 === 0) stepWaterfall(model.waterfall, nextElapsed * 2.4, model.palette);
         if (model.viewMode === 'force') model.forceSim.tick(1);
-        return [{ ...model, frame: model.frame + 1, elapsedSec: model.elapsedSec + msg.dt }, []];
+        const latestIdx = Math.max(0, model.telemetry.samples.length - 1);
+        const nextCursor = model.followLive ? latestIdx : (added && wasFull ? Math.max(0, model.cursorSampleIdx - 1) : model.cursorSampleIdx);
+        return [{ ...model, frame: model.frame + 1, elapsedSec: nextElapsed, cursorSampleIdx: nextCursor }, []];
       }
       return [model, []];
     },

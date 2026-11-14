@@ -44,6 +44,13 @@ describe('scaleLinear', () => {
     const ticks = s.ticks(5);
     expect(ticks).toEqual([0, 20, 40, 60, 80, 100]);
   });
+
+  it('terminates in bounded time on high-magnitude narrow domains like [1e20, 1e20 + 65536]', () => {
+    const s = scaleLinear([1e20, 1e20 + 65536]);
+    const ticks = s.ticks(5);
+    expect(ticks.length).toBeGreaterThan(0);
+    expect(ticks.length).toBeLessThanOrEqual(20);
+  });
 });
 
 describe('scaleLog', () => {
@@ -61,6 +68,11 @@ describe('scaleLog', () => {
     expect(Number.isFinite(s(0))).toBe(true);
     expect(Number.isFinite(s(-10))).toBe(true);
     expect(Number.isFinite(s(NaN))).toBe(true);
+  });
+
+  it('preserves reversed domains when nice() is called on scaleLog([90, 2])', () => {
+    const s = scaleLog([90, 2]).nice();
+    expect(s.domain()).toEqual([100, 1]);
   });
 });
 

@@ -34,8 +34,8 @@ keywords:
 Bijou adopts a three-layer **Grammar of the Grid** inside `@flyingrobots/bijou` (`packages/bijou/src/core/viz/`, exported both from `@flyingrobots/bijou` and the `@flyingrobots/bijou/viz` subpath):
 
 1. **Layer 1: Pure Composable Scales (`scaleLinear`, `scaleLog`, `scaleBand`, `scaleOklch`)** — stateless mathematical functions mapping data domains to sub-cell coordinates or perceptual OKLCH colours, with `.nice()` tick rounding, `.ticks()`, `.invert()`, and zero-division guards.
-2. **Layer 2: Push-Based Sub-Cell Rasterizer (`BrailleCanvas`)** — an allocation-free `Uint8Array` (`2W x 4H` Unicode `U+2800..U+28FF` dot masks) and `Int16Array` per-cell RGB buffer with integer Bresenham `plotLine`, `plotDot`, `fillColumn`, and `flushToSurface()` via `PackedSurface.setRGB()`.
-3. **Layer 3: Declarative Mark Composition (`plot`, `plotSurface`, `lineY`, `areaY`, `dot`, `barY`, `ruleY`, `ruleX`)** — an Observable Plot-style compositor that separates **1x1 character-cell typography** (axes, ticks, labels, title, legend) in outer margins from **2x4 / 1x8 sub-cell geometry** inside the inner plot viewport, and automatically lowers into TSV (`pipe` mode) or screen-reader summaries (`accessible` mode).
+2. **Layer 2: Push-Based Sub-Cell Rasterizer (`BrailleCanvas`)** — a pre-allocated `Uint8Array` (`2W x 4H` Unicode `U+2800..U+28FF` dot masks) and `Int16Array` per-cell RGB buffer with Liang–Barsky viewport segment clipping, integer Bresenham `plotLine`, `plotDot`, `fillColumn`, and `flushToSurface()` via `PackedSurface.setRGB()`. Once constructed, `BrailleCanvas` performs zero heap allocations per pixel write.
+3. **Layer 3: Declarative Mark Composition (`plot`, `plotSurface`, `lineY`, `areaY`, `dot`, `barY`, `ruleY`, `ruleX`)** — an Observable Plot-style compositor that normalizes mark points (allocating a per-mark point array and cloning supplied scales per render), separates **1x1 character-cell typography** in outer margins from **2x4 / 1x8 sub-cell geometry** inside the inner plot viewport, and automatically lowers into exact-number TSV (`pipe` mode) or screen-reader summaries (`accessible` mode).
 
 ```text
 Domain Data (T[] | number[])
@@ -77,11 +77,12 @@ A common failure mode of terminal plotting libraries is attempting to draw axes 
 - **Outer Margins (`1x1` cell grid):** Title, legend pills (`● label`), Y-axis numeric tick labels, the `│` / `└` / `─` axis frame, and X-axis tick labels are placed on exact character cell coordinates.
 - **Inner Plot Viewport (`2W x 4H` Braille sub-grid or `1W x 8H` fractional-block grid):** Continuous marks (`lineY`, `areaY`, `dot`, `ruleY`, `ruleX`) project data coordinates into `[0, plotWidth * 2 - 1] x [plotHeight * 4 - 1, 0]` (with Y inverted so higher domain values render at the top of the viewport).
 
-### 2. Perceptual Colour Encoding (`scaleOklch`)
+### 2. Scale-Projected Marks, Missing Samples, and Cell Collision Policy
 
-Terminal charts only have two colour channels per cell (`fgRGB` and `bgRGB`). When multiple series or continuous colour-mapped scatter points (`dot`) are drawn:
-- Continuous colour scales interpolate in **OKLCH** (`l`, `c`, `h` via `interpolateHue` and `oklchToRgb`), guaranteeing uniform perceived lightness across heatmaps and scatter plots rather than muddy sRGB midpoints.
-- Each cell in `BrailleCanvas` tracks its foreground RGB tuple in a flat `Int16Array` and writes directly via `PackedSurface.setRGB(x, y, codePoint, r, g, b, -1, 0, 0)` with zero hex-string parsing or object allocation.
+- **Unified Scale Projection (`barY` vs `dot`/`lineY`):** Every mark projects through the supplied `x` and `y` scales. `barY` projects both `pt.y` and its baseline (`y0`, defaulting to `0` when inside a linear domain or `d0` for positive/logarithmic domains) through `yScale`, so signed bars draw downward from `0` and logarithmic bars align to the exact cell row of a `dot` at the same value.
+- **Explicit Missing Data (`NaN` & `defined`):** Invalid or omitted samples (`NaN`, `undefined`, or `defined(d, i) === false`) remain `NaN` rather than coercing to `0`. `lineY` and `areaY` break their polylines/fills across `NaN` samples to render genuine gaps, and domain inference / `pipe` / `accessible` summaries ignore non-finite samples.
+- **Cell Collision & Mark-Order Policy:** Within a contiguous Braille pass, up to 8 dots in the same character cell OR their bitmasks (`mask |= BRAILLE_DOT_MASKS[dx][dy]`) and the latest colored write sets the cell's foreground RGB. Between `1x8` fractional block marks (`barY`) and `2x4` Braille marks, `plotSurface()` flushes and clears `BrailleCanvas` before each `barY` mark so `options.marks` array order deterministically controls which layer overwrites overlapping cells.
+- **Viewport Clipping:** `BrailleCanvas.plotLine()` clips segments to `[0, pixelWidth - 1] x [0, pixelHeight - 1]` via Liang–Barsky before walking Bresenham, and `areaY` clamps horizontal column spans to the visible viewport so extreme outliers never cause unbounded offscreen raster work.
 
 ### 3. Graceful Mode Lowering (`interactive`, `static`, `pipe`, `accessible`)
 

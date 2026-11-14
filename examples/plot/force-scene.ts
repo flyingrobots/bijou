@@ -67,7 +67,7 @@ export function renderForceSurface(model: VizModel, ctx: BijouContext): Surface 
   });
   root.blit(
     boxSurface(graphInner, {
-      title: `Deck 3 // d3-force in Braille (alpha=${sim.alpha().toFixed(3)} · ${String(nodes.length)} nodes)`,
+      title: `Deck 3 [SYNTHETIC DEMO] // d3-force in Braille (alpha=${sim.alpha().toFixed(3)} · ${String(nodes.length)} nodes)`,
       width: leftW,
       ctx,
     }),
@@ -97,10 +97,10 @@ export function renderForceSurface(model: VizModel, ctx: BijouContext): Surface 
 
   const degBars = nodes.map((n, idx) => {
     const deg = links.filter((l) => l.source === n.id || l.target === n.id).length;
-    return { x: idx, y: deg * 18 };
+    return { x: idx, y: deg * 20 };
   });
   const speedDots = nodes.map((n, idx) => {
-    const v = Math.min(96, 65 + Math.hypot(n.vx, n.vy) * 900);
+    const v = Math.min(100, Math.hypot(n.vx, n.vy) * 1200);
     return { x: idx, y: v, colorValue: v };
   });
   const degPlot = plotSurface({

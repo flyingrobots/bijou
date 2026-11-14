@@ -49,6 +49,7 @@ export {
   type AccessorOptions,
   type AreaMarkOptions,
   type AreaYMark,
+  type BarMarkOptions,
   type BarYMark,
   type DotMark,
   type DotMarkOptions,

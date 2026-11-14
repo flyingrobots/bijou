@@ -100,44 +100,44 @@ export function scaleLinear(
       return r0 + t * (r1 - r0);
     },
     {
-      domain,
-      range,
-      clamp,
+      domain, range, clamp,
       nice(count = 5): ContinuousScale {
-        if (d0 === d1) {
-          d0 -= 1;
-          d1 += 1;
-          return scale;
-        }
-        const reverse = d1 < d0;
-        const lo = reverse ? d1 : d0;
-        const hi = reverse ? d0 : d1;
+        if (d0 === d1) { d0 -= 1; d1 += 1; return scale; }
+        const reverse = d1 < d0, lo = reverse ? d1 : d0, hi = reverse ? d0 : d1;
         const step = niceStep(hi - lo, count);
-        const nLo = Math.floor(lo / step) * step;
-        const nHi = Math.ceil(hi / step) * step;
-        d0 = reverse ? nHi : nLo;
-        d1 = reverse ? nLo : nHi;
+        if (lo + step === lo || Math.abs(lo / step) > 1e12) return scale;
+        const nLo = Math.floor(lo / step) * step, nHi = Math.ceil(hi / step) * step;
+        d0 = reverse ? nHi : nLo; d1 = reverse ? nLo : nHi;
         return scale;
       },
       ticks(count = 5): number[] {
         if (count <= 0) return [];
         if (d0 === d1) return [d0];
-        const lo = Math.min(d0, d1);
-        const hi = Math.max(d0, d1);
+        const lo = Math.min(d0, d1), hi = Math.max(d0, d1);
         const step = niceStep(hi - lo, count);
-        const start = Math.ceil(lo / step);
-        const end = Math.floor(hi / step);
+        if (!Number.isFinite(step) || step <= 0 || lo + step === lo || hi - step === hi) return [lo, hi];
+        const maxTicks = Math.max(2, Math.min(256, Math.floor(count) * 4));
         const result: number[] = [];
-        for (let i = start; i <= end; i++) {
-          const val = Number((i * step).toPrecision(12));
-          result.push(Object.is(val, -0) ? 0 : val);
+        if (Math.abs(lo / step) <= 1e12 && Math.abs(hi / step) <= 1e12) {
+          const start = Math.ceil(lo / step), end = Math.floor(hi / step);
+          const countSteps = Math.min(maxTicks, Math.max(0, end - start + 1));
+          for (let k = 0; k < countSteps; k++) {
+            const val = Number(((start + k) * step).toPrecision(12));
+            result.push(Object.is(val, -0) ? 0 : val);
+          }
+        } else {
+          for (let k = 0; k < maxTicks; k++) {
+            const val = lo + k * step;
+            if (val > hi || (result.length > 0 && val === result[result.length - 1])) break;
+            result.push(Object.is(val, -0) ? 0 : val);
+          }
         }
         return result.length > 0 ? result : [lo, hi];
       },
       invert(output: number): number {
-        const rSpan = r1 - r0;
-        if (rSpan === 0) return d0;
-        let t = (output - r0) / rSpan;
+        const span = r1 - r0;
+        if (span === 0) return d0;
+        let t = (output - r0) / span;
         if (clamped) t = Math.max(0, Math.min(1, t));
         return d0 + t * (d1 - d0);
       },

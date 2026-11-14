@@ -22,63 +22,51 @@ export function createHeatScale(palette: PaletteName): OklchScale {
 }
 
 export interface CoreTickSnapshot {
-  readonly user: number;
-  readonly sys: number;
-  readonly idle: number;
-  readonly total: number;
+  readonly user: number; readonly sys: number; readonly idle: number; readonly total: number;
 }
-
 export interface CoreStat {
-  readonly id: number;
-  readonly totalPct: number;
-  readonly userPct: number;
-  readonly sysPct: number;
-  readonly peakPct: number;
+  readonly id: number; readonly totalPct: number; readonly userPct: number; readonly sysPct: number; readonly peakPct: number;
 }
-
 export interface MemBreakdown {
-  readonly totalBytes: number;
-  readonly usedBytes: number;
-  readonly appBytes: number;
-  readonly wiredBytes: number;
-  readonly compressedBytes: number;
-  readonly cachedBytes: number;
-  readonly freeBytes: number;
+  readonly totalBytes: number; readonly usedBytes: number; readonly freeBytes: number;
+  readonly vmStatAvailable: boolean; readonly appBytes: number | null;
+  readonly wiredBytes: number | null; readonly compressedBytes: number | null; readonly cachedBytes: number | null;
 }
-
 export interface DiskStat {
-  readonly totalBytes: number;
-  readonly usedBytes: number;
-  readonly freeBytes: number;
+  readonly available: boolean; readonly totalBytes: number; readonly usedBytes: number; readonly freeBytes: number;
 }
-
 export interface ProcEntry {
-  readonly pid: number;
-  readonly cpuPct: number;
-  readonly memPct: number;
-  readonly rssKb: number;
-  readonly command: string;
+  readonly pid: number; readonly cpuPct: number; readonly memPct: number; readonly rssKb: number; readonly command: string;
 }
 
-export interface TelemetryState {
+export interface TelemetrySample {
+  readonly seq: number;
+  readonly timestampSec: number;
+  readonly cpuTotalPct: number;
+  readonly cpuUserPct: number;
+  readonly cpuSysPct: number;
+  readonly pinnedCpuPct: number | null;
+  readonly cores: readonly CoreStat[];
+  readonly loadAvg: readonly [number, number, number];
+  readonly uptimeSec: number;
+  readonly mem: MemBreakdown;
+  readonly disk: DiskStat;
+  readonly processes: readonly ProcEntry[];
+}
+
+export interface TelemetryCollector {
   readonly cpuModel: string;
   readonly coreCount: number;
-  readonly historyLen: number;
+  readonly maxSamples: number;
+  readonly windowSize: number;
   prevCoreTicks: readonly CoreTickSnapshot[];
-  cores: readonly CoreStat[];
-  cpuTotalHistory: number[];
-  cpuUserHistory: number[];
-  cpuSysHistory: number[];
-  memUsedPctHistory: number[];
+  corePeaks: number[];
+  latestMem: MemBreakdown;
+  latestDisk: DiskStat;
+  latestProcesses: readonly ProcEntry[];
   pinnedPid: number | null;
   pinnedName: string;
-  pinnedDetail: string;
-  pinnedCpuHistory: number[];
-  loadAvg: readonly [number, number, number];
-  uptimeSec: number;
-  mem: MemBreakdown;
-  disk: DiskStat;
-  processes: readonly ProcEntry[];
+  samples: readonly TelemetrySample[];
   sampleAccumSec: number;
   slowAccumSec: number;
   psInFlight: boolean;
@@ -90,14 +78,15 @@ export interface VizModel {
   readonly frame: number;
   readonly elapsedSec: number;
   readonly paused: boolean;
-  readonly cursorIdx: number;
+  readonly followLive: boolean;
+  readonly cursorSampleIdx: number;
   readonly selectedProcIdx: number;
   readonly sortKey: ProcSortKey;
   readonly palette: PaletteName;
   readonly sampleIntervalSec: number;
   readonly cols: number;
   readonly rows: number;
-  readonly telemetry: TelemetryState;
+  readonly telemetry: TelemetryCollector;
   readonly waterfall: HalfBlockCanvas;
   readonly forceSim: ForceSimulation;
   readonly selectedNodeIdx: number;

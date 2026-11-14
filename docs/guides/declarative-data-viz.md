@@ -4,7 +4,7 @@ Bijou provides a D3 / Observable Plot-inspired declarative visualization toolkit
 
 ## Architectural Overview
 
-Unlike browser libraries that mutate a retained SVG DOM (`d3-selection`), Bijou's visualization pipeline is immediate-mode and allocation-free on the hot cell path:
+Unlike browser libraries that mutate a retained SVG DOM (`d3-selection`), Bijou's visualization pipeline is immediate-mode: `plotSurface()` normalizes marks and clones viewport scales per render, while `BrailleCanvas` rasterizes sub-pixels into pre-allocated typed arrays with zero per-pixel heap allocations:
 
 1. **Scales (`scaleLinear`, `scaleLog`, `scaleBand`, `scaleOklch`)** map arbitrary domain values into sub-cell pixel coordinates or perceptual OKLCH colours.
 2. **Sub-Cell Rasterizer (`BrailleCanvas`)** projects points, Bresenham lines, and vertical area spans onto a `2W x 4H` sub-pixel dot buffer and flushes directly into a `PackedSurface` via `setRGB()`.
@@ -114,19 +114,19 @@ canvas.flushToSurface(surface, 0, 0);
 
 | Mark | Resolution | Purpose |
 | --- | --- | --- |
-| `lineY(data, options?)` | `2x4` Braille (`U+2800..U+28FF`) | Connected polyline using integer Bresenham sub-cell rasterization. |
-| `areaY(data, options?)` | `2x4` Braille (`U+2800..U+28FF`) | Vertical sub-pixel fill from baseline (`y0`, default `0`) to `y`, topped by a crisp ridge. |
-| `dot(data, options?)` | `2x4` Braille (`U+2800..U+28FF`) | Scatter plot supporting `O(D)` overplotting and per-point `colorScale: OklchScale`. |
-| `barY(data, options?)` | `1x8` Fractional Block (`▁`..`█`) | Columnar vertical bars with 8 sub-cell vertical steps per row. |
+| `lineY(data, options?)` | `2x4` Braille (`U+2800..U+28FF`) | Connected polyline with Liang–Barsky viewport clipping; breaks cleanly across `NaN` / `defined: false` gaps. |
+| `areaY(data, options?)` | `2x4` Braille (`U+2800..U+28FF`) | Vertical sub-pixel fill from baseline (`y0`, default `0`) to `y`, breaking across `NaN` gaps. |
+| `dot(data, options?)` | `2x4` Braille (`U+2800..U+28FF`) | Scatter plot supporting `O(D)` overplotting and per-point `colorValue` + `colorScale: OklchScale`. |
+| `barY(data, options?)` | `1x8` Fractional Block (`▁`..`█`) | Scale-projected bars from baseline `y0` (default `0` in signed linear domains, `d0` in log/positive domains) to `y`. |
 | `ruleY(y, options?)` | `2x4` Braille horizontal line | Horizontal threshold / baseline / SLO reference line at domain value `y`. |
 | `ruleX(x, options?)` | `2x4` Braille vertical line | Vertical event marker / reference line at domain value `x`. |
 
-## Advanced Sub-Cell Primitives (`HalfBlockCanvas`, `forceSimulation`, `flamegraphSurface`)
+### Missing Data, Accessors, and Mark-Order Collision Policy
 
-- **`HalfBlockCanvas` & `heatmapSurface(options)` (`1x2` True-Color Sub-Pixels):** Encodes two independent 24-bit OKLCH RGB pixels per terminal cell using `'▀'` (`fgRGB` = top sub-pixel, `bgRGB` = bottom sub-pixel), plus `.shiftDown()` for scrolling waterfall spectrograms.
-- **`forceSimulation(nodes, links)` & `forceGraphSurface(sim, options)` (`d3-force` in Braille):** Velocity-Verlet spring/repulsion layout rendering sub-cell Braille edges and crisp `Surface` node badges.
-- **`computeHdrHistogram(values)` & `flamegraphSurface(root, options)` (`d3-hierarchy` + `scaleLog`):** Log-bucketed tail-latency histograms (`P50`/`P90`/`P99`/`P99.9`) and interactive icicle flamegraphs with subtree zoom.
-- **Interactive Instrument Decks:** Run `npm run btop` (or `npm run data-viz`), `npm run scope`, `npm run force-dag`, or `npm run flame` (press `Tab` inside the console to cycle all four decks).
+- **Missing Samples (`NaN` & `defined`):** Non-finite values (`NaN`) or items rejected by `defined: (d, i) => boolean` are preserved as missing rather than coerced to `0`. `lineY` and `areaY` leave a visible gap across missing samples, and `inferPlotDomains`, `pipe`, and `accessible` modes exclude them from min/max/count statistics.
+- **Independent Accessors:** `x`, `y`, `colorValue`, and `defined` accessors resolve independently whether input data is `number[]` or `T[]`.
+- **Cell Collision Policy:** Within a Braille layer, dots in the same cell OR their `2x4` bitmasks and the latest colored write sets the cell's foreground RGB. Across `barY` (`1x8` block cells) and Braille marks, `plotSurface()` flushes the Braille buffer before each `barY` mark so `options.marks` declaration order determines which mark wins on overlapping cells.
+- **Live Telemetry vs. Synthetic Showcase:** Run `npm run btop` for the live host monitor (which records only observed timestamped samples and reports unavailable `vm_stat` metrics as `n/a`), or `npm run plot` (`npm run data-viz`) for the explicitly labeled synthetic latency & Lissajous showcase.
 
 ## Graceful Mode Lowering
 

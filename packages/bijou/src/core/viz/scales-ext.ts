@@ -43,8 +43,9 @@ export function scaleLog(
       range,
       clamp,
       nice(): ContinuousScale {
-        d0 = powB(Math.floor(logB(d0)));
-        d1 = powB(Math.ceil(logB(d1)));
+        const rev = d0 > d1;
+        d0 = powB(rev ? Math.ceil(logB(d0)) : Math.floor(logB(d0)));
+        d1 = powB(rev ? Math.floor(logB(d1)) : Math.ceil(logB(d1)));
         inner.domain([logB(d0), logB(d1)]);
         return scale;
       },

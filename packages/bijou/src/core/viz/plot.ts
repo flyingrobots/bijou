@@ -5,7 +5,7 @@ import { resolveSafeCtx } from '../resolve-ctx.js';
 import type { RGB } from '../theme/tokens.js';
 import { computePlotLayout, renderGridAndAxes, writePlotText } from './axes.js';
 import { BrailleCanvas } from './braille-canvas.js';
-import { resolveMarkRGB, type BarYMark, type PlotMark } from './marks.js';
+import { resolveMarkRGB, type BarYMark, type PlotMark, type PlotPoint } from './marks.js';
 import { inferPlotDomains, renderAccessiblePlot, renderPipePlot, surfaceToPlainString } from './plot-lower.js';
 import { scaleLinear, type ContinuousScale } from './scales.js';
 
@@ -23,38 +23,48 @@ export interface PlotOptions extends BijouNodeOptions {
   readonly axes?: boolean;
 }
 
-function renderBarMarks(
-  surface: Surface,
-  bars: readonly { readonly mark: BarYMark; readonly rgb: RGB }[],
-  plotX: number,
-  plotY: number,
-  plotWidth: number,
-  plotHeight: number,
-  xScale: ContinuousScale,
-  yScale: ContinuousScale,
+function isDefined(pt: PlotPoint | undefined): pt is PlotPoint {
+  return pt !== undefined && Number.isFinite(pt.x) && Number.isFinite(pt.y);
+}
+
+function renderSingleBarMark(
+  surface: Surface, mark: BarYMark, rgb: RGB,
+  plotX: number, plotY: number, plotWidth: number, plotHeight: number,
+  xScale: ContinuousScale, yScale: ContinuousScale,
 ): void {
-  const totalEighths = plotHeight * 8;
-  const [yMin, yMax] = yScale.domain();
-  const ySpan = yMax - yMin;
-  if (ySpan === 0) return;
-  for (const { mark, rgb } of bars) {
-    for (const pt of mark.points) {
-      const px = xScale(pt.x);
-      const cx = plotX + Math.max(0, Math.min(plotWidth - 1, Math.floor(px / 2)));
-      const norm = Math.max(0, Math.min(1, (pt.y - Math.min(yMin, yMax)) / Math.abs(ySpan)));
-      let rem = Math.round(norm * totalEighths);
-      for (let row = plotHeight - 1; row >= 0 && rem > 0; row--) {
-        const step = Math.min(8, rem);
-        writePlotText(surface, cx, plotY + row, BLOCK_EIGHTHS[step] ?? '█', rgb);
-        rem -= step;
-      }
+  if (plotWidth <= 0 || plotHeight <= 0) return;
+  const maxPy = Math.max(1, plotHeight * 4 - 1);
+  const [d0, d1] = yScale.domain();
+  const dMin = Math.min(d0, d1), dMax = Math.max(d0, d1);
+  const pyBaseRaw = yScale(mark.y0 ?? (dMin <= 0 && 0 <= dMax ? 0 : d0));
+
+  for (const pt of mark.points) {
+    if (!isDefined(pt)) continue;
+    const px = xScale(pt.x), pyValRaw = yScale(pt.y);
+    if (!Number.isFinite(px) || !Number.isFinite(pyValRaw) || !Number.isFinite(pyBaseRaw)) continue;
+    const cx = Math.round(px) >> 1;
+    if (cx < 0 || cx >= plotWidth || Math.abs(pyValRaw - pyBaseRaw) < 0.25) continue;
+
+    const pyTop = Math.max(0, Math.min(maxPy, Math.min(pyValRaw, pyBaseRaw)));
+    const pyBot = Math.max(0, Math.min(maxPy, Math.max(pyValRaw, pyBaseRaw)));
+    const rowTop = Math.max(0, Math.min(plotHeight - 1, Math.round(pyTop) >> 2));
+    const rowBot = Math.max(0, Math.min(plotHeight - 1, Math.round(pyBot) >> 2));
+
+    if (pyValRaw <= pyBaseRaw) {
+      const fracInTop = Math.max(0, Math.min(1, (pyTop - rowTop * 4) / 4));
+      const topStep = Math.max(1, Math.min(8, Math.round((1 - fracInTop) * 8)));
+      writePlotText(surface, plotX + cx, plotY + rowTop, BLOCK_EIGHTHS[topStep] ?? '█', rgb);
+      for (let r = rowTop + 1; r <= rowBot; r++) writePlotText(surface, plotX + cx, plotY + r, '█', rgb);
+    } else {
+      for (let r = rowTop; r < rowBot; r++) writePlotText(surface, plotX + cx, plotY + r, '█', rgb);
+      const fracInBot = Math.max(0, Math.min(1, (pyBot - rowBot * 4) / 4));
+      writePlotText(surface, plotX + cx, plotY + rowBot, fracInBot < 0.5 ? '▀' : '█', rgb);
     }
   }
 }
 
 export function plotSurface(options: PlotOptions): Surface {
-  const width = Math.max(0, Math.floor(options.width));
-  const height = Math.max(0, Math.floor(options.height));
+  const width = Math.max(0, Math.floor(options.width)), height = Math.max(0, Math.floor(options.height));
   const surface = createSurface(width, height);
   if (width === 0 || height === 0) return surface;
 
@@ -63,8 +73,7 @@ export function plotSurface(options: PlotOptions): Surface {
   const xScale = options.x ? options.x.clone() : scaleLinear(inferred.xDomain);
   const yScale = options.y ? options.y.clone() : scaleLinear(inferred.yDomain).nice(4);
   const hasLegendLabels = (options.legend ?? true) && options.marks.some((m) => Boolean(m.label));
-  const hasHeader = Boolean(options.title) || hasLegendLabels;
-  const layout = computePlotLayout(width, height, yScale, hasHeader, options.axes ?? true);
+  const layout = computePlotLayout(width, height, yScale, Boolean(options.title) || hasLegendLabels, options.axes ?? true);
 
   const canvas = new BrailleCanvas(layout.plotWidth, layout.plotHeight);
   xScale.range([0, Math.max(0, canvas.pixelWidth - 1)]);
@@ -73,55 +82,51 @@ export function plotSurface(options: PlotOptions): Surface {
   const axisRGB: RGB = ctx?.semantic('muted').fgRGB ?? [148, 163, 184];
   const gridRGB: RGB = ctx?.border('muted').fgRGB ?? [71, 85, 105];
   const titleRGB: RGB = ctx?.semantic('primary').fgRGB ?? [226, 232, 240];
-
   renderGridAndAxes(surface, layout, xScale, yScale, options.marks, {
     title: options.title, legend: options.legend ?? true, grid: options.grid ?? true, axisRGB, gridRGB, titleRGB,
   });
 
-  const barMarks: { readonly mark: BarYMark; readonly rgb: RGB }[] = [];
   for (const [i, mark] of options.marks.entries()) {
     const rgb = resolveMarkRGB(mark.stroke, i);
     if (mark.kind === 'barY') {
-      barMarks.push({ mark, rgb });
+      canvas.flushToSurface(surface, layout.plotX, layout.plotY, false);
+      canvas.clear();
+      renderSingleBarMark(surface, mark, rgb, layout.plotX, layout.plotY, layout.plotWidth, layout.plotHeight, xScale, yScale);
     } else if (mark.kind === 'ruleY') {
-      const py = yScale(mark.y);
-      canvas.plotLine(0, py, canvas.pixelWidth - 1, py, rgb);
+      canvas.plotLine(0, yScale(mark.y), canvas.pixelWidth - 1, yScale(mark.y), rgb);
     } else if (mark.kind === 'ruleX') {
-      const px = xScale(mark.x);
-      canvas.plotLine(px, 0, px, canvas.pixelHeight - 1, rgb);
+      canvas.plotLine(xScale(mark.x), 0, xScale(mark.x), canvas.pixelHeight - 1, rgb);
     } else if (mark.kind === 'areaY') {
       const basePy = yScale(mark.y0);
       for (const [p, pt] of mark.points.entries()) {
+        if (!isDefined(pt)) continue;
         const x1 = Math.round(xScale(pt.x)), y1 = yScale(pt.y);
         canvas.fillColumn(x1, y1, basePy, rgb);
         const prev = p > 0 ? mark.points[p - 1] : undefined;
-        if (prev) {
-          const x0 = Math.round(xScale(prev.x)), y0 = yScale(prev.y);
-          const span = Math.abs(x1 - x0), step = x0 <= x1 ? 1 : -1;
-          for (let s = 1; s < span; s++) canvas.fillColumn(x0 + s * step, y0 + (y1 - y0) * (s / span), basePy, rgb);
+        if (isDefined(prev)) {
+          const x0 = Math.round(xScale(prev.x)), y0 = yScale(prev.y), span = x1 - x0;
+          if (span !== 0) {
+            const cLo = Math.max(0, Math.min(x0, x1)), cHi = Math.min(canvas.pixelWidth - 1, Math.max(x0, x1));
+            for (let x = cLo; x <= cHi; x++) canvas.fillColumn(x, y0 + (y1 - y0) * ((x - x0) / span), basePy, rgb);
+          }
           canvas.plotLine(x0, y0, x1, y1, rgb);
         }
       }
     } else if (mark.kind === 'lineY') {
-      const first = mark.points[0];
-      if (mark.points.length === 1 && first) canvas.plotDot(xScale(first.x), yScale(first.y), rgb);
-      for (let p = 1; p < mark.points.length; p++) {
-        const prev = mark.points[p - 1];
-        const curr = mark.points[p];
-        if (prev && curr) canvas.plotLine(xScale(prev.x), yScale(prev.y), xScale(curr.x), yScale(curr.y), rgb);
+      for (const [p, curr] of mark.points.entries()) {
+        if (!isDefined(curr)) continue;
+        const prev = p > 0 ? mark.points[p - 1] : undefined;
+        const next = p + 1 < mark.points.length ? mark.points[p + 1] : undefined;
+        if (isDefined(prev)) canvas.plotLine(xScale(prev.x), yScale(prev.y), xScale(curr.x), yScale(curr.y), rgb);
+        else if (!isDefined(next)) canvas.plotDot(xScale(curr.x), yScale(curr.y), rgb);
       }
     } else {
       for (const pt of mark.points) {
-        const ptRGB = mark.colorScale && pt.colorValue !== undefined
-          ? mark.colorScale(pt.colorValue).rgb
-          : rgb;
+        if (!isDefined(pt)) continue;
+        const ptRGB = mark.colorScale && pt.colorValue !== undefined ? mark.colorScale(pt.colorValue).rgb : rgb;
         canvas.plotDot(xScale(pt.x), yScale(pt.y), ptRGB);
       }
     }
-  }
-
-  if (barMarks.length > 0) {
-    renderBarMarks(surface, barMarks, layout.plotX, layout.plotY, layout.plotWidth, layout.plotHeight, xScale, yScale);
   }
   canvas.flushToSurface(surface, layout.plotX, layout.plotY, false);
   return surface;
@@ -135,6 +140,5 @@ export function plot(options: PlotOptions): string {
   if (ctx?.mode === 'pipe') return renderPipePlot(options.marks);
   if (ctx?.mode === 'accessible') return renderAccessiblePlot(options.title, xDomain, yDomain, options.marks);
   const surface = plotSurface(options);
-  if (!ctx || ctx.theme.noColor) return surfaceToPlainString(surface);
-  return surfaceToString(surface, ctx.style);
+  return (!ctx || ctx.theme.noColor) ? surfaceToPlainString(surface) : surfaceToString(surface, ctx.style);
 }

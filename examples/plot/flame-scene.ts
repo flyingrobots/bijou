@@ -83,12 +83,12 @@ export function renderFlameSurface(model: VizModel, ctx: BijouContext): Surface 
     const detail = `▸ Frame: ${selFrame.name} · total ${selFrame.totalPct.toFixed(1)}% · self ${selFrame.selfPct.toFixed(1)}% · zoomRoot=${zoomRoot.name} [Enter: zoom in · u: reset]`;
     writePlotText(flameInner, 1, flameInner.height - 1, detail.slice(0, cols - 4), EMERALD);
   }
-  root.blit(boxSurface(flameInner, { title: `Deck 4 // d3-hierarchy Icicle Flamegraph (zoom: ${zoomRoot.id})`, width: cols, ctx }), 0, 0);
+  root.blit(boxSurface(flameInner, { title: `Deck 4 [SYNTHETIC DEMO] // d3-hierarchy Icicle Flamegraph (zoom: ${zoomRoot.id})`, width: cols, ctx }), 0, 0);
 
   const rightW = Math.min(38, Math.max(30, Math.floor(cols * 0.34))), leftW = Math.max(38, cols - rightW - 1);
   const samples = generateLatencySamples(model.elapsedSec * 1.5);
   const hdr = computeHdrHistogram(samples, 24);
-  const binBars = hdr.bins.map((b) => ({ x: b.index, y: Math.min(72, b.pct * 3.2) }));
+  const binBars = hdr.bins.map((b) => ({ x: b.index, y: b.pct }));
   const cdfLine = hdr.bins.map((b) => ({ x: b.index, y: b.cdfPct }));
   const p99Bin = hdr.bins.findIndex((b) => b.high >= hdr.p99);
 

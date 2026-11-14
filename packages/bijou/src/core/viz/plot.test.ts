@@ -1,143 +1,145 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext, must } from '../../adapters/test/index.js';
+import { createTestContext } from '../../adapters/test/index.js';
 import { createSurface } from '../../ports/surface.js';
 import {
-  BrailleCanvas,
-  areaY,
-  barY,
-  dot,
-  lineY,
-  plot,
-  plotSurface,
-  ruleX,
-  ruleY,
-  scaleLinear,
-  scaleOklch,
+  BrailleCanvas, areaY, barY, dot, lineY, plot, plotSurface, ruleX, ruleY, scaleLinear, scaleLog, scaleOklch,
 } from './index.js';
 
 describe('BrailleCanvas', () => {
-  it('maps 2x4 sub-pixel dots into Unicode Braille code points (U+2800..U+28FF)', () => {
-    const canvas = new BrailleCanvas(2, 2);
-    canvas.plotDot(0, 0, [56, 189, 248]); // top-left bit 0x01
-    canvas.plotDot(1, 3, [56, 189, 248]); // bottom-right bit 0x80
+  it('encodes 2x4 sub-pixel dots into Unicode Braille and clips offscreen lines in O(1)', () => {
+    const canvas = new BrailleCanvas(5, 5);
+    canvas.plotDot(0, 0, [56, 189, 248]);
+    canvas.plotDot(1, 3, [56, 189, 248]);
     expect(canvas.getCellMask(0, 0)).toBe(0x81);
 
-    const surface = createSurface(2, 2);
-    canvas.flushToSurface(surface);
-    const cell = surface.get(0, 0);
-    expect(must(cell.char.codePointAt(0))).toBe(0x2881);
-    expect(cell.fgRGB).toEqual([56, 189, 248]);
-  });
-
-  it('rasterizes continuous Bresenham lines across cell boundaries', () => {
-    const canvas = new BrailleCanvas(6, 3);
-    canvas.plotLine(0, 0, 11, 11, [255, 100, 50]);
-    let nonEmptyCells = 0;
-    for (let cy = 0; cy < 3; cy++) {
-      for (let cx = 0; cx < 6; cx++) {
-        if (canvas.getCellMask(cx, cy) > 0) nonEmptyCells++;
+    canvas.clear();
+    canvas.plotLine(-100_000, -100_000, -50_000, -50_000, [255, 0, 0]);
+    for (let cy = 0; cy < 5; cy++) {
+      for (let cx = 0; cx < 5; cx++) {
+        expect(canvas.getCellMask(cx, cy)).toBe(0);
       }
     }
-    expect(nonEmptyCells).toBeGreaterThanOrEqual(6);
+
+    canvas.plotLine(-1000, -1000, 1000, 1000, [0, 255, 0]);
+    expect(canvas.getCellMask(0, 0)).toBeGreaterThan(0);
+    expect(canvas.getCellMask(4, 2)).toBeGreaterThan(0);
+
+    const surface = createSurface(5, 5);
+    canvas.flushToSurface(surface);
+    expect(surface.get(0, 0).fgRGB).toEqual([0, 255, 0]);
   });
 });
 
-describe('plotSurface and plot', () => {
-  it('composes lineY, areaY, ruleY, and ruleX with axes and legend onto a PackedSurface', () => {
-    const ctx = createTestContext({ mode: 'interactive' });
-    const surface = plotSurface({
-      title: 'Throughput',
-      width: 48,
-      height: 12,
-      ctx,
-      y: scaleLinear([0, 100]),
-      marks: [
-        areaY([20, 40, 65, 50, 80, 90], { label: 'rps', stroke: '#38bdf8' }),
-        lineY([10, 25, 35, 30, 45, 55], { label: 'err', stroke: '#f43f5e' }),
-        ruleY(75, { label: 'target', stroke: '#f59e0b' }),
-        ruleX(3, { stroke: '#a78bfa' }),
-      ],
-    });
+describe('normalizePoints, missing data, and accessors', () => {
+  it('preserves NaN missing samples and produces a genuine gap in lineY', () => {
+    const mark = lineY([10, Number.NaN, 20]);
+    expect(mark.points[0]).toEqual({ x: 0, y: 10 });
+    expect(mark.points[1]?.x).toBe(1);
+    expect(Number.isNaN(mark.points[1]?.y)).toBe(true);
+    expect(mark.points[2]).toEqual({ x: 2, y: 20 });
 
-    expect(surface.width).toBe(48);
-    expect(surface.height).toBe(12);
-    const rendered = plot({
-      title: 'Throughput',
-      width: 48,
-      height: 12,
-      ctx,
-      y: scaleLinear([0, 100]),
-      marks: [
-        areaY([20, 40, 65, 50, 80, 90], { label: 'rps', stroke: '#38bdf8' }),
-        lineY([10, 25, 35, 30, 45, 55], { label: 'err', stroke: '#f43f5e' }),
-      ],
+    const surf = plotSurface({
+      width: 12,
+      height: 4,
+      axes: false,
+      grid: false,
+      legend: false,
+      x: scaleLinear([0, 2]),
+      y: scaleLinear([0, 20]),
+      marks: [mark],
     });
-    expect(rendered).toContain('Throughput');
-    expect(rendered).toContain('● rps');
-    expect(rendered).toContain('● err');
-    expect(rendered).toContain('└');
+    const midCol = 6;
+    for (let r = 0; r < 4; r++) {
+      expect(surf.get(midCol, r).char).toBe(' ');
+    }
   });
 
-  it('renders barY fractional blocks and dot marks with OKLCH colour scales', () => {
-    const ctx = createTestContext({ mode: 'interactive' });
-    const heat = scaleOklch([0, 100]);
-    const surface = plotSurface({
-      width: 36,
-      height: 10,
-      ctx,
-      marks: [
-        barY([10, 50, 90, 40], { label: 'bars' }),
-        dot(
-          [
-            { x: 0, y: 15, colorValue: 15 },
-            { x: 2, y: 85, colorValue: 85 },
-          ],
-          { label: 'pts', colorScale: heat },
-        ),
-      ],
+  it('resolves x, y, and colorValue accessors independently across numeric and object inputs', () => {
+    const scaled = lineY([10, 20], { x: (_, i) => i * 100, y: (d) => d * 2 });
+    expect(scaled.points).toEqual([
+      { x: 0, y: 20 },
+      { x: 100, y: 40 },
+    ]);
+
+    const heatPts = dot([{ x: 1, y: 2, heat: 90 }], {
+      colorValue: (d) => d.heat,
+      colorScale: scaleOklch([0, 100]),
     });
-    expect(surface.width).toBe(36);
-    expect(surface.height).toBe(10);
+    expect(heatPts.points).toEqual([{ x: 1, y: 2, colorValue: 90 }]);
+  });
+});
+
+describe('barY scale projection, logarithmic agreement, and mark-order collision', () => {
+  it('projects barY around zero on signed linear domains [-10, 10]', () => {
+    const surf = plotSurface({
+      width: 6,
+      height: 8,
+      axes: false,
+      grid: false,
+      legend: false,
+      x: scaleLinear([0, 2]),
+      y: scaleLinear([-10, 10]),
+      marks: [barY([-10, 0, 10])],
+    });
+    for (let r = 0; r < 8; r++) {
+      expect(surf.get(2, r).char).toBe(' ');
+    }
+    expect(surf.get(5, 0).char).toBe('█');
+    expect(surf.get(5, 7).char).toBe(' ');
+    expect(surf.get(0, 0).char).toBe(' ');
+    expect(surf.get(0, 7).char).toBe('█');
   });
 
-  it('lowers cleanly in pipe mode (TSV) and accessible mode (screen-reader summary)', () => {
+  it('aligns barY top row and dot row on scaleLog([1, 100]) at y=10', () => {
+    const logY = scaleLog([1, 100]);
+    const barSurf = plotSurface({
+      width: 4, height: 9, axes: false, grid: false, legend: false,
+      x: scaleLinear([0, 1]), y: logY,
+      marks: [barY([{ x: 0, y: 10 }])],
+    });
+    const dotSurf = plotSurface({
+      width: 4, height: 9, axes: false, grid: false, legend: false,
+      x: scaleLinear([0, 1]), y: logY,
+      marks: [dot([{ x: 0, y: 10 }])],
+    });
+    let barTopRow = -1, dotRow = -1;
+    for (let r = 0; r < 9; r++) {
+      if (barTopRow < 0 && barSurf.get(0, r).char !== ' ') barTopRow = r;
+      if (dotSurf.get(0, r).char !== ' ') dotRow = r;
+    }
+    expect(barTopRow).toBe(4);
+    expect(dotRow).toBe(4);
+  });
+
+  it('respects declared mark order when barY and dot collide on the same cell', () => {
+    const dotOverBar = plotSurface({
+      width: 4, height: 4, axes: false, grid: false, legend: false,
+      x: scaleLinear([0, 1]), y: scaleLinear([0, 100]),
+      marks: [barY([{ x: 0, y: 100 }]), dot([{ x: 0, y: 50 }])],
+    });
+    const barOverDot = plotSurface({
+      width: 4, height: 4, axes: false, grid: false, legend: false,
+      x: scaleLinear([0, 1]), y: scaleLinear([0, 100]),
+      marks: [dot([{ x: 0, y: 50 }]), barY([{ x: 0, y: 100 }])],
+    });
+    expect(dotOverBar.get(0, 2).char.codePointAt(0)).toBeGreaterThanOrEqual(0x2800);
+    expect(barOverDot.get(0, 2).char).toBe('█');
+  });
+
+  it('serializes exact numbers in pipe mode (TSV) and summarizes accessible mode', () => {
     const pipeCtx = createTestContext({ mode: 'pipe' });
     const tsv = plot({
-      title: 'CPU Load',
-      width: 40,
-      height: 10,
-      ctx: pipeCtx,
-      marks: [lineY([12, 35, 28, 64], { label: 'cpu_pct' })],
+      width: 40, height: 10, ctx: pipeCtx,
+      marks: [lineY([0.001, Number.NaN, 10001], { label: 'lat\t_ms' })],
     });
-    expect(tsv).toBe('series\tcount\tx_min\tx_max\ty_min\ty_max\ty_last\ncpu_pct\t4\t0\t3\t12\t64\t64');
+    expect(tsv).toBe('series\tcount\tx_min\tx_max\ty_min\ty_max\ty_last\nlat\\t_ms\t2\t0\t2\t0.001\t10001\t10001');
 
     const a11yCtx = createTestContext({ mode: 'accessible' });
     const summary = plot({
-      title: 'CPU Load',
-      width: 40,
-      height: 10,
-      ctx: a11yCtx,
-      marks: [
-        lineY([12, 35, 28, 64], { label: 'cpu_pct' }),
-        ruleY(80, { label: 'alert' }),
-      ],
+      title: 'CPU', width: 40, height: 10, ctx: a11yCtx,
+      marks: [areaY([12, 64], { label: 'cpu' }), ruleY(80, { label: 'warn' }), ruleX(1)],
     });
-    expect(summary).toContain('Plot: CPU Load.');
-    expect(summary).toContain('cpu_pct: 4 points, min=12, max=64, latest=64.');
-    expect(summary).toContain('Horizontal rule (alert) at y=80.');
-  });
-
-  it('rasterizes 100,000 scatter points in O(D) without stack overflow', () => {
-    const points = new Array(100_000).fill(0).map((_, i) => ({
-      x: i,
-      y: Math.sin(i * 0.01) * 50 + 50,
-    }));
-    const surface = plotSurface({
-      width: 40,
-      height: 10,
-      marks: [dot(points, { label: 'wave' })],
-    });
-    expect(surface.width).toBe(40);
-    expect(surface.height).toBe(10);
+    expect(summary).toContain('Plot: CPU.');
+    expect(summary).toContain('Horizontal rule (warn) at y=80.');
   });
 });
