@@ -8,23 +8,16 @@ const HISTORY_LEN = 48;
 
 function readCoreSnapshots(): CoreTickSnapshot[] {
   return os.cpus().map((c) => {
-    const user = c.times.user + c.times.nice;
-    const sys = c.times.sys + c.times.irq;
+    const user = c.times.user + c.times.nice, sys = c.times.sys + c.times.irq;
     return { user, sys, idle: c.times.idle, total: user + sys + c.times.idle };
   });
 }
-
 function readDiskStat(): DiskStat {
   try {
-    const s = statfsSync('/');
-    const totalBytes = s.blocks * s.bsize;
-    const freeBytes = s.bavail * s.bsize;
+    const s = statfsSync('/'), totalBytes = s.blocks * s.bsize, freeBytes = s.bavail * s.bsize;
     return { totalBytes, usedBytes: Math.max(0, totalBytes - freeBytes), freeBytes };
-  } catch {
-    return { totalBytes: 0, usedBytes: 0, freeBytes: 0 };
-  }
+  } catch { return { totalBytes: 0, usedBytes: 0, freeBytes: 0 }; }
 }
-
 function parseVmStat(raw: string, totalBytes: number): MemBreakdown {
   const pageMatch = /page size of (\d+) bytes/.exec(raw);
   const pageSize = pageMatch?.[1] ? Number(pageMatch[1]) : 16384;
@@ -32,10 +25,8 @@ function parseVmStat(raw: string, totalBytes: number): MemBreakdown {
     const m = new RegExp(`${label}:\\s+(\\d+)`).exec(raw);
     return m?.[1] ? Number(m[1]) * pageSize : 0;
   };
-  const appBytes = getPages('Anonymous pages');
-  const wiredBytes = getPages('Pages wired down');
-  const compressedBytes = getPages('Pages occupied by compressor');
-  const cachedBytes = getPages('File-backed pages');
+  const appBytes = getPages('Anonymous pages'), wiredBytes = getPages('Pages wired down');
+  const compressedBytes = getPages('Pages occupied by compressor'), cachedBytes = getPages('File-backed pages');
   const usedBytes = Math.min(totalBytes, appBytes + wiredBytes + compressedBytes);
   return { totalBytes, usedBytes, appBytes, wiredBytes, compressedBytes, cachedBytes, freeBytes: Math.max(0, totalBytes - usedBytes) };
 }
@@ -46,21 +37,27 @@ function parsePsOutput(raw: string): ProcEntry[] {
     const m = /^(\d+)\s+([\d.]+)\s+([\d.]+)\s+(\d+)\s+(.+)$/.exec(line.trim());
     if (!m) continue;
     const fullCmd = m[5] ?? 'unknown';
-    out.push({
-      pid: Number(m[1]), cpuPct: Number(m[2]), memPct: Number(m[3]),
-      rssKb: Number(m[4]), command: path.basename(fullCmd.trim()) || fullCmd,
-    });
+    out.push({ pid: Number(m[1]), cpuPct: Number(m[2]), memPct: Number(m[3]), rssKb: Number(m[4]), command: path.basename(fullCmd.trim()) || fullCmd });
     if (out.length >= 24) break;
   }
   return out;
+}
+export function togglePinnedPid(state: TelemetryState, proc: ProcEntry | undefined): void {
+  if (!proc || state.pinnedPid === proc.pid) {
+    state.pinnedPid = null; state.pinnedName = ''; state.pinnedDetail = '';
+    return;
+  }
+  state.pinnedPid = proc.pid; state.pinnedName = proc.command;
+  state.pinnedDetail = `PID ${String(proc.pid)} · ${proc.command}`;
+  const seed = Math.min(100, proc.cpuPct);
+  state.pinnedCpuHistory = Array.from({ length: HISTORY_LEN }, (_, i) => Math.max(0, Math.min(100, seed + Math.sin(i * 0.3) * 4)));
 }
 
 export function createInitialTelemetry(): TelemetryState {
   const cpuModel = (os.cpus()[0]?.model ?? 'Host CPU').replace(/\s+/g, ' ').trim();
   const snap0 = readCoreSnapshots();
   const totalBytes = os.totalmem();
-  const freeFallback = os.freemem();
-  const usedFallback = totalBytes - freeFallback;
+  const freeFallback = os.freemem(), usedFallback = totalBytes - freeFallback;
   let mem: MemBreakdown = {
     totalBytes, usedBytes: usedFallback, appBytes: usedFallback * 0.5,
     wiredBytes: usedFallback * 0.2, compressedBytes: usedFallback * 0.3, cachedBytes: freeFallback, freeBytes: freeFallback,
@@ -71,8 +68,7 @@ export function createInitialTelemetry(): TelemetryState {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 35);
   const snaps = readCoreSnapshots();
   const cores: CoreStat[] = snaps.map((curr, id) => {
-    const prev = snap0[id] ?? curr;
-    const dTot = curr.total - prev.total;
+    const prev = snap0[id] ?? curr, dTot = curr.total - prev.total;
     const u = dTot > 0 ? ((curr.user - prev.user) / dTot) * 100 : (curr.user / Math.max(1, curr.total)) * 100;
     const sy = dTot > 0 ? ((curr.sys - prev.sys) / dTot) * 100 : (curr.sys / Math.max(1, curr.total)) * 100;
     const tot = Math.max(0, Math.min(100, u + sy));
@@ -80,16 +76,12 @@ export function createInitialTelemetry(): TelemetryState {
   });
   const avgUser = cores.reduce((a, c) => a + c.userPct, 0) / Math.max(1, cores.length);
   const avgSys = cores.reduce((a, c) => a + c.sysPct, 0) / Math.max(1, cores.length);
-  const cpuTotalHistory: number[] = [];
-  const cpuUserHistory: number[] = [];
-  const cpuSysHistory: number[] = [];
+  const cpuTotalHistory: number[] = [], cpuUserHistory: number[] = [], cpuSysHistory: number[] = [];
   for (let i = 0; i < HISTORY_LEN; i++) {
     const wave = Math.sin(i * 0.26) * 8 + Math.cos(i * 0.14) * 5;
     const u = Math.max(2, Math.min(92, avgUser + wave));
     const s = Math.max(1, Math.min(90, avgSys + Math.abs(wave) * 0.45));
-    cpuUserHistory.push(u);
-    cpuSysHistory.push(s);
-    cpuTotalHistory.push(Math.min(100, u + s));
+    cpuUserHistory.push(u); cpuSysHistory.push(s); cpuTotalHistory.push(Math.min(100, u + s));
   }
   const memPct = totalBytes > 0 ? (mem.usedBytes / totalBytes) * 100 : 50;
   const load = os.loadavg();
@@ -97,6 +89,8 @@ export function createInitialTelemetry(): TelemetryState {
     cpuModel, coreCount: snaps.length, historyLen: HISTORY_LEN, prevCoreTicks: snaps, cores,
     cpuTotalHistory, cpuUserHistory, cpuSysHistory,
     memUsedPctHistory: Array.from({ length: HISTORY_LEN }, () => memPct),
+    pinnedPid: null, pinnedName: '', pinnedDetail: '',
+    pinnedCpuHistory: Array.from({ length: HISTORY_LEN }, () => 0),
     loadAvg: [load[0] ?? 0, load[1] ?? 0, load[2] ?? 0],
     uptimeSec: os.uptime(), mem, disk: readDiskStat(), processes,
     sampleAccumSec: 0, slowAccumSec: 0, psInFlight: false, vmInFlight: false,
@@ -110,8 +104,7 @@ export function stepTelemetry(state: TelemetryState, dt: number, sampleIntervalS
     state.sampleAccumSec = 0;
     const nextSnaps = readCoreSnapshots();
     state.cores = nextSnaps.map((curr, id) => {
-      const prev = state.prevCoreTicks[id] ?? curr;
-      const dTot = Math.max(1, curr.total - prev.total);
+      const prev = state.prevCoreTicks[id] ?? curr, dTot = Math.max(1, curr.total - prev.total);
       const u = Math.max(0, Math.min(100, ((curr.user - prev.user) / dTot) * 100));
       const sy = Math.max(0, Math.min(100, ((curr.sys - prev.sys) / dTot) * 100));
       const tot = Math.min(100, u + sy);
@@ -124,6 +117,10 @@ export function stepTelemetry(state: TelemetryState, dt: number, sampleIntervalS
     state.cpuUserHistory = [...state.cpuUserHistory.slice(1), avgUser];
     state.cpuSysHistory = [...state.cpuSysHistory.slice(1), avgSys];
     state.cpuTotalHistory = [...state.cpuTotalHistory.slice(1), Math.min(100, avgUser + avgSys)];
+    if (state.pinnedPid !== null) {
+      const pinned = state.processes.find((p) => p.pid === state.pinnedPid);
+      state.pinnedCpuHistory = [...state.pinnedCpuHistory.slice(1), Math.min(100, pinned?.cpuPct ?? 0)];
+    }
     const load = os.loadavg();
     state.loadAvg = [load[0] ?? 0, load[1] ?? 0, load[2] ?? 0];
     state.uptimeSec = os.uptime();

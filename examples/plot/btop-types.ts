@@ -1,8 +1,14 @@
 import type { Oklch } from '@flyingrobots/bijou';
-import { scaleOklch, type OklchScale } from '@flyingrobots/bijou/viz';
+import {
+  HalfBlockCanvas,
+  scaleOklch,
+  type ForceSimulation,
+  type OklchScale,
+} from '@flyingrobots/bijou/viz';
 
 export type PaletteName = 'inferno' | 'viridis' | 'plasma' | 'cool';
 export type ProcSortKey = 'cpu' | 'mem' | 'pid';
+export type ViewMode = 'btop' | 'scope' | 'force' | 'flame';
 
 const PALETTE_STOPS: Record<PaletteName, readonly [Oklch, Oklch]> = {
   inferno: [{ l: 0.62, c: 0.16, h: 265 }, { l: 0.82, c: 0.19, h: 42 }],
@@ -64,6 +70,10 @@ export interface TelemetryState {
   cpuUserHistory: number[];
   cpuSysHistory: number[];
   memUsedPctHistory: number[];
+  pinnedPid: number | null;
+  pinnedName: string;
+  pinnedDetail: string;
+  pinnedCpuHistory: number[];
   loadAvg: readonly [number, number, number];
   uptimeSec: number;
   mem: MemBreakdown;
@@ -76,6 +86,7 @@ export interface TelemetryState {
 }
 
 export interface VizModel {
+  readonly viewMode: ViewMode;
   readonly frame: number;
   readonly elapsedSec: number;
   readonly paused: boolean;
@@ -87,6 +98,11 @@ export interface VizModel {
   readonly cols: number;
   readonly rows: number;
   readonly telemetry: TelemetryState;
+  readonly waterfall: HalfBlockCanvas;
+  readonly forceSim: ForceSimulation;
+  readonly selectedNodeIdx: number;
+  readonly flameZoomId: string;
+  readonly selectedFlameIdx: number;
 }
 
 const H_BLOCKS: readonly string[] = [' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█'];

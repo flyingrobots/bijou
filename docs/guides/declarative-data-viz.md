@@ -121,6 +121,13 @@ canvas.flushToSurface(surface, 0, 0);
 | `ruleY(y, options?)` | `2x4` Braille horizontal line | Horizontal threshold / baseline / SLO reference line at domain value `y`. |
 | `ruleX(x, options?)` | `2x4` Braille vertical line | Vertical event marker / reference line at domain value `x`. |
 
+## Advanced Sub-Cell Primitives (`HalfBlockCanvas`, `forceSimulation`, `flamegraphSurface`)
+
+- **`HalfBlockCanvas` & `heatmapSurface(options)` (`1x2` True-Color Sub-Pixels):** Encodes two independent 24-bit OKLCH RGB pixels per terminal cell using `'▀'` (`fgRGB` = top sub-pixel, `bgRGB` = bottom sub-pixel), plus `.shiftDown()` for scrolling waterfall spectrograms.
+- **`forceSimulation(nodes, links)` & `forceGraphSurface(sim, options)` (`d3-force` in Braille):** Velocity-Verlet spring/repulsion layout rendering sub-cell Braille edges and crisp `Surface` node badges.
+- **`computeHdrHistogram(values)` & `flamegraphSurface(root, options)` (`d3-hierarchy` + `scaleLog`):** Log-bucketed tail-latency histograms (`P50`/`P90`/`P99`/`P99.9`) and interactive icicle flamegraphs with subtree zoom.
+- **Interactive Instrument Decks:** Run `npm run btop` (or `npm run data-viz`), `npm run scope`, `npm run force-dag`, or `npm run flame` (press `Tab` inside the console to cycle all four decks).
+
 ## Graceful Mode Lowering
 
 `plot(options)` adapts automatically to `ctx.mode`:

@@ -21,10 +21,17 @@ import {
   renderProcessTableSurface,
 } from './btop-panes.js';
 import { createHeatScale, type VizModel } from './btop-types.js';
+import { renderFlameSurface } from './flame-scene.js';
+import { renderForceSurface } from './force-scene.js';
+import { renderScopeSurface } from './scope-scene.js';
 
 export type { VizModel } from './btop-types.js';
 
 export function renderDashboardSurface(model: VizModel, ctx: BijouContext): Surface {
+  if (model.viewMode === 'scope') return renderScopeSurface(model, ctx);
+  if (model.viewMode === 'force') return renderForceSurface(model, ctx);
+  if (model.viewMode === 'flame') return renderFlameSurface(model, ctx);
+
   const cols = Math.max(76, model.cols);
   const rows = Math.max(30, model.rows);
   const root = createSurface(cols, rows);
@@ -43,24 +50,38 @@ export function renderDashboardSurface(model: VizModel, ctx: BijouContext): Surf
   const curSys = t.cpuSysHistory[cursor] ?? 0;
   const yScale = scaleLinear([0, 100]);
 
+  const hasPin = t.pinnedPid !== null;
+  const pinVal = t.pinnedCpuHistory[cursor] ?? 0;
+  const plotTitle = hasPin
+    ? `★ PID ${String(t.pinnedPid)} ${t.pinnedName} (${pinVal.toFixed(1)}% vs host ${curTot.toFixed(1)}% @ t=${String(cursor)})`
+    : `CPU ${curTot.toFixed(1)}% (usr ${curUsr.toFixed(1)}% · sys ${curSys.toFixed(1)}% @ t=${String(cursor)})`;
+  const marks = hasPin
+    ? [
+        areaY(t.pinnedCpuHistory, { label: `pid:${String(t.pinnedPid)}`, stroke: '#34d399' }),
+        lineY(t.cpuTotalHistory, { label: 'host%', stroke: '#38bdf8' }),
+        ruleY(80, { label: 'warn', stroke: '#f59e0b' }),
+        ruleX(cursor, { stroke: '#a78bfa' }),
+      ]
+    : [
+        areaY(t.cpuTotalHistory, { label: 'tot%', stroke: '#38bdf8' }),
+        lineY(t.cpuUserHistory, { label: 'usr%', stroke: '#34d399' }),
+        lineY(t.cpuSysHistory, { label: 'sys%', stroke: '#f43f5e' }),
+        ruleY(80, { label: 'warn', stroke: '#f59e0b' }),
+        ruleX(cursor, { stroke: '#a78bfa' }),
+      ];
+
   const cpuPlot = plotSurface({
-    title: `CPU ${curTot.toFixed(1)}% (usr ${curUsr.toFixed(1)}% · sys ${curSys.toFixed(1)}% @ t=${String(cursor)})`,
+    title: plotTitle,
     width: topLeftW - 2,
     height: Math.max(6, topH - 2),
     ctx,
     y: yScale,
-    marks: [
-      areaY(t.cpuTotalHistory, { label: 'tot%', stroke: '#38bdf8' }),
-      lineY(t.cpuUserHistory, { label: 'usr%', stroke: '#34d399' }),
-      lineY(t.cpuSysHistory, { label: 'sys%', stroke: '#f43f5e' }),
-      ruleY(80, { label: 'warn', stroke: '#f59e0b' }),
-      ruleX(cursor, { stroke: '#a78bfa' }),
-    ],
+    marks,
   });
   const streamTag = model.paused ? 'FROZEN' : 'LIVE';
   root.blit(
     boxSurface(cpuPlot, {
-      title: `btop // @flyingrobots/bijou/viz [${streamTag}]`,
+      title: `Deck 1 // btop [@flyingrobots/bijou/viz · ${streamTag}]`,
       width: topLeftW,
       ctx,
     }),
@@ -102,7 +123,7 @@ export function renderDashboardSurface(model: VizModel, ctx: BijouContext): Surf
   root.blit(renderProcessTableSurface(model, botRightW, botH, ctx), botLeftW + 1, topH);
 
   const rateMs = String(Math.round(model.sampleIntervalSec * 1000));
-  const footer = ` [Space] ${model.paused ? 'resume' : 'freeze'}  [↑/↓] proc  [s] sort:${model.sortKey}  [←/→] scrub  [1-4] ${model.palette}  [+/-] ${rateMs}ms  [q] quit `;
+  const footer = ` [Tab] view:BTOP  [Enter] pin PID  [↑/↓] proc  [s] sort:${model.sortKey}  [←/→] scrub  [1-4] ${model.palette}  [+/-] ${rateMs}ms  [q] quit `;
   writePlotText(root, 1, rows - 1, footer.slice(0, cols - 2), [148, 163, 184]);
   return root;
 }

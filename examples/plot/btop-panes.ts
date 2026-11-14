@@ -108,14 +108,15 @@ export function renderProcessTableSurface(model: VizModel, width: number, height
     const proc = sorted[i];
     if (!proc) break;
     const isSel = i === selIdx;
-    const prefix = isSel ? '▸' : ' ';
+    const isPinned = proc.pid === model.telemetry.pinnedPid;
+    const prefix = isPinned ? '★' : isSel ? '▸' : ' ';
     const pidStr = String(proc.pid).padStart(5, ' ');
     const cmdStr = proc.command.slice(0, cmdW).padEnd(cmdW, ' ');
     const cpuStr = proc.cpuPct.toFixed(1).padStart(5, ' ');
     const memStr = proc.memPct.toFixed(1).padStart(5, ' ');
     const rssStr = formatRss(proc.rssKb).padStart(6, ' ');
     const bar = renderHorizontalBar(Math.min(100, proc.cpuPct), 4);
-    const rowColor = isSel ? EMERALD : PRIMARY;
+    const rowColor = isPinned ? ACCENT : isSel ? EMERALD : PRIMARY;
     writePlotText(inner, 0, i + 1, `${prefix} ${pidStr} ${cmdStr}`, rowColor);
     writePlotText(inner, 9 + cmdW, i + 1, cpuStr, heat(Math.min(100, Math.max(15, proc.cpuPct))).rgb);
     writePlotText(inner, 15 + cmdW, i + 1, `${memStr} ${rssStr} `, rowColor);
@@ -123,7 +124,8 @@ export function renderProcessTableSurface(model: VizModel, width: number, height
   }
   const sel = sorted[selIdx];
   if (sel && innerH >= 3) {
-    const info = `▸ PID ${String(sel.pid)} ${sel.command} · CPU ${sel.cpuPct.toFixed(1)}% · MEM ${sel.memPct.toFixed(1)}% (${formatRss(sel.rssKb)})`;
+    const pinHint = model.telemetry.pinnedPid === sel.pid ? '[PINNED · Enter unpin]' : '[Enter to pin PID]';
+    const info = `▸ PID ${String(sel.pid)} ${sel.command} · CPU ${sel.cpuPct.toFixed(1)}% · ${formatRss(sel.rssKb)} ${pinHint}`;
     writePlotText(inner, 1, innerH - 1, info.slice(0, innerW - 2), EMERALD);
   }
   return boxSurface(inner, { title: `Processes [sort: ${model.sortKey}] (${String(sorted.length)})`, width, ctx });

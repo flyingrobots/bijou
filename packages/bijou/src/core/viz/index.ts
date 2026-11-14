@@ -12,6 +12,32 @@ export {
 } from './scales-ext.js';
 export { BrailleCanvas } from './braille-canvas.js';
 export {
+  HalfBlockCanvas,
+  heatmapSurface,
+  type HeatmapOptions,
+} from './half-block.js';
+export {
+  forceGraphSurface,
+  forceSimulation,
+  type ForceGraphRenderOptions,
+  type ForceLink,
+  type ForceNode,
+  type ForceNodeInput,
+  type ForceSimulation,
+  type ForceSimulationOptions,
+} from './force.js';
+export {
+  computeHdrHistogram,
+  findFlameNode,
+  flamegraphSurface,
+  layoutFlamegraph,
+  type FlameFrame,
+  type FlameNode,
+  type FlamegraphOptions,
+  type HdrBin,
+  type HdrHistogramResult,
+} from './hierarchy.js';
+export {
   areaY,
   barY,
   dot,
