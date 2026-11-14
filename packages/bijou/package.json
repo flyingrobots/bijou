@@ -19,6 +19,10 @@
       "types": "./dist/core/render/packed-cell.d.ts",
       "default": "./dist/core/render/packed-cell.js"
     },
+    "./viz": {
+      "types": "./dist/core/viz/index.d.ts",
+      "default": "./dist/core/viz/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
