@@ -29,3 +29,4 @@ export * from './index.part11.js';
 
 export { renameRuleAuthoredTheme, ruleAuthoredDefinitions } from './core/theme/preset-authoring.js';
 export { collectTokenDependents, collectTransitiveTokenDependents, tokenDefinitionPaths } from './core/theme/graph-dependents.js';
+export * from './core/viz/index.js';
