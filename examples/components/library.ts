@@ -19,7 +19,7 @@ import type { LibraryStart } from './library-cli.js';
 import { introBody } from './library-intro.js';
 import { familyStepper, progressRow } from './library-progress.js';
 import { titleSlide } from './library-stages.js';
-import { carousel, dots, heading, hiddenGutter, modeRow, stack } from './library-view.js';
+import { carousel, dots, heading, modeRow, stack } from './library-view.js';
 
 export { LIBRARY_CSS } from './library-view.js';
 export { LIBRARY_MODES, type LibraryModel, type LibraryMsg } from './library-model.js';
@@ -81,16 +81,17 @@ export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}
     }
   }
 
-  // Rows: the body, then the mode row (absent on the title screen). The progress bar is an overlay.
+  // Rows: the deck-wide progress bar, the body, then the mode row (absent on the title screen).
   function renderBody(model: LibraryModel, width: number, height: number): Surface {
-    if (height < 2) return createSurface(width, height);
-    const bodyH = height - 1;
+    if (height < 3) return createSurface(width, height);
+    const bodyH = height - 2;
     const component = (): Surface => componentBody(model, width, bodyH);
     const body = model.stage === 'title' ? titleSlide(width, bodyH, FAMILIES.length, COMPONENT_STORIES.length, ctx, model.rtl)
       : model.stage === 'intro' ? introBody(model, width, bodyH, ctx, introFrom, component) : component();
     lastBody = body;
     const screen = createSurface(width, height);
-    screen.blit(body, 0, 0);
+    screen.blit(progressRow(model, width, ctx), 0, 0);
+    screen.blit(body, 0, 1);
     if (model.stage === 'title') return screen;
     const hint = model.stage === 'component' && maxScroll > 0 ? `${model.scroll > 0 ? '↑' : ' '}${model.scroll < maxScroll ? '↓' : ' '} j/k` : '';
     modeRow(screen, height - 1, model, hint);
@@ -120,13 +121,8 @@ export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}
     keyMap: libraryKeys,
     searchItems: () => SEARCH_ITEMS,
     searchTitle: 'Components',
-    layout: (model) => {
-      const hidden = hiddenGutter(ctx);
-      return {
-        kind: 'pane', paneId: 'library', focusedGutterToken: hidden, unfocusedGutterToken: hidden,
-        render: (width, height) => renderBody(model, width, height),
-      } satisfies FrameLayoutNode;
-    },
+    // A single pane, so the frame draws no focus gutter and the page uses the full width.
+    layout: (model) => ({ kind: 'pane', paneId: 'library', render: (width, height) => renderBody(model, width, height) }) satisfies FrameLayoutNode,
   };
   return createFramedApp<LibraryModel, LibraryMsg>({
     ctx: baseCtx,
@@ -139,8 +135,8 @@ export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}
     shellThemes: DOGFOOD_SHELL_THEMES,
     onShellThemeChange: ({ ctx: themed }) => { ctx = themed; },
     i18n,
-    // The show-wide progress bar replaces the frame header: full width, on the top row, outside the pane gutter.
-    overlayFactory: ({ pageModel, screenRect }) => [{ content: '', surface: progressRow(pageModel, screenRect.width, ctx), row: 0, col: 0 }],
+    // No header row: the page's own top row carries the deck-wide progress bar.
+    bodyTopRows: 0,
     pages: [page],
   });
 }

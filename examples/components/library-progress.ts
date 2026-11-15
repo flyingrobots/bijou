@@ -29,12 +29,12 @@ function position(model: LibraryModel): number {
 const toSurface = (text: string, width: number): Surface =>
   parseAnsiToSurface(text, Math.min(width, Array.from(stripAnsi(text)).length), 1);
 
-/** "Slide X of Y" across the whole deck: the title, every family slide, and every component. It never resets. */
+/** "X of Y" across the whole deck: the title, every family slide, and every component. It never resets. */
 export function slideLabel(model: LibraryModel): string {
-  return `Slide ${String(position(model) + 1)} of ${String(SEQUENCE.length)}`;
+  return `${String(position(model) + 1)} of ${String(SEQUENCE.length)}`;
 }
 
-/** A screen-wide progress bar through the whole deck, labelled "Slide X of Y" at its end. */
+/** A screen-wide progress bar through the whole deck, labelled "X of Y" at its end. */
 export function progressRow(model: LibraryModel, width: number, ctx: BijouContext): Surface {
   const percent = SEQUENCE.length < 2 ? 100 : (position(model) / (SEQUENCE.length - 1)) * 100;
   const label = ` ${slideLabel(model)} `;

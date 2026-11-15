@@ -5,7 +5,6 @@ import {
   stripAnsi,
   type BijouContext,
   type Surface,
-  type TokenValue,
 } from '../../packages/bijou/src/index.js';
 import { createStoryProfileContext, storyPreviewSurface, type ComponentStory } from '../_stories/protocol.js';
 import { MAX_WIDTH, SLIDE_SEC, wrap, LIBRARY_MODES, type LibraryModel } from './library-model.js';
@@ -110,12 +109,6 @@ export function stack(parts: readonly Surface[], width: number): Surface {
     y += part.height + 1;
   }
   return out;
-}
-
-/** The library has one pane, so the frame's focus bar carries no information: paint it in the background colour. */
-export function hiddenGutter(ctx: BijouContext): TokenValue {
-  const bg = ctx.surface('primary');
-  return { hex: bg.bg ?? bg.hex, bg: bg.bg ?? bg.hex };
 }
 
 /**
