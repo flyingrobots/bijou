@@ -1,6 +1,6 @@
 # Bijou
 
-![Bijou hero reel: DOGFOOD, Block Lab, the Components Library, and the hero app's dashboard, plot, and render lab, cut together with Bijou transitions](assets/gifs/hero.gif)
+![Bijou hero reel: the Bijou title, the render lab's raytracer, a live dashboard, one component in four output modes, guidedFlow() and explainability(), the plot grammar, theme changes, and the install command](assets/recordings/hero.webp)
 
 Build terminal applications in TypeScript, from a small CLI to a full-screen workbench.
 
@@ -12,7 +12,7 @@ Build terminal applications in TypeScript, from a small CLI to a full-screen wor
 
 DOGFOOD is built with Bijou: a component explorer, live documentation, and a place to try layouts and themes. These are real Ghostty screenshots; [see Theme Lab and settings](assets/screenshots/README.md).
 
-![The Components Library walking every slide: the title, each family slide, every component with its variant tabs, and the end slide](assets/gifs/components.gif)
+![The Components Library walking every slide: the title, each section slide, every component with its variant tabs, and the end slide](assets/recordings/components.webp)
 
 The Components Library shows every Bijou component one slide at a time, with its variants and its output in each mode. Run it with `npm run components`.
 
