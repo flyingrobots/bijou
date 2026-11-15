@@ -35,6 +35,8 @@ export interface FocusAreaOptions {
 export interface FocusAreaRenderOptions {
   /** Whether the pane is currently focused. Default: `true`. */
   readonly focused?: boolean;
+  /** Reserve the left focus-gutter column. Default: `true`; set false when there is nothing else to focus. */
+  readonly gutter?: boolean;
   /** Token for the focused gutter. Default: `theme.ui.focusGutter`. */
   readonly focusedGutterToken?: TokenValue;
   /** Token for the unfocused gutter. Default: `theme.semantic.muted`. */

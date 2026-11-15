@@ -93,6 +93,8 @@ export interface RenderContext<PageModel, Msg> {
   readonly model: InternalFrameModel<PageModel, Msg>;
   readonly pageId: string;
   readonly focusedPaneId: string | undefined;
+  /** True when the page layout is one pane, so there is no other pane to focus and no focus gutter. */
+  readonly singlePane?: boolean;
   readonly scrollByPane: Readonly<
     Record<string, { readonly x: number; readonly y: number }>
   >;
