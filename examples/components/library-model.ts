@@ -2,17 +2,18 @@ import type { OutputMode } from '../../packages/bijou/src/index.js';
 import { createKeyMap, type FrameCommandItem } from '../../packages/bijou-tui/src/index.js';
 import { COMPONENT_STORIES } from '../docs/stories.js';
 
-/* Zen's model, messages, timings and key map. */
+/* The component library's model, messages, timings and key map. */
 
 /** 1–4 pick the output mode the component renders in; the component is the only thing in the body. */
-export const ZEN_MODES: readonly { readonly mode: OutputMode; readonly label: string }[] = [
+export const LIBRARY_MODES: readonly { readonly mode: OutputMode; readonly label: string }[] = [
   { mode: 'interactive', label: 'interactive' },
   { mode: 'static', label: 'static' },
   { mode: 'pipe', label: 'pipe' },
   { mode: 'accessible', label: 'accessible' },
 ];
 
-export const LEGEND = 'h/l move · tab variant · j/k scroll · 1–4 mode · i info · r RTL · / search · F2 · q quit';
+// The mode row already shows 1–4, i and r on its chips; ? lists every key.
+export const LEGEND = 'h/l item · [ ] family · tab variant · j/k scroll · / search · F2 · ? help · q quit';
 export const SLIDE_SEC = 0.28;
 export const INTRO_IN = 0.5;
 export const INTRO_OUT = 0.5;
@@ -25,17 +26,18 @@ export function liveVariant(index: number): number {
 }
 export const MAX_WIDTH = 76;
 
-export type ZenMsg =
-  | { readonly type: 'zen-step'; readonly delta: number }
-  | { readonly type: 'zen-variant'; readonly delta: number }
-  | { readonly type: 'zen-scroll'; readonly delta: number }
-  | { readonly type: 'zen-mode'; readonly index: number }
-  | { readonly type: 'zen-info' }
-  | { readonly type: 'zen-start' }
-  | { readonly type: 'zen-rtl' }
-  | { readonly type: 'zen-select'; readonly index: number };
+export type LibraryMsg =
+  | { readonly type: 'library-step'; readonly delta: number }
+  | { readonly type: 'library-family'; readonly delta: number }
+  | { readonly type: 'library-variant'; readonly delta: number }
+  | { readonly type: 'library-scroll'; readonly delta: number }
+  | { readonly type: 'library-mode'; readonly index: number }
+  | { readonly type: 'library-info' }
+  | { readonly type: 'library-start' }
+  | { readonly type: 'library-rtl' }
+  | { readonly type: 'library-select'; readonly index: number };
 
-export interface ZenModel {
+export interface LibraryModel {
   readonly index: number;
   readonly modeIndex: number;
   readonly variantIndex: number;
@@ -57,34 +59,36 @@ export function wrap(index: number, length: number): number {
   return ((index % length) + length) % length;
 }
 
-const step = (delta: number): ZenMsg => ({ type: 'zen-step', delta });
-const scroll = (delta: number): ZenMsg => ({ type: 'zen-scroll', delta });
-const mode = (index: number): ZenMsg => ({ type: 'zen-mode', index });
+const step = (delta: number): LibraryMsg => ({ type: 'library-step', delta });
+const scroll = (delta: number): LibraryMsg => ({ type: 'library-scroll', delta });
+const mode = (index: number): LibraryMsg => ({ type: 'library-mode', index });
 
-export const zenKeys = createKeyMap<ZenMsg>()
+export const libraryKeys = createKeyMap<LibraryMsg>()
   .group('Components', (group) => group
     .bind('h', 'Previous component', step(-1))
     .bind('left', 'Previous component', step(-1))
     .bind('l', 'Next component', step(1))
     .bind('right', 'Next component', step(1))
-    .bind('tab', 'Next variant', { type: 'zen-variant', delta: 1 })
-    .bind('shift+tab', 'Previous variant', { type: 'zen-variant', delta: -1 }))
+    .bind('[', 'Previous family', { type: 'library-family', delta: -1 })
+    .bind(']', 'Next family', { type: 'library-family', delta: 1 })
+    .bind('tab', 'Next variant', { type: 'library-variant', delta: 1 })
+    .bind('shift+tab', 'Previous variant', { type: 'library-variant', delta: -1 }))
   .group('View', (group) => group
     .bind('j', 'Scroll down', scroll(1))
     .bind('down', 'Scroll down', scroll(1))
     .bind('k', 'Scroll up', scroll(-1))
     .bind('up', 'Scroll up', scroll(-1))
-    .bind('i', 'Toggle info', { type: 'zen-info' })
-    .bind('r', 'Toggle right-to-left', { type: 'zen-rtl' })
-    .bind('enter', 'Start', { type: 'zen-start' })
-    .bind('space', 'Start', { type: 'zen-start' }))
+    .bind('i', 'Toggle info', { type: 'library-info' })
+    .bind('r', 'Toggle right-to-left', { type: 'library-rtl' })
+    .bind('enter', 'Start', { type: 'library-start' })
+    .bind('space', 'Start', { type: 'library-start' }))
   .group('Mode', (group) => group
     .bind('1', 'TUI', mode(0))
     .bind('2', 'Static', mode(1))
     .bind('3', 'Pipe', mode(2))
     .bind('4', 'Accessible', mode(3)));
 
-/** `/` opens the frame's search over component names; picking one dispatches zen-select. */
-export const SEARCH_ITEMS: readonly FrameCommandItem<ZenMsg>[] = COMPONENT_STORIES.map((story, index) => ({
-  id: story.id, label: story.title, description: story.family, action: { type: 'zen-select', index },
+/** `/` opens the frame's search over component names; picking one dispatches library-select. */
+export const SEARCH_ITEMS: readonly FrameCommandItem<LibraryMsg>[] = COMPONENT_STORIES.map((story, index) => ({
+  id: story.id, label: story.title, description: story.family, action: { type: 'library-select', index },
 }));

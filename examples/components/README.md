@@ -1,14 +1,17 @@
-# Components (Zen)
+# Components Library
 
 ```sh
 npm run components
 ```
 
-Zen opens on a "Components Library" title screen, set in DM Sans; press Enter. After that it shows one Bijou component in the centre of the screen, taken from the same 42-story catalog that DOGFOOD and Block Lab use. It runs inside Bijou's standard app frame, so search, settings and quit behave as in DOGFOOD.
+The Components Library shows one Bijou component at a time in the centre of the screen, with nothing else competing for attention. It uses the same 42-story catalog as DOGFOOD and Block Lab, and runs inside Bijou's standard app frame, so search, settings, and quit behave as they do in DOGFOOD.
+
+The library opens on a "Components Library" title screen, set in DM Sans. Press Enter to start.
 
 | Key | Action |
 | --- | --- |
 | `h` `l`, left and right arrows | Previous or next component |
+| `[` `]` | Previous or next family; plays that family's intro slide |
 | `Tab`, `Shift-Tab` | Slide the carousel to the next or previous variant |
 | `j` `k`, up and down arrows | Scroll when the content is taller than the screen |
 | `1` `2` `3` `4` | Output mode: interactive, static, pipe, accessible |
@@ -16,16 +19,25 @@ Zen opens on a "Components Library" title screen, set in DM Sans; press Enter. A
 | `r` | Right-to-left layout on or off |
 | `/` | Search component names; Enter shows the match, Esc closes |
 | `F2` | Settings, including the shell theme |
+| `?` | Every key binding |
 | `q`, `Esc` | Quit, after a confirmation |
 
-The component's name and current variant sit above it, and dots below it show where you are in the variants. The bottom row shows the active lowering, whether docs are on, and scroll hints; the frame's footer below it shows the key legend.
+A breadcrumb above the component names its family, the component, and the variant on screen; dots below it show your position among the variants. The bottom row shows the active output mode and whether info and right-to-left layout are on, as keys you can press. The frame's footer shows the navigation keys.
 
-Crossing into a new component family plays that family's intro slide, which lists the family's functions one per line, grouped as **Components**, **Surface renderers**, and **Setup and state**. The slide enters and leaves through two of Bijou's transition shaders; each family gets its own pair. Slides never advance on their own: Enter, Space, `l`, the right arrow or Tab continues into the family's first component, and `h` or the left arrow goes back. Components that animate open on their animated variant: TUI mode plays it, and static mode shows a single frozen frame.
+## Family slides
 
-The example code under `i` is the variant's own `render()` call, read from its story file in `examples/docs/`. Some stories call a shared preview helper, so their example shows that helper rather than a bare component call.
+Entering a new family, with `h`, `l`, `[`, `]`, or search, shows that family's intro slide. It lists the family's functions one per line, grouped as **Components**, **Surface renderers**, and **Setup and state**. Each family's slide enters and leaves through its own pair of Bijou transition shaders.
+
+Slides never advance on their own. Press Enter, Space, `l`, the right arrow, or Tab to continue into the family's first component, `h` or the left arrow to go back, or `[` and `]` to move between families.
+
+## Info and examples
+
+The example under `i` is the variant's own `render()` call, read from its story file in `examples/docs/`. Long examples are abridged and labelled as such. Some stories call a shared preview helper, so their example shows that helper rather than a bare component call.
+
+Components that animate open on their animated variant. Interactive mode plays it; static mode shows one frozen frame.
 
 ## Right-to-left layout
 
-`r` switches the reading direction. Zen passes it to the app frame through an i18n runtime and mirrors its own body: the breadcrumb flow, the mode row, the variant dots, the carousel's slide direction, and the alignment of prose and slides. In right-to-left layout, `h` and the left arrow move toward the end of the component list. Code, component names, and the components themselves are not mirrored.
+`r` switches the reading direction. The library passes it to the app frame through an i18n runtime and mirrors its own body: the breadcrumb flow, the mode row, the variant dots, the carousel's slide direction, and the alignment of prose and slides. In right-to-left layout, `h`, `[`, and the left arrow move toward the end of the list. Code, function names, and the components themselves are not mirrored.
 
 The app frame mirrors only what it supports today: the settings drawer and notifications open from the other side. The header, footer, and pane chrome do not mirror yet; issues #571 to #575 track the remaining right-to-left work.

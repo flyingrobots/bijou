@@ -1,6 +1,6 @@
 import { createSurface, wrapToWidth, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
 import type { ComponentStory } from '../_stories/protocol.js';
-import { SNIPPETS } from './zen-snippets.js';
+import { SNIPPETS } from './library-snippets.js';
 
 const MAX_CODE_LINES = 8;
 const MAX_POINTS = 3;

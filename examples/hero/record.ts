@@ -4,7 +4,7 @@ import { createSurface, type Surface } from '../../packages/bijou/src/index.js';
 import { rasterizeSurface } from '../../packages/bijou-node/src/index.js';
 import { applyGifPalette, createGifEncoder, quantizeColors } from '../../packages/bijou-node/src/gifenc-runtime.js';
 import { diamond, matrixShader, meltShader, wipe, type TransitionShaderFn } from '../../packages/bijou-tui/src/index.js';
-import { createZenApp } from '../components/zen.js';
+import { createLibraryApp } from '../components/library.js';
 import { createDocsApp } from '../docs/app.js';
 import { createBlockLabFrameApp } from '../docs/storybook-app.js';
 import { createHeroApp } from './app.js';
@@ -57,9 +57,9 @@ const dogfood = await recordClip(createDocsApp(dogfoodCtx.ctx, { initialRoute: '
   keys: [[2.8, KEY.enter], [3.8, ']'], [4.8, KEY.enter], [5.6, KEY.down], [6.1, KEY.enter]],
 });
 
-// 3. Zen (`npm run components`): title, a family intro, Tab through variants, 1–4 lowerings, i for info.
-const zenCtx = createClipContext(COLS, ROWS);
-const zen = await recordClip(createZenApp(zenCtx.ctx), zenCtx, {
+// 3. Components Library (`npm run components`): title, a family intro, Tab through variants, 1–4 modes, i for info.
+const libraryCtx = createClipContext(COLS, ROWS);
+const library = await recordClip(createLibraryApp(libraryCtx.ctx), libraryCtx, {
   seconds: 9, fps: FPS,
   keys: [[1.2, KEY.enter], [2.9, KEY.enter], [4.0, '\t'], [4.6, '3'], [5.1, '4'], [5.6, '1'], [6.0, 'i'], [7.4, 'l']],
 });
@@ -82,7 +82,7 @@ const hero = await recordClip({ ...heroBase, view: (model) => perf.measure(() =>
 const segments: readonly Segment[] = [
   { name: 'dogfood', frames: dogfood, enter: meltShader },
   { name: 'blocklab', frames: blocklab, enter: matrixShader },
-  { name: 'components', frames: zen, enter: wipe('right') },
+  { name: 'components', frames: library, enter: wipe('right') },
   { name: 'dashboard', frames: at(hero, 4.0, 7.6), enter: diamond(0.5, 0.5) },
   { name: 'plot', frames: at(hero, 8.4, 11.2), enter: wipe('down') },
   { name: 'render-lab', frames: at(hero, 12.0, 18.0), enter: diamond(0.5, 0.5) },

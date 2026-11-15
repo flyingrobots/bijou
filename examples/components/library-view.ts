@@ -8,9 +8,9 @@ import {
   type TokenValue,
 } from '../../packages/bijou/src/index.js';
 import { createStoryProfileContext, storyPreviewSurface, type ComponentStory } from '../_stories/protocol.js';
-import { MAX_WIDTH, SLIDE_SEC, wrap, ZEN_MODES, type ZenModel } from './zen-model.js';
+import { MAX_WIDTH, SLIDE_SEC, wrap, LIBRARY_MODES, type LibraryModel } from './library-model.js';
 
-/* Drawing helpers for Zen's body: carousel, variant dots, breadcrumb heading and the mode row. */
+/* Drawing helpers for the library's body: carousel, variant dots, breadcrumb heading and the mode row. */
 
 export function writeRow(surface: Surface, x: number, y: number, text: string, active: boolean): number {
   const modifiers = active ? ['bold', 'inverse'] : ['dim'];
@@ -18,10 +18,10 @@ export function writeRow(surface: Surface, x: number, y: number, text: string, a
   return x + Array.from(text).length;
 }
 
-/** The one row of chrome Zen owns: the output mode, info and RTL toggles, and scroll hints. Mirrors in RTL. */
-export function modeRow(surface: Surface, y: number, model: ZenModel, hint: string): void {
+/** The one row of chrome the library owns: the output mode, info and RTL toggles, and scroll hints. Mirrors in RTL. */
+export function modeRow(surface: Surface, y: number, model: LibraryModel, hint: string): void {
   const chips: { text: string; active: boolean; gap: number }[] = [
-    ...ZEN_MODES.map((m, i) => ({ text: ` ${String(i + 1)} ${m.label} `, active: i === model.modeIndex, gap: 1 })),
+    ...LIBRARY_MODES.map((m, i) => ({ text: ` ${String(i + 1)} ${m.label} `, active: i === model.modeIndex, gap: 1 })),
     { text: ' i info ', active: model.docs, gap: 3 },
     { text: ' r RTL ', active: model.rtl, gap: 1 },
   ];
@@ -36,18 +36,18 @@ export function modeRow(surface: Surface, y: number, model: ZenModel, hint: stri
   if (hint !== '') writeRow(surface, model.rtl ? 1 : surface.width - width(hint) - 1, y, hint, false);
 }
 
-export function renderPreview(story: ComponentStory, variantIndex: number, model: ZenModel, ctx: BijouContext, w: number, h: number): Surface {
-  const zenMode = ZEN_MODES[model.modeIndex] ?? ZEN_MODES[0];
+export function renderPreview(story: ComponentStory, variantIndex: number, model: LibraryModel, ctx: BijouContext, w: number, h: number): Surface {
+  const libraryMode = LIBRARY_MODES[model.modeIndex] ?? LIBRARY_MODES[0];
   const variant = story.variants[wrap(variantIndex, story.variants.length)];
-  if (zenMode === undefined || variant === undefined) return createSurface(0, 0);
-  const previewCtx = createStoryProfileContext(ctx, { id: zenMode.mode, label: zenMode.label, mode: zenMode.mode, width: w }, { width: w, height: h });
+  if (libraryMode === undefined || variant === undefined) return createSurface(0, 0);
+  const previewCtx = createStoryProfileContext(ctx, { id: libraryMode.mode, label: libraryMode.label, mode: libraryMode.mode, width: w }, { width: w, height: h });
   // Static is one honest frame, so its clock stands still; interactive animates.
-  const timeMs = zenMode.mode === 'static' ? 0 : model.time * 1000;
+  const timeMs = libraryMode.mode === 'static' ? 0 : model.time * 1000;
   return storyPreviewSurface(variant.render({ width: w, ctx: previewCtx, state: variant.initialState, timeMs }));
 }
 
 /** Carousel: the current variant, sliding in over the previous one for SLIDE_SEC after Tab. */
-export function carousel(story: ComponentStory, model: ZenModel, ctx: BijouContext, width: number, h: number): Surface {
+export function carousel(story: ComponentStory, model: LibraryModel, ctx: BijouContext, width: number, h: number): Surface {
   const w = Math.min(width - 8, MAX_WIDTH);
   const current = renderPreview(story, model.variantIndex, model, ctx, w, h);
   const t = model.slide === undefined ? 1 : Math.min(1, (model.time - model.slide.at) / SLIDE_SEC);
@@ -68,7 +68,7 @@ export function carousel(story: ComponentStory, model: ZenModel, ctx: BijouConte
 }
 
 /** Variant dots under the carousel: ‹ ○ ● ○ › (the heading names the variant). Reversed in RTL. */
-export function dots(story: ComponentStory, model: ZenModel, width: number): Surface {
+export function dots(story: ComponentStory, model: LibraryModel, width: number): Surface {
   const current = wrap(model.variantIndex, story.variants.length);
   const marks = story.variants.map((_, i) => (i === current ? '●' : '○'));
   const text = model.rtl ? `tab  ‹ ${marks.reverse().join(' ')} ›` : `‹ ${marks.join(' ')} ›  tab`;
@@ -78,7 +78,7 @@ export function dots(story: ComponentStory, model: ZenModel, width: number): Sur
 }
 
 /** Breadcrumb above the component (family › component › variant), drawn with Bijou's breadcrumb(). */
-export function heading(story: ComponentStory, model: ZenModel, ctx: BijouContext, width: number): Surface {
+export function heading(story: ComponentStory, model: LibraryModel, ctx: BijouContext, width: number): Surface {
   const variant = story.variants[wrap(model.variantIndex, story.variants.length)]?.label;
   const items = variant === undefined ? [story.family, story.title] : [story.family, story.title, variant];
   const surface = createSurface(width, 1);
@@ -112,7 +112,7 @@ export function stack(parts: readonly Surface[], width: number): Surface {
   return out;
 }
 
-/** Zen has one pane, so the frame's focus bar carries no information: paint it in the background colour. */
+/** The library has one pane, so the frame's focus bar carries no information: paint it in the background colour. */
 export function hiddenGutter(ctx: BijouContext): TokenValue {
   const bg = ctx.surface('primary');
   return { hex: bg.bg ?? bg.hex, bg: bg.bg ?? bg.hex };

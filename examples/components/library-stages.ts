@@ -19,8 +19,8 @@ import {
   type TransitionShaderFn,
 } from '../../packages/bijou-tui/src/index.js';
 import type { ComponentStory } from '../_stories/protocol.js';
-import { TITLE_FONT } from './zen-font.js';
-import { namesSurface } from './zen-names.js';
+import { TITLE_FONT } from './library-font.js';
+import { namesSurface } from './library-names.js';
 
 /** One transition per family, cycled; a family enters with one shader and leaves with the next. */
 export const FAMILY_TRANSITIONS: readonly { readonly name: string; readonly shader: TransitionShaderFn }[] = [

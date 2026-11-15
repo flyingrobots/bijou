@@ -1,15 +1,15 @@
 import { createSurface, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
 import { COMPONENT_STORIES } from '../docs/stories.js';
 import { applyTransition } from '../hero/transition.js';
-import { FAMILIES, INTRO_IN, INTRO_OUT, type ZenModel } from './zen-model.js';
-import { familySlide, FAMILY_TRANSITIONS } from './zen-stages.js';
+import { FAMILIES, INTRO_IN, INTRO_OUT, type LibraryModel } from './library-model.js';
+import { familySlide, FAMILY_TRANSITIONS } from './library-stages.js';
 
 /**
  * A family intro in progress: the slide enters over `from` through the family's shader, holds
  * until the user continues, then leaves into the component through the next shader.
  */
 export function introBody(
-  model: ZenModel, width: number, height: number, ctx: BijouContext,
+  model: LibraryModel, width: number, height: number, ctx: BijouContext,
   from: Surface | undefined, component: () => Surface,
 ): Surface {
   const family = COMPONENT_STORIES[model.index]?.family ?? '';

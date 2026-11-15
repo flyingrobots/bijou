@@ -1,6 +1,6 @@
 # Hero demo
 
-A 30-second, scripted marketing reel recorded with Bijou's own GIF recorder: no screen capture and no terminal emulator. Every segment is a real Bijou app (DOGFOOD, Block Lab, the Zen component browser and this hero app), driven by scripted key presses on a mock clock and cut together with Bijou's transition shaders.
+A 33-second, scripted marketing reel recorded with Bijou's own GIF recorder: no screen capture and no terminal emulator. Every segment is a real Bijou app (DOGFOOD, Block Lab, the Components Library and this hero app), driven by scripted key presses on a mock clock and cut together with Bijou's transition shaders.
 
 ```sh
 npm run record:hero                  # writes examples/hero/hero.gif at 25 fps
@@ -8,7 +8,7 @@ npm run record:hero -- --fps=50      # 50 fps, about twice the size
 npm run record:hero -- --stills=2.5,6,10.5   # also writes PNG stills at those seconds
 npm run record:modes                 # one UI in all four output modes (PNGs, contact sheet, GIF)
 npm run hero                         # run the hero app live; ctrl+p palette, n, [ ], b, q
-npm run components                   # Zen: one component at a time (see examples/components)
+npm run components                   # Components Library: one component at a time (see examples/components)
 ```
 
 ## What the reel shows
@@ -17,10 +17,10 @@ npm run components                   # Zen: one component at a time (see example
 | --- | --- | --- |
 | 0–7 | DOGFOOD | Melts in on the animated Jacquard title; Enter opens the docs, which browse to `alert()` |
 | 7–12 | Block Lab | Matrix rain in; walks the 42-story catalog to `modal()` and steps it through static, pipe and accessible |
-| 12–18 | Zen (`npm run components`) | One component alone on screen; `l` walks, `3` and `4` lower it, typing opens the component palette |
-| 18–21.6 | Hero dashboard | DAG re-sliced around a new focus each second, live heatmap and flamegraph |
-| 21.6–24.4 | Plot grammar | Area, line, rule, bar and OKLCH-coloured dot marks |
-| 24.4–30.4 | Render lab | Raytracer in a widening split pane, switched to Braille, perf overlay, palette theme switches |
+| 12–21 | Components Library (`npm run components`) | Title screen, the first family's intro slide, Tab through variants, the four output modes, and `i` for info |
+| 21–24.6 | Hero dashboard | DAG re-sliced around a new focus each second, live heatmap and flamegraph |
+| 24.6–27.4 | Plot grammar | Area, line, rule, bar and OKLCH-coloured dot marks |
+| 27.4–33.4 | Render lab | Raytracer in a widening split pane, switched to Braille, perf overlay, palette theme switches |
 
 Every colour comes from a theme of eight OKLCH anchors (`theme.ts`). A theme switch interpolates those anchors in OKLCH over 0.6 s, so the whole screen crossfades perceptually.
 

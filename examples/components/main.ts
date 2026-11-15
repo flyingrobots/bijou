@@ -1,8 +1,9 @@
 import { initDefaultContext } from '../../packages/bijou-node/src/index.js';
 import { run } from '../../packages/bijou-tui/src/index.js';
-import { createZenApp } from './zen.js';
+import { createLibraryApp } from './library.js';
 
-// Zen: one component in the middle of the screen. h/j/k/l or arrows walk, 1–4 switch lowering,
-// / searches component names, Tab cycles variants, F2 opens settings, q asks before quitting.
+// Components Library: one component in the middle of the screen. h/l or the arrows move between components,
+// [ ] between families, Tab between variants; 1–4 pick the output mode, i shows info, r switches to
+// right-to-left layout, / searches component names, F2 opens settings, and q asks before quitting.
 const ctx = initDefaultContext();
-await run(createZenApp(ctx), { ctx });
+await run(createLibraryApp(ctx), { ctx });
