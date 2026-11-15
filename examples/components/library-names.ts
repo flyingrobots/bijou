@@ -1,31 +1,34 @@
 import { createSurface, type Surface } from '../../packages/bijou/src/index.js';
 import type { ComponentStory } from '../_stories/protocol.js';
+import { designFamilyFor } from './library-design.js';
 
-const GROUPS = ['Components', 'Surface renderers', 'Setup and state'] as const;
 const GAP = 6;
 
-/** Sort a function name into a group by Bijou's naming conventions. */
-function groupOf(name: string): (typeof GROUPS)[number] {
-  if (/^(create|push|load)[A-Z]/.test(name)) return 'Setup and state';
-  if (/^render[A-Z]/.test(name) || name.endsWith('Surface')) return 'Surface renderers';
-  return 'Components';
-}
+/** A story's functions, one per name, without "()". */
+const functionsOf = (story: ComponentStory): string[] =>
+  story.title.split('/').map((n) => n.trim().replace(/\(\)$/, '')).filter((n) => n !== '');
 
-/** Every function a family's stories cover, one per name, without "()" and without duplicates. */
-export function familyFunctions(stories: readonly ComponentStory[]): string[] {
-  const names = stories.flatMap((s) => s.title.split('/').map((n) => n.trim().replace(/\(\)$/, '')));
-  return [...new Set(names)].filter((n) => n !== '');
+/**
+ * The functions a slide covers, grouped under their design-system family names (book record R19),
+ * for example "Transient app notifications". A story without a family entry is headed by its own title.
+ */
+export function groupedFunctions(stories: readonly ComponentStory[]): { heading: string; names: string[] }[] {
+  const groups = new Map<string, Set<string>>();
+  for (const story of stories) {
+    const heading = designFamilyFor(story)?.name ?? story.title;
+    const names = groups.get(heading) ?? new Set<string>();
+    for (const name of functionsOf(story)) names.add(name);
+    groups.set(heading, names);
+  }
+  return [...groups].map(([heading, names]) => ({ heading, names: [...names] }));
 }
 
 /**
- * A family's functions grouped by kind: one column per group, a bold heading, then one name per line.
+ * A family slide's functions: one column per design family, a bold heading, then one name per line.
  * Columns wrap to a new row when they do not fit; in RTL their order and alignment mirror.
  */
 export function namesSurface(stories: readonly ComponentStory[], maxWidth: number, rtl: boolean): Surface {
-  const names = familyFunctions(stories);
-  const columns = GROUPS
-    .map((heading) => ({ heading, names: names.filter((n) => groupOf(n) === heading) }))
-    .filter((c) => c.names.length > 0)
+  const columns = groupedFunctions(stories)
     .map((c) => ({ ...c, width: Math.max(c.heading.length, ...c.names.map((n) => n.length)) }));
   const rows: (typeof columns)[] = [];
   for (const column of columns) {

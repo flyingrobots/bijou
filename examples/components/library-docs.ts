@@ -1,9 +1,11 @@
 import { createSurface, wrapToWidth, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
 import type { ComponentStory } from '../_stories/protocol.js';
+import { designFamilyFor, type DesignField } from './library-design.js';
 import { SNIPPETS } from './library-snippets.js';
 
 const MAX_CODE_LINES = 8;
-const MAX_POINTS = 3;
+const MAX_POINTS = 4;
+const MODES = ['interactive', 'static', 'pipe', 'accessible'] as const;
 
 interface Line {
   readonly text: string;
@@ -11,7 +13,7 @@ interface Line {
 }
 
 /**
- * Wrap prose; `code` spans written with backticks in the story docs keep their name but lose the ticks.
+ * Wrap prose; `code` spans written with backticks keep their name but lose the ticks.
  * A bullet sits at the start edge: left in LTR, right in RTL, with wrapped lines indented from that side.
  */
 function prose(text: string, width: number, rtl: boolean, bullet = false): Line[] {
@@ -32,19 +34,30 @@ function section(heading: string, points: readonly string[], width: number, rtl:
 }
 
 /**
- * The info panel (`i`): what the component is, when to choose the variant on screen,
- * when to use the component and when not to, and the variant's own render() call.
- * Prose aligns to the reading direction; code stays left to right.
+ * The info panel (`i`), using the design system's family fields in their order (book record R19):
+ * Family, Variants, Use when, Avoid when, Content guidance, Ownership, Graceful lowering, and
+ * Related families, then the on-screen variant's example. The component's own story supplies a
+ * field where it has one; the family entry in the design-system docs fills the rest.
  */
 export function docsSurface(
   story: ComponentStory, variantIndex: number, width: number, ctx: BijouContext, rtl = false,
 ): Surface {
-  const variant = story.variants[variantIndex];
+  const family = designFamilyFor(story);
+  const field = (name: DesignField): readonly string[] => family?.fields.get(name) ?? [];
+  const pick = (own: readonly string[], name: DesignField): readonly string[] => (own.length > 0 ? own : field(name));
+  const variants = story.variants.map((v, i) =>
+    `${v.label}${i === variantIndex ? ' (on screen)' : ''}${v.description === undefined ? '' : `: ${v.description}`}`);
+  const lowering = MODES.map((mode) => `${mode}: ${story.docs.gracefulLowering[mode]}`);
   const lines: Line[] = [
+    ...(family === undefined ? [] : [{ text: `Family: ${family.name}`, kind: 'muted' } satisfies Line]),
     ...prose(story.docs.summary, width, rtl),
-    ...(variant?.description === undefined ? [] : section(`This variant: ${variant.label}`, [variant.description], width, rtl)),
-    ...section('When to use', story.docs.useWhen, width, rtl),
-    ...section('When not to use', story.docs.avoidWhen, width, rtl),
+    ...section('Variants', variants, width, rtl),
+    ...section('Use when', pick(story.docs.useWhen, 'Use when'), width, rtl),
+    ...section('Avoid when', pick(story.docs.avoidWhen, 'Avoid when'), width, rtl),
+    ...section('Content guidance', field('Content guidance'), width, rtl),
+    ...section('Ownership', field('Ownership'), width, rtl),
+    ...section('Graceful lowering', lowering, width, rtl),
+    ...section('Related families', pick(story.docs.relatedFamilies, 'Related families'), width, rtl),
   ];
   const all = SNIPPETS.get(story.id)?.[variantIndex] ?? [];
   const abridged = all.length > MAX_CODE_LINES;

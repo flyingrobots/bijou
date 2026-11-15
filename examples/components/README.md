@@ -15,7 +15,7 @@ The library opens on a "Components Library" title screen, set in DM Sans. Press 
 | `Tab`, `Shift-Tab` | Slide the carousel to the next or previous variant |
 | `j` `k`, up and down arrows | Scroll when the content is taller than the screen |
 | `1` `2` `3` `4` | Output mode: interactive, static, pipe, accessible |
-| `i` | Info on or off: the summary, a tip for this variant, when to use the component and when not to, and the variant's example code |
+| `i` | Info on or off: the component's design-system family entry and the on-screen variant's example (see below) |
 | `r` | Right-to-left layout on or off |
 | `/` | Search component names; Enter shows the match, Esc closes |
 | `F2` | Settings, including the shell theme |
@@ -26,13 +26,15 @@ A breadcrumb above the component names its family, the component, and the varian
 
 ## Family slides
 
-Entering a new family, with `h`, `l`, `[`, `]`, or search, shows that family's intro slide. It lists the family's functions one per line, grouped as **Components**, **Surface renderers**, and **Setup and state**. Each family's slide enters and leaves through its own pair of Bijou transition shaders.
+Entering a new family, with `h`, `l`, `[`, `]`, or search, shows that family's intro slide. It lists the family's functions one per line, grouped under their design-system family names, for example **Transient app notifications** or **Activity stream**. Each family's slide enters and leaves through its own pair of Bijou transition shaders.
 
 Slides never advance on their own. Press Enter, Space, `l`, the right arrow, or Tab to continue into the family's first component, `h` or the left arrow to go back, or `[` and `]` to move between families.
 
 ## Info and examples
 
-The example under `i` is the variant's own `render()` call, read from its story file in `examples/docs/`. Long examples are abridged and labelled as such. Some stories call a shared preview helper, so their example shows that helper rather than a bare component call.
+`i` shows the component's entry in the vocabulary of the design system's Component Families reference (book record R19): **Family**, **Variants**, **Use when**, **Avoid when**, **Content guidance**, **Ownership**, **Graceful lowering**, and **Related families**, followed by an **Example**. The component's own story supplies a field where it has one; its family entry in `docs/design-system/component-families.md` supplies **Content guidance** and **Ownership**, and fills any field the story lacks. `guidedFlow()` has no family entry yet, so its panel shows only the story's fields.
+
+The example is the variant's own `render()` call, read from its story file in `examples/docs/`. Long examples are abridged and labelled as such. Some stories call a shared preview helper, so their example shows that helper rather than a bare component call.
 
 Components that animate open on their animated variant. Interactive mode plays it; static mode shows one frozen frame.
 
