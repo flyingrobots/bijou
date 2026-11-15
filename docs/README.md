@@ -53,6 +53,7 @@ The glossary and topic finder support practical lookup.
 - [MCP package guide](../examples/docs/content/package-mcp.md)
 - [Project front door](../README.md)
 - [Agent agreements](../AGENTS.md)
+- [Design vocabulary](./topics/design-vocabulary.md): canonical terms, component family fields, and writing style
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)
 - [Changelog](./CHANGELOG.md)

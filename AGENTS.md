@@ -44,6 +44,23 @@ This guide is for AI agents and human operators recovering context in the Bijou 
   touches a DOGFOOD TypeScript source file that still has raw visible-copy debt,
   clean that file or prove the strings non-localizable by scanner policy.
 
+## Design Vocabulary
+
+- Always use Bijou's design vocabulary in code comments, documentation, issues,
+  pull requests, example apps, and on-screen copy:
+  **`docs/topics/design-vocabulary.md`**. It collects the canonical terms,
+  component family fields, and writing style from the Bijou book's
+  Documentation Standards (R45), Component Families (R52), Content Guide (R15),
+  and Localization and Bidirectionality (R26) records.
+- Use one canonical term per concept: Component, Block, Surface, family, variant,
+  and the output modes `interactive`, `static`, `pipe`, and `accessible`.
+- Document component families with the R52 fields, in order: Family, Variants,
+  Use when, Avoid when, Content guidance, Ownership, Graceful lowering, and
+  Related families. Do not document components by comparison to other design
+  systems.
+- When new vocabulary is needed, add it to `docs/topics/design-vocabulary.md`
+  in the same change rather than coining a term in one place.
+
 ## Work Tracking
 
 - GitHub Issues and milestones are the roadmap and release-scope authority.
@@ -76,6 +93,8 @@ This guide is for AI agents and human operators recovering context in the Bijou 
   individual compiled Markdown files have been removed.
 - **`docs/typescript-code-standards.editors-edition.md`** and
   **`docs/code-dojo-exceptions.md`**: retained live engineering policy.
+- **`docs/topics/design-vocabulary.md`**: canonical terms, component family
+  fields, and writing style for every surface.
 - **`docs/CHANGELOG.md`**: ongoing merged-behavior history.
 
 Read an archived source in bounded excerpts with
