@@ -49,7 +49,7 @@ Unknown options or values print the problem and the usage, and exit with status 
 
 ## Family slides
 
-Each family's slide shows the Bijou wordmark, in its own face (Jacquard 12), above the family name. Stepping onto it shows the slide; It lists the family's functions one per line, grouped under their design-system family names, for example **Transient app notifications** or **Activity stream**. Each family's slide enters and leaves through its own pair of Bijou transition shaders.
+Each family's slide shows the Bijou wordmark, in its own face (Jacquard 12), above the family name. Stepping onto it shows the slide. It lists the family's functions one per line, grouped under their design-system family names, for example **Transient app notifications** or **Activity stream**. Every family slide enters and leaves with the same Bijou transition, a cell dissolve.
 
 slides never advance on their own. Press Enter, Space, `l`, the right arrow, or Tab to continue into the family's first component, or `h` or the left arrow to go back. The title and end slides show the wordmark too.
 

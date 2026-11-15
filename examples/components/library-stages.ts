@@ -1,21 +1,8 @@
 import { createSurface, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
 import {
-  blinds,
-  curtain,
-  diamond,
   dissolveShader,
-  glitch,
   layoutRasterText,
-  matrixShader,
-  meltShader,
-  pixelate,
-  radial,
   rasterTextSurface,
-  scrambleShader,
-  spiral,
-  tvStatic,
-  typewriter,
-  wipe,
   type TransitionShaderFn,
 } from '../../packages/bijou-tui/src/index.js';
 import type { ComponentStory } from '../_stories/protocol.js';
@@ -24,23 +11,8 @@ import { namesSurface } from './library-names.js';
 import { wordmark } from './library-wordmark.js';
 import { familyMembers, familyStepper } from './library-progress.js';
 
-/** One transition per family, cycled; a family enters with one shader and leaves with the next. */
-export const FAMILY_TRANSITIONS: readonly { readonly name: string; readonly shader: TransitionShaderFn }[] = [
-  { name: 'melt', shader: meltShader },
-  { name: 'diamond', shader: diamond(0.5, 0.5) },
-  { name: 'matrix', shader: matrixShader },
-  { name: 'wipe', shader: wipe('right') },
-  { name: 'spiral', shader: spiral() },
-  { name: 'blinds', shader: blinds() },
-  { name: 'radial', shader: radial(0.5, 0.5) },
-  { name: 'dissolve', shader: dissolveShader },
-  { name: 'curtain', shader: curtain() },
-  { name: 'pixelate', shader: pixelate() },
-  { name: 'glitch', shader: glitch() },
-  { name: 'scramble', shader: scrambleShader },
-  { name: 'typewriter', shader: typewriter() },
-  { name: 'static', shader: tvStatic() },
-];
+/** The one transition into and out of every family slide: a calm cell dissolve, with no motion to distract. */
+export const FAMILY_TRANSITION: TransitionShaderFn = dissolveShader;
 
 /** Quad blocks (2×2 per cell) read best large and solid; Braille (2×4 dots) keeps detail when small. */
 export type TitleRenderer = 'quad' | 'braille';
