@@ -22,7 +22,30 @@ The library opens on a "Components Library" title screen, set in DM Sans. Press 
 | `?` | Every key binding |
 | `q`, `Esc` | Quit, after a confirmation |
 
-A breadcrumb above the component names its family, the component, and the variant on screen; dots below it show your position among the variants. The bottom row shows the active output mode and whether info and right-to-left layout are on, as keys you can press. The frame's footer shows the navigation keys.
+A progress bar across the top shows how far you are through the whole show: the title, every family slide, and every component. A breadcrumb above the component names its family, the component, and the variant on screen, and a stepper under it shows where the component sits within its family; dots below the component show your position among its variants. The bottom row shows the active output mode and whether info and right-to-left layout are on, as keys you can press. The frame's footer shows the navigation keys.
+
+## Opening on a specific screen
+
+Pass options after `--` to open the library on a particular slide, output mode, and theme:
+
+```sh
+npm run components -- --component alert --variant warning --mode pipe --info
+npm run components -- --component table --theme book --scheme light --rtl
+npm run components -- --component toast --slide family
+```
+
+| Option | Values |
+| --- | --- |
+| `--component` | A story id or function name, such as `alert` or `table` |
+| `--variant` | A variant id or label, such as `warning` |
+| `--mode` | `interactive`, `static`, `pipe`, or `accessible` |
+| `--info` | Open with info shown |
+| `--rtl` | Open in right-to-left layout |
+| `--slide` | `title`, `family`, or `component` (default: `component` when `--component` is given, otherwise `title`) |
+| `--theme` | A shell theme family: `book` or `dogfood` |
+| `--scheme` | `dark` or `light` |
+
+Unknown options or values print the problem and the usage, and exit with status 2.
 
 ## Family slides
 

@@ -12,20 +12,23 @@ import { COMPONENT_STORIES } from '../docs/stories.js';
 import { docsSurface } from './library-docs.js';
 import { createLibraryI18n, physical, setLibraryDirection } from './library-direction.js';
 import {
-  FAMILIES, INTRO_IN, INTRO_OUT, LEGEND, liveVariant, MAX_WIDTH, SEARCH_ITEMS, wrap, libraryKeys,
+  FAMILIES, INTRO_IN, INTRO_OUT, initialModel, LEGEND, liveVariant, MAX_WIDTH, SEARCH_ITEMS, wrap, libraryKeys,
   type LibraryModel, type LibraryMsg,
 } from './library-model.js';
+import type { LibraryStart } from './library-cli.js';
 import { introBody } from './library-intro.js';
+import { familyStepper, progressRow } from './library-progress.js';
 import { titleSlide } from './library-stages.js';
 import { carousel, dots, heading, hiddenGutter, modeRow, stack } from './library-view.js';
 
 export { LIBRARY_CSS } from './library-view.js';
 export { LIBRARY_MODES, type LibraryModel, type LibraryMsg } from './library-model.js';
 
-export function createLibraryApp(baseCtx: BijouContext): FramedApp<LibraryModel, LibraryMsg> {
+export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}): FramedApp<LibraryModel, LibraryMsg> {
   // F2 settings can switch shell theme; components re-render with the themed context.
   let ctx = baseCtx;
   const i18n = createLibraryI18n();
+  if (start.rtl === true) setLibraryDirection(i18n, true);
   // How far the body can scroll, measured by the last render; keeps j/k inside the content.
   let maxScroll = 0;
 
@@ -78,24 +81,18 @@ export function createLibraryApp(baseCtx: BijouContext): FramedApp<LibraryModel,
     }
   }
 
+  // Rows: the show-wide progress bar, the body, then the mode row (absent on the title screen).
   function renderBody(model: LibraryModel, width: number, height: number): Surface {
-    if (height < 2) return createSurface(width, height);
-    const bodyH = height - 1;
-    let body: Surface;
-    if (model.stage === 'title') {
-      body = titleSlide(width, height, FAMILIES.length, COMPONENT_STORIES.length, ctx, model.rtl);
-      lastBody = body;
-      return body;
-    }
+    if (height < 3) return createSurface(width, height);
+    const bodyH = height - 2;
     const component = (): Surface => componentBody(model, width, bodyH);
-    if (model.stage === 'intro') {
-      body = introBody(model, width, bodyH, ctx, introFrom, component);
-    } else {
-      body = component();
-    }
+    const body = model.stage === 'title' ? titleSlide(width, bodyH, FAMILIES.length, COMPONENT_STORIES.length, ctx, model.rtl)
+      : model.stage === 'intro' ? introBody(model, width, bodyH, ctx, introFrom, component) : component();
     lastBody = body;
     const screen = createSurface(width, height);
-    screen.blit(body, 0, 0);
+    screen.blit(progressRow(model, width, ctx), 0, 0);
+    screen.blit(body, 0, 1);
+    if (model.stage === 'title') return screen;
     const hint = model.stage === 'component' && maxScroll > 0 ? `${model.scroll > 0 ? '↑' : ' '}${model.scroll < maxScroll ? '↓' : ' '} j/k` : '';
     modeRow(screen, height - 1, model, hint);
     return screen;
@@ -105,7 +102,7 @@ export function createLibraryApp(baseCtx: BijouContext): FramedApp<LibraryModel,
     const screen = createSurface(width, bodyH);
     const story = COMPONENT_STORIES[model.index];
     if (story === undefined) return screen;
-    const parts = [heading(story, model, ctx, width), carousel(story, model, ctx, width, bodyH)];
+    const parts = [heading(story, model, ctx, width), familyStepper(story.family, model.index, width - 8, ctx), carousel(story, model, ctx, width, bodyH)];
     if (story.variants.length > 1) parts.push(dots(story, model, width));
     if (model.docs) parts.push(docsSurface(story, wrap(model.variantIndex, story.variants.length), Math.min(width - 8, MAX_WIDTH), ctx, model.rtl));
     const content = stack(parts, width);
@@ -119,7 +116,7 @@ export function createLibraryApp(baseCtx: BijouContext): FramedApp<LibraryModel,
   const page: FramePage<LibraryModel, LibraryMsg> = {
     id: 'components',
     title: 'Components',
-    init: () => [{ index: 0, modeIndex: 0, variantIndex: liveVariant(0), docs: false, scroll: 0, rtl: false, time: 0, stage: 'title', introAt: 0, introExitAt: undefined, slide: undefined }, []],
+    init: () => [initialModel(start), []],
     update: (msg, model) => [update('type' in msg && (msg.type === 'library-step' || msg.type === 'library-family') ? physical(msg, model.rtl) : msg, model), []],
     keyMap: libraryKeys,
     searchItems: () => SEARCH_ITEMS,

@@ -1,6 +1,7 @@
 import type { OutputMode } from '../../packages/bijou/src/index.js';
 import { createKeyMap, type FrameCommandItem } from '../../packages/bijou-tui/src/index.js';
 import { COMPONENT_STORIES } from '../docs/stories.js';
+import { findStoryIndex, type LibraryStart } from './library-cli.js';
 
 /* The component library's model, messages, timings and key map. */
 
@@ -53,6 +54,21 @@ export interface LibraryModel {
   readonly introExitAt: number | undefined;
   /** Carousel slide: the variant we came from, when, and which way. */
   readonly slide: { readonly from: number; readonly at: number; readonly dir: 1 | -1 } | undefined;
+}
+
+/** The model the library opens with, from command-line options (see library-cli.ts). */
+export function initialModel(start: LibraryStart = {}): LibraryModel {
+  const index = start.component === undefined ? 0 : Math.max(0, findStoryIndex(start.component));
+  const variants = COMPONENT_STORIES[index]?.variants ?? [];
+  const wanted = start.variant?.toLowerCase();
+  const named = wanted === undefined ? -1 : variants.findIndex((v) => v.id.toLowerCase() === wanted || v.label.toLowerCase() === wanted);
+  const slide = start.slide ?? (start.component === undefined ? 'title' : 'component');
+  return {
+    index, variantIndex: named >= 0 ? named : liveVariant(index),
+    modeIndex: Math.max(0, LIBRARY_MODES.findIndex((m) => m.mode === start.mode)),
+    docs: start.info ?? false, scroll: 0, rtl: start.rtl ?? false, time: 0,
+    stage: slide === 'family' ? 'intro' : slide, introAt: 0, introExitAt: undefined, slide: undefined,
+  };
 }
 
 export function wrap(index: number, length: number): number {

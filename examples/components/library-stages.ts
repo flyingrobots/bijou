@@ -1,4 +1,4 @@
-import { createSurface, paginator, parseAnsiToSurface, stepper, stripAnsi, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
+import { createSurface, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
 import {
   blinds,
   curtain,
@@ -21,6 +21,7 @@ import {
 import type { ComponentStory } from '../_stories/protocol.js';
 import { TITLE_FONT } from './library-font.js';
 import { namesSurface } from './library-names.js';
+import { familyMembers, familyStepper } from './library-progress.js';
 
 /** One transition per family, cycled; a family enters with one shader and leaves with the next. */
 export const FAMILY_TRANSITIONS: readonly { readonly name: string; readonly shader: TransitionShaderFn }[] = [
@@ -119,15 +120,7 @@ export function familySlide(
   // Function names are code and are not mirrored; only the column order and alignment follow the direction.
   surface.blit(names, startX(b, names.width), y);
   putStart(surface, b, y + names.height + 1, 'Press Enter to continue.', ['dim']);
-  const progress = progressSurface(index, total, width - 8, ctx);
+  const progress = familyStepper(family, familyMembers(family)[0]?.index ?? 0, width - 8, ctx);
   surface.blit(progress, Math.max(0, Math.floor((width - progress.width) / 2)), Math.min(height - 1, y + names.height + 3));
   return surface;
-}
-
-/** Where this slide sits in the show: Bijou's stepper(), or paginator() dots when the stepper does not fit. */
-function progressSurface(index: number, total: number, maxWidth: number, ctx: BijouContext): Surface {
-  const steps = Array.from({ length: total }, (_, i) => ({ label: String(i + 1) }));
-  let text = stepper(steps, { current: index, ctx });
-  if (stripAnsi(text).length > maxWidth) text = paginator({ current: index, total, ctx });
-  return parseAnsiToSurface(text, Math.min(maxWidth, stripAnsi(text).length), 1);
 }
