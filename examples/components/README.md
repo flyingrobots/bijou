@@ -66,3 +66,7 @@ Components that animate open on their animated variant. Interactive mode plays i
 `r` switches the reading direction. The library passes it to the app frame through an i18n runtime and mirrors its own body: the breadcrumb flow, the mode row, the carousel's slide direction, and the alignment of prose and slides. In right-to-left layout, `h`, `[`, and the left arrow move toward the end of the list. Code, function names, and the components themselves are not mirrored.
 
 The app frame mirrors only what it supports today: the settings drawer and notifications open from the other side. The header, footer, and pane chrome do not mirror yet; issues #571 to #575 track the remaining right-to-left work.
+
+## Recording a walkthrough
+
+`npm run record:components` records `components.gif` (not committed): every slide in deck order, from the title to the end slide, one `l` press at a time on a mock clock. Title, family, and end slides hold longer than component slides. `npm run record:components -- --out=path.gif` writes elsewhere, and `-- --stills=1,45` also writes PNG stills at those times in seconds.

@@ -1,8 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
 import { createSurface, type Surface } from '../../packages/bijou/src/index.js';
-import { rasterizeSurface } from '../../packages/bijou-node/src/index.js';
-import { applyGifPalette, createGifEncoder, quantizeColors } from '../../packages/bijou-node/src/gifenc-runtime.js';
 import { diamond, matrixShader, meltShader, wipe, type TransitionShaderFn } from '../../packages/bijou-tui/src/index.js';
 import { createLibraryApp, LIBRARY_CSS } from '../components/library.js';
 import { createDocsApp } from '../docs/app.js';
@@ -10,7 +6,7 @@ import { createBlockLabFrameApp } from '../docs/storybook-app.js';
 import { createHeroApp } from './app.js';
 import { createClipContext, KEY, recordClip } from './clip.js';
 import { createPerfTracker } from './perf.js';
-import { encodePng } from './png.js';
+import { CELL, writeGif, writeStills } from './encode.js';
 import { applyTransition } from './transition.js';
 
 /*
@@ -28,7 +24,6 @@ const DELAY_CS = DELAYS_CS[arg('fps') ?? '25'] ?? 4;
 const FPS = 100 / DELAY_CS;
 const COLS = 120;
 const ROWS = 36;
-const CELL = { cellWidth: 8, cellHeight: 16, foreground: '#e5e7eb', background: '#000000' };
 const OUT = arg('out') ?? new URL('./hero.gif', import.meta.url).pathname;
 const TRANSITION_SEC = 0.6;
 
@@ -105,25 +100,6 @@ for (const segment of segments) {
 }
 process.stderr.write(`rendered ${String(frames.length)} frames in ${((performance.now() - started) / 1000).toFixed(1)} s: ${cuts.join(' ')}\n`);
 
-// Stream encode: a global palette from sampled frames, then one rasterized frame at a time.
-const sampleEvery = Math.max(1, Math.floor(frames.length / 32));
-const samples = frames.filter((_, i) => i % sampleEvery === 0).map((f) => rasterizeSurface(f, CELL));
-const joined = new Uint8Array(samples.reduce((n, s) => n + s.length, 0));
-samples.reduce((offset, s) => { joined.set(s, offset); return offset + s.length; }, 0);
-const palette = quantizeColors(joined, 256, { format: 'rgb565' });
-
-const gif = createGifEncoder();
-for (const frame of frames) {
-  gif.writeFrame(applyGifPalette(rasterizeSurface(frame, CELL), palette), COLS * CELL.cellWidth, ROWS * CELL.cellHeight, { palette, delay: DELAY_CS * 10 });
-}
-gif.finish();
-mkdirSync(dirname(OUT), { recursive: true });
-writeFileSync(OUT, Buffer.from(gif.bytes()));
-
-// Optional PNG stills (`--stills=1.2,6,14.5`) for a poster frame or a quick visual check.
-for (const t of (arg('stills') ?? '').split(',').filter(Boolean).map(Number)) {
-  const frame = frames.at(Math.min(frames.length - 1, Math.round(t * FPS)));
-  if (frame === undefined) continue;
-  writeFileSync(OUT.replace(/\.gif$/, `-${t.toFixed(1)}s.png`), encodePng(rasterizeSurface(frame, CELL), COLS * CELL.cellWidth, ROWS * CELL.cellHeight));
-}
+writeGif(frames, OUT, DELAY_CS);
+writeStills(frames, OUT, FPS, (arg('stills') ?? '').split(',').filter(Boolean).map(Number));
 process.stderr.write(`wrote ${OUT}: ${String(frames.length)} frames, ${String(FPS)} fps, ${String(COLS * CELL.cellWidth)}x${String(ROWS * CELL.cellHeight)} px\n`);

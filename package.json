@@ -28,6 +28,7 @@
     "components": "node --import tsx examples/components/main.ts",
     "record:hero": "node --import tsx examples/hero/record.ts",
     "record:modes": "node --import tsx examples/hero/modes.ts",
+    "record:components": "node --import tsx examples/components/record.ts",
     "app-frame": "node --import tsx examples/app-frame/main.ts",
     "test:frames": "vitest run --config vitest.config.ts scripts/frame-assertions.test.ts scripts/frame-regressions.test.ts",
     "test:watch": "vitest --config vitest.config.ts",
