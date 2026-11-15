@@ -13,6 +13,8 @@ export interface ClipOptions {
   readonly fps: number;
   /** Raw key strings at timestamps in seconds. */
   readonly keys?: readonly (readonly [number, string])[];
+  /** BCSS stylesheet, as the app would pass to run(). */
+  readonly css?: string;
 }
 
 export interface ClipContext {
@@ -60,7 +62,7 @@ export async function recordClip<Model, M>(app: App<Model, M>, { ctx, clock }: C
   };
   const frames: Surface[] = [];
   await runScript(wrapped, steps, {
-    ctx, pulseFps: false,
+    ctx, pulseFps: false, ...(options.css === undefined ? {} : { css: options.css }),
     // Clone: apps may reuse one surface between renders, which would alias every stored frame.
     onFrame: (frame, index) => { if (index > 0 && lastWasPulse) frames.push(frame.clone()); },
   });

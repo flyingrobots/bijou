@@ -117,3 +117,12 @@ export function hiddenGutter(ctx: BijouContext): TokenValue {
   const bg = ctx.surface('primary');
   return { hex: bg.bg ?? bg.hex, bg: bg.bg ?? bg.hex };
 }
+
+/**
+ * Chrome styling: the frame header and footer sit on different surface tokens from the page body, so
+ * the three bands stay distinguishable in every shell theme. Pass it to run() as `css`.
+ */
+export const LIBRARY_CSS = `
+FrameHeader { background: var(surface.elevated); }
+FrameHelp { background: var(surface.muted); }
+`;

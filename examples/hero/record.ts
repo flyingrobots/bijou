@@ -4,7 +4,7 @@ import { createSurface, type Surface } from '../../packages/bijou/src/index.js';
 import { rasterizeSurface } from '../../packages/bijou-node/src/index.js';
 import { applyGifPalette, createGifEncoder, quantizeColors } from '../../packages/bijou-node/src/gifenc-runtime.js';
 import { diamond, matrixShader, meltShader, wipe, type TransitionShaderFn } from '../../packages/bijou-tui/src/index.js';
-import { createLibraryApp } from '../components/library.js';
+import { createLibraryApp, LIBRARY_CSS } from '../components/library.js';
 import { createDocsApp } from '../docs/app.js';
 import { createBlockLabFrameApp } from '../docs/storybook-app.js';
 import { createHeroApp } from './app.js';
@@ -60,7 +60,7 @@ const dogfood = await recordClip(createDocsApp(dogfoodCtx.ctx, { initialRoute: '
 // 3. Components Library (`npm run components`): title, a family intro, Tab through variants, 1–4 modes, i for info.
 const libraryCtx = createClipContext(COLS, ROWS);
 const library = await recordClip(createLibraryApp(libraryCtx.ctx), libraryCtx, {
-  seconds: 9, fps: FPS,
+  seconds: 9, fps: FPS, css: LIBRARY_CSS,
   keys: [[1.2, KEY.enter], [2.9, KEY.enter], [4.0, '\t'], [4.6, '3'], [5.1, '4'], [5.6, '1'], [6.0, 'i'], [7.4, 'l']],
 });
 

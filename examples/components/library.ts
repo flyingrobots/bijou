@@ -19,6 +19,7 @@ import { introBody } from './library-intro.js';
 import { titleSlide } from './library-stages.js';
 import { carousel, dots, heading, hiddenGutter, modeRow, stack } from './library-view.js';
 
+export { LIBRARY_CSS } from './library-view.js';
 export { LIBRARY_MODES, type LibraryModel, type LibraryMsg } from './library-model.js';
 
 export function createLibraryApp(baseCtx: BijouContext): FramedApp<LibraryModel, LibraryMsg> {
