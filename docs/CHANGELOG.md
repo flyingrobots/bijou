@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The app frame's help overlay scrolls with the up and down arrows as well as
+  the frame's scroll keys.
+
+- The app frame omits the one-column focus gutter on a page whose layout is a
+  single pane, where there is no other pane to focus.
+
 - Theme Lab wraps complete picker labels, hints and editor context before
   painting, retaining long Book theme names in narrow columns. Column content
   budgets include both the border and horizontal padding.
