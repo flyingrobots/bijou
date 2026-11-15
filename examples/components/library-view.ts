@@ -119,10 +119,10 @@ export function hiddenGutter(ctx: BijouContext): TokenValue {
 }
 
 /**
- * Chrome styling: the frame header and footer sit on different surface tokens from the page body, so
- * the three bands stay distinguishable in every shell theme. Pass it to run() as `css`.
+ * Chrome styling: the footer sits on the muted surface, below the page body, so the two stay
+ * distinguishable in every shell theme. The frame header is covered by the progress-bar overlay.
+ * Pass it to run() as `css`.
  */
 export const LIBRARY_CSS = `
-FrameHeader { background: var(surface.elevated); }
 FrameHelp { background: var(surface.muted); }
 `;

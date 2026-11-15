@@ -31,7 +31,9 @@ const toSurface = (text: string, width: number): Surface =>
 /** A screen-wide progress bar: how far through the whole show (title, family slides, components) you are. */
 export function progressRow(model: LibraryModel, width: number, ctx: BijouContext): Surface {
   const percent = SEQUENCE.length < 2 ? 100 : (position(model) / (SEQUENCE.length - 1)) * 100;
-  return toSurface(progressBar(percent, { width, showPercent: false, ctx }), width);
+  // The unfilled part sits on the elevated surface, so the bar reads as one band in every theme.
+  const emptyToken = { hex: ctx.semantic('muted').hex, bg: ctx.surface('elevated').bg ?? ctx.surface('elevated').hex };
+  return toSurface(progressBar(percent, { width, showPercent: false, emptyToken, ctx }), width);
 }
 
 /** The family's components in order, as each story's first function name. */

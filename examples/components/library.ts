@@ -81,17 +81,16 @@ export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}
     }
   }
 
-  // Rows: the show-wide progress bar, the body, then the mode row (absent on the title screen).
+  // Rows: the body, then the mode row (absent on the title screen). The progress bar is an overlay.
   function renderBody(model: LibraryModel, width: number, height: number): Surface {
-    if (height < 3) return createSurface(width, height);
-    const bodyH = height - 2;
+    if (height < 2) return createSurface(width, height);
+    const bodyH = height - 1;
     const component = (): Surface => componentBody(model, width, bodyH);
     const body = model.stage === 'title' ? titleSlide(width, bodyH, FAMILIES.length, COMPONENT_STORIES.length, ctx, model.rtl)
       : model.stage === 'intro' ? introBody(model, width, bodyH, ctx, introFrom, component) : component();
     lastBody = body;
     const screen = createSurface(width, height);
-    screen.blit(progressRow(model, width, ctx), 0, 0);
-    screen.blit(body, 0, 1);
+    screen.blit(body, 0, 0);
     if (model.stage === 'title') return screen;
     const hint = model.stage === 'component' && maxScroll > 0 ? `${model.scroll > 0 ? '↑' : ' '}${model.scroll < maxScroll ? '↓' : ' '} j/k` : '';
     modeRow(screen, height - 1, model, hint);
@@ -140,6 +139,8 @@ export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}
     shellThemes: DOGFOOD_SHELL_THEMES,
     onShellThemeChange: ({ ctx: themed }) => { ctx = themed; },
     i18n,
+    // The show-wide progress bar replaces the frame header: full width, on the top row, outside the pane gutter.
+    overlayFactory: ({ pageModel, screenRect }) => [{ content: '', surface: progressRow(pageModel, screenRect.width, ctx), row: 0, col: 0 }],
     pages: [page],
   });
 }

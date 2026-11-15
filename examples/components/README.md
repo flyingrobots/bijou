@@ -22,7 +22,7 @@ The library opens on a "Components Library" title screen, set in DM Sans. Press 
 | `?` | Every key binding |
 | `q`, `Esc` | Quit, after a confirmation |
 
-A progress bar across the top shows how far you are through the whole show: the title, every family slide, and every component. A breadcrumb above the component names its family, the component, and the variant on screen, and a stepper under it shows where the component sits within its family; dots below the component show your position among its variants. The bottom row shows the active output mode and whether info and right-to-left layout are on, as keys you can press. The frame's footer shows the navigation keys.
+A progress bar across the top row, in place of the frame header, shows how far you are through the whole show: the title, every family slide, and every component. A breadcrumb above the component names its family, the component, and the variant on screen, and a stepper under it shows where the component sits within its family; dots below the component show your position among its variants. The bottom row shows the active output mode and whether info and right-to-left layout are on, as keys you can press. The frame's footer shows the navigation keys.
 
 ## Opening on a specific screen
 
