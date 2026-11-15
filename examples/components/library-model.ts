@@ -14,7 +14,7 @@ export const LIBRARY_MODES: readonly { readonly mode: OutputMode; readonly label
 ];
 
 // The mode row already shows 1–4, i and r on its chips; ? lists every key.
-export const LEGEND = 'h/l item · [ ] family · tab variant · j/k scroll · / search · F2 · ? help · q quit';
+export const LEGEND = 'h/l item · [ ] family · tab variant · j/k scroll · / search · ? help · q quit';
 export const SLIDE_SEC = 0.28;
 export const INTRO_IN = 0.5;
 export const INTRO_OUT = 0.5;

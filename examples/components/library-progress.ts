@@ -1,4 +1,5 @@
 import {
+  createSurface,
   paginator,
   parseAnsiToSurface,
   progressBar,
@@ -28,12 +29,24 @@ function position(model: LibraryModel): number {
 const toSurface = (text: string, width: number): Surface =>
   parseAnsiToSurface(text, Math.min(width, Array.from(stripAnsi(text)).length), 1);
 
-/** A screen-wide progress bar: how far through the whole show (title, family slides, components) you are. */
+/** "Slide X of Y" across the whole deck: the title, every family slide, and every component. It never resets. */
+export function slideLabel(model: LibraryModel): string {
+  return `Slide ${String(position(model) + 1)} of ${String(SEQUENCE.length)}`;
+}
+
+/** A screen-wide progress bar through the whole deck, labelled "Slide X of Y" at its end. */
 export function progressRow(model: LibraryModel, width: number, ctx: BijouContext): Surface {
   const percent = SEQUENCE.length < 2 ? 100 : (position(model) / (SEQUENCE.length - 1)) * 100;
-  // The unfilled part sits on the elevated surface, so the bar reads as one band in every theme.
-  const emptyToken = { hex: ctx.semantic('muted').hex, bg: ctx.surface('elevated').bg ?? ctx.surface('elevated').hex };
-  return toSurface(progressBar(percent, { width, showPercent: false, emptyToken, ctx }), width);
+  const label = ` ${slideLabel(model)} `;
+  const elevated = ctx.surface('elevated').bg ?? ctx.surface('elevated').hex;
+  // The unfilled part and the label sit on the elevated surface, so the row reads as one band in every theme.
+  const emptyToken = { hex: ctx.semantic('muted').hex, bg: elevated };
+  const row = createSurface(width, 1);
+  row.blit(toSurface(progressBar(percent, { width: Math.max(1, width - label.length), showPercent: false, emptyToken, ctx }), width), 0, 0);
+  Array.from(label).forEach((char, i) => {
+    row.set(width - label.length + i, 0, { char, fg: ctx.semantic('primary').hex, bg: elevated, empty: false });
+  });
+  return row;
 }
 
 /** The family's components in order, as each story's first function name. */

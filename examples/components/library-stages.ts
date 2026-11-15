@@ -108,10 +108,8 @@ export function familySlide(
   const names = namesSurface(stories, width - 8, rtl);
   const blockW = Math.min(width, Math.max(names.width, ...lines.map((l) => l.width)));
   const b: Block = { x: Math.max(0, Math.floor((width - blockW) / 2)), w: blockW, rtl };
-  const blockH = 2 + lines.length * (rows + 2) + names.height + 4;
+  const blockH = lines.length * (rows + 2) + names.height + 4;
   let y = Math.max(0, Math.floor((height - blockH) / 2));
-  putStart(surface, b, y, `Family ${String(index + 1)} of ${String(total)}`, ['dim']);
-  y += 2;
   // A spare row under each line keeps descenders clear of the next line.
   for (const line of lines) {
     surface.blit(line, startX(b, line.width), y);
