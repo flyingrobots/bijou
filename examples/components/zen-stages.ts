@@ -20,6 +20,7 @@ import {
 } from '../../packages/bijou-tui/src/index.js';
 import type { ComponentStory } from '../_stories/protocol.js';
 import { TITLE_FONT } from './zen-font.js';
+import { namesSurface } from './zen-names.js';
 
 /** One transition per family, cycled; a family enters with one shader and leaves with the next. */
 export const FAMILY_TRANSITIONS: readonly { readonly name: string; readonly shader: TransitionShaderFn }[] = [
@@ -103,9 +104,10 @@ export function familySlide(
   const rows = Math.min(5, Math.max(3, Math.floor(height / 7)));
   let lines = [wordSurface(family, rows, ctx, 'braille')];
   if ((lines[0]?.width ?? 0) > width - 8) lines = twoLines(family).map((t) => wordSurface(t, rows, ctx, 'braille'));
-  const blockW = Math.min(width, Math.max(...lines.map((l) => l.width)));
+  const names = namesSurface(stories, width - 8, rtl);
+  const blockW = Math.min(width, Math.max(names.width, ...lines.map((l) => l.width)));
   const b: Block = { x: Math.max(0, Math.floor((width - blockW) / 2)), w: blockW, rtl };
-  const blockH = 2 + lines.length * (rows + 2) + 3;
+  const blockH = 2 + lines.length * (rows + 2) + names.height + 2;
   let y = Math.max(0, Math.floor((height - blockH) / 2));
   putStart(surface, b, y, `Family ${String(index + 1)} of ${String(total)}`, ['dim']);
   y += 2;
@@ -114,9 +116,8 @@ export function familySlide(
     surface.blit(line, startX(b, line.width), y);
     y += rows + 2;
   }
-  // Component names are code and are not mirrored; only their sequence follows the reading direction.
-  const names = stories.map((s) => s.title);
-  putStart(surface, b, y, (rtl ? [...names].reverse() : names).join('  ·  '), []);
-  putStart(surface, b, y + 2, 'Press Enter to continue.', ['dim']);
+  // Function names are code and are not mirrored; only the column order and alignment follow the direction.
+  surface.blit(names, startX(b, names.width), y);
+  putStart(surface, b, y + names.height + 1, 'Press Enter to continue.', ['dim']);
   return surface;
 }

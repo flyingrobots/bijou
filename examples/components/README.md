@@ -20,7 +20,7 @@ Zen opens on a "Components Library" title screen, set in DM Sans; press Enter. A
 
 The component's name and current variant sit above it, and dots below it show where you are in the variants. The bottom row shows the active lowering, whether docs are on, and scroll hints; the frame's footer below it shows the key legend.
 
-Crossing into a new component family plays that family's intro slide, which enters and leaves through two of Bijou's transition shaders; each family gets its own pair. Slides never advance on their own: Enter, Space, `l`, the right arrow or Tab continues into the family's first component, and `h` or the left arrow goes back. Components that animate open on their animated variant: TUI mode plays it, and static mode shows a single frozen frame.
+Crossing into a new component family plays that family's intro slide, which lists the family's functions one per line, grouped as **Components**, **Surface renderers**, and **Setup and state**. The slide enters and leaves through two of Bijou's transition shaders; each family gets its own pair. Slides never advance on their own: Enter, Space, `l`, the right arrow or Tab continues into the family's first component, and `h` or the left arrow goes back. Components that animate open on their animated variant: TUI mode plays it, and static mode shows a single frozen frame.
 
 The example code under `i` is the variant's own `render()` call, read from its story file in `examples/docs/`. Some stories call a shared preview helper, so their example shows that helper rather than a bare component call.
 
