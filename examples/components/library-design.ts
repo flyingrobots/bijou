@@ -2,7 +2,7 @@ import { parseFamilySections } from '../../scripts/design-system-docs-parser.js'
 import { readDocumentationFile } from '../../scripts/documentation-corpus.js';
 import type { ComponentStory } from '../_stories/protocol.js';
 
-/** Fields of a design-system component family, named as in "Component Families" (book record R19). */
+/** Fields of a design-system component family, named as in "Component Families" (book record R52). */
 export const DESIGN_FIELDS = [
   'Family', 'Variants', 'Use when', 'Avoid when', 'Content guidance', 'Ownership', 'Graceful lowering', 'Related families',
 ] as const;
@@ -27,7 +27,7 @@ function fieldsOf(lines: readonly string[]): Map<DesignField, string[]> {
     const match = FIELD_LINE.exec(line);
     if (match !== null) {
       const name = match[1] ?? '';
-      // Fields outside the design vocabulary (such as the retired "Carbon analogue") are dropped.
+      // Fields outside the design vocabulary are dropped.
       current = isField(name) ? [] : undefined;
       if (current !== undefined && isField(name)) fields.set(name, current);
       const inline = plain(match[2] ?? '');

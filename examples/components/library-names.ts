@@ -9,7 +9,7 @@ const functionsOf = (story: ComponentStory): string[] =>
   story.title.split('/').map((n) => n.trim().replace(/\(\)$/, '')).filter((n) => n !== '');
 
 /**
- * The functions a slide covers, grouped under their design-system family names (book record R19),
+ * The functions a slide covers, grouped under their design-system family names (book record R52),
  * for example "Transient app notifications". A story without a family entry is headed by its own title.
  */
 export function groupedFunctions(stories: readonly ComponentStory[]): { heading: string; names: string[] }[] {

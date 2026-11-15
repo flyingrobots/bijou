@@ -32,7 +32,7 @@ Slides never advance on their own. Press Enter, Space, `l`, the right arrow, or 
 
 ## Info and examples
 
-`i` shows the component's entry in the vocabulary of the design system's Component Families reference (book record R19): **Family**, **Variants**, **Use when**, **Avoid when**, **Content guidance**, **Ownership**, **Graceful lowering**, and **Related families**, followed by an **Example**. The component's own story supplies a field where it has one; its family entry in `docs/design-system/component-families.md` supplies **Content guidance** and **Ownership**, and fills any field the story lacks. `guidedFlow()` has no family entry yet, so its panel shows only the story's fields.
+`i` shows the component's entry in the vocabulary of the design system's Component Families reference (book record R52). It opens with the family name and a summary, then a box titled **Variant: <name>** with the tip for the variant on screen. Below that come **Use when**, **Avoid when**, **Content guidance**, **Ownership**, **Graceful lowering**, and **Related families**, then an **Example**. The component's own story supplies a field where it has one; its family entry in `docs/design-system/component-families.md` supplies **Content guidance** and **Ownership**, and fills any field the story lacks. `guidedFlow()` has no family entry yet, so its panel shows only the story's fields.
 
 The example is the variant's own `render()` call, read from its story file in `examples/docs/`. Long examples are abridged and labelled as such. Some stories call a shared preview helper, so their example shows that helper rather than a bare component call.
 
