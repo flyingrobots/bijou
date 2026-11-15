@@ -46,6 +46,11 @@ const FAMILIES: readonly DesignFamily[] = parseFamilySections(readDocumentationF
 const functions = (text: string): string[] =>
   [...text.matchAll(/([A-Za-z][A-Za-z0-9]*)\(\)/g)].map((m) => m[1] ?? '').filter((name) => name !== '');
 
+/** How many design-system families a set of stories covers. */
+export function coveredFamilies(stories: readonly ComponentStory[]): number {
+  return new Set(stories.flatMap((story) => designFamilyFor(story)?.name ?? [])).size;
+}
+
 /** The design-system family that documents a story's component: the one naming the most of its functions. */
 export function designFamilyFor(story: ComponentStory): DesignFamily | undefined {
   const names = new Set(functions(story.title));

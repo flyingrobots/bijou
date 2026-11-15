@@ -14,7 +14,7 @@ export const LIBRARY_MODES: readonly { readonly mode: OutputMode; readonly label
 ];
 
 // The mode row already shows 1–4, i and r on its chips; ? lists every key.
-export const LEGEND = 'h/l slide · PgUp/PgDn family · tab variant · / search · ? help · q quit';
+export const LEGEND = 'h/l slide · PgUp/PgDn section · tab variant · / search · ? help · q quit';
 export const SLIDE_SEC = 0.28;
 export const INTRO_IN = 0.5;
 export const INTRO_OUT = 0.5;
@@ -85,10 +85,10 @@ export const libraryKeys = createKeyMap<LibraryMsg>()
     .bind('left', 'Previous component', step(-1))
     .bind('l', 'Next component', step(1))
     .bind('right', 'Next component', step(1))
-    .bind('pageup', 'Previous family', { type: 'library-family', delta: -1 })
-    .bind('pagedown', 'Next family', { type: 'library-family', delta: 1 })
-    .bind('[', 'Previous family', { type: 'library-family', delta: -1 })
-    .bind(']', 'Next family', { type: 'library-family', delta: 1 })
+    .bind('pageup', 'Previous section', { type: 'library-family', delta: -1 })
+    .bind('pagedown', 'Next section', { type: 'library-family', delta: 1 })
+    .bind('[', 'Previous section', { type: 'library-family', delta: -1 })
+    .bind(']', 'Next section', { type: 'library-family', delta: 1 })
     .bind('tab', 'Next variant', { type: 'library-variant', delta: 1 })
     .bind('shift+tab', 'Previous variant', { type: 'library-variant', delta: -1 }))
   .group('View', (group) => group

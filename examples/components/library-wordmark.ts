@@ -1,4 +1,6 @@
 import { createSurface, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
+import { coveredFamilies } from './library-design.js';
+import { COMPONENT_STORIES } from '../docs/stories.js';
 import { layoutRasterText, rasterTextSurface } from '../../packages/bijou-tui/src/index.js';
 import { CYLINDER_FONT } from '../docs/app-cylinder-font.js';
 
@@ -25,7 +27,7 @@ export function endSlide(width: number, height: number, components: number, fami
   while (rows > 2 && mark.width > width - 8) mark = wordmark(--rows, ctx);
   const top = Math.max(0, Math.floor((height - rows - 5) / 2));
   surface.blit(mark, Math.max(0, Math.floor((width - mark.width) / 2)), top);
-  centred(surface, top + rows + 2, `That is the whole library: ${String(components)} components in ${String(families)} families.`, []);
+  centred(surface, top + rows + 2, `That is the whole library: ${String(components)} components across ${String(coveredFamilies(COMPONENT_STORIES))} families, in ${String(families)} sections.`, []);
   centred(surface, top + rows + 4, 'Press h to go back, or q to quit.', ['dim']);
   return surface;
 }

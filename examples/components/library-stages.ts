@@ -1,4 +1,6 @@
 import { createSurface, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
+import { coveredFamilies } from './library-design.js';
+import { COMPONENT_STORIES } from '../docs/stories.js';
 import {
   dissolveShader,
   layoutRasterText,
@@ -67,7 +69,7 @@ export function titleSlide(width: number, height: number, families: number, comp
     y += rows + 1;
   }
   putStart(surface, b, y + 1, 'Bijou components, one at a time.', []);
-  putStart(surface, b, y + 2, `${String(components)} components in ${String(families)} families`, ['dim']);
+  putStart(surface, b, y + 2, `${String(components)} components across ${String(coveredFamilies(COMPONENT_STORIES))} families, in ${String(families)} sections`, ['dim']);
   putStart(surface, b, y + 4, 'Press Enter to start.', ['dim']);
   return surface;
 }

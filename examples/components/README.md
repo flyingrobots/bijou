@@ -4,14 +4,14 @@
 npm run components
 ```
 
-The Components Library is a deck of 58 slides: a title, a slide for each of 14 component families followed by its components, and an end slide. It shows one Bijou component at a time in the centre of the screen, with nothing else competing for attention. It uses the same 42-story catalog as DOGFOOD and Block Lab, and runs inside Bijou's standard app frame, so search, settings, and quit behave as they do in DOGFOOD.
+The Components Library is a deck of 58 slides: a title, a slide for each of 14 sections followed by its components, and an end slide. A section groups related component families for browsing; the 42 components cover 35 of the 36 families in `docs/design-system/component-families.md`. It shows one Bijou component at a time in the centre of the screen, with nothing else competing for attention. It uses the same 42-story catalog as DOGFOOD and Block Lab, and runs inside Bijou's standard app frame, so search, settings, and quit behave as they do in DOGFOOD.
 
 The library opens on a "Components Library" title screen, set in DM Sans. Press Enter to start.
 
 | Key | Action |
 | --- | --- |
 | `h` `l`, left and right arrows | Previous or next slide, one at a time; stops at the first and last slide |
-| `PgUp` `PgDn` (or `[` `]`) | Previous or next family slide; stops at the title and the end slide |
+| `PgUp` `PgDn` (or `[` `]`) | Previous or next section slide; stops at the title and the end slide |
 | `Tab`, `Shift-Tab` | Slide the carousel to the next or previous variant |
 | `j` `k`, up and down arrows | Scroll when the content is taller than the screen |
 | `1` `2` `3` `4` | Output mode: interactive, static, pipe, accessible |
@@ -22,7 +22,7 @@ The library opens on a "Components Library" title screen, set in DM Sans. Press 
 | `?` | Every key binding |
 | `q`, `Esc` | Quit, after a confirmation |
 
-A bar across the top row, in place of the frame header, shows how far you are through the whole deck, ending in a label such as "3 of 58". The Library draws this bar itself: it shows a place in a sequence, not a task's progress, so it does not use `progressBar()`. A breadcrumb above the component names its family and the component. Bijou's `tabs()` below the component list its variants, falling back to `paginator()` dots when the tabs are wider than the screen. The bottom row shows the output modes as tabs, then the info and right-to-left switches with their state (`i info off · r RTL off`). The frame's footer shows the navigation keys.
+A bar across the top row, in place of the frame header, shows how far you are through the whole deck, ending in a label such as "3 of 58". The Library draws this bar itself: it shows a place in a sequence, not a task's progress, so it does not use `progressBar()`. A breadcrumb above the component names its section and the component. Bijou's `tabs()` below the component list its variants, falling back to `paginator()` dots when the tabs are wider than the screen. The bottom row shows the output modes as tabs, then the info and right-to-left switches with their state (`i info off · r RTL off`). The frame's footer shows the navigation keys.
 
 ## Opening on a specific screen
 
@@ -41,17 +41,17 @@ npm run components -- --component toast --slide family
 | `--mode` | `interactive`, `static`, `pipe`, or `accessible` |
 | `--info` | Open with info shown |
 | `--rtl` | Open in right-to-left layout |
-| `--slide` | `title`, `family`, or `component` (default: `component` when `--component` is given, otherwise `title`) |
+| `--slide` | `title`, `family` (the section slide), or `component` (default: `component` when `--component` is given, otherwise `title`) |
 | `--theme` | A shell theme family: `book` or `dogfood` |
 | `--scheme` | `dark` or `light` |
 
 Unknown options or values print the problem and the usage, and exit with status 2.
 
-## Family slides
+## Section slides
 
-Each family's slide shows the Bijou wordmark, in its own face (Jacquard 12), above the family name. Stepping onto it shows the slide. It lists the family's functions one per line, grouped under their design-system family names, for example **Transient app notifications** or **Activity stream**. Every family slide enters and leaves with the same Bijou transition, a cell dissolve.
+Each section's slide shows the Bijou wordmark, in its own face (Jacquard 12), above the section name. Stepping onto it shows the slide. It lists the section's functions one per line, grouped under their design-system family names, for example **Transient app notifications** or **Activity stream**. Every section slide enters and leaves with the same Bijou transition, a cell dissolve.
 
-slides never advance on their own. Press Enter, Space, `l`, the right arrow, or Tab to continue into the family's first component, or `h` or the left arrow to go back. The title and end slides show the wordmark too.
+slides never advance on their own. Press Enter, Space, `l`, the right arrow, or Tab to continue into the section's first component, or `h` or the left arrow to go back. The title and end slides show the wordmark too.
 
 ## Info and examples
 
@@ -69,4 +69,4 @@ The app frame mirrors only what it supports today: the settings drawer and notif
 
 ## Recording a walkthrough
 
-`npm run record:components` records `components.gif` (not committed): every slide in deck order, from the title to the end slide, one `l` press at a time on a mock clock. Title, family, and end slides hold longer than component slides. `npm run record:components -- --out=path.gif` writes elsewhere, and `-- --stills=1,45` also writes PNG stills at those times in seconds.
+`npm run record:components` records `components.webp`, a full-colour animated WebP (not committed; needs `img2webp` from `brew install webp`): every slide in deck order, from the title to the end slide, one `l` press at a time on a mock clock. Title, family, and end slides hold longer than component slides. `npm run record:components -- --out=path.webp` writes elsewhere (a `.gif` path writes a GIF), and `-- --stills=1,45` also writes PNG stills at those times in seconds.
