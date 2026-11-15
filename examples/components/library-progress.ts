@@ -44,15 +44,19 @@ export function familyMembers(family: string): { index: number; name: string }[]
     : []));
 }
 
-/** Peers with one active, as Bijou's tabs(); paginator() dots when the tabs are wider than `width`. */
-export function peerTabs(labels: readonly string[], active: number, width: number, ctx: BijouContext): Surface {
-  let text = tabs(labels.map((label) => ({ label })), { active, ctx });
+/**
+ * Peers with one active, as Bijou's tabs(); paginator() dots when the tabs are wider than `width`.
+ * tabs() has no direction option yet, so right-to-left layout reverses the order here.
+ */
+export function peerTabs(labels: readonly string[], active: number, width: number, ctx: BijouContext, rtl = false): Surface {
+  const order = rtl ? [...labels].reverse() : labels;
+  let text = tabs(order.map((label) => ({ label })), { active: rtl ? labels.length - 1 - active : active, ctx });
   if (Array.from(stripAnsi(text)).length > width) text = paginator({ current: active, total: labels.length, ctx });
   return toSurface(text, width);
 }
 
 /** The family's components as tabs, with the current one active; on a family slide, the first. */
-export function familyTabs(family: string, current: number, width: number, ctx: BijouContext): Surface {
+export function familyTabs(family: string, current: number, width: number, ctx: BijouContext, rtl = false): Surface {
   const members = familyMembers(family);
-  return peerTabs(members.map((m) => m.name), Math.max(0, members.findIndex((m) => m.index === current)), width, ctx);
+  return peerTabs(members.map((m) => m.name), Math.max(0, members.findIndex((m) => m.index === current)), width, ctx, rtl);
 }

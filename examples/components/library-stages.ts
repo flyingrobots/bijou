@@ -97,7 +97,7 @@ export function familySlide(
   // Function names are code and are not mirrored; only the column order and alignment follow the direction.
   surface.blit(names, startX(b, names.width), y);
   putStart(surface, b, y + names.height + 1, 'Press Enter to continue.', ['dim']);
-  const progress = familyTabs(family, familyMembers(family)[0]?.index ?? 0, width - 8, ctx);
+  const progress = familyTabs(family, familyMembers(family)[0]?.index ?? 0, width - 8, ctx, rtl);
   surface.blit(progress, Math.max(0, Math.floor((width - progress.width) / 2)), Math.min(height - 1, y + names.height + 3));
   return surface;
 }

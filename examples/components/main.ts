@@ -4,8 +4,8 @@ import { cloneContextWithTheme } from '../../packages/bijou/src/index.js';
 import { LIBRARY_USAGE, parseLibraryArgs, resolveStartTheme } from './library-cli.js';
 import { createLibraryApp, LIBRARY_CSS } from './library.js';
 
-// Components Library: one component in the middle of the screen. h/l or the arrows move between components,
-// [ ] between families, Tab between variants; 1–4 pick the output mode, i shows info, r switches to
+// Components Library: a deck of slides, one component in the middle of the screen. h/l or the arrows step one
+// slide at a time, PgUp/PgDn (or [ ]) between families, Tab between variants; 1–4 pick the output mode, i shows info, r switches to
 // right-to-left layout, / searches component names, F2 opens settings, and q asks before quitting.
 const { start, errors } = parseLibraryArgs(process.argv.slice(2));
 if (errors.length > 0) {

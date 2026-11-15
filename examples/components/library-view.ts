@@ -24,7 +24,7 @@ export function writeRow(surface: Surface, x: number, y: number, text: string, a
  * beside any scroll hint. Mirrors in RTL.
  */
 export function modeRow(surface: Surface, y: number, model: LibraryModel, hint: string, ctx: BijouContext): void {
-  const modes = peerTabs(LIBRARY_MODES.map((m, i) => `${String(i + 1)} ${m.label}`), model.modeIndex, surface.width - 40, ctx);
+  const modes = peerTabs(LIBRARY_MODES.map((m, i) => `${String(i + 1)} ${m.label}`), model.modeIndex, surface.width - 40, ctx, model.rtl);
   surface.blit(modes, model.rtl ? surface.width - modes.width - 1 : 1, y);
   const onOff = (on: boolean): string => (on ? 'on' : 'off');
   const toggles = [`i info ${onOff(model.docs)}`, `r RTL ${onOff(model.rtl)}`, ...(hint === '' ? [] : [hint])].join(' · ');
@@ -65,7 +65,7 @@ export function carousel(story: ComponentStory, model: LibraryModel, ctx: BijouC
 
 /** Variant dots under the carousel: ‹ ○ ● ○ › (the heading names the variant). Reversed in RTL. */
 export function dots(story: ComponentStory, model: LibraryModel, width: number, ctx: BijouContext): Surface {
-  const tabsRow = peerTabs(story.variants.map((v) => v.label), wrap(model.variantIndex, story.variants.length), width - 8, ctx);
+  const tabsRow = peerTabs(story.variants.map((v) => v.label), wrap(model.variantIndex, story.variants.length), width - 8, ctx, model.rtl);
   const surface = createSurface(width, 1);
   surface.blit(tabsRow, Math.max(0, Math.floor((width - tabsRow.width) / 2)), 0);
   return surface;
