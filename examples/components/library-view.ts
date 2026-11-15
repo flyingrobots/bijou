@@ -7,6 +7,7 @@ import {
   type Surface,
 } from '../../packages/bijou/src/index.js';
 import { createStoryProfileContext, storyPreviewSurface, type ComponentStory } from '../_stories/protocol.js';
+import { peerTabs } from './library-progress.js';
 import { MAX_WIDTH, SLIDE_SEC, wrap, LIBRARY_MODES, type LibraryModel } from './library-model.js';
 
 /* Drawing helpers for the library's body: carousel, variant dots, breadcrumb heading and the mode row. */
@@ -17,22 +18,18 @@ export function writeRow(surface: Surface, x: number, y: number, text: string, a
   return x + Array.from(text).length;
 }
 
-/** The one row of chrome the library owns: the output mode, info and RTL toggles, and scroll hints. Mirrors in RTL. */
-export function modeRow(surface: Surface, y: number, model: LibraryModel, hint: string): void {
-  const chips: { text: string; active: boolean; gap: number }[] = [
-    ...LIBRARY_MODES.map((m, i) => ({ text: ` ${String(i + 1)} ${m.label} `, active: i === model.modeIndex, gap: 1 })),
-    { text: ' i info ', active: model.docs, gap: 3 },
-    { text: ' r RTL ', active: model.rtl, gap: 1 },
-  ];
-  const width = (t: string): number => Array.from(t).length;
-  let x = 1;
-  for (const chip of chips) {
-    x += chip.gap - 1;
-    const at = model.rtl ? surface.width - x - width(chip.text) : x;
-    writeRow(surface, at, y, chip.text, chip.active);
-    x += width(chip.text) + 1;
-  }
-  if (hint !== '') writeRow(surface, model.rtl ? 1 : surface.width - width(hint) - 1, y, hint, false);
+/**
+ * The one row of chrome the library owns. The output modes are peers with one active, so they are Bijou's
+ * tabs(); the info and RTL switches are toggles, not peers, so they sit apart with their state spelled out,
+ * beside any scroll hint. Mirrors in RTL.
+ */
+export function modeRow(surface: Surface, y: number, model: LibraryModel, hint: string, ctx: BijouContext): void {
+  const modes = peerTabs(LIBRARY_MODES.map((m, i) => `${String(i + 1)} ${m.label}`), model.modeIndex, surface.width - 40, ctx);
+  surface.blit(modes, model.rtl ? surface.width - modes.width - 1 : 1, y);
+  const onOff = (on: boolean): string => (on ? 'on' : 'off');
+  const toggles = [`i info ${onOff(model.docs)}`, `r RTL ${onOff(model.rtl)}`, ...(hint === '' ? [] : [hint])].join(' · ');
+  const width = Array.from(toggles).length;
+  writeRow(surface, model.rtl ? 1 : surface.width - width - 1, y, toggles, false);
 }
 
 export function renderPreview(story: ComponentStory, variantIndex: number, model: LibraryModel, ctx: BijouContext, w: number, h: number): Surface {
@@ -67,19 +64,16 @@ export function carousel(story: ComponentStory, model: LibraryModel, ctx: BijouC
 }
 
 /** Variant dots under the carousel: ‹ ○ ● ○ › (the heading names the variant). Reversed in RTL. */
-export function dots(story: ComponentStory, model: LibraryModel, width: number): Surface {
-  const current = wrap(model.variantIndex, story.variants.length);
-  const marks = story.variants.map((_, i) => (i === current ? '●' : '○'));
-  const text = model.rtl ? `tab  ‹ ${marks.reverse().join(' ')} ›` : `‹ ${marks.join(' ')} ›  tab`;
+export function dots(story: ComponentStory, model: LibraryModel, width: number, ctx: BijouContext): Surface {
+  const tabsRow = peerTabs(story.variants.map((v) => v.label), wrap(model.variantIndex, story.variants.length), width - 8, ctx);
   const surface = createSurface(width, 1);
-  writeRow(surface, Math.max(0, Math.floor((width - Array.from(text).length) / 2)), 0, text, false);
+  surface.blit(tabsRow, Math.max(0, Math.floor((width - tabsRow.width) / 2)), 0);
   return surface;
 }
 
-/** Breadcrumb above the component (family › component › variant), drawn with Bijou's breadcrumb(). */
+/** Breadcrumb above the component (family › component), drawn with Bijou's breadcrumb(). The variant is a tab, not a place. */
 export function heading(story: ComponentStory, model: LibraryModel, ctx: BijouContext, width: number): Surface {
-  const variant = story.variants[wrap(model.variantIndex, story.variants.length)]?.label;
-  const items = variant === undefined ? [story.family, story.title] : [story.family, story.title, variant];
+  const items = [story.family, story.title];
   const surface = createSurface(width, 1);
   if (model.rtl) {
     // Breadcrumb flow mirrors in RTL (Localization and Bidirectionality doctrine). breadcrumb() has no

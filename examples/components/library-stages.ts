@@ -9,7 +9,7 @@ import type { ComponentStory } from '../_stories/protocol.js';
 import { TITLE_FONT } from './library-font.js';
 import { namesSurface } from './library-names.js';
 import { wordmark } from './library-wordmark.js';
-import { familyMembers, familyStepper } from './library-progress.js';
+import { familyMembers, familyTabs } from './library-progress.js';
 
 /** The one transition into and out of every family slide: a calm cell dissolve, with no motion to distract. */
 export const FAMILY_TRANSITION: TransitionShaderFn = dissolveShader;
@@ -97,7 +97,7 @@ export function familySlide(
   // Function names are code and are not mirrored; only the column order and alignment follow the direction.
   surface.blit(names, startX(b, names.width), y);
   putStart(surface, b, y + names.height + 1, 'Press Enter to continue.', ['dim']);
-  const progress = familyStepper(family, familyMembers(family)[0]?.index ?? 0, width - 8, ctx);
+  const progress = familyTabs(family, familyMembers(family)[0]?.index ?? 0, width - 8, ctx);
   surface.blit(progress, Math.max(0, Math.floor((width - progress.width) / 2)), Math.min(height - 1, y + names.height + 3));
   return surface;
 }

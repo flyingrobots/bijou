@@ -22,7 +22,7 @@ The library opens on a "Components Library" title screen, set in DM Sans. Press 
 | `?` | Every key binding |
 | `q`, `Esc` | Quit, after a confirmation |
 
-A progress bar across the top row, in place of the frame header, shows how far you are through the whole show: the title, every family slide, and every component. A breadcrumb above the component names its family, the component, and the variant on screen, and a stepper under it shows where the component sits within its family; dots below the component show your position among its variants. The bottom row shows the active output mode and whether info and right-to-left layout are on, as keys you can press. The frame's footer shows the navigation keys.
+A bar across the top row, in place of the frame header, shows how far you are through the whole deck, ending in a label such as "3 of 58". The Library draws this bar itself: it shows a place in a sequence, not a task's progress, so it does not use `progressBar()`. A breadcrumb above the component names its family and the component. Under it, Bijou's `tabs()` list the family's components with the current one active, and tabs below the component list its variants; either falls back to `paginator()` dots when the tabs are wider than the screen. The bottom row shows the output modes as tabs, then the info and right-to-left switches with their state (`i info off · r RTL off`). The frame's footer shows the navigation keys.
 
 ## Opening on a specific screen
 
@@ -55,7 +55,7 @@ slides never advance on their own. Press Enter, Space, `l`, the right arrow, or 
 
 ## Info and examples
 
-`i` shows the component's entry in the vocabulary of the design system's Component Families reference (book record R52). It opens with the family name and a summary, then a box titled **Variant: <name>** with the tip for the variant on screen. Below that come **Use when**, **Avoid when**, **Content guidance**, **Ownership**, **Graceful lowering**, and **Related families**, then an **Example**. The component's own story supplies a field where it has one; its family entry in `docs/design-system/component-families.md` supplies **Content guidance** and **Ownership**, and fills any field the story lacks. `guidedFlow()` has no family entry yet, so its panel shows only the story's fields.
+`i` shows the component's entry in the vocabulary of the design system's Component Families reference (book record R52). It opens with the family name and a summary, then a box titled **Tip for this variant** with the tip for the variant on screen. Below that, **When to use each variant** lists every variant with its tip; it stays the same as you change variant. Then come **Use when**, **Avoid when**, **Content guidance**, **Ownership**, **Graceful lowering**, and **Related families**, then an **Example**. The component's own story supplies a field where it has one; its family entry in `docs/design-system/component-families.md` supplies **Content guidance** and **Ownership**, and fills any field the story lacks. `guidedFlow()` has no family entry yet, so its panel shows only the story's fields.
 
 The example is the variant's own `render()` call, read from its story file in `examples/docs/`. Long examples are abridged and labelled as such. Some stories call a shared preview helper, so their example shows that helper rather than a bare component call.
 
@@ -63,6 +63,6 @@ Components that animate open on their animated variant. Interactive mode plays i
 
 ## Right-to-left layout
 
-`r` switches the reading direction. The library passes it to the app frame through an i18n runtime and mirrors its own body: the breadcrumb flow, the mode row, the variant dots, the carousel's slide direction, and the alignment of prose and slides. In right-to-left layout, `h`, `[`, and the left arrow move toward the end of the list. Code, function names, and the components themselves are not mirrored.
+`r` switches the reading direction. The library passes it to the app frame through an i18n runtime and mirrors its own body: the breadcrumb flow, the mode row, the carousel's slide direction, and the alignment of prose and slides. In right-to-left layout, `h`, `[`, and the left arrow move toward the end of the list. Code, function names, and the components themselves are not mirrored.
 
 The app frame mirrors only what it supports today: the settings drawer and notifications open from the other side. The header, footer, and pane chrome do not mirror yet; issues #571 to #575 track the remaining right-to-left work.

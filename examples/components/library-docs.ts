@@ -50,11 +50,11 @@ function drawLines(lines: readonly Line[], width: number, ctx: BijouContext, rtl
   return surface;
 }
 
-/** The on-screen variant's tip, in Bijou's box() titled with the variant's name. */
-function variantBox(label: string, tip: string, width: number, ctx: BijouContext, rtl: boolean): Surface {
+/** The on-screen variant's tip, in Bijou's box(). The variant tabs already name it, so the title names the box's job. */
+function variantBox(tip: string, width: number, ctx: BijouContext, rtl: boolean): Surface {
   const inner = wrapToWidth(tip.replace(/`([^`]+)`/g, '$1'), width - 4);
   const text = inner.map((line) => (rtl ? line.padStart(width - 4) : line)).join('\n');
-  return boxSurface(text, { title: `Variant: ${label}`, width, padding: { left: 1, right: 1 }, ctx });
+  return boxSurface(text, { title: 'Tip for this variant', width, padding: { left: 1, right: 1 }, ctx });
 }
 
 function stackParts(parts: readonly Surface[], width: number): Surface {
@@ -69,7 +69,7 @@ function stackParts(parts: readonly Surface[], width: number): Surface {
 
 /**
  * The info panel (`i`), using the design system's family fields in their order (book record R52):
- * Family, the on-screen variant's tip in a box, Use when, Avoid when, Content guidance, Ownership,
+ * Family, the on-screen variant's tip in a box, when to use each variant, Use when, Avoid when, Content guidance, Ownership,
  * Graceful lowering, and Related families, then the variant's example. The component's own story
  * supplies a field where it has one; the family entry in the design-system docs fills the rest.
  */
@@ -85,7 +85,10 @@ export function docsSurface(
     ...(family === undefined ? [] : [{ text: `Family: ${family.name}`, kind: 'muted' } satisfies Line]),
     ...prose(story.docs.summary, width, rtl),
   ];
+  // Every variant and when to use it. Unlike the tip box, this list stays the same as you change variant.
+  const variants = story.variants.length < 2 ? [] : story.variants.map((v) => `${v.label}: ${v.description ?? ''}`);
   const lines: Line[] = [
+    ...section('When to use each variant', variants, width, rtl),
     ...section('Use when', pick(story.docs.useWhen, 'Use when'), width, rtl),
     ...section('Avoid when', pick(story.docs.avoidWhen, 'Avoid when'), width, rtl),
     ...section('Content guidance', field('Content guidance'), width, rtl),
@@ -108,6 +111,6 @@ export function docsSurface(
   }
   // Sections open with a blank line; the stack already spaces its parts, so drop the first one.
   const rest = lines[0]?.kind === 'blank' ? lines.slice(1) : lines;
-  const box = variant?.description === undefined ? [] : [variantBox(variant.label, variant.description, width, ctx, rtl)];
+  const box = variant?.description === undefined ? [] : [variantBox(variant.description, width, ctx, rtl)];
   return stackParts([drawLines(head, width, ctx, rtl), ...box, drawLines(rest, width, ctx, rtl)], width);
 }

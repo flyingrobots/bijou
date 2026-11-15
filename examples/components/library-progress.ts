@@ -2,8 +2,7 @@ import {
   createSurface,
   paginator,
   parseAnsiToSurface,
-  progressBar,
-  stepper,
+  tabs,
   stripAnsi,
   type BijouContext,
   type Surface,
@@ -20,17 +19,20 @@ export function slideLabel(model: LibraryModel): string {
   return `${String(position(model) + 1)} of ${String(SEQUENCE.length)}`;
 }
 
-/** A screen-wide progress bar through the whole deck, labelled "X of Y" at its end. */
+/**
+ * The deck's position: a full-width bar the Library draws itself (decoration, not a task's progress, so not
+ * progressBar()), ending in an "X of Y" label.
+ */
 export function progressRow(model: LibraryModel, width: number, ctx: BijouContext): Surface {
-  const percent = SEQUENCE.length < 2 ? 100 : (position(model) / (SEQUENCE.length - 1)) * 100;
   const label = ` ${slideLabel(model)} `;
+  const track = Math.max(1, width - label.length);
+  const filled = SEQUENCE.length < 2 ? track : Math.round((position(model) / (SEQUENCE.length - 1)) * track);
   const elevated = ctx.surface('elevated').bg ?? ctx.surface('elevated').hex;
-  // The unfilled part and the label sit on the elevated surface, so the row reads as one band in every theme.
-  const emptyToken = { hex: ctx.semantic('muted').hex, bg: elevated };
+  const accent = ctx.semantic('accent').hex;
   const row = createSurface(width, 1);
-  row.blit(toSurface(progressBar(percent, { width: Math.max(1, width - label.length), showPercent: false, emptyToken, ctx }), width), 0, 0);
+  for (let x = 0; x < track; x++) row.set(x, 0, { char: ' ', bg: x < filled ? accent : elevated, empty: false });
   Array.from(label).forEach((char, i) => {
-    row.set(width - label.length + i, 0, { char, fg: ctx.semantic('primary').hex, bg: elevated, empty: false });
+    row.set(track + i, 0, { char, fg: ctx.semantic('primary').hex, bg: elevated, empty: false });
   });
   return row;
 }
@@ -42,14 +44,15 @@ export function familyMembers(family: string): { index: number; name: string }[]
     : []));
 }
 
-/**
- * Where a component sits within its family: Bijou's stepper(), or paginator() dots when the stepper
- * is wider than the screen. On a family slide `current` is the family's first component.
- */
-export function familyStepper(family: string, current: number, width: number, ctx: BijouContext): Surface {
-  const members = familyMembers(family);
-  const at = Math.max(0, members.findIndex((m) => m.index === current));
-  let text = stepper(members.map((m) => ({ label: m.name })), { current: at, ctx });
-  if (Array.from(stripAnsi(text)).length > width) text = paginator({ current: at, total: members.length, ctx });
+/** Peers with one active, as Bijou's tabs(); paginator() dots when the tabs are wider than `width`. */
+export function peerTabs(labels: readonly string[], active: number, width: number, ctx: BijouContext): Surface {
+  let text = tabs(labels.map((label) => ({ label })), { active, ctx });
+  if (Array.from(stripAnsi(text)).length > width) text = paginator({ current: active, total: labels.length, ctx });
   return toSurface(text, width);
+}
+
+/** The family's components as tabs, with the current one active; on a family slide, the first. */
+export function familyTabs(family: string, current: number, width: number, ctx: BijouContext): Surface {
+  const members = familyMembers(family);
+  return peerTabs(members.map((m) => m.name), Math.max(0, members.findIndex((m) => m.index === current)), width, ctx);
 }
