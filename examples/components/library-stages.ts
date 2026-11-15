@@ -73,14 +73,14 @@ function putStart(surface: Surface, b: Block, y: number, text: string, modifiers
   putAt(surface, Math.max(0, startX(b, Array.from(text).length)), y, text, modifiers);
 }
 
-/** "Components / Library" in DM Sans, two lines aligned to the start edge, as a block in the middle of the screen. */
+/** "Components / Library" in DM Sans (Braille, like the family slides), two lines aligned to the start edge, centred as a block. */
 export function titleSlide(width: number, height: number, families: number, components: number, ctx: BijouContext, rtl = false): Surface {
   const surface = createSurface(width, height);
   let rows = Math.min(8, Math.max(3, Math.floor(height / 4)));
-  let lines = [wordSurface('Components', rows, ctx), wordSurface('Library', rows, ctx)];
+  let lines = [wordSurface('Components', rows, ctx, 'braille'), wordSurface('Library', rows, ctx, 'braille')];
   while (rows > 2 && Math.max(...lines.map((l) => l.width)) > width - 8) {
     rows--;
-    lines = [wordSurface('Components', rows, ctx), wordSurface('Library', rows, ctx)];
+    lines = [wordSurface('Components', rows, ctx, 'braille'), wordSurface('Library', rows, ctx, 'braille')];
   }
   const blockW = Math.max(...lines.map((l) => l.width));
   const blockH = rows * 2 + 1 + 6;
