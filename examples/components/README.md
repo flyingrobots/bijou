@@ -22,7 +22,7 @@ The library opens on a "Components Library" title screen, set in DM Sans. Press 
 | `?` | Every key binding |
 | `q`, `Esc` | Quit, after a confirmation |
 
-A bar across the top row, in place of the frame header, shows how far you are through the whole deck, ending in a label such as "3 of 58". The Library draws this bar itself: it shows a place in a sequence, not a task's progress, so it does not use `progressBar()`. A breadcrumb above the component names its family and the component. Under it, Bijou's `tabs()` list the family's components with the current one active, and tabs below the component list its variants; either falls back to `paginator()` dots when the tabs are wider than the screen. The bottom row shows the output modes as tabs, then the info and right-to-left switches with their state (`i info off · r RTL off`). The frame's footer shows the navigation keys.
+A bar across the top row, in place of the frame header, shows how far you are through the whole deck, ending in a label such as "3 of 58". The Library draws this bar itself: it shows a place in a sequence, not a task's progress, so it does not use `progressBar()`. A breadcrumb above the component names its family and the component. Bijou's `tabs()` below the component list its variants, falling back to `paginator()` dots when the tabs are wider than the screen. The bottom row shows the output modes as tabs, then the info and right-to-left switches with their state (`i info off · r RTL off`). The frame's footer shows the navigation keys.
 
 ## Opening on a specific screen
 

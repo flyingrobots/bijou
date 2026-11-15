@@ -19,7 +19,7 @@ import type { LibraryStart } from './library-cli.js';
 import { introBody } from './library-intro.js';
 import { familyTarget, showSlide, stepTarget } from './library-nav.js';
 import { endSlide } from './library-wordmark.js';
-import { familyTabs, progressRow } from './library-progress.js';
+import { progressRow } from './library-progress.js';
 import { titleSlide } from './library-stages.js';
 import { carousel, dots, heading, modeRow, stack } from './library-view.js';
 
@@ -101,7 +101,7 @@ export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}
     const screen = createSurface(width, bodyH);
     const story = COMPONENT_STORIES[model.index];
     if (story === undefined) return screen;
-    const parts = [heading(story, model, ctx, width), familyTabs(story.family, model.index, width - 8, ctx), carousel(story, model, ctx, width, bodyH)];
+    const parts = [heading(story, model, ctx, width), carousel(story, model, ctx, width, bodyH)];
     if (story.variants.length > 1) parts.push(dots(story, model, width, ctx));
     if (model.docs) parts.push(docsSurface(story, wrap(model.variantIndex, story.variants.length), Math.min(width - 8, MAX_WIDTH), ctx, model.rtl));
     const content = stack(parts, width);
