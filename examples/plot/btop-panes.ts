@@ -1,5 +1,5 @@
-import { boxSurface, createSurface, type BijouContext, type RGB, type Surface } from '@flyingrobots/bijou';
-import { writePlotText } from '@flyingrobots/bijou/viz';
+import { boxSurface, createSurface, type BijouContext, type RGB, type Surface } from '../../packages/bijou/src/index.js';
+import { writePlotText } from '../../packages/bijou/src/core/viz/index.js';
 import {
   createHeatScale,
   formatGiB,

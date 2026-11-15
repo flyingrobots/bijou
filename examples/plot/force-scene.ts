@@ -1,4 +1,4 @@
-import { boxSurface, createSurface, type BijouContext, type RGB, type Surface } from '@flyingrobots/bijou';
+import { boxSurface, createSurface, type BijouContext, type RGB, type Surface } from '../../packages/bijou/src/index.js';
 import {
   barY,
   dot,
@@ -8,7 +8,7 @@ import {
   scaleLinear,
   writePlotText,
   type ForceSimulation,
-} from '@flyingrobots/bijou/viz';
+} from '../../packages/bijou/src/core/viz/index.js';
 import { createHeatScale, renderHorizontalBar, type VizModel } from './btop-types.js';
 
 export function createWorkspaceForceSim(): ForceSimulation {

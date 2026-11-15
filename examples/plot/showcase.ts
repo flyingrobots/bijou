@@ -1,7 +1,7 @@
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { boxSurface, createSurface, surfaceToString, type BijouContext, type Surface } from '@flyingrobots/bijou';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { isKeyMsg, isPulseMsg, isResizeMsg, quit, run, type App } from '@flyingrobots/bijou-tui';
+import { initDefaultContext } from '../../packages/bijou-node/src/index.js';
+import { boxSurface, createSurface, surfaceToString, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
+import { createTestContext } from '../../packages/bijou/src/adapters/test/index.js';
+import { isKeyMsg, isPulseMsg, isResizeMsg, quit, run, type App } from '../../packages/bijou-tui/src/index.js';
 import {
   BrailleCanvas,
   areaY,
@@ -14,7 +14,7 @@ import {
   scaleLinear,
   scaleOklch,
   writePlotText,
-} from '@flyingrobots/bijou/viz';
+} from '../../packages/bijou/src/core/viz/index.js';
 
 interface ShowcaseModel {
   readonly elapsedSec: number;
@@ -32,10 +32,10 @@ function renderLissajousBox(width: number, height: number, phase: number, ctx: B
   const innerW = Math.max(8, width - 2), innerH = Math.max(4, height - 2);
   const inner = createSurface(innerW, innerH);
   const canvas = new BrailleCanvas(innerW, innerH);
+  // scaleOklch() interpolates between two stops; these are the two it has always used here.
   const colorScale = scaleOklch([0, 1], [
     { l: 0.64, c: 0.19, h: 255 },
     { l: 0.72, c: 0.21, h: 330 },
-    { l: 0.78, c: 0.17, h: 45 },
   ]);
   const cx = (canvas.pixelWidth - 1) / 2, cy = (canvas.pixelHeight - 1) / 2;
   const rx = Math.max(2, cx - 2), ry = Math.max(2, cy - 2);
@@ -90,7 +90,7 @@ export function renderShowcaseSurface(model: ShowcaseModel, ctx: BijouContext): 
   writePlotText(insp, 1, 4, `y-domain  [0, ${String(model.yMax)}]`, [148, 163, 184]);
   root.blit(boxSurface(insp, { title: 'Inspector (scale.invert)', width: rightW, ctx }), leftW + 1, 0);
 
-  const heat = scaleOklch([0, 47], [{ l: 0.65, c: 0.18, h: 250 }, { l: 0.72, c: 0.21, h: 330 }, { l: 0.80, c: 0.16, h: 55 }]);
+  const heat = scaleOklch([0, 47], [{ l: 0.65, c: 0.18, h: 250 }, { l: 0.72, c: 0.21, h: 330 }]);
   const botPlot = plotSurface({
     title: 'Throughput (1x8 Block) & OKLCH Scatter [SYNTHETIC]',
     width: leftW - 2, height: Math.max(6, botH - 2), ctx, y: yScale,

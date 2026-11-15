@@ -1,10 +1,10 @@
-import type { Oklch } from '@flyingrobots/bijou';
+import type { Oklch } from '../../packages/bijou/src/index.js';
 import {
   HalfBlockCanvas,
   scaleOklch,
   type ForceSimulation,
   type OklchScale,
-} from '@flyingrobots/bijou/viz';
+} from '../../packages/bijou/src/core/viz/index.js';
 
 export type PaletteName = 'inferno' | 'viridis' | 'plasma' | 'cool';
 export type ProcSortKey = 'cpu' | 'mem' | 'pid';

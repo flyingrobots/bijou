@@ -1,4 +1,4 @@
-import { boxSurface, createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { boxSurface, createSurface, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
 import {
   BrailleCanvas,
   HalfBlockCanvas,
@@ -11,7 +11,7 @@ import {
   scaleLinear,
   scaleLog,
   writePlotText,
-} from '@flyingrobots/bijou/viz';
+} from '../../packages/bijou/src/core/viz/index.js';
 import { createHeatScale, type VizModel } from './btop-types.js';
 
 export function createInitialWaterfall(width = 56, height = 13): HalfBlockCanvas {

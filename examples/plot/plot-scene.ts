@@ -3,7 +3,7 @@ import {
   createSurface,
   type BijouContext,
   type Surface,
-} from '@flyingrobots/bijou';
+} from '../../packages/bijou/src/index.js';
 import {
   areaY,
   barY,
@@ -14,7 +14,7 @@ import {
   ruleY,
   scaleLinear,
   writePlotText,
-} from '@flyingrobots/bijou/viz';
+} from '../../packages/bijou/src/core/viz/index.js';
 import {
   renderCoreGridSurface,
   renderMemDiskSurface,

@@ -1,4 +1,4 @@
-import { boxSurface, createSurface, type BijouContext, type RGB, type Surface } from '@flyingrobots/bijou';
+import { boxSurface, createSurface, type BijouContext, type RGB, type Surface } from '../../packages/bijou/src/index.js';
 import {
   barY,
   computeHdrHistogram,
@@ -12,7 +12,7 @@ import {
   writePlotText,
   type FlameFrame,
   type FlameNode,
-} from '@flyingrobots/bijou/viz';
+} from '../../packages/bijou/src/core/viz/index.js';
 import { createHeatScale, type VizModel } from './btop-types.js';
 
 export const BIJOU_FLAME_TREE: FlameNode = {

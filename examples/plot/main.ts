@@ -1,7 +1,7 @@
-import { initDefaultContext } from '@flyingrobots/bijou-node';
-import { surfaceToString } from '@flyingrobots/bijou';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
-import { isKeyMsg, isPulseMsg, isResizeMsg, quit, run, type App } from '@flyingrobots/bijou-tui';
+import { initDefaultContext } from '../../packages/bijou-node/src/index.js';
+import { surfaceToString } from '../../packages/bijou/src/index.js';
+import { createTestContext } from '../../packages/bijou/src/adapters/test/index.js';
+import { isKeyMsg, isPulseMsg, isResizeMsg, quit, run, type App } from '../../packages/bijou-tui/src/index.js';
 import { sortProcesses } from './btop-panes.js';
 import { createInitialTelemetry, stepTelemetry, togglePinnedPid } from './btop-telemetry.js';
 import type { PaletteName, ProcSortKey, TelemetrySample, ViewMode, VizModel } from './btop-types.js';
