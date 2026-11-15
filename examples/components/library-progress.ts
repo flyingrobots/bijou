@@ -9,22 +9,8 @@ import {
   type Surface,
 } from '../../packages/bijou/src/index.js';
 import { COMPONENT_STORIES } from '../docs/stories.js';
-import { FAMILIES, type LibraryModel } from './library-model.js';
-
-/** Every screen in show order: the title, then each family's slide followed by its components. */
-const SEQUENCE: readonly string[] = [
-  'title',
-  ...FAMILIES.flatMap((family) => [
-    `family:${family}`,
-    ...COMPONENT_STORIES.flatMap((story, index) => (story.family === family ? [`component:${String(index)}`] : [])),
-  ]),
-];
-
-function position(model: LibraryModel): number {
-  const family = COMPONENT_STORIES[model.index]?.family ?? '';
-  const key = model.stage === 'title' ? 'title' : model.stage === 'intro' ? `family:${family}` : `component:${String(model.index)}`;
-  return Math.max(0, SEQUENCE.indexOf(key));
-}
+import type { LibraryModel } from './library-model.js';
+import { position, SEQUENCE } from './library-nav.js';
 
 const toSurface = (text: string, width: number): Surface =>
   parseAnsiToSurface(text, Math.min(width, Array.from(stripAnsi(text)).length), 1);

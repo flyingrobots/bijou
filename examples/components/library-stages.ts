@@ -21,6 +21,7 @@ import {
 import type { ComponentStory } from '../_stories/protocol.js';
 import { TITLE_FONT } from './library-font.js';
 import { namesSurface } from './library-names.js';
+import { wordmark } from './library-wordmark.js';
 import { familyMembers, familyStepper } from './library-progress.js';
 
 /** One transition per family, cycled; a family enters with one shader and leaves with the next. */
@@ -82,10 +83,13 @@ export function titleSlide(width: number, height: number, families: number, comp
     rows--;
     lines = [wordSurface('Components', rows, ctx, 'braille'), wordSurface('Library', rows, ctx, 'braille')];
   }
-  const blockW = Math.max(...lines.map((l) => l.width));
-  const blockH = rows * 2 + 1 + 6;
+  const mark = wordmark(Math.max(3, rows - 2), ctx);
+  const blockW = Math.max(mark.width, ...lines.map((l) => l.width));
+  const blockH = mark.height + 1 + rows * 2 + 1 + 6;
   const b: Block = { x: Math.max(0, Math.floor((width - blockW) / 2)), w: blockW, rtl };
   let y = Math.max(0, Math.floor((height - blockH) / 2));
+  surface.blit(mark, startX(b, mark.width), y);
+  y += mark.height + 1;
   for (const line of lines) {
     surface.blit(line, startX(b, line.width), y);
     y += rows + 1;
@@ -96,7 +100,7 @@ export function titleSlide(width: number, height: number, families: number, comp
   return surface;
 }
 
-/** A family's intro: its position, its name in DM Sans (Braille), and the components it holds. */
+/** A family's intro: the Bijou wordmark, its name in DM Sans (Braille), and the components it holds. */
 export function familySlide(
   width: number, height: number, family: string, index: number, total: number,
   stories: readonly ComponentStory[], ctx: BijouContext, rtl = false,
@@ -108,8 +112,11 @@ export function familySlide(
   const names = namesSurface(stories, width - 8, rtl);
   const blockW = Math.min(width, Math.max(names.width, ...lines.map((l) => l.width)));
   const b: Block = { x: Math.max(0, Math.floor((width - blockW) / 2)), w: blockW, rtl };
-  const blockH = lines.length * (rows + 2) + names.height + 4;
+  const mark = wordmark(4, ctx);
+  const blockH = mark.height + 1 + lines.length * (rows + 2) + names.height + 4;
   let y = Math.max(0, Math.floor((height - blockH) / 2));
+  surface.blit(mark, startX(b, mark.width), y);
+  y += mark.height + 1;
   // A spare row under each line keeps descenders clear of the next line.
   for (const line of lines) {
     surface.blit(line, startX(b, line.width), y);

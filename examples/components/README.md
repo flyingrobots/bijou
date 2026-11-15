@@ -4,14 +4,14 @@
 npm run components
 ```
 
-The Components Library shows one Bijou component at a time in the centre of the screen, with nothing else competing for attention. It uses the same 42-story catalog as DOGFOOD and Block Lab, and runs inside Bijou's standard app frame, so search, settings, and quit behave as they do in DOGFOOD.
+The Components Library is a deck of 58 slides: a title, a slide for each of 14 component families followed by its components, and an end slide. It shows one Bijou component at a time in the centre of the screen, with nothing else competing for attention. It uses the same 42-story catalog as DOGFOOD and Block Lab, and runs inside Bijou's standard app frame, so search, settings, and quit behave as they do in DOGFOOD.
 
 The library opens on a "Components Library" title screen, set in DM Sans. Press Enter to start.
 
 | Key | Action |
 | --- | --- |
-| `h` `l`, left and right arrows | Previous or next component |
-| `[` `]` | Previous or next family; plays that family's intro slide |
+| `h` `l`, left and right arrows | Previous or next slide, one at a time; stops at the first and last slide |
+| `PgUp` `PgDn` (or `[` `]`) | Previous or next family slide; stops at the title and the end slide |
 | `Tab`, `Shift-Tab` | Slide the carousel to the next or previous variant |
 | `j` `k`, up and down arrows | Scroll when the content is taller than the screen |
 | `1` `2` `3` `4` | Output mode: interactive, static, pipe, accessible |
@@ -49,9 +49,9 @@ Unknown options or values print the problem and the usage, and exit with status 
 
 ## Family slides
 
-Entering a new family, with `h`, `l`, `[`, `]`, or search, shows that family's intro slide. It lists the family's functions one per line, grouped under their design-system family names, for example **Transient app notifications** or **Activity stream**. Each family's slide enters and leaves through its own pair of Bijou transition shaders.
+Each family's slide shows the Bijou wordmark, in its own face (Jacquard 12), above the family name. Stepping onto it shows the slide; It lists the family's functions one per line, grouped under their design-system family names, for example **Transient app notifications** or **Activity stream**. Each family's slide enters and leaves through its own pair of Bijou transition shaders.
 
-Slides never advance on their own. Press Enter, Space, `l`, the right arrow, or Tab to continue into the family's first component, `h` or the left arrow to go back, or `[` and `]` to move between families.
+slides never advance on their own. Press Enter, Space, `l`, the right arrow, or Tab to continue into the family's first component, or `h` or the left arrow to go back. The title and end slides show the wordmark too.
 
 ## Info and examples
 

@@ -12,11 +12,13 @@ import { COMPONENT_STORIES } from '../docs/stories.js';
 import { docsSurface } from './library-docs.js';
 import { createLibraryI18n, physical, setLibraryDirection } from './library-direction.js';
 import {
-  FAMILIES, INTRO_IN, INTRO_OUT, initialModel, LEGEND, liveVariant, MAX_WIDTH, SEARCH_ITEMS, wrap, libraryKeys,
+  FAMILIES, INTRO_IN, INTRO_OUT, initialModel, LEGEND, MAX_WIDTH, SEARCH_ITEMS, wrap, libraryKeys,
   type LibraryModel, type LibraryMsg,
 } from './library-model.js';
 import type { LibraryStart } from './library-cli.js';
 import { introBody } from './library-intro.js';
+import { familyTarget, showSlide, stepTarget } from './library-nav.js';
+import { endSlide } from './library-wordmark.js';
 import { familyStepper, progressRow } from './library-progress.js';
 import { titleSlide } from './library-stages.js';
 import { carousel, dots, heading, modeRow, stack } from './library-view.js';
@@ -37,12 +39,12 @@ export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}
   let introFrom: Surface | undefined;
 
   /** Move to a component; crossing into another family (or leaving the title) plays its intro. */
-  function goTo(model: LibraryModel, index: number, force: boolean): LibraryModel {
-    const next = { ...model, index, variantIndex: liveVariant(index), scroll: 0, slide: undefined };
-    const crossed = force || COMPONENT_STORIES[index]?.family !== COMPONENT_STORIES[model.index]?.family;
-    if (!crossed) return { ...next, stage: 'component' };
-    introFrom = lastBody;
-    return { ...next, stage: 'intro', introAt: model.time, introExitAt: undefined };
+  /** Show a deck slide; entering a family slide transitions out of whatever was on screen. */
+  function show(model: LibraryModel, key: string | undefined): LibraryModel {
+    if (key === undefined) return model;
+    const next = showSlide(model, key);
+    if (next.stage === 'intro') introFrom = lastBody;
+    return next;
   }
 
   function update(msg: FramePageMsg<LibraryMsg>, model: LibraryModel): LibraryModel {
@@ -52,22 +54,18 @@ export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}
       return leaving ? { ...model, time, stage: 'component', introExitAt: undefined } : { ...model, time };
     }
     if (!('type' in msg) || msg.type === 'mouse') return model;
-    // From the title, any library key starts with the first family's intro.
-    if (model.stage === 'title') return goTo(model, model.index, true);
+    const forward = msg.type === 'library-start' || ((msg.type === 'library-step' || msg.type === 'library-variant' || msg.type === 'library-family') && msg.delta > 0);
+    // From the title, forward keys start the deck; nothing comes before the title.
+    if (model.stage === 'title') return forward ? show(model, stepTarget(model, 1)) : model;
     // On a family slide, forward keys leave the slide (into its first component); back goes to the previous family.
-    if (model.stage === 'intro' && model.introExitAt === undefined) {
-      const forward = msg.type === 'library-start' || (msg.type === 'library-step' && msg.delta > 0) || (msg.type === 'library-variant' && msg.delta > 0);
-      if (forward) return { ...model, introExitAt: Math.max(model.time, model.introAt + INTRO_IN) };
+    if (model.stage === 'intro' && model.introExitAt === undefined && forward && msg.type !== 'library-family') {
+      return { ...model, introExitAt: Math.max(model.time, model.introAt + INTRO_IN) };
     }
     switch (msg.type) {
-      case 'library-step': return goTo(model, wrap(model.index + msg.delta, COMPONENT_STORIES.length), false);
-      case 'library-select': return goTo(model, msg.index, false);
-      case 'library-family': {
-        // Jump to the first component of the previous or next family, which plays its intro slide.
-        const fi = FAMILIES.indexOf(COMPONENT_STORIES[model.index]?.family ?? '');
-        const family = FAMILIES[wrap(fi + msg.delta, FAMILIES.length)];
-        return goTo(model, Math.max(0, COMPONENT_STORIES.findIndex((s) => s.family === family)), true);
-      }
+      // One slide at a time, in deck order; the deck does not wrap.
+      case 'library-step': return show(model, stepTarget(model, msg.delta));
+      case 'library-select': return show(model, `component:${String(msg.index)}`);
+      case 'library-family': return show(model, familyTarget(model, msg.delta));
       case 'library-variant': {
         const n = COMPONENT_STORIES[model.index]?.variants.length ?? 1;
         if (n < 2) return model;
@@ -87,12 +85,13 @@ export function createLibraryApp(baseCtx: BijouContext, start: LibraryStart = {}
     const bodyH = height - 2;
     const component = (): Surface => componentBody(model, width, bodyH);
     const body = model.stage === 'title' ? titleSlide(width, bodyH, FAMILIES.length, COMPONENT_STORIES.length, ctx, model.rtl)
+      : model.stage === 'end' ? endSlide(width, bodyH, COMPONENT_STORIES.length, FAMILIES.length, ctx)
       : model.stage === 'intro' ? introBody(model, width, bodyH, ctx, introFrom, component) : component();
     lastBody = body;
     const screen = createSurface(width, height);
     screen.blit(progressRow(model, width, ctx), 0, 0);
     screen.blit(body, 0, 1);
-    if (model.stage === 'title') return screen;
+    if (model.stage === 'title' || model.stage === 'end') return screen;
     const hint = model.stage === 'component' && maxScroll > 0 ? `${model.scroll > 0 ? '↑' : ' '}${model.scroll < maxScroll ? '↓' : ' '} j/k` : '';
     modeRow(screen, height - 1, model, hint);
     return screen;
