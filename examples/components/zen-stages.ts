@@ -63,8 +63,16 @@ function putAt(surface: Surface, x: number, y: number, text: string, modifiers: 
   Array.from(text).forEach((char, i) => { if (x + i < surface.width) surface.set(x + i, y, { char, modifiers, empty: false }); });
 }
 
-/** "Components / Library" in DM Sans, two lines, left-aligned as a block in the middle of the screen. */
-export function titleSlide(width: number, height: number, families: number, components: number, ctx: BijouContext): Surface {
+/** A text block's start edge: left in LTR, right in RTL, so slides mirror with the reading direction. */
+interface Block { readonly x: number; readonly w: number; readonly rtl: boolean }
+const startX = (b: Block, itemWidth: number): number => (b.rtl ? b.x + b.w - itemWidth : b.x);
+
+function putStart(surface: Surface, b: Block, y: number, text: string, modifiers: string[]): void {
+  putAt(surface, Math.max(0, startX(b, Array.from(text).length)), y, text, modifiers);
+}
+
+/** "Components / Library" in DM Sans, two lines aligned to the start edge, as a block in the middle of the screen. */
+export function titleSlide(width: number, height: number, families: number, components: number, ctx: BijouContext, rtl = false): Surface {
   const surface = createSurface(width, height);
   let rows = Math.min(8, Math.max(3, Math.floor(height / 4)));
   let lines = [wordSurface('Components', rows, ctx), wordSurface('Library', rows, ctx)];
@@ -74,39 +82,41 @@ export function titleSlide(width: number, height: number, families: number, comp
   }
   const blockW = Math.max(...lines.map((l) => l.width));
   const blockH = rows * 2 + 1 + 6;
-  const x = Math.max(0, Math.floor((width - blockW) / 2));
+  const b: Block = { x: Math.max(0, Math.floor((width - blockW) / 2)), w: blockW, rtl };
   let y = Math.max(0, Math.floor((height - blockH) / 2));
   for (const line of lines) {
-    surface.blit(line, x, y);
+    surface.blit(line, startX(b, line.width), y);
     y += rows + 1;
   }
-  putAt(surface, x, y + 1, 'Bijou components, one at a time.', []);
-  putAt(surface, x, y + 2, `${String(components)} components · ${String(families)} families`, ['dim']);
-  putAt(surface, x, y + 4, 'press enter', ['dim']);
+  putStart(surface, b, y + 1, 'Bijou components, one at a time.', []);
+  putStart(surface, b, y + 2, `${String(components)} components in ${String(families)} families`, ['dim']);
+  putStart(surface, b, y + 4, 'Press Enter to start.', ['dim']);
   return surface;
 }
 
 /** A family's intro: its position, its name in DM Sans (Braille), and the components it holds. */
 export function familySlide(
   width: number, height: number, family: string, index: number, total: number,
-  stories: readonly ComponentStory[], ctx: BijouContext,
+  stories: readonly ComponentStory[], ctx: BijouContext, rtl = false,
 ): Surface {
   const surface = createSurface(width, height);
   const rows = Math.min(5, Math.max(3, Math.floor(height / 7)));
   let lines = [wordSurface(family, rows, ctx, 'braille')];
   if ((lines[0]?.width ?? 0) > width - 8) lines = twoLines(family).map((t) => wordSurface(t, rows, ctx, 'braille'));
   const blockW = Math.min(width, Math.max(...lines.map((l) => l.width)));
-  const x = Math.max(0, Math.floor((width - blockW) / 2));
+  const b: Block = { x: Math.max(0, Math.floor((width - blockW) / 2)), w: blockW, rtl };
   const blockH = 2 + lines.length * (rows + 2) + 3;
   let y = Math.max(0, Math.floor((height - blockH) / 2));
-  putAt(surface, x, y, `${String(index + 1)} / ${String(total)}`, ['dim']);
+  putStart(surface, b, y, `Family ${String(index + 1)} of ${String(total)}`, ['dim']);
   y += 2;
   // A spare row under each line keeps descenders clear of the next line.
   for (const line of lines) {
-    surface.blit(line, x, y);
+    surface.blit(line, startX(b, line.width), y);
     y += rows + 2;
   }
-  putAt(surface, x, y, stories.map((s) => s.title).join('  ·  '), []);
-  putAt(surface, x, y + 2, 'press enter', ['dim']);
+  // Component names are code and are not mirrored; only their sequence follows the reading direction.
+  const names = stories.map((s) => s.title);
+  putStart(surface, b, y, (rtl ? [...names].reverse() : names).join('  ·  '), []);
+  putStart(surface, b, y + 2, 'Press Enter to continue.', ['dim']);
   return surface;
 }

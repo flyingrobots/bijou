@@ -4,15 +4,15 @@ import { COMPONENT_STORIES } from '../docs/stories.js';
 
 /* Zen's model, messages, timings and key map. */
 
-/** 1–4 pick the lowering; the component itself is the only thing in the body. */
+/** 1–4 pick the output mode the component renders in; the component is the only thing in the body. */
 export const ZEN_MODES: readonly { readonly mode: OutputMode; readonly label: string }[] = [
-  { mode: 'interactive', label: 'TUI' },
+  { mode: 'interactive', label: 'interactive' },
   { mode: 'static', label: 'static' },
   { mode: 'pipe', label: 'pipe' },
   { mode: 'accessible', label: 'accessible' },
 ];
 
-export const LEGEND = 'h/l component · tab variant · j/k scroll · 1–4 mode · i info · / search · F2 · q quit';
+export const LEGEND = 'h/l move · tab variant · j/k scroll · 1–4 mode · i info · r RTL · / search · F2 · q quit';
 export const SLIDE_SEC = 0.28;
 export const INTRO_IN = 0.5;
 export const INTRO_OUT = 0.5;
@@ -32,6 +32,7 @@ export type ZenMsg =
   | { readonly type: 'zen-mode'; readonly index: number }
   | { readonly type: 'zen-info' }
   | { readonly type: 'zen-start' }
+  | { readonly type: 'zen-rtl' }
   | { readonly type: 'zen-select'; readonly index: number };
 
 export interface ZenModel {
@@ -40,6 +41,8 @@ export interface ZenModel {
   readonly variantIndex: number;
   readonly docs: boolean;
   readonly scroll: number;
+  /** Right-to-left reading direction, shared with the frame through its i18n runtime. */
+  readonly rtl: boolean;
   readonly time: number;
   /** Title screen, a family's intro slide (entered at `introAt`), or the component itself. */
   readonly stage: 'title' | 'intro' | 'component';
@@ -72,6 +75,7 @@ export const zenKeys = createKeyMap<ZenMsg>()
     .bind('k', 'Scroll up', scroll(-1))
     .bind('up', 'Scroll up', scroll(-1))
     .bind('i', 'Toggle info', { type: 'zen-info' })
+    .bind('r', 'Toggle right-to-left', { type: 'zen-rtl' })
     .bind('enter', 'Start', { type: 'zen-start' })
     .bind('space', 'Start', { type: 'zen-start' }))
   .group('Mode', (group) => group

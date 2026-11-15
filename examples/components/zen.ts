@@ -9,13 +9,14 @@ import {
 } from '../../packages/bijou-tui/src/index.js';
 import { DOGFOOD_SHELL_THEMES } from '../docs/dogfood-shell-themes.js';
 import { COMPONENT_STORIES } from '../docs/stories.js';
-import { applyTransition } from '../hero/transition.js';
 import { docsSurface } from './zen-docs.js';
+import { createZenI18n, physical, setZenDirection } from './zen-direction.js';
 import {
   FAMILIES, INTRO_IN, INTRO_OUT, LEGEND, liveVariant, MAX_WIDTH, SEARCH_ITEMS, wrap, zenKeys,
   type ZenModel, type ZenMsg,
 } from './zen-model.js';
-import { familySlide, FAMILY_TRANSITIONS, titleSlide } from './zen-stages.js';
+import { introBody } from './zen-intro.js';
+import { titleSlide } from './zen-stages.js';
 import { carousel, dots, heading, hiddenGutter, modeRow, stack } from './zen-view.js';
 
 export { ZEN_MODES, type ZenModel, type ZenMsg } from './zen-model.js';
@@ -23,6 +24,7 @@ export { ZEN_MODES, type ZenModel, type ZenMsg } from './zen-model.js';
 export function createZenApp(baseCtx: BijouContext): FramedApp<ZenModel, ZenMsg> {
   // F2 settings can switch shell theme; components re-render with the themed context.
   let ctx = baseCtx;
+  const i18n = createZenI18n();
   // How far the body can scroll, measured by the last render; keeps j/k inside the content.
   let maxScroll = 0;
 
@@ -64,6 +66,7 @@ export function createZenApp(baseCtx: BijouContext): FramedApp<ZenModel, ZenMsg>
       case 'zen-scroll': return { ...model, scroll: Math.max(0, Math.min(maxScroll, model.scroll + msg.delta)) };
       case 'zen-mode': return { ...model, modeIndex: msg.index };
       case 'zen-info': return { ...model, docs: !model.docs, scroll: 0 };
+      case 'zen-rtl': setZenDirection(i18n, !model.rtl); return { ...model, rtl: !model.rtl };
       case 'zen-start': return model;
     }
   }
@@ -73,26 +76,13 @@ export function createZenApp(baseCtx: BijouContext): FramedApp<ZenModel, ZenMsg>
     const bodyH = height - 1;
     let body: Surface;
     if (model.stage === 'title') {
-      body = titleSlide(width, height, FAMILIES.length, COMPONENT_STORIES.length, ctx);
+      body = titleSlide(width, height, FAMILIES.length, COMPONENT_STORIES.length, ctx, model.rtl);
       lastBody = body;
       return body;
     }
     const component = (): Surface => componentBody(model, width, bodyH);
     if (model.stage === 'intro') {
-      const story = COMPONENT_STORIES[model.index];
-      const family = story?.family ?? '';
-      const fi = FAMILIES.indexOf(family);
-      const slide = familySlide(width, bodyH, family, fi, FAMILIES.length, COMPONENT_STORIES.filter((s) => s.family === family), ctx);
-      const into = FAMILY_TRANSITIONS.at(fi % FAMILY_TRANSITIONS.length) ?? FAMILY_TRANSITIONS[0];
-      const outOf = FAMILY_TRANSITIONS.at((fi + 1) % FAMILY_TRANSITIONS.length) ?? FAMILY_TRANSITIONS[0];
-      const t = model.time - model.introAt;
-      const out = model.introExitAt === undefined ? -1 : (model.time - model.introExitAt) / INTRO_OUT;
-      const frame = Math.round(model.time * 60);
-      const from = introFrom?.height === bodyH ? introFrom : createSurface(width, bodyH);
-      if (into === undefined || outOf === undefined) body = slide;
-      else if (t < INTRO_IN) body = applyTransition(from, slide, into.shader, t / INTRO_IN, frame, ctx);
-      else if (out < 0) body = slide;
-      else body = applyTransition(slide, component(), outOf.shader, Math.min(1, out), frame, ctx);
+      body = introBody(model, width, bodyH, ctx, introFrom, component);
     } else {
       body = component();
     }
@@ -110,7 +100,7 @@ export function createZenApp(baseCtx: BijouContext): FramedApp<ZenModel, ZenMsg>
     if (story === undefined) return screen;
     const parts = [heading(story, model, ctx, width), carousel(story, model, ctx, width, bodyH)];
     if (story.variants.length > 1) parts.push(dots(story, model, width));
-    if (model.docs) parts.push(docsSurface(story, wrap(model.variantIndex, story.variants.length), Math.min(width - 8, MAX_WIDTH), ctx));
+    if (model.docs) parts.push(docsSurface(story, wrap(model.variantIndex, story.variants.length), Math.min(width - 8, MAX_WIDTH), ctx, model.rtl));
     const content = stack(parts, width);
     maxScroll = Math.max(0, content.height - bodyH);
     const offset = Math.min(model.scroll, maxScroll);
@@ -122,8 +112,8 @@ export function createZenApp(baseCtx: BijouContext): FramedApp<ZenModel, ZenMsg>
   const page: FramePage<ZenModel, ZenMsg> = {
     id: 'components',
     title: 'Components',
-    init: () => [{ index: 0, modeIndex: 0, variantIndex: liveVariant(0), docs: false, scroll: 0, time: 0, stage: 'title', introAt: 0, introExitAt: undefined, slide: undefined }, []],
-    update: (msg, model) => [update(msg, model), []],
+    init: () => [{ index: 0, modeIndex: 0, variantIndex: liveVariant(0), docs: false, scroll: 0, rtl: false, time: 0, stage: 'title', introAt: 0, introExitAt: undefined, slide: undefined }, []],
+    update: (msg, model) => [update('type' in msg && msg.type === 'zen-step' ? physical(msg, model.rtl) : msg, model), []],
     keyMap: zenKeys,
     searchItems: () => SEARCH_ITEMS,
     searchTitle: 'Components',
@@ -145,6 +135,7 @@ export function createZenApp(baseCtx: BijouContext): FramedApp<ZenModel, ZenMsg>
     helpLineSource: () => LEGEND,
     shellThemes: DOGFOOD_SHELL_THEMES,
     onShellThemeChange: ({ ctx: themed }) => { ctx = themed; },
+    i18n,
     pages: [page],
   });
 }

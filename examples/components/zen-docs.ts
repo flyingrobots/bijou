@@ -1,69 +1,76 @@
-import { readdirSync, readFileSync } from 'node:fs';
 import { createSurface, wrapToWidth, type BijouContext, type Surface } from '../../packages/bijou/src/index.js';
 import type { ComponentStory } from '../_stories/protocol.js';
+import { SNIPPETS } from './zen-snippets.js';
 
-const STORY_DIR = new URL('../docs/', import.meta.url);
 const MAX_CODE_LINES = 8;
+const MAX_POINTS = 3;
 
-/** Return the source text of each `render:` property in a story file, in declaration order. */
-function renderSources(text: string): string[] {
-  const out: string[] = [];
-  let from = 0;
-  for (;;) {
-    const start = text.indexOf('render:', from);
-    if (start < 0) return out;
-    let depth = 0;
-    let end = start + 'render:'.length;
-    for (; end < text.length; end++) {
-      const ch = text[end];
-      if (ch === '(' || ch === '{' || ch === '[') depth++;
-      else if (ch === ')' || ch === '}' || ch === ']') {
-        if (depth === 0) break;
-        depth--;
-      } else if (ch === ',' && depth === 0) break;
-    }
-    out.push(text.slice(start + 'render:'.length, end).trim());
-    from = end;
-  }
+interface Line {
+  readonly text: string;
+  readonly kind: 'heading' | 'prose' | 'muted' | 'code' | 'blank';
 }
 
-/** Drop the `({ ctx }) =>` header and the common indentation, keeping the call as written. */
-function tidy(source: string): string[] {
-  const body = source.replace(/^\([^)]*\)\s*=>\s*/, '').replace(/^\{\s*\n?/, '').replace(/\n?\s*\}$/, '');
-  const lines = body.split('\n');
-  const indents = lines.slice(1).filter((l) => l.trim() !== '').map((l) => /^ */.exec(l)?.[0].length ?? 0);
-  const cut = indents.length === 0 ? 0 : Math.min(...indents);
-  return lines.map((l, i) => (i === 0 ? l : l.slice(cut))).filter((l) => l.trim() !== '');
+/**
+ * Wrap prose; `code` spans written with backticks in the story docs keep their name but lose the ticks.
+ * A bullet sits at the start edge: left in LTR, right in RTL, with wrapped lines indented from that side.
+ */
+function prose(text: string, width: number, rtl: boolean, bullet = false): Line[] {
+  const mark = bullet ? 2 : 0;
+  return wrapToWidth(text.replace(/`([^`]+)`/g, '$1'), width - mark).map((line, i) => {
+    const lead = !bullet ? '' : i === 0 ? '•' : ' ';
+    return { text: !bullet ? line : rtl ? `${line} ${lead}` : `${lead} ${line}`, kind: 'prose' };
+  });
 }
 
-/** story id → per-variant example code, read from the story's own TypeScript source. */
-const SNIPPETS: ReadonlyMap<string, readonly (readonly string[])[]> = new Map(
-  readdirSync(STORY_DIR).filter((f) => f.startsWith('stories-story-') && f.endsWith('.ts')).flatMap((file) => {
-    const text = readFileSync(new URL(file, STORY_DIR), 'utf8');
-    const id = /\bid:\s*'([^']+)'/.exec(text)?.[1];
-    return id === undefined ? [] : [[id, renderSources(text).map(tidy)] as const];
-  }),
-);
-
-function put(surface: Surface, y: number, text: string, cell: { fg?: string; bg?: string; modifiers?: string[] }, x = 0): void {
-  Array.from(text).forEach((char, i) => { if (x + i < surface.width) surface.set(x + i, y, { char, ...cell, empty: false }); });
+function section(heading: string, points: readonly string[], width: number, rtl: boolean): Line[] {
+  if (points.length === 0) return [];
+  return [
+    { text: '', kind: 'blank' },
+    { text: heading, kind: 'heading' },
+    ...points.slice(0, MAX_POINTS).flatMap((point) => prose(point, width, rtl, true)),
+  ];
 }
 
-/** A brief description plus a code block with the variant's real render() call. */
-export function docsSurface(story: ComponentStory, variantIndex: number, width: number, ctx: BijouContext): Surface {
-  const summary = wrapToWidth(story.docs.summary, width);
+/**
+ * The info panel (`i`): what the component is, when to choose the variant on screen,
+ * when to use the component and when not to, and the variant's own render() call.
+ * Prose aligns to the reading direction; code stays left to right.
+ */
+export function docsSurface(
+  story: ComponentStory, variantIndex: number, width: number, ctx: BijouContext, rtl = false,
+): Surface {
+  const variant = story.variants[variantIndex];
+  const lines: Line[] = [
+    ...prose(story.docs.summary, width, rtl),
+    ...(variant?.description === undefined ? [] : section(`This variant: ${variant.label}`, [variant.description], width, rtl)),
+    ...section('When to use', story.docs.useWhen, width, rtl),
+    ...section('When not to use', story.docs.avoidWhen, width, rtl),
+  ];
   const all = SNIPPETS.get(story.id)?.[variantIndex] ?? [];
-  const code = all.length > MAX_CODE_LINES ? [...all.slice(0, MAX_CODE_LINES - 1), '…'] : all;
-  const codeLines = code.flatMap((line) => wrapToWidth(line, width - 4));
-  const height = summary.length + (codeLines.length > 0 ? codeLines.length + 4 : 0);
-  const surface = createSurface(width, height);
-  summary.forEach((line, y) => { put(surface, y, line, {}); });
-  if (codeLines.length === 0) return surface;
+  const abridged = all.length > MAX_CODE_LINES;
+  const code = (abridged ? all.slice(0, MAX_CODE_LINES - 1) : all).flatMap((line) => wrapToWidth(line, width - 4));
+  if (code.length > 0) {
+    lines.push(
+      { text: '', kind: 'blank' },
+      { text: 'Example', kind: 'heading' },
+      { text: abridged ? `From the story's render() call, abridged after ${String(MAX_CODE_LINES - 1)} lines.` : "From the story's render() call.", kind: 'muted' },
+      { text: '', kind: 'code' },
+      ...code.map((text): Line => ({ text, kind: 'code' })),
+      { text: '', kind: 'code' },
+    );
+  }
 
-  const bg = ctx.surface('elevated').bg ?? ctx.surface('elevated').hex;
-  const top = summary.length + 1;
-  put(surface, top, `// ${story.title} · from the story's render()`, { fg: ctx.semantic('muted').hex });
-  for (let y = top + 1; y < height; y++) put(surface, y, ' '.repeat(width), { bg });
-  codeLines.forEach((line, i) => { put(surface, top + 2 + i, line, { bg }, 2); });
+  const surface = createSurface(width, lines.length);
+  const codeBg = ctx.surface('elevated').bg ?? ctx.surface('elevated').hex;
+  lines.forEach((line, y) => {
+    const glyphs = Array.from(line.text);
+    if (line.kind === 'code') {
+      for (let x = 0; x < width; x++) surface.set(x, y, { char: glyphs[x - 2] ?? ' ', bg: codeBg, empty: false });
+      return;
+    }
+    const x0 = rtl ? Math.max(0, width - glyphs.length) : 0;
+    const cell = line.kind === 'heading' ? { modifiers: ['bold'] } : line.kind === 'muted' ? { fg: ctx.semantic('muted').hex } : {};
+    glyphs.forEach((char, i) => { if (x0 + i < width) surface.set(x0 + i, y, { char, ...cell, empty: false }); });
+  });
   return surface;
 }
