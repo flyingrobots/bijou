@@ -1,4 +1,5 @@
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
+import { once } from 'node:events';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -82,9 +83,32 @@ export function writeWebp(frames: readonly Surface[], out: string, delayCs: numb
   }
 }
 
-/** Write an animation as WebP or GIF, chosen by the output file's extension. */
-export function writeAnimation(frames: readonly Surface[], out: string, delayCs: number): void {
-  if (out.endsWith('.webp')) writeWebp(frames, out, delayCs);
+/**
+ * Encode frames as an H.264 MP4 with ffmpeg: full colour, the smallest file, and plays anywhere video does.
+ * Frames stream to ffmpeg one at a time; a long reel never sits in memory as pixels.
+ */
+export async function writeMp4(frames: readonly Surface[], out: string, delayCs: number): Promise<void> {
+  const first = frames[0];
+  if (first === undefined) throw new Error('no frames to encode');
+  mkdirSync(dirname(out), { recursive: true });
+  const size = `${String(first.width * CELL.cellWidth)}x${String(first.height * CELL.cellHeight)}`;
+  const ffmpeg = spawn('ffmpeg', [
+    '-loglevel', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-s', size, '-r', String(100 / delayCs), '-i', '-',
+    '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-tune', 'animation', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out,
+  ], { stdio: ['pipe', 'inherit', 'inherit'] });
+  const exited = new Promise<number | null>((resolve) => { ffmpeg.on('close', resolve); });
+  for (const frame of frames) {
+    if (!ffmpeg.stdin.write(rasterize(frame))) await once(ffmpeg.stdin, 'drain');
+  }
+  ffmpeg.stdin.end();
+  const code = await exited;
+  if (code !== 0) throw new Error(`ffmpeg exited with ${String(code)}`);
+}
+
+/** Write an animation as MP4, WebP, or GIF, chosen by the output file's extension. */
+export async function writeAnimation(frames: readonly Surface[], out: string, delayCs: number): Promise<void> {
+  if (out.endsWith('.mp4')) await writeMp4(frames, out, delayCs);
+  else if (out.endsWith('.webp')) writeWebp(frames, out, delayCs);
   else writeGif(frames, out, delayCs);
 }
 
@@ -99,6 +123,6 @@ export function writeStills(frames: readonly Surface[], out: string, fps: number
   for (const t of times) {
     const frame = frames.at(Math.min(frames.length - 1, Math.round(t * fps)));
     if (frame === undefined) continue;
-    writeFileSync(out.replace(/\.(gif|webp)$/, `-${t.toFixed(1)}s.png`), encodePng(rasterize(frame), frame.width * CELL.cellWidth, frame.height * CELL.cellHeight));
+    writeFileSync(out.replace(/\.(gif|webp|mp4)$/, `-${t.toFixed(1)}s.png`), encodePng(rasterize(frame), frame.width * CELL.cellWidth, frame.height * CELL.cellHeight));
   }
 }

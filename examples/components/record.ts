@@ -30,6 +30,6 @@ const seconds = t + HOLD.end;
 
 const clip = createClipContext(120, 36);
 const frames = await recordClip(createLibraryApp(clip.ctx), clip, { seconds, fps: FPS, css: LIBRARY_CSS, keys });
-writeAnimation(frames, OUT, DELAY_CS);
+await writeAnimation(frames, OUT, DELAY_CS);
 writeStills(frames, OUT, FPS, (arg('stills') ?? '').split(',').filter(Boolean).map(Number));
 process.stderr.write(`wrote ${OUT}: ${String(SEQUENCE.length)} slides, ${String(frames.length)} frames, ${seconds.toFixed(1)} s\n`);

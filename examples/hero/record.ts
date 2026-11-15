@@ -112,6 +112,6 @@ for (const segment of segments) {
 }
 process.stderr.write(`rendered ${String(frames.length)} frames in ${((performance.now() - started) / 1000).toFixed(1)} s: ${cuts.join(' ')}\n`);
 
-writeAnimation(frames, OUT, DELAY_CS);
+await writeAnimation(frames, OUT, DELAY_CS);
 writeStills(frames, OUT, FPS, (arg('stills') ?? '').split(',').filter(Boolean).map(Number));
 process.stderr.write(`wrote ${OUT}: ${String(frames.length)} frames, ${String(FPS)} fps, ${String(COLS * CELL.cellWidth)}x${String(ROWS * CELL.cellHeight)} px\n`);
