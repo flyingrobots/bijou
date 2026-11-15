@@ -6,6 +6,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- `npm run audit:components` renders every component variant in each output
+  mode, and in every shell theme for `interactive` and `static`. It checks that
+  the output fits its mode, measures text contrast (WCAG 2: errors below 3:1,
+  warnings below 4.5:1, dim text as drawn), and flags colours outside the
+  theme. One combination prints a report card; `--all` writes one Markdown
+  report with ERRORS and WARNINGS sections. CI runs `--all --check`, which fails
+  only on errors not in `scripts/component-audit/baseline.json`, and uploads the
+  report.
+
 ### Fixed
 
 - The app frame's help overlay scrolls with the up and down arrows as well as
