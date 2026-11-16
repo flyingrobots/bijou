@@ -14,12 +14,12 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  Cmd,
-  FramePage,
-  FramePageMsg,
-  FramedApp,
-  FramedAppMsg,
-  FramedAppUpdateResult,
+  type Cmd,
+  type FramePage,
+  type FramePageMsg,
+  type FramedApp,
+  type FramedAppMsg,
+  type FramedAppUpdateResult,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -35,7 +35,7 @@ describe('createFramedApp', () => {
       | { type: 'refresh' };
 
     interface TypedPageModel {
-      readonly selected?: string;
+      readonly selected?: string | undefined;
     }
 
     const page: FramePage<TypedPageModel, TypedMsg> = {
@@ -64,7 +64,7 @@ describe('createFramedApp', () => {
     expectTypeOf(app).toEqualTypeOf<FramedApp<TypedPageModel, TypedMsg>>();
     expectTypeOf(result).toEqualTypeOf<FramedAppUpdateResult<TypedPageModel, TypedMsg>>();
     expectTypeOf(result[1]).toEqualTypeOf<Cmd<FramedAppMsg<TypedMsg>>[]>();
-    expect(result[0].pageModels.typed?.selected).toBe('alpha');
+    expect(result[0].pageModels['typed']?.selected).toBe('alpha');
   });
 });
 

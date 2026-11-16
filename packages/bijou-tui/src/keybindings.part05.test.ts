@@ -70,8 +70,8 @@ describe('enable / disable', () => {
     const km = createKeyMap<TestAction>()
       .bind('q', 'Quit', { type: 'quit' });
 
-    expect(km.bindings()[0].enabled).toBe(true);
+    expect(km.bindings()[0]?.enabled).toBe(true);
     km.disable('Quit');
-    expect(km.bindings()[0].enabled).toBe(false);
+    expect(km.bindings()[0]?.enabled).toBe(false);
   });
 });

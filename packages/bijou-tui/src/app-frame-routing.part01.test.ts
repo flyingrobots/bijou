@@ -92,7 +92,7 @@ describe('createFramedApp', () => {
       }],
     });
     const [model] = app.init();
-    expect(model.focusedPaneByPage.home).toBe('main');
-    expect(model.scrollByPage.home?.ghost).toBeUndefined();
+    expect(model.focusedPaneByPage['home']).toBe('main');
+    expect(model.scrollByPage['home']?.['ghost']).toBeUndefined();
   });
 });

@@ -12,9 +12,9 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 /** Configuration options for the {@link log} component. */
 export interface LogOptions {
   /** Whether to prepend a `HH:MM:SS` timestamp. Defaults to `false`. */
-  readonly timestamp?: boolean;
+  readonly timestamp?: boolean | undefined;
   /** Whether to show the level prefix badge/label. Defaults to `true`. */
-  readonly prefix?: boolean;
+  readonly prefix?: boolean | undefined;
   /** Bijou context for rendering mode and theme resolution. */
   readonly ctx?: BijouContext;
 }

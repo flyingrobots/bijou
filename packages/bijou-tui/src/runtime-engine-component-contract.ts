@@ -40,7 +40,7 @@ export interface RuntimeComponentContract<
     Command,
     Effect,
     Model
-  >;
+  > | undefined;
 }
 
 export interface RuntimeComponentLayoutNode<

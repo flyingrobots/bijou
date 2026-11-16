@@ -15,9 +15,9 @@ import {
   setDefaultContext,
   surfaceToString,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {

@@ -54,11 +54,11 @@ export interface ModalOptions {
   /** Preferred edge inset from the viewport when the dialog is centered. */
   readonly margin?: number;
   /** Design token for the border color. */
-  readonly borderToken?: TokenValue;
+  readonly borderToken?: TokenValue | undefined;
   /** Background fill token for the overlay interior. */
-  readonly bgToken?: TokenValue;
+  readonly bgToken?: TokenValue | undefined;
   /** Bijou context for styled output. */
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
 }
 export type ToastVariant = 'success' | 'error' | 'info';
 export type ToastAnchor = 'top-right' | 'bottom-right' | 'bottom-left' | 'top-left';

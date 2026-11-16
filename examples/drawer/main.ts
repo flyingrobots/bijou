@@ -4,7 +4,7 @@ import {
   run, quit, type App, type KeyMsg, type ResizeMsg,
   compositeSurface, drawer,
 } from '@flyingrobots/bijou-tui';
-import { badgeSurface, column, contentSurface, line, row, screenSurface, spacer } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, contentSurface, line, row, screenSurface, spacer } from '../_shared/example-surfaces.js';
 
 const ctx = initDefaultContext();
 

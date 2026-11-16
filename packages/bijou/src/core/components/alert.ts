@@ -11,7 +11,7 @@ export type AlertVariant = 'success' | 'error' | 'warning' | 'info';
 /** Configuration for rendering an alert box. */
 export interface AlertOptions extends BijouNodeOptions {
   /** Severity variant (defaults to `'info'`). */
-  variant?: AlertVariant;
+  variant?: AlertVariant | undefined;
   /** Theme token applied to alert borders. Defaults to a variant-specific border token. */
   borderToken?: TokenValue;
   /** Background fill token for the alert box interior. Defaults to `surface.elevated`. */

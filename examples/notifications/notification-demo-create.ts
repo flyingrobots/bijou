@@ -122,7 +122,7 @@ export function createNotificationDemoApp(
 ) {
   const autoDemo =
     options.autoDemo ??
-    (notificationCtx.runtime.env('CI') === '1' || process.env.CI === '1');
+    (notificationCtx.runtime.env('CI') === '1' || process.env['CI'] === '1');
   const page = createNotificationPage(notificationCtx, autoDemo);
   return createFramedApp<NotificationDemoModel, NotificationDemoMsg>({
     title: 'Bijou Notification Lab',

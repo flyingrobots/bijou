@@ -15,7 +15,6 @@ const REQUIRED_FIELDS = [
   'Ownership',
   'Graceful lowering',
   'Related families',
-  'Carbon analogue',
 ] as const;
 type RequiredField = (typeof REQUIRED_FIELDS)[number];
 const REQUIRED_FIELD_NAMES: readonly string[] = REQUIRED_FIELDS;

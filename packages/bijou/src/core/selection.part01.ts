@@ -27,7 +27,7 @@ export interface SurfaceSelectionContentModel {
 export interface TableSelectionContentModel {
   readonly kind: 'table';
   readonly rows: readonly (readonly string[])[];
-  readonly delimiter?: string;
+  readonly delimiter?: string | undefined;
 }
 export interface MixedSelectionContentRegion {
   readonly id: string;
@@ -37,7 +37,7 @@ export interface MixedSelectionContentRegion {
 export interface MixedSelectionContentModel {
   readonly kind: 'mixed';
   readonly regions: readonly MixedSelectionContentRegion[];
-  readonly separator?: string;
+  readonly separator?: string | undefined;
 }
 export type SelectionContentModel =
   | ProseSelectionContentModel
@@ -75,7 +75,7 @@ export interface SelectionRegion {
 export interface SelectionRangeInput {
   readonly anchor: SelectionPoint;
   readonly focus: SelectionPoint;
-  readonly dragSource?: SelectionDragSource;
+  readonly dragSource?: SelectionDragSource | undefined;
 }
 export interface SelectionRange {
   readonly ownerId: string;

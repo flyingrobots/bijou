@@ -45,7 +45,7 @@ describe('createFramedApp', () => {
 
       const modalResult = await runScript(modalApp, [{ key: 'm' }]);
       const modalModel = modalResult.model;
-      expect(describeFrameLayerStack(modalModel, { pageModalOpen: !!modalModel.pageModels.home?.modalOpen }).map((layer) => layer.kind)).toEqual([
+      expect(describeFrameLayerStack(modalModel, { pageModalOpen: !!modalModel.pageModels['home']?.modalOpen }).map((layer) => layer.kind)).toEqual([
         'workspace',
         'page-modal',
       ]);

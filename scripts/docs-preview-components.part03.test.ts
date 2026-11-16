@@ -80,8 +80,8 @@ describe('docs preview app', () => {
 
     const pageModel = docsPageModel(result.model, 'components');
     expect(pageModel.familyState.items[pageModel.familyState.focusIndex]?.value).toBe('story:alert');
-    expect(pageModel.variantIndexByStory.alert).toBe(1);
-    expect((result.model).docsModel.focusedPaneByPage.components).toBe('story-variants');
+    expect(pageModel.variantIndexByStory['alert']).toBe(1);
+    expect((result.model).docsModel.focusedPaneByPage['components']).toBe('story-variants');
   });
 });
 
@@ -105,7 +105,7 @@ describe('docs preview app', () => {
     const frame = last(result.frames);
     const footer = frameText(frame).split('\n')[frame.height - 1] ?? '';
 
-    expect((result.model).docsModel.focusedPaneByPage.components).toBe('story-variants');
+    expect((result.model).docsModel.focusedPaneByPage['components']).toBe('story-variants');
     expect(footer).toContain('Tab next pane');
     expect(footer).toContain('↑/↓ variant');
     expect(footer).toContain(',/. cycle');

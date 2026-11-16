@@ -1,10 +1,10 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { kbd, type Surface } from '@flyingrobots/bijou';
 import {
-  run, quit, isKeyMsg, type App,
+  run, quit, isKeyMsg, type App, type Cmd,
   animate,
 } from '@flyingrobots/bijou-tui';
-import { badgeSurface, column, line, row, spacer } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, line, row, spacer } from '../_shared/example-surfaces.js';
 
 const ctx = initDefaultContext();
 
@@ -22,8 +22,8 @@ type Msg =
   | { type: 'go' }
   | { type: 'quit' };
 
-function launchAll(from: number, to: number): ReturnType<typeof animate>[] {
-  return PRESETS.map(preset =>
+function launchAll(from: number, to: number): Cmd<Msg>[] {
+  return PRESETS.map((preset): Cmd<Msg> =>
     animate({
       from,
       to,

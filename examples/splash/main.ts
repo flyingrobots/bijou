@@ -4,7 +4,7 @@ import {
   run, quit, tick, isKeyMsg, type App,
   animate, sequence, EASINGS,
 } from '@flyingrobots/bijou-tui';
-import { contentSurface } from '../_shared/example-surfaces.ts';
+import { contentSurface } from '../_shared/example-surfaces.js';
 
 const ctx = initDefaultContext();
 
@@ -35,16 +35,14 @@ const app: App<Model, Msg> = {
   init: () => [
     { logoY: -8, taglineOpacity: 0, showPrompt: false, promptBlink: 0 },
     [
-      sequence(
-        animate({
+      sequence<Msg>(
+        animate<Msg>({
           from: -8, to: 0,
           spring: 'wobbly',
-          fps: 60,
           onFrame: (v: number) => ({ type: 'logo-y', value: v }),
         }),
-        animate({
+        animate<Msg>({
           type: 'tween', from: 0, to: 1, duration: 600, ease: EASINGS.easeOut,
-          fps: 30,
           onFrame: (v: number) => ({ type: 'tagline', value: v }),
           onComplete: () => ({ type: 'show-prompt' }),
         }),

@@ -32,7 +32,7 @@ export interface RuntimeCommandIntentEmission<Payload = undefined> {
   readonly [RUNTIME_COMMAND_INTENT_EMISSION_BRAND]: true;
   readonly intent: CommandIntent<Payload>;
   readonly payload: DeepReadonly<Payload>;
-  readonly owner?: BindingLifecycleOwner;
+  readonly owner?: BindingLifecycleOwner | undefined;
 }
 
 export interface RuntimeCommandIntentRouteInput<Payload, Command> {

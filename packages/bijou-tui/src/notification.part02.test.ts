@@ -19,7 +19,7 @@ describe('notification state', () => {
         durationMs: null,
       }, 0);
       state = tickNotifications(state, 250);
-      state = dismissNotification(state, state.items[0]?.id, 300);
+      state = dismissNotification(state, state.items[0]?.id ?? -1, 300);
       state = tickNotifications(state, 900);
       expect(countNotificationHistory(state, 'ACTIONABLE')).toBe(1);
       const body = renderNotificationHistory(state, {
@@ -66,7 +66,7 @@ describe('notification state', () => {
         action: { label: 'Weiter prüfen', payload: { type: 'ignore' } },
       }, 0);
       state = tickNotifications(state, 250);
-      state = dismissNotification(state, state.items[0]?.id, 300);
+      state = dismissNotification(state, state.items[0]?.id ?? -1, 300);
       state = tickNotifications(state, 900);
       const body = renderNotificationHistory(state, {
         width: 20,
@@ -91,7 +91,7 @@ describe('notification state', () => {
         action: { label: 'Retry deploy', payload: { type: 'retry', id: 42 } },
       }, 0);
       state = tickNotifications(state, 250);
-      state = dismissNotification(state, state.items[0]?.id, 300);
+      state = dismissNotification(state, state.items[0]?.id ?? -1, 300);
       state = tickNotifications(state, 900);
       const ctx = createTestContext({ mode: 'interactive' });
       const surface = renderNotificationHistorySurface(state, {

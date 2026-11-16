@@ -28,7 +28,7 @@ export function summarizeCodeRabbitStatus(
   const activeRateLimitCount =
     events.filter((event) => event.kind === 'rate_limit').length -
     staleRateLimitCount;
-  const shared = {
+  const shared: Pick<CodeRabbitStatus, 'latestKind' | 'staleRateLimitCount' | 'activeRateLimitCount'> = {
     latestKind: latestEvent?.kind ?? 'none',
     staleRateLimitCount,
     activeRateLimitCount,

@@ -30,7 +30,7 @@ function paneLines(editorState?: ThemeLabEditorState): readonly string[] {
     landingTheme,
     activeTheme,
     shellThemes: DOCS_SHELL_THEME_CHOICES,
-    editorState,
+    ...(editorState === undefined ? {} : { editorState }),
   });
   return surfaceToString(surface, ctx.style).split('\n');
 }

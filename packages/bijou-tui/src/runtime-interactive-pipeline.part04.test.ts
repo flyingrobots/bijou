@@ -1,4 +1,4 @@
-import { App, createInteractiveContext, createTestContext, createTrackingClock, describe, expect, it, quit, run, scheduleKeys, textView } from './runtime.test-support.js';
+import { type App, createInteractiveContext, createTestContext, createTrackingClock, describe, expect, it, quit, run, scheduleKeys, textView } from './runtime.test-support.js';
 
 describe('run', () => {
   describe('interactive mode', () => {

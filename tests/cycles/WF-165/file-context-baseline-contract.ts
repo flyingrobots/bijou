@@ -23,36 +23,36 @@ export function parseFileContextBaseline(
   const parsed: unknown = JSON.parse(source);
   if (
     !isRecord(parsed)
-    || parsed.schema !== 'code-dojo.file-context-baseline.v1'
-    || !isPositiveInteger(parsed.maxLines)
-    || !isPositiveInteger(parsed.maxBytes)
-    || !Array.isArray(parsed.files)
+    || parsed['schema'] !== 'code-dojo.file-context-baseline.v1'
+    || !isPositiveInteger(parsed['maxLines'])
+    || !isPositiveInteger(parsed['maxBytes'])
+    || !Array.isArray(parsed['files'])
   ) {
     throw new Error('invalid file/context baseline');
   }
   const paths = new Set<string>();
-  const files = parsed.files.map((entry: unknown) => {
+  const files = parsed['files'].map((entry: unknown) => {
     if (
       !isRecord(entry)
-      || typeof entry.path !== 'string'
-      || entry.path.length === 0
-      || !isNonNegativeInteger(entry.lines)
-      || !isNonNegativeInteger(entry.bytes)
-      || paths.has(entry.path)
+      || typeof entry['path'] !== 'string'
+      || entry['path'].length === 0
+      || !isNonNegativeInteger(entry['lines'])
+      || !isNonNegativeInteger(entry['bytes'])
+      || paths.has(entry['path'])
     ) {
       throw new Error('invalid file/context baseline entry');
     }
-    paths.add(entry.path);
+    paths.add(entry['path']);
     return {
-      path: entry.path,
-      lines: entry.lines,
-      bytes: entry.bytes,
+      path: entry['path'],
+      lines: entry['lines'],
+      bytes: entry['bytes'],
     };
   });
   return {
-    schema: parsed.schema,
-    maxLines: parsed.maxLines,
-    maxBytes: parsed.maxBytes,
+    schema: parsed['schema'],
+    maxLines: parsed['maxLines'],
+    maxBytes: parsed['maxBytes'],
     files,
   };
 }
