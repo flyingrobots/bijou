@@ -31,46 +31,46 @@ export interface DotMarkOptions<T> extends AccessorOptions<T> {
 export interface LineYMark {
   readonly kind: 'lineY';
   readonly points: readonly PlotPoint[];
-  readonly label?: string;
-  readonly stroke?: MarkColorInput;
+  readonly label?: string | undefined;
+  readonly stroke?: MarkColorInput | undefined;
 }
 
 export interface AreaYMark {
   readonly kind: 'areaY';
   readonly points: readonly PlotPoint[];
   readonly y0: number;
-  readonly label?: string;
-  readonly stroke?: MarkColorInput;
+  readonly label?: string | undefined;
+  readonly stroke?: MarkColorInput | undefined;
 }
 
 export interface DotMark {
   readonly kind: 'dot';
   readonly points: readonly PlotPoint[];
-  readonly label?: string;
-  readonly stroke?: MarkColorInput;
-  readonly colorScale?: OklchScale;
+  readonly label?: string | undefined;
+  readonly stroke?: MarkColorInput | undefined;
+  readonly colorScale?: OklchScale | undefined;
 }
 
 export interface BarYMark {
   readonly kind: 'barY';
   readonly points: readonly PlotPoint[];
-  readonly y0?: number;
-  readonly label?: string;
-  readonly stroke?: MarkColorInput;
+  readonly y0?: number | undefined;
+  readonly label?: string | undefined;
+  readonly stroke?: MarkColorInput | undefined;
 }
 
 export interface RuleYMark {
   readonly kind: 'ruleY';
   readonly y: number;
-  readonly label?: string;
-  readonly stroke?: MarkColorInput;
+  readonly label?: string | undefined;
+  readonly stroke?: MarkColorInput | undefined;
 }
 
 export interface RuleXMark {
   readonly kind: 'ruleX';
   readonly x: number;
-  readonly label?: string;
-  readonly stroke?: MarkColorInput;
+  readonly label?: string | undefined;
+  readonly stroke?: MarkColorInput | undefined;
 }
 
 export type PlotMark = LineYMark | AreaYMark | DotMark | BarYMark | RuleYMark | RuleXMark;

@@ -25,8 +25,8 @@ describe('renderNotificationStack', () => {
         screenWidth: 90,
         screenHeight: 30,
       });
-      expect(after?.row).toBeLessThan(before?.row);
-      expect(after?.col).toBeLessThan(before?.col);
+      expect(after?.row).toBeLessThan(before?.row ?? Number.NaN);
+      expect(after?.col).toBeLessThan(before?.col ?? Number.NaN);
       expect(moved.items[0]?.phase).toBe('entering');
     });
 
@@ -74,7 +74,7 @@ describe('renderNotificationStack', () => {
         screenWidth: 90,
         screenHeight: 30,
       });
-      state = dismissNotification(state, state.items[0]?.id, 300);
+      state = dismissNotification(state, state.items[0]?.id ?? -1, 300);
       const [dismissed] = renderNotificationStack(state, {
         screenWidth: 90,
         screenHeight: 30,
@@ -86,7 +86,7 @@ describe('renderNotificationStack', () => {
         screenHeight: 30,
       });
       expect(animating).toBeDefined();
-      expect(animating?.col).toBeGreaterThanOrEqual(visible?.col);
+      expect(animating?.col).toBeGreaterThanOrEqual(visible?.col ?? Number.NaN);
       state = tickNotifications(state, 700);
       const overlays = renderNotificationStack(state, {
         screenWidth: 90,
@@ -105,7 +105,7 @@ describe('renderNotificationStack', () => {
         durationMs: null,
       }, 0);
       state = tickNotifications(state, 250);
-      state = dismissNotification(state, state.items[0]?.id, 300);
+      state = dismissNotification(state, state.items[0]?.id ?? -1, 300);
       state = tickNotifications(state, 619);
       const [overlay] = renderNotificationStack(state, {
         screenWidth: 90,

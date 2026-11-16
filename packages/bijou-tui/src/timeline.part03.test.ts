@@ -38,7 +38,7 @@ describe('step (tweens)', () => {
       .build();
     const state = runUntilDone(tl);
     expect(tl.done(state)).toBe(true);
-    expect(tl.values(state).x).toBe(100);
+    expect(tl.values(state)['x']).toBe(100);
   });
   it('interpolates midway with linear easing', () => {
     const tl = timeline()
@@ -53,6 +53,6 @@ describe('step (tweens)', () => {
     // Run for ~500ms (30 frames at 60fps)
     const state = runFrames(tl, tl.init(), 30);
     const values = tl.values(state);
-    expect(values.x).toBeCloseTo(50, 0);
+    expect(values['x']).toBeCloseTo(50, 0);
   });
 });

@@ -9,11 +9,7 @@ describe('wizard()', () => {
           {
             key: 'greeting',
             field: () => 'hi',
-            transform: (vals) => {
-              if (vals.mode === 'formal') {
-                return () => 'Good day';
-              }
-            },
+            transform: (vals) => (vals.mode === 'formal' ? () => 'Good day' : undefined),
           },
         ],
       });

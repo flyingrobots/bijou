@@ -9,9 +9,9 @@ export class ProviderScope {
   readonly [PROVIDER_SCOPE_BRAND] = true;
   readonly #providersByResource: ReadonlyMap<string, DataProvider>;
   readonly #providersById: ReadonlyMap<ProviderId, DataProvider>;
-  readonly id?: string;
-  readonly label?: string;
-  readonly description?: string;
+  readonly id?: string | undefined;
+  readonly label?: string | undefined;
+  readonly description?: string | undefined;
   readonly facts: readonly BindingFact[];
 
   constructor(entries: readonly ProviderScopeEntry[], options: ProviderScopeOptions = {}) {

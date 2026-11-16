@@ -31,9 +31,9 @@ export interface SplitPaneOptions {
   /** Total available height. */
   readonly height: number;
   /** Minimum size for pane A in the main axis. Default: 0. */
-  readonly minA?: number;
+  readonly minA?: number | undefined;
   /** Minimum size for pane B in the main axis. Default: 0. */
-  readonly minB?: number;
+  readonly minB?: number | undefined;
   /** Divider thickness in the main axis. Default: 1. */
   readonly dividerSize?: number;
   /** Divider character (single terminal column). Default: `│` or `─` based on direction. */

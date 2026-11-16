@@ -50,7 +50,7 @@ describe('renderNotificationStack', () => {
         screenWidth: 80,
         screenHeight: 24,
       });
-      expect(stripAnsi(toastOverlay?.content)).toMatch(/\d{2}:\d{2}:\d{2} [AP]M/);
+      expect(stripAnsi(toastOverlay?.content ?? '')).toMatch(/\d{2}:\d{2}:\d{2} [AP]M/);
       let inlineState = createNotificationState<Msg>();
       inlineState = pushNotification(inlineState, {
         title: 'Inline notice',
@@ -63,7 +63,7 @@ describe('renderNotificationStack', () => {
         screenWidth: 100,
         screenHeight: 28,
       });
-      const lines = stripAnsi(inlineOverlay?.content).split('\n');
+      const lines = stripAnsi(inlineOverlay?.content ?? '').split('\n');
       expect(lines).toHaveLength(1);
       expect(must(lines[0])).toContain('Inline notice');
       expect(must(lines[0])).toContain('Rendered as one row');
@@ -81,7 +81,7 @@ describe('renderNotificationStack', () => {
         screenWidth: 48,
         screenHeight: 20,
       });
-      const lines = stripAnsi(overlay?.content).split('\n');
+      const lines = stripAnsi(overlay?.content ?? '').split('\n');
       expect(lines.length).toBeGreaterThan(3);
       expect(lines.join('\n')).toContain('diagnostic');
       expect(lines.join('\n')).toContain('text.');
@@ -101,7 +101,7 @@ describe('renderNotificationStack', () => {
         screenWidth: 80,
         screenHeight: 24,
       });
-      const lines = stripAnsi(overlay?.content).split('\n')
+      const lines = stripAnsi(overlay?.content ?? '').split('\n')
         .map((line) => line.replace(/^\s*\S?\s*/, '').trimEnd());
       expect(lines).toContain('command: Undo must be submitted as explicit causal');
       expect(lines).toContain('input before production use.');
@@ -121,7 +121,7 @@ describe('renderNotificationStack', () => {
         screenWidth: 48,
         screenHeight: 20,
       });
-      const lines = stripAnsi(overlay?.content).split('\n');
+      const lines = stripAnsi(overlay?.content ?? '').split('\n');
       expect(lines.join('\n')).not.toContain('requested.');
     });
 

@@ -10,9 +10,9 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 const key = (name: string) => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false }) as const;

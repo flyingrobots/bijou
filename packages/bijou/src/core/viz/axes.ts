@@ -83,7 +83,7 @@ export function renderGridAndAxes(
   yScale: ContinuousScale,
   marks: readonly PlotMark[],
   options: {
-    readonly title?: string;
+    readonly title?: string | undefined;
     readonly legend?: boolean;
     readonly grid?: boolean;
     readonly axisRGB: RGB;

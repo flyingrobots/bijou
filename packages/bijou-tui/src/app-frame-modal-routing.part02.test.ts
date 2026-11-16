@@ -13,10 +13,10 @@ import {
   shiftKey,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  NotificationState,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type NotificationState,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -72,10 +72,10 @@ describe('createFramedApp', () => {
 
     expect(model.notificationCenterOpen).toBe(true);
     expect(model.notificationCenterScrollY).toBeGreaterThan(0);
-    expect(model.scrollByPage.home?.main?.y ?? 0).toBe(0);
+    expect(model.scrollByPage['home']?.['main']?.y ?? 0).toBe(0);
 
     const [nextModel, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
-    expect(nextModel.pageModels.home?.count).toBe(0);
+    expect(nextModel.pageModels['home']?.count).toBe(0);
     expect(nextModel.notificationCenterOpen).toBe(true);
     expect(cmds).toHaveLength(0);
   });

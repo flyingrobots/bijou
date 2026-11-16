@@ -29,16 +29,16 @@ describe('theme builder API', () => {
         'color.status.danger.bg',
         'color.status.danger.fg',
       ]);
-      expect(theme.modes.dark.tokens['color.status.danger.bg']).toEqual({
+      expect(theme.modes['dark']?.tokens['color.status.danger.bg']).toEqual({
         hex: '#102030',
         rgb: [16, 32, 48],
       });
-      expect(theme.modes.light.tokens['color.status.danger.bg']).toEqual({
+      expect(theme.modes['light']?.tokens['color.status.danger.bg']).toEqual({
         hex: '#f0e8d2',
         rgb: [240, 232, 210],
       });
       expect(Object.isFrozen(theme)).toBe(true);
-      expect(Object.isFrozen(theme.modes.dark.tokens)).toBe(true);
+      expect(Object.isFrozen(theme.modes['dark']?.tokens ?? {})).toBe(true);
     });
 
   it('supports the explicit token builder variant inside a mode', () => {
@@ -56,11 +56,11 @@ describe('theme builder API', () => {
           .register())
         .build();
 
-      expect(theme.modes.dark.tokens['color.brand.primary']).toEqual({
+      expect(theme.modes['dark']?.tokens['color.brand.primary']).toEqual({
         hex: '#010203',
         rgb: [1, 2, 3],
       });
-      expect(theme.modes.light.tokens['color.brand.primary']?.hex).toBe('#abcdef');
+      expect(theme.modes['light']?.tokens['color.brand.primary']?.hex).toBe('#abcdef');
     });
 
   it('rejects duplicate token ids within one mode', () => {

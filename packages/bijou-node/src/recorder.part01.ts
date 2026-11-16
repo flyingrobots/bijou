@@ -70,11 +70,11 @@ export interface RecorderResult {
 export interface SurfaceGifOptions {
   outputPath: string;
   frames: Surface[];
-  frameDelayMs?: number;
-  cellWidth?: number;
-  cellHeight?: number;
-  foreground?: string;
-  background?: string;
+  frameDelayMs?: number | undefined;
+  cellWidth?: number | undefined;
+  cellHeight?: number | undefined;
+  foreground?: string | undefined;
+  background?: string | undefined;
 }
 
 interface RasterizeOptions {

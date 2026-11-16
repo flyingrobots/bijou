@@ -46,10 +46,10 @@ function writePreferenceLine(
   options: {
     readonly strong?: boolean;
     readonly dim?: boolean;
-    readonly fg?: string;
-    readonly bg?: string;
-    readonly fgRGB?: readonly [number, number, number];
-    readonly bgRGB?: readonly [number, number, number];
+    readonly fg?: string | undefined;
+    readonly bg?: string | undefined;
+    readonly fgRGB?: readonly [number, number, number] | undefined;
+    readonly bgRGB?: readonly [number, number, number] | undefined;
   } = {},
 ): void {
   const chars = Array.from(text);

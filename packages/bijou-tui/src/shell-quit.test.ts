@@ -33,7 +33,7 @@ describe('shell quit confirmation', () => {
     const overlay = renderShellQuitOverlay(80, 24, undefined, ctx);
     const surface = must(overlay.surface);
 
-    const actionCells: { char: string; modifiers?: readonly string[]; fg?: unknown; fgRGB?: unknown }[] = [];
+    const actionCells: { char: string; modifiers?: readonly string[] | undefined; fg?: unknown; fgRGB?: unknown }[] = [];
     for (let y = 0; y < surface.height; y++) {
       for (let x = 0; x < surface.width; x++) {
         const cell = surface.get(x, y);

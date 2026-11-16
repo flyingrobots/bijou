@@ -35,7 +35,7 @@ export interface BijouContext {
   readonly tokenGraph: TokenGraph;
 
   /** Resolve styles from a global stylesheet based on component identity. */
-  resolveBCSS(identity: { type: string, id?: string, classes?: string[] }): Record<string, string>;
+  resolveBCSS(identity: { type: string, id?: string | undefined, classes?: string[] | undefined }): Record<string, string>;
 
   /** Look up a semantic color token. */
   semantic(key: keyof Theme['semantic']): TokenValue;

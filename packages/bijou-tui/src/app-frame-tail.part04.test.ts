@@ -12,8 +12,8 @@ import {
   surfaceToString,
   textView,
   _resetDefaultContextForTesting,
-  FrameOverlayContext,
-  PageModel,
+  type FrameOverlayContext,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 import { must } from '@flyingrobots/bijou/adapters/test';

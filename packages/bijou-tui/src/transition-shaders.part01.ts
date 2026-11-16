@@ -14,11 +14,11 @@ export interface TransitionCell {
 export type TransitionOverrideRole = 'decoration' | 'marker';
 export interface TransitionResult {
   readonly showNext: boolean;
-  readonly overrideChar?: string;
+  readonly overrideChar?: string | undefined;
   /** Surface-native override cell. Merged on top of the selected base cell. */
-  readonly overrideCell?: Cell;
+  readonly overrideCell?: Cell | undefined;
   /** Semantic role of the override. Defaults to `'decoration'` if omitted. */
-  readonly overrideRole?: TransitionOverrideRole;
+  readonly overrideRole?: TransitionOverrideRole | undefined;
 }
 export type TransitionShaderFn = (cell: TransitionCell) => TransitionResult;
 export type WipeDirection = 'left' | 'right' | 'up' | 'down';

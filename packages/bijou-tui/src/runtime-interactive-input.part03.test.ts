@@ -1,4 +1,4 @@
-import { App, Cmd, createInteractiveContext, createSurface, describe, expect, it, quit, run, scheduleKeys, textView } from './runtime.test-support.js';
+import { type App, type Cmd, createInteractiveContext, createSurface, describe, expect, it, quit, run, scheduleKeys, textView } from './runtime.test-support.js';
 
 describe('run', () => {
   describe('interactive mode', () => {
