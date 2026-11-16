@@ -14,6 +14,7 @@ import { createFrameLayoutRuntime } from './app-frame-layout-runtime.js';
 import { initializeFrameApp } from './app-frame-app-init.js';
 import { updateFrameApp } from './app-frame-app-update.js';
 import { renderFrameApp } from './app-frame-app-view.js';
+import { createFocusedPaneMeasureCache } from './app-frame-scroll-measure-cache.js';
 import { createHostedFrameApp } from './app-frame-host.js';
 
 /**
@@ -24,10 +25,12 @@ export function createFramedApp<PageModel, Msg>(
 ): FramedApp<PageModel, Msg> {
   const registry = createFramePageRegistry(options);
   const themeRuntime = new FrameThemeRuntime(options);
+  const measureCache = createFocusedPaneMeasureCache();
   const controls = createFrameControlsRuntime(
     options,
     registry,
     themeRuntime,
+    measureCache,
   );
   const layout = createFrameLayoutRuntime(
     options,
@@ -47,6 +50,7 @@ export function createFramedApp<PageModel, Msg>(
     update: (msg, model) =>
       updateFrameApp(msg, model, {
         options,
+        measureCache,
         pagesById: registry.pagesById,
         notificationOptions: controls.notificationOptions,
         notificationState: controls.notificationState,
