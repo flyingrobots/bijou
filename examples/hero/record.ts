@@ -47,12 +47,12 @@ const blocklab = await recordClip(createBlockLabFrameApp(labCtx.ctx, {}), labCtx
   keys: [[0.7, KEY.down], [1.3, KEY.down], [2.4, '2'], [3.9, '3'], [5.4, '4'], [6.9, '1']],
 });
 
-// 2. DOGFOOD: the animated Bijou title (the opening logo), then the docs, F2 settings, and the language cycled
-//    English → French → Spanish → German while the shell translates around it.
+// 2. DOGFOOD: the animated Bijou title (the opening logo), then the Start Here guide, F2 settings, and the
+//    language switched to Spanish (English → French → Spanish) while the article and shell translate.
 const dogfoodCtx = createClipContext(COLS, ROWS);
 const dogfood = await recordClip(createDocsApp(dogfoodCtx.ctx, { initialRoute: 'landing' }), dogfoodCtx, {
-  seconds: 9.8, fps: FPS,
-  keys: [[2.8, KEY.enter], [3.6, KEY.f2], [4.0, KEY.down], [4.3, KEY.down], [5.0, KEY.enter], [6.3, KEY.enter], [7.6, KEY.enter], [8.8, KEY.escape]],
+  seconds: 10.4, fps: FPS,
+  keys: [[3.2, KEY.enter], [4.8, KEY.f2], [5.2, KEY.down], [5.5, KEY.down], [6.2, KEY.enter], [6.4, KEY.enter], [7.4, KEY.escape]],
 });
 
 // 3. Components Library (`npm run components`): guidedFlow(), then explainability(), components that carry evidence.
@@ -82,9 +82,9 @@ const bookTheme = resolveStartTheme(undefined, 'dark');
 const brand = bookTheme === undefined ? libraryCtx.ctx : cloneContextWithTheme(libraryCtx.ctx, bookTheme);
 const accent = brand.semantic('accent').hex;
 const modes = at(blocklab, 1.8, 8.2).map((frame) => captioned(frame, 'One component. Multiple output modes.', accent));
-const languages = at(dogfood, 3.2, 9.8).map((frame) => captioned(frame, 'One app. Every language.', accent, 12));
+const languages = at(dogfood, 3.6, 10.4).map((frame) => captioned(frame, 'Switch languages at runtime.', accent, 2));
 const segments: readonly Segment[] = [
-  { name: 'logo', frames: at(dogfood, 0, 2.6), enter: dissolveShader },
+  { name: 'logo', frames: at(dogfood, 0, 3.0), enter: dissolveShader },
   { name: 'render-lab', frames: at(hero, 12.0, 14.8), enter: dissolveShader },
   { name: 'dashboard', frames: at(hero, 4.0, 7.6), enter: wipe('right') },
   { name: 'modes', frames: modes, enter: dissolveShader },
@@ -92,7 +92,7 @@ const segments: readonly Segment[] = [
   { name: 'components', frames: library, enter: dissolveShader },
   { name: 'plot', frames: at(hero, 8.4, 11.2), enter: dissolveShader },
   { name: 'render-lab-themes', frames: at(hero, 14.2, 18.0), enter: wipe('right') },
-  { name: 'end', frames: Array.from({ length: Math.round(4 * FPS) }, () => endCard(COLS, ROWS, brand)), enter: dissolveShader },
+  { name: 'end', frames: Array.from({ length: Math.round(3 * FPS) }, () => endCard(COLS, ROWS, brand)), enter: dissolveShader },
 ];
 
 // Cut the segments together: each one enters through its shader over the previous segment's last frame.

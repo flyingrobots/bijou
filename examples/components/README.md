@@ -41,7 +41,7 @@ npm run components -- --component toast --slide family
 | `--mode` | `interactive`, `static`, `pipe`, or `accessible` |
 | `--info` | Open with info shown |
 | `--rtl` | Open in right-to-left layout |
-| `--slide` | `title`, `family` (the section slide), or `component` (default: `component` when `--component` is given, otherwise `title`) |
+| `--slide` | `title`, `family` (the section slide), `component`, or `end` (default: `component` when `--component` is given, otherwise `title`) |
 | `--theme` | A shell theme family: `book` or `dogfood` |
 | `--scheme` | `dark` or `light` |
 

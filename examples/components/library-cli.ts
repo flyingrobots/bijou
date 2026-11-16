@@ -10,7 +10,7 @@ export interface LibraryStart {
   readonly mode?: OutputMode;
   readonly info?: boolean;
   readonly rtl?: boolean;
-  readonly slide?: 'title' | 'family' | 'component';
+  readonly slide?: 'title' | 'family' | 'component' | 'end';
   readonly theme?: string;
   readonly scheme?: 'dark' | 'light';
 }
@@ -22,7 +22,7 @@ export const LIBRARY_USAGE = `Usage: npm run components -- [options]
   --mode <mode>        output mode: interactive, static, pipe, or accessible
   --info               open with info shown
   --rtl                open in right-to-left layout
-  --slide <slide>      title, family, or component (default: component when --component is given, else title)
+  --slide <slide>      title, family, component, or end (default: component when --component is given, else title)
   --theme <id>         shell theme family: ${DOGFOOD_SHELL_THEMES.map((t) => t.id).join(', ')}
   --scheme <scheme>    dark or light`;
 
@@ -64,7 +64,7 @@ function toStart(values: ReadonlyMap<string, string>, errors: string[]): Library
   const start: { -readonly [K in keyof LibraryStart]: LibraryStart[K] } = { info: values.has('info'), rtl: values.has('rtl') };
   const variant = values.get('variant');
   const mode = oneOf('mode', values.get('mode'), MODES, errors);
-  const slide = oneOf('slide', values.get('slide'), ['title', 'family', 'component'] as const, errors);
+  const slide = oneOf('slide', values.get('slide'), ['title', 'family', 'component', 'end'] as const, errors);
   const scheme = oneOf('scheme', values.get('scheme'), ['dark', 'light'] as const, errors);
   if (component !== undefined) start.component = component;
   if (variant !== undefined) start.variant = variant;

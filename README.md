@@ -1,6 +1,6 @@
 # Bijou
 
-![Bijou hero reel: the Bijou title, the render lab's raytracer, a live dashboard, one component in four output modes, DOGFOOD switching between English, French, Spanish, and German, guidedFlow() and explainability(), the plot grammar, theme changes, and the install command](assets/recordings/hero.webp)
+![Bijou hero reel: the Bijou title, the render lab's raytracer, a live dashboard, one component in four output modes, DOGFOOD switching from English to Spanish, guidedFlow() and explainability(), the plot grammar, theme changes, and the install command](assets/recordings/hero.webp)
 
 Build terminal applications in TypeScript, from a small CLI to a full-screen workbench.
 
