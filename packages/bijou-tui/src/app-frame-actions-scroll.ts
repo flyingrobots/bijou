@@ -72,7 +72,12 @@ export function scrollFocusedPane<PageModel, Msg>(
     dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
     frameBackgroundToken: undefined,
   });
-  const paneRect = resolved.paneRects.get(focusedPaneId);
+  // A maximized pane is painted at the full body size, so measure it there.
+  const isMaximized =
+    model.maximizedPaneByPage[pageId]?.maximizedPaneId === focusedPaneId;
+  const paneRect = isMaximized
+    ? bodyRect
+    : resolved.paneRects.get(focusedPaneId);
   if (
     paneRect == null
     || paneRect.width <= 0

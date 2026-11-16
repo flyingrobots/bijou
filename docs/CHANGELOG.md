@@ -70,6 +70,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Scrolling a maximized pane (ctrl+f) now clamps to the full body size the
+  frame paints, so the last line is reachable (#669). Scroll measurement used
+  the pane's normal split rectangle before.
 - The Components Library no longer renders dimmed. The app frame dims
   everything beneath any overlay, so the Library draws its progress bar inside
   the page instead of as an overlay.
