@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Changed
+
+- The `guidedFlow()` story's docs, variant label, and preview copy resolve
+  through the DOGFOOD catalogs in `en`, `fr`, `es`, and `de`. Stories can opt in
+  through a `localize` hook, documented in `docs/development.md`.
+
 ### Added
 
 - Components can resolve a layout direction (#612). `BijouNodeOptions` and
@@ -16,6 +22,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `orderForDirection()`, `mirrorGlyph()` and `mirrorGlyphs()` map logical
   edges, sequences and directional glyphs (‹ ›, ▸ ◂, → ←) for right-to-left
   layout. No Component mirrors yet; the family tasks under #573 adopt it.
+- DL-037 sets the scope of the DOGFOOD localization touched-file rule (#664).
+  A touched file must not add or modify raw visible copy without localizing
+  it, and must lower its raw-string debt by at least one entry. Whole-file
+  cleanup is no longer required. `npm run dogfood:i18n:debt` now rejects a
+  touched file that adds a raw string, even when its net count falls.
+- DL-031 records the DOGFOOD contextual drawer contract (#623). A page-owned
+  drawer participates in layout and does not dim the frame. It holds variant
+  and guide metadata, takes focus on open, restores focus to a visible pane on
+  close, and supplies footer hints and help while it has focus.
 - The Components Library (`npm run components`) is a 58-slide deck: a title,
   one slide per section followed by its components, and an end slide. `h`/`l`
   step one slide at a time and stop at both ends; `PgUp`/`PgDn` move between
@@ -141,6 +156,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Reject explicit null Sapphire hue seeds instead of silently selecting default hues.
 
 ### Added
+
+- DL-032 records the scroll-measurement cache contract: a runtime-owned frame
+  input revision, a one-entry cache per framed-app runtime, and the
+  acceptance probes for the implementation and its evidence (#587).
 
 - **Inspectable theme provenance and key-binding conflicts** — rule-authored
   presets retain their definitions when renamed, token graphs expose
