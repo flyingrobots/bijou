@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Changed
+
+- The `guidedFlow()` story's docs, variant label, and preview copy resolve
+  through the DOGFOOD catalogs in `en`, `fr`, `es`, and `de`. Stories can opt in
+  through a `localize` hook, documented in `docs/development.md`.
+
 ### Added
 
 - DL-031 records the DOGFOOD contextual drawer contract (#623). A page-owned
