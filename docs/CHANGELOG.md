@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Design record DL-036 decides which book edition to translate first: the
+  teaching book (about 13,500 words). Translations live in `bijou-job-monitor`
+  under `book/locales/<locale>/` and build to per-locale PDFs. The English
+  hash pins do not change. Each language's translation splits into two tasks
+  of about 4.5 hours (#616).
 - The Components Library (`npm run components`) is a 58-slide deck: a title,
   one slide per section followed by its components, and an end slide. `h`/`l`
   step one slide at a time and stop at both ends; `PgUp`/`PgDn` move between
