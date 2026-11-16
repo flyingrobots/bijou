@@ -83,7 +83,7 @@ describe('LocalizationPort runtime adapter', () => {
 
   it('rejects non-portable localized value shapes deterministically', () => {
       const cyclicValue: Record<string, unknown> = { label: 'Cycle' };
-      cyclicValue.self = cyclicValue;
+      cyclicValue['self'] = cyclicValue;
       const secretKey = Symbol('secret');
       const symbolValue = { label: 'Symbol', [secretKey]: 'hidden' };
       const nonEnumerableValue: Record<string, unknown> = { label: 'Hidden' };

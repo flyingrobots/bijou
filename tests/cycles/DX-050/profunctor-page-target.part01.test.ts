@@ -67,8 +67,8 @@ describe('DX-050 Profunctor Page target proof', () => {
   it('preserves composition and content identities in target facts', () => {
     const proof = lowerProfunctorPageArtifacts(mutatePage((page) => {
       const contentNodeId = 'content:project.keep#summary';
-      page.contentRefs = [contentNodeId];
-      recordAt(page.nodes, 1).contentNodeId = contentNodeId;
+      page['contentRefs'] = [contentNodeId];
+      recordAt(page['nodes'], 1)['contentNodeId'] = contentNodeId;
     }));
     expect(proof.targetMap.compositionRef).toBe('composition:project-page@0');
     expect(proof.targetMap.entries[1]?.contentNodeId).toBe(
@@ -84,13 +84,13 @@ describe('DX-050 Profunctor Page target proof', () => {
     const secondOccurrence = 'source-occurrence:projectCatalog.keep#fact.summary';
     const proof = lowerProfunctorPageArtifacts(mutatePageAndSourceMap(
       (page) => {
-        recordAt(page.nodes, 0).sourceBindings = {
+        recordAt(page['nodes'], 0)['sourceBindings'] = {
           record: 'source-occurrence:projectCatalog.keep#record',
           summary: secondOccurrence,
         };
       },
       (sourceMap) => {
-        const entries = records(sourceMap.entries);
+        const entries = records(sourceMap['entries']);
         entries.push({
           ...recordAt(entries, 0),
           sourceOccurrenceId: secondOccurrence,

@@ -7,11 +7,11 @@ import { graphemeWidth } from '../text/grapheme.js';
 /** Configuration for content constraint rendering. */
 export interface ConstrainOptions {
   /** Maximum visible width in terminal columns. Lines exceeding this are clipped. */
-  maxWidth?: number;
+  maxWidth?: number | undefined;
   /** Maximum number of visible lines. When truncating, the last visible line is replaced with the ellipsis indicator. */
-  maxHeight?: number;
+  maxHeight?: number | undefined;
   /** Ellipsis string appended when content is clipped. Defaults to `"…"`. */
-  ellipsis?: string;
+  ellipsis?: string | undefined;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }

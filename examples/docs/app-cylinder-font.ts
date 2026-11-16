@@ -19,8 +19,26 @@ function number(value: unknown): number {
   return value;
 }
 
+interface GlyphFields {
+  readonly mask?: unknown;
+  readonly advance?: unknown;
+  readonly left?: unknown;
+  readonly top?: unknown;
+  readonly width?: unknown;
+  readonly height?: unknown;
+  readonly columns?: unknown;
+  readonly rows?: unknown;
+}
+
+interface FontFields {
+  readonly family?: unknown;
+  readonly version?: unknown;
+  readonly glyphs?: unknown;
+  readonly text?: unknown;
+}
+
 function glyph(value: unknown): RasterFontGlyph {
-  const g = object(value);
+  const g: GlyphFields = object(value);
   if (typeof g.mask !== 'string') throw new Error('Missing title glyph mask.');
   const mask = Buffer.from(g.mask, MASK_ENCODING);
   if (mask.toString(MASK_ENCODING) !== g.mask) throw new Error('Invalid title glyph mask.');
@@ -33,7 +51,7 @@ function glyph(value: unknown): RasterFontGlyph {
 }
 
 const raw = JSON.parse(readFileSync(new URL('../../assets/jacquard12-bijou.json', import.meta.url), 'utf8')) as unknown;
-const data = object(raw);
+const data: FontFields = object(raw);
 const EXPECTED_FONT = { family: 'Jacquard 12', version: 1 };
 if (data.family !== EXPECTED_FONT.family || data.version !== EXPECTED_FONT.version
   || !Array.isArray(data.glyphs) || data.glyphs.length < 1 || data.glyphs.length > 32) {

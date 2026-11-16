@@ -20,6 +20,7 @@ export type {
   MouseButton,
   MouseAction,
   MouseTrackingMode,
+  PulseMsg,
   QuitSignal,
   RunOptions,
   RuntimeIssue,
@@ -27,7 +28,7 @@ export type {
   RuntimeIssueSource,
 } from './types.js';
 
-export { QUIT, isKeyMsg, isResizeMsg, isMouseMsg } from './types.js';
+export { QUIT, isKeyMsg, isResizeMsg, isMouseMsg, isPulseMsg } from './types.js';
 
 // Runtime engine
 export type {

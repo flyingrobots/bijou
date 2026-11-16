@@ -1,4 +1,4 @@
-import { App, CLEAR_SCREEN, counterApp, createInteractiveContext, describe, DISABLE_MOUSE, ENABLE_MOUSE_ANY, ENTER_ALT_SCREEN, EXIT_ALT_SCREEN, expect, HIDE_CURSOR, HOME, it, quit, run, scheduleKeys, SHOW_CURSOR, textView, WRAP_DISABLE, WRAP_ENABLE } from './runtime.test-support.js';
+import { type App, CLEAR_SCREEN, counterApp, createInteractiveContext, describe, DISABLE_MOUSE, ENABLE_MOUSE_ANY, ENTER_ALT_SCREEN, EXIT_ALT_SCREEN, expect, HIDE_CURSOR, HOME, it, quit, run, scheduleKeys, SHOW_CURSOR, textView, WRAP_DISABLE, WRAP_ENABLE } from './runtime.test-support.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 
 describe('run', () => {

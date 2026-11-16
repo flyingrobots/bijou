@@ -27,25 +27,25 @@ export interface NodeThemeOptions {
    * This wins whenever the selected env var does not point at a known preset or
    * a valid DTCG JSON file.
    */
-  theme?: Theme;
+  theme?: Theme | undefined;
   /** Named preset themes available to env-var selection. */
-  presets?: Record<string, Theme>;
+  presets?: Record<string, Theme> | undefined;
   /** Environment variable name that selects a preset or JSON theme path. */
-  envVar?: string;
+  envVar?: string | undefined;
   /** Named theme entries available for auto-selection or app-owned overrides. */
-  themes?: readonly NodeThemeEntry[];
+  themes?: readonly NodeThemeEntry[] | undefined;
   /** Automatic or forced light/dark selection mode for `themes`. */
-  themeMode?: NodeThemeMode;
+  themeMode?: NodeThemeMode | undefined;
   /** Explicit theme-entry id override that wins over env-driven selection. */
-  themeOverride?: string;
+  themeOverride?: string | undefined;
 }
 
 /** Options for `createNodeContext`. */
 export interface CreateNodeContextOptions extends NodeThemeOptions {
   /** Optional IO adapter override for tests or embedded hosts. */
-  readonly io?: IOPort;
+  readonly io?: IOPort | undefined;
   /** Optional Node IO construction overrides when `io` is omitted. */
-  readonly nodeIO?: NodeIOOptions;
+  readonly nodeIO?: NodeIOOptions | undefined;
 }
 
 /** Options for `initDefaultContext`. */

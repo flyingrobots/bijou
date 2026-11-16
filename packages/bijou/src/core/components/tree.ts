@@ -8,7 +8,7 @@ export interface TreeNode {
   /** Display text for this node. */
   label: string;
   /** Optional child nodes nested beneath this node. */
-  children?: TreeNode[];
+  children?: TreeNode[] | undefined;
 }
 
 /** Configuration options for the {@link tree} component. */

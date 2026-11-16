@@ -29,13 +29,13 @@ export interface RasterToGlyphSurfaceOptions {
   readonly rows: number;
   readonly fit?: RasterGlyphFit;
   readonly cellAspectRatio?: number;
-  readonly zoom?: number;
-  readonly panX?: number;
-  readonly panY?: number;
+  readonly zoom?: number | undefined;
+  readonly panX?: number | undefined;
+  readonly panY?: number | undefined;
   readonly colorMode?: RasterGlyphColorMode;
-  readonly contrast?: number;
-  readonly dither?: RasterGlyphDitherMode;
-  readonly renderer?: RasterGlyphRenderer;
+  readonly contrast?: number | undefined;
+  readonly dither?: RasterGlyphDitherMode | undefined;
+  readonly renderer?: RasterGlyphRenderer | undefined;
 }
 export interface FitTransform {
   readonly scaleX: number;

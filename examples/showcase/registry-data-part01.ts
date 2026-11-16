@@ -115,20 +115,20 @@ export const DATA_PART_01: ComponentEntry[] = [
       [
         tabs(
           [
-            { label: "Overview", active: true },
+            { label: "Overview" },
             { label: "Files", badge: "12" },
             { label: "Settings" },
           ],
-          { ctx },
+          { active: 0, ctx },
         ),
         "",
         tabs(
           [
             { label: "Home" },
-            { label: "Dashboard", active: true, badge: "3" },
+            { label: "Dashboard", badge: "3" },
             { label: "Logs" },
           ],
-          { ctx },
+          { active: 1, ctx },
         ),
       ].join("\n"),
   },

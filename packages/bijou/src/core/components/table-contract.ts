@@ -21,7 +21,7 @@ export interface TableColumn {
   /** Column header text. */
   header: string;
   /** Fixed column width in characters. When omitted, width is calculated from content and layout policy. */
-  width?: number;
+  width?: number | undefined;
   /** Minimum fitted width for responsive layouts. */
   minWidth?: number;
   /** Maximum fitted width for responsive layouts. */
@@ -62,7 +62,7 @@ export interface TableOptions extends BijouNodeOptions {
   /** Background fill token for the header row. No default — opt-in only. */
   headerBgToken?: TokenValue;
   /** Bijou context for I/O, styling, and mode detection. */
-  ctx?: BijouContext;
+  ctx?: BijouContext | undefined;
 }
 
 /**

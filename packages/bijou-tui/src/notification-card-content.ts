@@ -24,7 +24,7 @@ import {
 export interface NotificationCardContent {
   readonly textWidth: number;
   readonly rows: readonly Surface[];
-  readonly actionRect?: LayoutRect;
+  readonly actionRect?: LayoutRect | undefined;
   readonly accentStyle: CellTextStyle;
   readonly backgroundStyle: CellTextStyle;
 }

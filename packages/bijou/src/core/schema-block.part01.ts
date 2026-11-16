@@ -14,7 +14,7 @@ export interface BlockSchemaIssue {
   readonly severity: BindingIssueSeverity;
   readonly code: string;
   readonly message: string;
-  readonly path?: string;
+  readonly path?: string | undefined;
 }
 export type BlockSchemaResult<Data> =
   | {
@@ -26,9 +26,9 @@ export type BlockSchemaResult<Data> =
     readonly issues: readonly BlockSchemaIssue[];
   };
 export interface BlockSchemaDescription {
-  readonly requiredFields?: readonly string[];
-  readonly optionalFields?: readonly string[];
-  readonly redactedFields?: readonly string[];
+  readonly requiredFields?: readonly string[] | undefined;
+  readonly optionalFields?: readonly string[] | undefined;
+  readonly redactedFields?: readonly string[] | undefined;
   readonly facts?: readonly BindingFact[];
 }
 export interface BlockSchemaAdapterInput<Data> {

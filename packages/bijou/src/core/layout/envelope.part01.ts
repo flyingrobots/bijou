@@ -82,7 +82,7 @@ export interface ContentExtent {
   readonly source: 'surface' | 'buffer' | 'text';
   readonly inlineSize: number;
   readonly blockSize: number;
-  readonly baseline?: number;
+  readonly baseline?: number | undefined;
   readonly facts: readonly LayoutFact[];
 }
 export interface ContentExtentInput {

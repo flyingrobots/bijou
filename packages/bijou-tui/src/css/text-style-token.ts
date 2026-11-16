@@ -6,16 +6,16 @@ import type {
 import { parseHex } from '@flyingrobots/bijou/perf';
 
 export interface StyledTextToken {
-  hex?: string;
-  bg?: string;
-  fgRGB?: [number, number, number];
-  bgRGB?: [number, number, number];
-  modifiers?: string[];
+  hex?: string | undefined;
+  bg?: string | undefined;
+  fgRGB?: [number, number, number] | undefined;
+  bgRGB?: [number, number, number] | undefined;
+  modifiers?: string[] | undefined;
 }
 
 export interface BCSSIdentity {
   type: string;
-  id?: string;
+  id?: string | undefined;
   classes?: string[];
 }
 
