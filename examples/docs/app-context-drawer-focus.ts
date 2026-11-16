@@ -77,10 +77,7 @@ function closePageDrawer(
 ): DocsFrameModel {
   if (!page.contextDrawer.open) return model;
   const visible = docsShellPaneIds(pageId, page.layoutVariant, false);
-  const focused = model.focusedPaneByPage[pageId];
-  const restore = focused === CONTEXT_DRAWER_PANE_ID || focused == null || !visible.includes(focused)
-    ? resolveContextDrawerRestorePane(pageId, page.contextDrawer.restorePaneId, visible)
-    : focused;
+  const restore = resolveContextDrawerRestorePane(pageId, page.contextDrawer.restorePaneId, visible);
   const contextDrawer = { ...page.contextDrawer, open: false };
   return withPage(model, pageId, { ...page, contextDrawer }, restore);
 }

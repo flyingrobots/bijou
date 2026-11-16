@@ -1,0 +1,17 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "C17D38DE-A883-440F-A33C-7EAE5AC107B1",
+  "agent": "codex",
+  "task": "Restore captured focus when closing an unfocused contextual drawer (#627)",
+  "bytesConsumed": 2760,
+  "filesRead": ["docs/design/DL-031-dogfood-contextual-drawer-contract.md"],
+  "filesModified": [
+    "examples/docs/app-context-drawer-focus.ts",
+    "tests/dogfood-context-drawer-focus.test.ts",
+    ".graft/receipts/2026-11-16-627-captured-focus.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Graft excerpt of DL-031 focus and layout contract only; bounded shell source and test reads are excluded from the byte count.",
+  "validation": "Node 22.23.3 real-app regression failed before repair: expected captured family-nav, received story-content. After repair all 14 tests in three drawer test files passed, including the invisible captured-pane fallback. Existing branch localization debt gate passed at 2279; main integration requires a fresh inventory.",
+  "publication": "Normal hooks, current-main integration, hosted CI and clean review remain required before merge."
+}

@@ -77,6 +77,17 @@ describe('DOGFOOD contextual drawer focus', () => {
     expect(active(run(opened, [key('escape')])).focused).toBe('guide-nav');
   });
 
+  it('restores the captured pane after focus leaves the drawer before toggle close', () => {
+    const { run, model } = boot(140, 40);
+    const onFamily = focusPane(run, model, 'family-nav');
+    const opened = run(onFamily, [key('i')]);
+    const onContent = focusPane(run, opened, 'story-content');
+    expect(active(onContent).page.contextDrawer.open).toBe(true);
+    const closed = run(onContent, [key('i')]);
+    expect(active(closed).page.contextDrawer.open).toBe(false);
+    expect(active(closed).focused).toBe('family-nav');
+  });
+
   it('restores to the primary content pane when a resize hid the captured pane', () => {
     const { run, model } = boot(140, 40);
     const onFamily = focusPane(run, model, 'family-nav');
