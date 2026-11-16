@@ -7,7 +7,7 @@ import { BIJOU_VERSION } from '../../../examples/docs/app-ids.js';
 import { BIJOU_RELEASE_LINE } from '../../../examples/docs/app-release-line.js';
 import { RELEASE_STORY_GUIDES } from '../../../examples/docs/app-release-story.js';
 import { dogfoodI18nCatalogsForLocale } from '../../../examples/docs/i18n/dogfood-catalog.js';
-import { readDocumentationFile } from '../../../scripts/documentation-corpus.js';
+import { documentationFileExists, readDocumentationFile } from '../../../scripts/documentation-corpus.js';
 import { renderReleaseStoryMarkdown } from '../../../examples/docs/app-release-story-render.js';
 import { createTestContext } from '../../../packages/bijou/src/adapters/test/index.js';
 import { runScript } from '../../../packages/bijou-tui/src/driver.js';
@@ -71,11 +71,12 @@ describe('current release story', () => {
     expect(text).not.toContain('v7.2 release story');
   });
 
-  it('keeps the original V7.2 document as historical evidence', () => {
-    const archived = readDocumentationFile(
-      resolve('examples/docs/content/release-story-current.md'), 'utf8',
-    );
-    expect(archived).toContain('v7.2 release story');
-    expect(archived).toContain('broad V8 artifact work stay out of this');
+  it('has no stale v7.2 release-story source left in DOGFOOD content', () => {
+    for (const suffix of ['', '.de', '.es', '.fr']) {
+      expect(documentationFileExists(resolve(`examples/docs/content/release-story-current${suffix}.md`))).toBe(false);
+      const active = readDocumentationFile(resolve(`examples/docs/content/release-story-active${suffix}.md`), 'utf8');
+      expect(active).toContain('{{RELEASE_VERSION}}');
+      expect(active).not.toMatch(/v7\.2 release story/u);
+    }
   });
 });
