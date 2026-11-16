@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- DL-031 records the DOGFOOD contextual drawer contract (#623). A page-owned
+  drawer participates in layout and does not dim the frame. It holds variant
+  and guide metadata, takes focus on open, restores focus to a visible pane on
+  close, and supplies footer hints and help while it has focus.
+
 ### Fixed
 
 - Theme Lab wraps complete picker labels, hints and editor context before
