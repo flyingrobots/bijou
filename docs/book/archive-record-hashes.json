@@ -414,9 +414,9 @@
     {
       "record": "R52",
       "original_path": "docs/design-system/component-families.md",
-      "original_markdown_sha256": "b120de8b83203987714aabcdc151f88c17eee0ad272a30f1ebc105d7fd3535e5",
+      "original_markdown_sha256": "36bc6ca233b9d7faab5a112773e721d5f7422bb23522209a950fee3ec4d59426",
       "latex_path": "chapters/02-design-system-and-reference/0019-component-families.tex",
-      "current_latex_sha256": "9eff8697a4f6b680f027c12f607ea9d0b617faa4eee42b5aea2334d401d9352c",
+      "current_latex_sha256": "670182b987311dde0d5b37fc8965b5a180e6dff70e92853cc48103dbd3715650",
       "previous_latex_sha256": "9eff8697a4f6b680f027c12f607ea9d0b617faa4eee42b5aea2334d401d9352c"
     },
     {
