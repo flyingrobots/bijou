@@ -1,4 +1,5 @@
 """Exercise the real Markdown CLI through a Unix PTY, including a terminal resize."""
+import errno
 import fcntl
 import json
 import os
@@ -33,6 +34,31 @@ def read_until(master, needle, seconds):
             if needle in data:
                 return data
     return data
+
+
+def wait_while_draining(proc: subprocess.Popen, master: int, seconds: float) -> None:
+    """Keep terminal restoration writable without extending the shutdown deadline."""
+    deadline = time.monotonic() + seconds
+    captured = 0
+    while proc.poll() is None:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise subprocess.TimeoutExpired(proc.args, seconds)
+        ready, _, _ = select.select([master], [], [], min(0.05, remaining))
+        if not ready:
+            continue
+        try:
+            chunk = os.read(master, 65536)
+        except OSError as error:
+            if error.errno != errno.EIO:
+                raise
+            chunk = b""  # Linux PTYs report EIO when the slave closes.
+        if not chunk:
+            proc.wait(timeout=max(0, deadline - time.monotonic()))
+            return
+        captured += len(chunk)
+        if captured > 1048576:
+            raise RuntimeError("PTY shutdown capture exceeded 1 MiB")
 
 
 signal.signal(signal.SIGTERM, cancel)
@@ -70,7 +96,8 @@ try:
     os.killpg(proc.pid, signal.SIGWINCH)
     resized = read_until(master, b"foxtrot golf hotel", 3)
     os.write(master, b"q")
-    proc.wait(timeout=5)
+    # Restoring terminal settings can wait for output to drain on macOS.
+    wait_while_draining(proc, master, 5)
     if proc.returncode != 0:
         raise RuntimeError("CLI exited " + str(proc.returncode))
     print(json.dumps({

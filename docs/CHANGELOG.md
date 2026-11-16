@@ -12,6 +12,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   through the DOGFOOD catalogs in `en`, `fr`, `es`, and `de`. Stories can opt in
   through a `localize` hook, documented in `docs/development.md`.
 
+### Removed
+
+- DOGFOOD no longer ships the unrendered `release-story-current*.md` sources that
+  described v7.2 as current. The Current Release Story renders
+  `release-story-active*.md`, and its tests assert that source (#585).
+
 ### Added
 
 - The DOGFOOD Components reading path shows the active variant, its position
@@ -86,6 +92,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The Markdown CLI resize test drains PTY output during shutdown, preventing
+  macOS terminal restoration from blocking behind unread output. Its five-second
+  shutdown deadline and process-group cleanup remain unchanged (#746).
+- Scrolling a maximized pane (ctrl+f) now clamps to the full body size the
+  frame paints, so the last line is reachable (#669). Scroll measurement used
+  the pane's normal split rectangle before.
 - The Components Library no longer renders dimmed. The app frame dims
   everything beneath any overlay, so the Library draws its progress bar inside
   the page instead of as an overlay.
