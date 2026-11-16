@@ -17,7 +17,7 @@ export function focusAreaSurfaceInto(
   const showScrollbar = options?.showScrollbar ?? true;
   const ctx = options?.ctx;
   const mode = ctx?.mode ?? 'interactive';
-  const hasGutter = mode !== 'pipe' && mode !== 'accessible' && state.width > 1;
+  const hasGutter = options?.gutter !== false && mode !== 'pipe' && mode !== 'accessible' && state.width > 1;
   const gutterWidth = hasGutter ? 1 : 0;
   const bodyWidth = Math.max(0, state.width - gutterWidth);
   const needsScrollbar = showScrollbar && content.height > state.height && bodyWidth > 0;

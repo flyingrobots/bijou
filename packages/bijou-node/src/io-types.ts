@@ -3,11 +3,11 @@ import type { ClockPort, IOPort } from '@flyingrobots/bijou';
 /** Optional overrides for `nodeIO`. */
 export interface NodeIOOptions {
   /** Clock override for deterministic timer scheduling in tests. */
-  clock?: ClockPort;
+  clock?: ClockPort | undefined;
   /** Writable stdout override for deterministic host tests. */
-  stdout?: NodeWriteStream;
+  stdout?: NodeWriteStream | undefined;
   /** Writable stderr override for deterministic host tests. */
-  stderr?: NodeWriteStream;
+  stderr?: NodeWriteStream | undefined;
 }
 
 export interface NodeWriteStream {

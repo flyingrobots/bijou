@@ -10,10 +10,10 @@ describe('summarizeChecks', () => {
       { name: 'test (22)', bucket: 'cancel', state: 'CANCELLED' },
     ]);
 
-    expect(summary.counts.pass).toBe(1);
-    expect(summary.counts.pending).toBe(1);
-    expect(summary.counts.fail).toBe(1);
-    expect(summary.counts.cancel).toBe(1);
+    expect(summary.counts['pass']).toBe(1);
+    expect(summary.counts['pending']).toBe(1);
+    expect(summary.counts['fail']).toBe(1);
+    expect(summary.counts['cancel']).toBe(1);
     expect(summary.codeRabbit?.name).toBe('CodeRabbit');
     expect(summary.failing).toHaveLength(1);
     expect(summary.pending).toHaveLength(1);

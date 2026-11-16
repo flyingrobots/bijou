@@ -27,6 +27,7 @@ describe('bindings()', () => {
       .bind('q', 'Quit', { type: 'quit' });
 
     const info = km.bindings()[0];
+    if (info === undefined) throw new Error('expected one binding');
     expect(info).toEqual({
       combo: { key: 'q', ctrl: false, alt: false, shift: false },
       description: 'Quit',

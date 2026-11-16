@@ -90,7 +90,7 @@ for (const tool of [...TOOLS, docsTool]) {
   server.registerTool(tool.name, {
     description: tool.description,
     inputSchema: tool.inputSchema,
-    outputSchema: tool.outputSchema,
+    ...(tool.outputSchema !== undefined ? { outputSchema: tool.outputSchema } : {}),
   }, async (args) => tool.handler(args as Record<string, unknown>));
 }
 

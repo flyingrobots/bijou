@@ -49,7 +49,7 @@ export interface Result {
   path: string;
   mode: 'pipe' | 'static-tty' | 'interactive-scripted';
   status: 'ok' | 'error';
-  reason?: string;
+  reason?: string | undefined;
   output?: string;
 }
 

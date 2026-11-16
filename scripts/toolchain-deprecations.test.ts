@@ -45,7 +45,7 @@ describe('toolchain deprecation guards', () => {
         encoding: 'utf8',
         env: {
           ...process.env,
-          NODE_OPTIONS: withThrowDeprecation(process.env.NODE_OPTIONS),
+          NODE_OPTIONS: withThrowDeprecation(process.env['NODE_OPTIONS']),
         },
       },
     );

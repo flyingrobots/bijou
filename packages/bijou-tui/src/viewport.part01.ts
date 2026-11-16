@@ -12,7 +12,7 @@ export interface ViewportOptions {
   /** Vertical scroll offset (0-based line index). Default: 0. */
   readonly scrollY?: number;
   /** Horizontal scroll offset (0-based column index). Default: 0. */
-  readonly scrollX?: number;
+  readonly scrollX?: number | undefined;
   /** Show a scrollbar track on the right edge. Default: true. */
   readonly showScrollbar?: boolean;
   /** Reserve a gutter column or overlay the rightmost content cell. Default: `'gutter'`. */

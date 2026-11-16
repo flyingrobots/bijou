@@ -30,7 +30,7 @@ export function loadCodeDojoBaselineCounts(root: string): CodeDojoBaselineCounts
 function readArrayBaseline(path: string, schema: string, key: string): readonly unknown[] {
   const parsed = readJsonObject(path);
   const values = parsed[key];
-  if (parsed.schema !== schema || !Array.isArray(values)) {
+  if (parsed['schema'] !== schema || !Array.isArray(values)) {
     throw new Error(`${path} is not a ${schema} file`);
   }
   return values;
@@ -38,8 +38,8 @@ function readArrayBaseline(path: string, schema: string, key: string): readonly 
 
 function readEslintViolationCount(path: string): number {
   const parsed = readJsonObject(path);
-  const total = parsed.total;
-  if (parsed.schema !== 'code-dojo.eslint-baseline.v1' || typeof total !== 'number' || !Number.isInteger(total)) {
+  const total = parsed['total'];
+  if (parsed['schema'] !== 'code-dojo.eslint-baseline.v1' || typeof total !== 'number' || !Number.isInteger(total)) {
     throw new Error(`${path} is not a code-dojo.eslint-baseline.v1 file`);
   }
   return total;

@@ -1,6 +1,6 @@
 import { startApp } from '@flyingrobots/bijou-node';
 import { isKeyMsg, quit, type App } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
+import { ansiSurface } from '../_shared/example-surfaces.js';
 
 interface Model {
   readonly text: string;

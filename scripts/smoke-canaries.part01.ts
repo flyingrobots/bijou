@@ -116,7 +116,7 @@ function runCommand(
 
 function requireJsonRecord(value: unknown, label: string): Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new Error(`${label} is not an object`);
-  return value;
+  return Object.fromEntries(Object.entries(value));
 }
 
 function parseJsonRecord(text: string, label: string): Record<string, unknown> {

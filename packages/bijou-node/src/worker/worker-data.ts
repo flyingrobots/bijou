@@ -1,9 +1,9 @@
 export interface WorkerSerializableOptions {
-  altScreen?: boolean;
-  hideCursor?: boolean;
-  mouse?: boolean;
-  mouseMode?: 'press' | 'drag' | 'any';
-  css?: string;
+  altScreen?: boolean | undefined;
+  hideCursor?: boolean | undefined;
+  mouse?: boolean | undefined;
+  mouseMode?: 'press' | 'drag' | 'any' | undefined;
+  css?: string | undefined;
 }
 
 interface BijouWorkerFlag {

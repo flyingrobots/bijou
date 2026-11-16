@@ -4,7 +4,7 @@ export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun';
 /** Parsed CLI arguments for the scaffolder command. */
 export interface ParsedArgs {
   /** Optional target directory argument (relative to cwd). */
-  readonly targetDirArg?: string;
+  readonly targetDirArg?: string | undefined;
   /** Whether to run dependency installation after writing files. */
   readonly install: boolean;
   /** Whether to allow scaffolding into a non-empty target directory. */
@@ -16,7 +16,7 @@ export interface ParsedArgs {
 /** Input options for {@link scaffoldProject}. */
 export interface ScaffoldOptions {
   /** Target directory path (relative to `cwd` or absolute). */
-  readonly targetDir?: string;
+  readonly targetDir?: string | undefined;
   /** Working directory used to resolve relative target paths. Defaults to process cwd. */
   readonly cwd?: string;
   /** Whether to run package install after file generation. Defaults to true. */

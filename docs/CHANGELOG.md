@@ -6,7 +6,86 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- The Components Library (`npm run components`) is a 58-slide deck: a title,
+  one slide per section followed by its components, and an end slide. `h`/`l`
+  step one slide at a time and stop at both ends; `PgUp`/`PgDn` move between
+  sections. Each component shows its variants as `tabs()`, its output modes as
+  `tabs()`, and an info panel (`i`) with the family guidance and when to use
+  each variant. Command-line options open it on any slide, variant, mode,
+  theme, or scheme (`--slide title|family|component|end`).
+- `npm run record:components` records the Components Library with every
+  variant in all four output modes, slide by slide, so the 6.5-minute
+  recording stays in bounded memory. Recordings draw text in JetBrains Mono
+  and write H.264 MP4, full-colour animated WebP, or GIF by output
+  extension, through one encoder port with an adapter per codec
+  (`examples/hero/encoders/`). WebP output needs `img2webp`
+  (`brew install webp`); MP4 output needs `ffmpeg`.
+- DOGFOOD is translated into French, Spanish, and German: every UI string in
+  `examples/docs/i18n/source/dogfood-strings.csv` and every guide article
+  (`examples/docs/content/i18n/<locale>/<guide id>.md`). An article shows the
+  English-source notice only when no translation exists. The translations are
+  agent-drafted and awaiting review by native speakers.
+- A Bijou skill for coding agents (`.claude/skills/bijou/`) teaches building
+  Bijou apps: the app runtime, all 36 component families and when to use
+  each, theming and BCSS, motion and transitions, output modes, localization,
+  and testing. `AGENTS.md` points to it.
+- The README opens with the hero reel and shows the Components Library
+  walkthrough (`assets/recordings/`).
+- `npm run audit:components` renders every component variant in each output
+  mode, and in every shell theme for `interactive` and `static`. It checks that
+  the output fits its mode, measures text contrast (WCAG 2: errors below 3:1,
+  warnings below 4.5:1, dim text as drawn), and flags colours outside the
+  theme. One combination prints a report card; `--all` writes one Markdown
+  report with ERRORS and WARNINGS sections. CI runs `--all --check`, which fails
+  only on errors not in `scripts/component-audit/baseline.json`, and uploads the
+  report.
+
+
+### Changed
+
+- New GitHub issues use issue-dag/2 card templates (feature, bug, decision,
+  investigation, research, spike): the first block is the Taskalisk
+  frontmatter (`.dag`, `.id`, `.kind`, `.type`, `.blocked_by`,
+  `.size_hours`), then the card for that type. Open issues were converted
+  to the same format, and cards over 8 hours were split into containers of
+  single-outcome tasks.
+- Published option and record types state `| undefined` where callers pass
+  `undefined` explicitly, so code compiled with `exactOptionalPropertyTypes`
+  type-checks. The repository now passes `tsconfig.code-standards.json` except
+  seven DOGFOOD files waiting on localization.
+- The Components Library calls its groupings sections, which group related
+  component families. "Family" means one semantic job (R52), as in DOGFOOD's
+  36 canonical families; the design vocabulary defines Section.
+- The hero reel opens on the Bijou title, then shows the render lab, a
+  dashboard, one component in four output modes, DOGFOOD switching to
+  Spanish, `guidedFlow()` and `explainability()`, the plot grammar, theme
+  changes, and an end card with the repository and install command. The
+  opening and closing each hold for 3 seconds.
+
 ### Fixed
+
+- The Components Library no longer renders dimmed. The app frame dims
+  everything beneath any overlay, so the Library draws its progress bar inside
+  the page instead of as an overlay.
+- DOGFOOD marks the V7 Product Truth and V7 Launch Wake release titles as
+  historical reference, so they no longer read as the current release.
+- The showcase's `gradientText()` entry passes the theme's brand gradient
+  instead of an options object, so it renders instead of throwing; its
+  `tabs()` and `stepper()` entries pass the required `active` and `current`
+  indexes.
+- The plot examples import package sources, so the strict ESLint ratchet
+  passes without a build; `scaleOklch()` calls pass the two stops it reads.
+- Recording a framed app no longer stalls when a command sleeps on the
+  recorder's mock clock (for example, after changing the language or theme in
+  settings).
+
+- The app frame's help overlay scrolls with the up and down arrows as well as
+  the frame's scroll keys.
+
+- The app frame omits the one-column focus gutter on a page whose layout is a
+  single pane, where there is no other pane to focus.
 
 - Theme Lab wraps complete picker labels, hints and editor context before
   painting, retaining long Book theme names in narrow columns. Column content
@@ -2053,7 +2132,7 @@ boundary.
 - **DOGFOOD strategy doc** — added a dedicated strategy document for the first post-v4 milestone, reframing the docs/story platform work around primary users, jobs to be done, principles, and a recommended first slice instead of treating it as an abstract feature bucket.
 - **Post-v4 roadmap triage** — the roadmap now reflects `v4.0.0` as a shipped release, moves the pure-surface release work into the completed archive, and reorganizes active backlog into post-v4 priorities: story-first docs, replay/debug tooling, platform hardening, runtime/design-system expansion, and long-range ecosystem bets.
 - **Design-system docs foundation** — added a new `docs/design-system/` section covering foundations, interaction/pattern policy, component families, and data-visualization guidance, plus linked that guidance from the root and package README entry points.
-- **Component-family graceful lowering coverage** — the component-family design-system guide now documents graceful lowering and related-family guidance across the shipped semantic families, so the docs more honestly match the Carbon-style standard they claim to enforce.
+- **Component-family graceful lowering coverage** — the component-family design-system guide now documents graceful lowering and related-family guidance across the shipped semantic families, so the docs more honestly match the documentation standard they claim to enforce.
 - **Overlay doctrine and surface-native examples** — the design-system pattern docs, family docs, package README, and TUI guide now give sharper overlay/interruption guidance and lead with `compositeSurface(...)` for modal/toast composition instead of teaching the string-first overlay path as the default.
 - **Shell and workspace doctrine** — the design-system and `@flyingrobots/bijou-tui` docs now more explicitly distinguish shell chrome from page content, clarify when to use `createFramedApp()`, `splitPane()`, and `grid()`, and tighten the content guidance for tabs, status rails, and workspace regions.
 - **Design-system docs completeness gate** — the component-family guide now includes `Content guidance` for every shipped family, and the repo now ships a `docs:design-system:preflight` script that fails when required family-doc sections or lowering modes are missing.

@@ -11,9 +11,9 @@ export class ViewDataContract {
   readonly [VIEW_DATA_CONTRACT_BRAND] = true;
   readonly #entriesByName: ReadonlyMap<string, ViewDataRequirementEntry>;
   readonly #entriesByRequirementId: ReadonlyMap<RequirementId, ViewDataRequirementEntry>;
-  readonly id?: string;
-  readonly label?: string;
-  readonly description?: string;
+  readonly id?: string | undefined;
+  readonly label?: string | undefined;
+  readonly description?: string | undefined;
   readonly facts: readonly BindingFact[];
 
   constructor(input: ViewDataInput) {

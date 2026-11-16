@@ -8,7 +8,7 @@ import {
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { badge, boxSurface, getDefaultContext, setDefaultContext } from '@flyingrobots/bijou';
 import { isKeyMsg, quit, type App, vstackSurface } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.js';
 
 interface Model {
   completedJobs: number;
@@ -101,7 +101,7 @@ if (process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]
     }
 
     const handle = runInWorker({
-      ctx,
+      ...(ctx === undefined ? {} : { ctx }),
       altScreen: !useMockContext,
       hideCursor: !useMockContext,
       entry: fileURLToPath(import.meta.url),

@@ -5,6 +5,9 @@ import {
 } from '../../helpers/scripted.js';
 import { must } from '@flyingrobots/bijou/adapters/test';
 import { createDocsApp } from '../../../examples/docs/app.js';
+import { guideDocBody } from '../../../examples/docs/app-guide-access.js';
+import { dogfoodI18nCatalogsForLocale } from '../../../examples/docs/i18n/dogfood-catalog.js';
+import { createI18nRuntime, createRuntimeLocalizationPort } from '@flyingrobots/bijou-i18n';
 
 const MISSING_MARKER = '<MISSING LOC STRING KEY=';
 
@@ -35,7 +38,17 @@ describe('LX-020 DOGFOOD locale demo readiness', () => {
     expect(text).not.toContain(MISSING_MARKER);
   });
 
-  it('labels English-source documentation when a non-English locale is selected', async () => {
+  it('labels an article without a translation as English-source documentation', () => {
+    const i18n = createI18nRuntime({ locale: 'fr', direction: 'ltr' });
+    for (const catalog of dogfoodI18nCatalogsForLocale('fr')) i18n.loadCatalog(catalog);
+    // No content/i18n/fr file exists for this id, so the article keeps its English body under a notice.
+    const body = guideDocBody({ id: 'untranslated-fixture', pageId: 'guides', title: 'Fixture', summary: '', body: 'Hello' }, createRuntimeLocalizationPort(i18n));
+
+    expect(body).toContain('Documentation source en anglais');
+    expect(body).toContain('Hello');
+  });
+
+  it('shows a translated article in the selected locale, without the English-source notice', async () => {
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 140, rows: 50 } });
     const app = createDocsApp(ctx, {
       initialRoute: 'docs',
@@ -48,8 +61,8 @@ describe('LX-020 DOGFOOD locale demo readiness', () => {
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
 
-    expect(text).toContain('Documentation source en anglais');
-    expect(text).toContain('Start Here');
+    expect(text).not.toContain('Documentation source en anglais');
+    expect(text).toContain('Commencer ici');
     expect(text).not.toContain(MISSING_MARKER);
   });
 });

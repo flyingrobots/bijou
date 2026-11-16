@@ -8,7 +8,7 @@ import {
   type App,
   gridSurface,
 } from '@flyingrobots/bijou-tui';
-import { column, row } from '../_shared/example-surfaces.ts';
+import { column, row } from '../_shared/example-surfaces.js';
 
 initDefaultContext();
 

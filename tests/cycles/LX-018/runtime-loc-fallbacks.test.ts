@@ -20,10 +20,10 @@ describe('LX-018 runtime localization fallback behavior', () => {
   it('keeps non-English generated runtime catalogs language-specific', () => {
     const catalog = must(dogfoodI18nCatalogsForLocale('fr')[0]);
     const translatedEntry = catalog.entries.find((entry) => entry.key.id === 'settings.language.label');
-    const missingEntry = catalog.entries.find((entry) => entry.key.id === 'docs.empty.coverage.title');
 
     expect(translatedEntry?.values).toEqual({ fr: 'Langue préférée' });
-    expect(missingEntry?.values).toEqual({});
+    // Language-specific: a French catalog carries only French values, never an English fallback.
+    for (const entry of catalog.entries) expect(Object.keys(entry.values).filter((locale) => locale !== 'fr')).toEqual([]);
   });
 
   it('renders a high-visibility development marker for missing selected-locale strings', async () => {
@@ -32,6 +32,11 @@ describe('LX-018 runtime localization fallback behavior', () => {
       initialRoute: 'docs',
       locale: 'fr',
       showMissingLocalizationMarkers: true,
+      // Every shipped French string is translated, so reload the French catalog with one string blanked.
+      extraI18nCatalogs: dogfoodI18nCatalogsForLocale('fr').map((catalog) => ({
+        ...catalog,
+        entries: catalog.entries.map((entry) => (entry.key.id === 'docs.page.guides' ? { ...entry, values: {} } : entry)),
+      })),
     });
     const result = await runScript(app, [], { ctx });
     const text = frameText(must(result.frames.at(-1)));

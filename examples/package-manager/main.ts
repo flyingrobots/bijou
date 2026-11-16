@@ -1,7 +1,7 @@
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { spinnerFrame, progressBar, alert, tree, separator, type Surface } from '@flyingrobots/bijou';
 import { run, quit, tick, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
-import { badgeSurface, column, contentSurface, line, row, spacer } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, contentSurface, line, row, spacer } from '../_shared/example-surfaces.js';
 
 const ctx = initDefaultContext();
 

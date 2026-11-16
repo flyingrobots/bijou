@@ -95,7 +95,7 @@ describe('createFramedApp', () => {
       { key: '[' },
     ]);
 
-    expect(result.model.scrollByPage.home?.main?.y).toBe(2);
-    expect(result.model.scrollByPage.logs?.main?.y).toBe(1);
+    expect(result.model.scrollByPage['home']?.['main']?.y).toBe(2);
+    expect(result.model.scrollByPage['logs']?.['main']?.y).toBe(1);
   });
 });

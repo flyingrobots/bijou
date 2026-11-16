@@ -45,7 +45,7 @@ export function mutatePage(
   mutate(page);
   const pageSource = `${JSON.stringify(page)}\n`;
   const manifest = parseRecord(inputs.buildManifest.source);
-  manifest.artifactDigest = sha256(pageSource);
+  manifest['artifactDigest'] = sha256(pageSource);
   return {
     ...inputs,
     page: { ...inputs.page, source: pageSource },

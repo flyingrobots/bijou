@@ -20,7 +20,7 @@ export interface BijouBlockFieldBinding {
     readonly kind: 'state' | 'query' | 'computed';
     readonly path: string;
   };
-  readonly when?: string;
+  readonly when?: string | undefined;
 }
 export interface BijouBlockGroup {
   readonly id: string;
@@ -31,14 +31,14 @@ export interface BijouBlockGroup {
 export interface BijouBlockField {
   readonly fieldName: string;
   readonly nodeId: string;
-  readonly groupId?: string;
+  readonly groupId?: string | undefined;
   readonly graphqlType: string;
   readonly source: string;
   readonly layout: UiLayoutIntent;
   readonly text: UiTextRef;
-  readonly style?: UiStyleRef;
-  readonly action?: BijouBlockFieldAction;
-  readonly binding?: BijouBlockFieldBinding;
+  readonly style?: UiStyleRef | undefined;
+  readonly action?: BijouBlockFieldAction | undefined;
+  readonly binding?: BijouBlockFieldBinding | undefined;
 }
 export interface BijouBlockArtifact {
   readonly artifactVersion: BijouBlockArtifactVersion;

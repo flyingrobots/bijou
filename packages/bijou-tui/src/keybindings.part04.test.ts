@@ -29,15 +29,15 @@ describe('groups', () => {
 
     const bindings = km.bindings();
     expect(bindings).toHaveLength(2);
-    expect(bindings[0].group).toBe('Navigation');
-    expect(bindings[1].group).toBe('Navigation');
+    expect(bindings[0]?.group).toBe('Navigation');
+    expect(bindings[1]?.group).toBe('Navigation');
   });
 
   it('ungrouped bindings have empty group', () => {
     const km = createKeyMap<TestAction>()
       .bind('q', 'Quit', { type: 'quit' });
 
-    expect(km.bindings()[0].group).toBe('');
+    expect(km.bindings()[0]?.group).toBe('');
   });
 
   it('groups do not affect matching', () => {
@@ -56,8 +56,8 @@ describe('groups', () => {
       .bind('?', 'Help', { type: 'help' });
 
     const bindings = km.bindings();
-    expect(bindings[0].group).toBe('');
-    expect(bindings[1].group).toBe('Nav');
-    expect(bindings[2].group).toBe('');
+    expect(bindings[0]?.group).toBe('');
+    expect(bindings[1]?.group).toBe('Nav');
+    expect(bindings[2]?.group).toBe('');
   });
 });

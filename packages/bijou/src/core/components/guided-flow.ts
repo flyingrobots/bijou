@@ -17,7 +17,7 @@ export type GuidedFlowSectionTone = 'normal' | 'muted';
 export interface GuidedFlowStep {
   readonly title: string;
   readonly detail?: string;
-  readonly status?: GuidedFlowStepStatus;
+  readonly status?: GuidedFlowStepStatus | undefined;
 }
 
 export interface GuidedFlowSection {
@@ -33,12 +33,12 @@ export interface GuidedFlowOptions extends BijouNodeOptions {
   readonly metadata?: readonly string[];
   readonly steps?: readonly GuidedFlowStep[];
   readonly sections?: readonly GuidedFlowSection[];
-  readonly nextAction?: string;
+  readonly nextAction?: string | undefined;
   readonly nextActionLabel?: string;
   readonly accessibleLead?: string;
   readonly borderToken?: TokenValue;
   readonly bgToken?: TokenValue;
-  readonly width?: number;
+  readonly width?: number | undefined;
   readonly ctx?: BijouContext;
 }
 

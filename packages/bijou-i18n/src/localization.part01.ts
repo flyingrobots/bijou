@@ -39,11 +39,11 @@ export interface LocalizedObject<Value = unknown> {
   readonly key: I18nCatalogKey;
   readonly locale: string;
   readonly fallbackLocale: string;
-  readonly sourceLocale?: string;
+  readonly sourceLocale?: string | undefined;
   readonly direction: I18nDirection;
   readonly kind: I18nEntryKind;
   readonly status: LocalizationStatus;
-  readonly value?: Value;
+  readonly value?: Value | undefined;
   readonly issues: readonly LocalizationIssue[];
   readonly facts: readonly LocalizationFact[];
 }

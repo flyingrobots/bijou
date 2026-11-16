@@ -1,5 +1,5 @@
 import type { BijouContext } from '@flyingrobots/bijou';
-import { createFramedApp, createKeyMap, drawer, EASINGS, modal, timeline, type App, type FrameModel, type Overlay } from '@flyingrobots/bijou-tui';
+import { createFramedApp, createKeyMap, drawer, EASINGS, modal, timeline, type FramedApp, type Overlay } from '@flyingrobots/bijou-tui';
 import type { ShowcaseMsg, ShowcasePageModel } from './types.js';
 import { CATEGORIES } from './registry.js';
 import { createCategoryPage } from './app-category.js';
@@ -8,7 +8,7 @@ import { clamp01, resolveQuitModalWidth } from './app-utils.js';
 
 export function createShowcaseApp(
   ctx: BijouContext,
-): App<FrameModel<ShowcasePageModel>, ShowcaseMsg> {
+): FramedApp<ShowcasePageModel, ShowcaseMsg> {
   const pages = CATEGORIES.map((cat, idx) => createCategoryPage(cat, idx === 0, ctx));
 
   return createFramedApp<ShowcasePageModel, ShowcaseMsg>({

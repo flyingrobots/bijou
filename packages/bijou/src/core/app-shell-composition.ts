@@ -50,9 +50,9 @@ export class AppShellComposition {
   readonly [APP_SHELL_COMPOSITION_BRAND] = true;
   readonly #slotsById: ReadonlyMap<AppShellSlotId, AppShellSlot>;
   readonly #providers: ProviderScope | undefined;
-  readonly id?: string;
-  readonly label?: string;
-  readonly description?: string;
+  readonly id?: string | undefined;
+  readonly label?: string | undefined;
+  readonly description?: string | undefined;
   readonly facts: readonly BindingFact[];
 
   constructor(input: AppShellCompositionInput) {

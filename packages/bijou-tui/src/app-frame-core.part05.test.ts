@@ -14,9 +14,9 @@ import {
   surfaceToString,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -49,14 +49,14 @@ describe('createFramedApp', () => {
     const [model] = app.init();
     const [afterSingleTab, singleTabCmds] = app.update(tab, model);
 
-    expect(afterSingleTab.focusedPaneByPage.home).toBe('right');
+    expect(afterSingleTab.focusedPaneByPage['home']).toBe('right');
     expect(afterSingleTab.footerVisible).toBe(true);
     expect(afterSingleTab.footerTranslateY).toBe(0);
     expect(singleTabCmds).toHaveLength(0);
 
     const [afterRepeatedTab, repeatedTabCmds] = app.update(tab, afterSingleTab);
 
-    expect(afterRepeatedTab.focusedPaneByPage.home).toBe('left');
+    expect(afterRepeatedTab.focusedPaneByPage['home']).toBe('left');
     expect(afterRepeatedTab.footerVisible).toBe(true);
     expect(afterRepeatedTab.footerTranslateY).toBe(0);
     expect(repeatedTabCmds).toHaveLength(0);

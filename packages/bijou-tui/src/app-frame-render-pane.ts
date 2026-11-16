@@ -66,6 +66,7 @@ export function paintFramePane<PageModel, Msg>(
     target,
     {
       focused: node.paneId === ctx.focusedPaneId,
+      gutter: ctx.singlePane !== true,
       ctx: ctx.ctx,
       id: node.paneId,
       classes: [node.paneId === ctx.focusedPaneId ? 'focused' : 'unfocused'],
