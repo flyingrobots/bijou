@@ -24,8 +24,8 @@ keywords:
   `runScript()` emission, [#605](https://github.com/flyingrobots/bijou/issues/605)
   `recordDemoGif()` as a subscriber, [#607](https://github.com/flyingrobots/bijou/issues/607)
   fixture that reproduces a GIF
-- Recording pipeline evidence: PR #579 (`feat/hero-demo-gif`,
-  `examples/hero/clip.ts` and `examples/hero/encoders/`)
+- Recording pipeline evidence: PR #579, merged as 36a77614
+  (`examples/hero/clip.ts` and `examples/hero/encoders/`)
 
 ## Sponsors
 
