@@ -86,7 +86,9 @@ Inside `test (22)`, the steps are dominated by one command:
 The full Vitest run is about 75% of the critical path. The full suite is
 879 files and 3,977 tests (evidence recorded on #479). The local
 `scripts/hooks/pre-push` runs that same suite, plus the test type check and the
-scripted interactive smoke, on every push. PR #478 lost its SSH connection
+scripted interactive smoke, on every push. Pushing this record (two Markdown
+files, no code) ran the hook for 5 min 47 s of wall time on the maintainer's
+macOS workstation, and nearly all of that was the full Vitest suite. PR #478 lost its SSH connection
 twice while that suite ran inside the hook.
 
 Three defects in the current gates are fixed by this decision:
