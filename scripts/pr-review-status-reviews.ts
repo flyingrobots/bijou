@@ -80,9 +80,9 @@ export function summarizeReviews(
   }
   return {
     total: latestByReviewer.size,
-    approvals: byState.APPROVED ?? 0,
-    changesRequested: byState.CHANGES_REQUESTED ?? 0,
-    comments: byState.COMMENTED ?? 0,
+    approvals: byState['APPROVED'] ?? 0,
+    changesRequested: byState['CHANGES_REQUESTED'] ?? 0,
+    comments: byState['COMMENTED'] ?? 0,
     byState,
   };
 }

@@ -17,7 +17,7 @@ interface ThemeLabCopyOptions {
   /** The shell theme the draft was cloned from, named as the rest of the app names it. */
   readonly baseTheme: Theme;
   readonly activeShellLine: string;
-  readonly localization?: LocalizationPort;
+  readonly localization?: LocalizationPort | undefined;
 }
 
 export interface ThemeLabCopy {

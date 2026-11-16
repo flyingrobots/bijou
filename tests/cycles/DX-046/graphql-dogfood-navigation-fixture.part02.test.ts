@@ -12,7 +12,7 @@ const NAV_TOKEN_COLORS = {
   'semantic.nav.title.fg': '#f7d774',
 };
 
-function rowText(surface: { get(x: number, y: number): { char: string; empty?: boolean }; width: number }, y: number): string {
+function rowText(surface: { get(x: number, y: number): { char: string; empty?: boolean | undefined }; width: number }, y: number): string {
   let text = '';
   for (let x = 0; x < surface.width; x++) {
     const cell = surface.get(x, y);

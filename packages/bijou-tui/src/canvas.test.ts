@@ -140,7 +140,7 @@ describe('canvas()', () => {
   });
   it('handles uniforms', () => {
     const shader: ShaderFn = ({ uniforms }) => {
-      const value: unknown = uniforms.value;
+      const value: unknown = uniforms['value'];
       return typeof value === 'string' ? value : ' ';
     };
     const surface = canvas(1, 1, shader, { uniforms: { value: 'Z' } });

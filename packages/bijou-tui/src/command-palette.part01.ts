@@ -45,7 +45,7 @@ export interface CommandPaletteOptions {
   /** Show shortcut hints (default: true). */
   readonly showShortcut?: boolean;
   /** Bijou context for theming and styling. */
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
 }
 
 /** Options for rendering the command palette into a `Surface`. */

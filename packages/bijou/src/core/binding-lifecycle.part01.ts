@@ -23,7 +23,7 @@ export interface BindingLifecycleOwner {
   readonly [BINDING_LIFECYCLE_OWNER_BRAND]: true;
   readonly id: string;
   readonly kind: BindingLifecycleOwnerKind;
-  readonly label?: string;
+  readonly label?: string | undefined;
 }
 export interface BindingInvalidationInput {
   readonly reason: BindingInvalidationReason;
@@ -32,9 +32,9 @@ export interface BindingInvalidationInput {
 }
 export interface BindingInvalidation {
   readonly requirementId: RequirementId;
-  readonly providerId?: ProviderId;
+  readonly providerId?: ProviderId | undefined;
   readonly reason: BindingInvalidationReason;
-  readonly snapshotVersion?: number;
+  readonly snapshotVersion?: number | undefined;
 }
 export interface BindingLifecycleTransition {
   readonly from: BindingLifecycleState;
@@ -44,7 +44,7 @@ export interface BindingLifecycleTransition {
 export interface BindingLifecycleRecordInput {
   readonly owner: BindingLifecycleOwner;
   readonly requirementId: string;
-  readonly providerId?: string;
+  readonly providerId?: string | undefined;
   readonly state?: BindingLifecycleState;
   readonly version?: number;
   readonly invalidations?: readonly BindingInvalidation[];
@@ -55,7 +55,7 @@ export interface BindingLifecycleRecord {
   readonly [BINDING_LIFECYCLE_RECORD_BRAND]: true;
   readonly owner: BindingLifecycleOwner;
   readonly requirementId: RequirementId;
-  readonly providerId?: ProviderId;
+  readonly providerId?: ProviderId | undefined;
   readonly state: BindingLifecycleState;
   readonly version: number;
   readonly invalidations: readonly BindingInvalidation[];

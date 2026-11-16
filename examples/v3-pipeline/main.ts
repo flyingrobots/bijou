@@ -2,7 +2,7 @@ import { pathToFileURL } from 'node:url';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { badge, boxSurface } from '@flyingrobots/bijou';
 import { isKeyMsg, quit, run, type App, type RenderPipeline, vstackSurface } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.js';
 
 export const ctx = initDefaultContext();
 
@@ -39,7 +39,7 @@ function pipelineModel(model: unknown): Model {
   if (typeof model !== 'object' || model === null || !('scanlineOn' in model) || typeof model.scanlineOn !== 'boolean') {
     throw new Error('v3-pipeline expected scanline model');
   }
-  return model;
+  return { scanlineOn: model.scanlineOn };
 }
 
 export function configureScanlinePipeline(pipeline: RenderPipeline): void {

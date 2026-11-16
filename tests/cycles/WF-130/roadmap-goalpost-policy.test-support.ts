@@ -2,6 +2,7 @@ import { readDocumentationFile as readFileSync } from '../../../scripts/document
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect } from 'vitest';
+import { must } from '@flyingrobots/bijou/adapters/test';
 
 export const ROOT = resolve(
   dirname(fileURLToPath(import.meta.url)),
@@ -59,7 +60,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 export function extractBashCommandBlocks(markdown: string): string[] {
   return Array.from(
     markdown.matchAll(/```bash\n(?<command>[\s\S]*?)```/g),
-    (match) => match.groups?.command.trim() ?? '',
+    (match) => match.groups?.['command']?.trim() ?? '',
   );
 }
 
@@ -68,7 +69,7 @@ export function extractReferencedTestPaths(markdown: string): string[] {
     markdown.matchAll(
       /\b((?:packages|scripts|tests)\/[A-Za-z0-9._/-]+\.test\.ts)\b/g,
     ),
-    (match) => match[1],
+    (match) => must(match[1], 'referenced test path'),
   );
   return [...new Set(paths)].sort();
 }

@@ -19,13 +19,14 @@ import {
   renderSurface,
   row,
   spacer,
-} from '../_shared/example-surfaces.ts';
+} from '../_shared/example-surfaces.js';
 
 // Show the same components rendered in each built-in theme.
 
 function renderTheme(themeName: string): void {
   // Set the theme via env and create a context
-  process.env.BIJOU_THEME = themeName;
+  // Set the theme via env and create a context
+process.env['BIJOU_THEME'] = themeName;
   const ctx = createBijou({
     runtime: nodeRuntime(),
     io: nodeIO(),

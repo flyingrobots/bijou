@@ -2,7 +2,7 @@ import type { BijouContext } from '@flyingrobots/bijou';
 import { animate, createBrowsableListState, createKeyMap, createSplitPaneState, listFocusNext, listFocusPrev, listPageDown, listPageUp, quit, type FrameLayoutNode, type FramePage } from '@flyingrobots/bijou-tui';
 import type { ShowcaseMsg, ShowcasePageModel } from './types.js';
 import type { Category } from './registry.js';
-import { contentSurface } from '../_shared/example-surfaces.ts';
+import { contentSurface } from '../_shared/example-surfaces.js';
 import { renderDetail, renderSidebar } from './app-views.js';
 import { clamp01 } from './app-utils.js';
 
@@ -97,8 +97,6 @@ export function createCategoryPage(
           // Ignore stale frames from superseded animations
           if (msg.gen !== model.drawerAnimGen) return [model, []];
           return [{ ...model, drawerProgress: clamp01(msg.value) }, []];
-        case 'force-quit':
-          return [model, [quit()]];
         case 'mouse':
         case 'pulse':
           return [model, []];

@@ -20,7 +20,7 @@ import { renderBlocks } from './markdown-render.js';
 /** Configuration options for the {@link markdown} renderer. */
 export interface MarkdownOptions {
   /** Wrap width in columns. Defaults to `ctx.runtime.columns`. */
-  width?: number;
+  width?: number | undefined;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }

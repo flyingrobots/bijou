@@ -51,7 +51,7 @@ export function themeLabEditorStateFor(
 }
 
 export function themeLabEditorSelectedPath(state: ThemeLabEditorState): ThemeLabEditableTokenPath {
-  return THEME_LAB_EDITABLE_PATHS[clampIndex(state.selectedIndex)];
+  return THEME_LAB_EDITABLE_PATHS[clampIndex(state.selectedIndex)] ?? 'semantic.primary';
 }
 
 export function themeLabEditorSelectedHex(state: ThemeLabEditorState): string {

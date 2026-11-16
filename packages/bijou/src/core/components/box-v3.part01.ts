@@ -4,11 +4,11 @@ import { encodeModifiers, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_EMPTY, FLAG_BG
 
 /** Pre-parse a CellTextStyle into numeric RGB + flags for setRGB. Returns undefined if not parseable. */
 function parseStyleRGB(style: {
-  fg?: ColorRef;
-  bg?: ColorRef;
+  fg?: ColorRef | undefined;
+  bg?: ColorRef | undefined;
   fgRGB?: readonly [number, number, number];
   bgRGB?: readonly [number, number, number];
-  modifiers?: string[];
+  modifiers?: string[] | undefined;
 }): {
   fgR: number; fgG: number; fgB: number;
   bgR: number; bgG: number; bgB: number;

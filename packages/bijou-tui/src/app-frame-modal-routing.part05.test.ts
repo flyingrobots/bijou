@@ -18,7 +18,7 @@ import {
   surfaceHasFg,
   surfaceToString,
   _resetDefaultContextForTesting,
-  Msg,
+  type Msg,
   QUIT,
   isCmdCleanup,
 } from './app-frame.test-support.js';

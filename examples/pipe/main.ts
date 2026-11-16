@@ -17,7 +17,7 @@ import {
   renderSurface,
   row,
   spacer,
-} from '../_shared/example-surfaces.ts';
+} from '../_shared/example-surfaces.js';
 
 // Render the same components in each output mode for comparison.
 

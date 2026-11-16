@@ -94,7 +94,7 @@ export interface MergeReadiness {
 export interface ReviewStatusOptions {
   readonly mergeReady: boolean;
   readonly minReviews: number;
-  readonly prArg?: string;
+  readonly prArg?: string | undefined;
 }
 
 export interface ReviewStatusReport {

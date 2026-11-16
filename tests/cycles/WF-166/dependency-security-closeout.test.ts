@@ -37,12 +37,12 @@ describe('WF-166 dependency security closeout', () => {
         return [`${packageName}: missing resolved version`];
       }
       return entries.flatMap(([packagePath, entry]) => {
-        if (!isRecord(entry) || typeof entry.version !== 'string') {
+        if (!isRecord(entry) || typeof entry['version'] !== 'string') {
           return [`${packagePath}: missing resolved version`];
         }
-        return isAtLeast(entry.version, minimum)
+        return isAtLeast(entry['version'], minimum)
           ? []
-          : [`${packagePath}: ${entry.version} is below ${minimum}`];
+          : [`${packagePath}: ${entry['version']} is below ${minimum}`];
       });
     });
 
@@ -54,18 +54,18 @@ describe('WF-166 dependency security closeout', () => {
     'proxy-addr': '^2.0.8', qs: '^6.16.0', zod: '^4.6.6',
   }))('keeps %s workspace installs on the patched runtime line', (name, floor) => {
     const manifest = readJsonObject(resolve(process.cwd(), 'package.json'));
-    expect(readStringProperty(manifest.overrides, name)).toBe(floor);
+    expect(readStringProperty(manifest['overrides'], name)).toBe(floor);
   });
 
   it('keeps MCP direct dependencies on patched SDK and Zod lines', () => {
     const mcp = readJsonObject(resolve(process.cwd(), 'packages/bijou-mcp/package.json'));
-    expect(readStringProperty(mcp.dependencies, '@modelcontextprotocol/sdk')).toBe('^1.32.1');
-    expect(readStringProperty(mcp.dependencies, 'zod')).toBe('^4.6.6');
+    expect(readStringProperty(mcp['dependencies'], '@modelcontextprotocol/sdk')).toBe('^1.32.1');
+    expect(readStringProperty(mcp['dependencies'], 'zod')).toBe('^4.6.6');
   });
 
   it('keeps clean workspace installs on the patched fast-uri line', () => {
     const manifest = readJsonObject(resolve(process.cwd(), 'package.json'));
-    expect(readStringProperty(manifest.overrides, 'fast-uri')).toBe('^3.1.9');
+    expect(readStringProperty(manifest['overrides'], 'fast-uri')).toBe('^3.1.9');
   });
 
   it('normalizes encoded uppercase hostname octets before comparing hosts', () => {
@@ -84,10 +84,10 @@ describe('WF-166 dependency security closeout', () => {
 function readLockedPackages(): Record<string, unknown> {
   const lockfilePath = resolve(process.cwd(), 'package-lock.json');
   const parsed = readJsonObject(lockfilePath);
-  if (!isRecord(parsed) || !isRecord(parsed.packages)) {
+  if (!isRecord(parsed) || !isRecord(parsed['packages'])) {
     throw new Error('package-lock.json must contain a packages object');
   }
-  return parsed.packages;
+  return parsed['packages'];
 }
 
 function readJsonObject(path: string): Record<string, unknown> {

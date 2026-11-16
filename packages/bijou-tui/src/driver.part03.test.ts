@@ -119,7 +119,7 @@ describe('runScript', () => {
         `,
       });
       const badgeCell = result.frames[0]?.get(1, 0);
-      expect(badgeCell.fg).toBe('#001122');
-      expect(badgeCell.bg).toBe('#33aa44');
+      expect(badgeCell?.fg).toBe('#001122');
+      expect(badgeCell?.bg).toBe('#33aa44');
     });
 });

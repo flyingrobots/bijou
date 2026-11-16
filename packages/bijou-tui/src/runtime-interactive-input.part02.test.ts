@@ -1,4 +1,4 @@
-import { App, Cmd, createInteractiveContext, createTestContext, describe, expect, it, KeyMsg, mockClock, quit, run, textView } from './runtime.test-support.js';
+import { type App, type Cmd, createInteractiveContext, createTestContext, describe, expect, it, type KeyMsg, mockClock, quit, run, textView } from './runtime.test-support.js';
 
 describe('run', () => {
   describe('interactive mode', () => {

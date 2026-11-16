@@ -19,11 +19,12 @@ function renderSidebar(
   io: ScopedNodeIO,
 ): Surface {
   const picker = resizePicker(model.picker, Math.max(1, height - 5));
+  const selectedIndex = selectedEntryIndex(picker, model.selectedPath, io);
   const pickerSurface = filePickerSurface(picker, {
     width: Math.max(1, width - 2),
     showScrollbar: true,
     focusIndicator: '>',
-    selectedIndex: selectedEntryIndex(picker, model.selectedPath, io),
+    ...(selectedIndex === undefined ? {} : { selectedIndex }),
     dirIndicator: 'd',
     fileIndicator: '-',
   });

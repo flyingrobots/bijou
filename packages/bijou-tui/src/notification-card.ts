@@ -14,7 +14,7 @@ export interface NotificationRenderEntry<Msg> {
   readonly item: NotificationRecord<Msg>;
   readonly surface: Surface;
   readonly dismissRect: LayoutRect;
-  readonly actionRect?: LayoutRect;
+  readonly actionRect?: LayoutRect | undefined;
 }
 
 export function renderNotificationSurface<Msg>(

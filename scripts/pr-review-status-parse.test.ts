@@ -6,6 +6,6 @@ describe('GH_EXEC_OPTIONS', () => {
     expect(GH_EXEC_OPTIONS.timeout).toBe(30_000);
     expect(GH_EXEC_OPTIONS.maxBuffer).toBe(2 * 1024 * 1024);
     expect(GH_EXEC_OPTIONS.encoding).toBe('utf8');
-    expect(GH_EXEC_OPTIONS.env?.GH_PAGER).toBe('cat');
+    expect(GH_EXEC_OPTIONS.env?.['GH_PAGER']).toBe('cat');
   });
 });

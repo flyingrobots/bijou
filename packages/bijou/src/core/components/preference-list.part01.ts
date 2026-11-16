@@ -8,11 +8,11 @@ export type PreferenceRowKind = 'toggle' | 'choice' | 'info' | 'action';
 export interface PreferenceRow {
   readonly id: string;
   readonly label: string;
-  readonly description?: string;
-  readonly valueLabel?: string;
-  readonly kind?: PreferenceRowKind;
-  readonly checked?: boolean;
-  readonly enabled?: boolean;
+  readonly description?: string | undefined;
+  readonly valueLabel?: string | undefined;
+  readonly kind?: PreferenceRowKind | undefined;
+  readonly checked?: boolean | undefined;
+  readonly enabled?: boolean | undefined;
 }
 
 export interface PreferenceSection {
@@ -32,7 +32,7 @@ export interface PreparedPreferenceRow {
   readonly row: PreferenceRow;
   readonly valueLabel: string;
   readonly baseLeftText: string;
-  readonly preparedDescription?: PreparedWrappedText;
+  readonly preparedDescription?: PreparedWrappedText | undefined;
 }
 
 export interface PreparedPreferenceSection {
@@ -54,19 +54,19 @@ export interface PreferenceListTheme {
 export interface PreferenceRowSurfaceOptions extends BijouNodeOptions {
   readonly width: number;
   readonly selected?: boolean;
-  readonly theme?: PreferenceListTheme;
+  readonly theme?: PreferenceListTheme | undefined;
 }
 
 export interface PreferenceListSurfaceOptions extends BijouNodeOptions {
   readonly width: number;
-  readonly selectedRowId?: string;
-  readonly theme?: PreferenceListTheme;
+  readonly selectedRowId?: string | undefined;
+  readonly theme?: PreferenceListTheme | undefined;
 }
 
 interface PreferenceColorStyle {
-  readonly fg?: string;
+  readonly fg?: string | undefined;
   readonly bg?: string;
-  readonly fgRGB?: readonly [number, number, number];
+  readonly fgRGB?: readonly [number, number, number] | undefined;
   readonly bgRGB?: readonly [number, number, number];
 }
 

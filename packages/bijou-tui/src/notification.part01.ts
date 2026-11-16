@@ -55,17 +55,17 @@ export interface NotificationRecord<Msg> {
   readonly message: string;
   readonly variant: NotificationVariant;
   readonly tone: NotificationTone;
-  readonly width?: number;
+  readonly width?: number | undefined;
   readonly durationMs: number | null;
   readonly placement: NotificationPlacement;
-  readonly action?: NotificationAction<Msg>;
-  readonly bgToken?: TokenValue;
-  readonly accentToken?: TokenValue;
+  readonly action?: NotificationAction<Msg> | undefined;
+  readonly bgToken?: TokenValue | undefined;
+  readonly accentToken?: TokenValue | undefined;
   readonly overflow: OverflowBehavior;
   readonly createdAtMs: number;
   readonly updatedAtMs: number;
-  readonly enteredAtMs?: number;
-  readonly exitStartedAtMs?: number;
+  readonly enteredAtMs?: number | undefined;
+  readonly exitStartedAtMs?: number | undefined;
   readonly phase: NotificationPhase;
   readonly progress: number;
 }
@@ -74,13 +74,13 @@ export interface NotificationState<Msg> {
   readonly overflowExits: readonly NotificationRecord<Msg>[];
   readonly history: readonly NotificationRecord<Msg>[];
   readonly nextId: number;
-  readonly focusedId?: number;
+  readonly focusedId?: number | undefined;
 }
 export interface RenderNotificationStackOptions {
   readonly screenWidth: number;
   readonly screenHeight: number;
   readonly region?: LayoutRect;
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
   readonly margin?: number;
   readonly gap?: number;
 }
@@ -89,12 +89,12 @@ export interface RenderNotificationHistoryOptions {
   readonly height: number;
   readonly scroll?: number;
   readonly filter?: NotificationHistoryFilter;
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
   readonly labels?: NotificationHistoryLabels;
 }
 export interface RenderNotificationReviewEntrySurfaceOptions {
   readonly width: number;
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
   readonly metaLabel?: string;
-  readonly actionLabel?: (label: string) => string;
+  readonly actionLabel?: ((label: string) => string) | undefined;
 }
