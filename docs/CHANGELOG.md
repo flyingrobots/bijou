@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Translation glossaries for French, Spanish, and German
+  (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
+  Block, Surface, Stories, core, and TUI stay English; graceful lowering is
+  abaissement maîtrisé, reducción controlada, and kontrolliertes Absenken;
+  address form is vous, tú, and du. DL-035 records the decision (#588).
 - The Components Library (`npm run components`) is a 58-slide deck: a title,
   one slide per section followed by its components, and an end slide. `h`/`l`
   step one slide at a time and stop at both ends; `PgUp`/`PgDn` move between
