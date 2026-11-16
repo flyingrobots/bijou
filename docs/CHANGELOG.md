@@ -160,6 +160,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   versioned policy identity, the verified Git tree, `classificationBase`, installed
   dependencies, toolchain and command set. The base binding applies to full
   receipts too; a full receipt satisfies fast only when all other bindings match.
+  Dependency and generated-input manifests bind actual file bytes; ignored input
+  coverage and cooperative exclusive custody are required for reusable receipts.
   It lives under the Git common directory and expires after 24 hours. Pre-push
   rejects a missing, stale or forged receipt and prints the witness command.
 

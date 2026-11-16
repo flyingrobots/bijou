@@ -53,7 +53,8 @@ responsibilities divide as follows:
    change.
 2. The witness command runs that selected policy, outside the network transport,
    against a clean working tree. It does not always run the exhaustive policy.
-3. The receipt binds the policy identity and every relevant input.
+3. The receipt binds the policy identity and every input of its eligible gates;
+   an incomplete input declaration makes receipt reuse unavailable.
 4. Pre-push only validates that the receipt the change requires exists and
    matches.
 5. CI still runs the required verification independently at merge (DL-030 full
@@ -61,14 +62,15 @@ responsibilities divide as follows:
 
 On success the witness writes a receipt keyed by the **Git tree object** that
 was verified and the policy identity. The receipt also binds the classification
-base, the installed dependency state, the Node and npm toolchain, the platform,
+base, actual installed dependency bytes, declared generated-input bytes,
+the Node and npm toolchain, the platform,
 and a digest of the exact ordered command set of that policy. It is signed with
 a per-clone key. The receipt and key live under the Git
 common directory, so no worktree can stage them. A receipt is valid for
 **24 hours** and only for an exact match on every bound field.
 
 For each pushed ref, pre-push recomputes every field for the commit being
-pushed. It accepts the push in seconds only when a matching, unexpired, correctly
+pushed. It accepts the push only when a matching, unexpired, correctly
 signed receipt exists. In every other case it fails, names the field that
 did not match, and prints the one command that fixes it. It never runs the suite
 silently and never treats a missing receipt as permission to proceed. CI stays
@@ -102,7 +104,8 @@ Grounded in `origin/main` at `63ea8d19`:
 | --- | --- | --- |
 | `schema` | `bijou.verify-receipt.v1` | A format change invalidates every old receipt. |
 | `tree` | `git rev-parse <commit>^{tree}` of the verified commit | This is the exact content that was verified. It covers source, tests, config, `package.json`, `package-lock.json`, generated catalogs, baselines and the hook scripts. |
-| `installedDeps` | SHA-256 of `node_modules/.package-lock.json` | `package-lock.json` is already in the tree. This field proves that the *installed* modules matched it when the suite ran. |
+| `installedDeps` | SHA-256 of the canonical dependency-content manifest below | Binds the files actually loaded from installed dependencies, including edits that leave lock metadata unchanged. |
+| `generatedInputs` | SHA-256 of the canonical content manifest for the policy's declared generated-input roots | Binds ignored workspace outputs consumed by checks, such as each package's `dist/`; the Git tree does not bind these bytes. |
 | `node` | `process.version` | Test and typecheck behavior depends on the runtime. |
 | `npm` | `npm --version` | It selects the script runner and the workspace resolution. |
 | `platform` | `${process.platform}-${process.arch}` | Terminal and smoke behavior differs between platforms. A receipt is never portable. |
@@ -122,15 +125,61 @@ identical tree, or a reworded commit, still needs no second run. A commit bindin
 would force reruns that prove nothing. A tree binding is exact: one byte of
 difference in any tracked file gives a different tree.
 
-### Clean working tree, so no untracked-input hash
+### Clean tracked tree and complete input declarations
 
 The witness **refuses to run** unless `git status --porcelain` is empty, which
-means no staged, unstaged or untracked non-ignored files. The suite then ran
-against exactly `HEAD^{tree}`. Uncommitted edits cannot leak into a green result
-that is then attributed to a commit that does not contain them. A separate hash
-of untracked inputs is not needed. Ignored inputs that change behavior are bound
-explicitly (`installedDeps`, toolchain). Everything else under `.gitignore` is
-build output that the policy regenerates.
+means no staged, unstaged or untracked non-ignored files. This binds tracked
+sources to `HEAD^{tree}`; it says nothing about ignored files. Every filesystem
+input that can affect an eligible gate must be tree-bound or content-manifest-
+bound. Each gate's policy entry must name its input roots and explain the
+boundary; an undeclared input or an unprovable boundary disables receipt reuse.
+Git cleanliness is not evidence that ignored configuration or build outputs
+cannot affect verification. Runtime resources outside the tree and dependency
+roots must also be declared and manifest-bound if the gate consumes them.
+
+### Actual-content manifests
+
+The manifest format has a version in `policyDigest`. Canonical JSON entries
+include a stable root ID and are sorted by normalized root-relative path within
+that root. They encode the entry kind, executable bit where
+applicable, and SHA-256 of actual regular-file bytes. Directory membership is
+included, so additions and removals change the digest. Do not use timestamps,
+file sizes, package versions or the hidden lockfile as substitutes for content.
+Include hidden dependency files and `.bin` entries.
+
+Symlink entries bind their link text and validated target identity. Resolve
+targets before traversal, track visited identities to detect cycles, and reject
+unreadable paths, special files, dangling links, cycles and targets outside the
+declared dependency or workspace roots. A workspace link is permitted only
+when every reachable target is covered by the tracked tree or a declared
+generated-input manifest. Linking a package does not exempt its ignored `dist/`
+from the binding. Absolute machine paths are not written to receipts.
+
+The shared policy manifest lists the exact generated-input roots used by the
+gates, including workspace build outputs. It also lists any other ignored or
+external filesystem input roots they require. Changing this declaration changes
+`policyDigest`. Gate caches, logs and mutable test fixtures must use separate
+output roots; they cannot be silently excluded from an input root.
+
+For trusted cooperative local development, the witness holds an exclusive
+verification-custody lease covering installation and writes to declared input
+roots, from initial input capture through receipt publication. All supported
+install, build and witness workflows share this protocol. The witness captures
+tracked and dependency inputs before classification; build is the first
+verification gate and may write only declared output roots. After build, the
+witness captures generated inputs. Remaining gates write caches, logs and
+fixtures only to separate output roots.
+
+The witness rechecks actual-content digests and tracked-tree cleanliness before
+publication. Missing input coverage, absent writer participation or lost custody
+refuses reuse. Pre-push holds equivalent custody while recomputing content
+digests without an mtime-only cache and admitting the receipt. #649 must define
+the concrete lock keys, ownership and failure handling before enabling reuse.
+The protocol detects stale bytes and excludes cooperating concurrent writers;
+it does not claim OS-enforced immutability against arbitrary local writers or
+operators deliberately ignoring the lease. Deliberate mutation-and-restoration
+outside the protocol is outside the trusted-operator boundary. Before/after
+hashes alone would not detect that attack.
 
 ### One command set per policy
 
@@ -199,7 +248,7 @@ A receipt is invalid if any one of these conditions is true:
    the requirement (see the table above).
 2. The JSON is malformed, a field is missing, or `schema` is unknown.
 3. `mac` does not verify with the local key, or no key exists.
-4. `classificationBase`, `classification`, `installedDeps`, `node`, `npm`,
+4. `classificationBase`, `classification`, `installedDeps`, `generatedInputs`, `node`, `npm`,
    `platform` or `policyDigest` differs from the value that pre-push recomputes now. A fetch
    that moves `origin/main` can therefore invalidate a receipt. This is
    intentional, because the classification and the related tests change with
@@ -207,10 +256,10 @@ A receipt is invalid if any one of these conditions is true:
 5. `now >= expiresAt`, or `completedAt` is more than 5 minutes in the future
    (clock skew or a fabricated timestamp).
 
-The expiry is 24 hours. Content binding already makes reuse exact, so the
-window is not the main defense. It limits the inputs that cannot be hashed
-cheaply: system libraries, terminal capabilities, and time-dependent tests. It
-also keeps the receipt store small. Each witness run removes receipts that are
+The expiry is 24 hours. Expiry limits age; it does not compensate for missing
+input bindings. A gate that depends on unbound system files or uncontrolled
+time cannot contribute reusable evidence until its inputs are controlled and
+declared. Each witness run removes receipts that are
 older than the expiry. The duration is a constant in the manifest, so a change
 to it changes `policyDigest`.
 
@@ -228,7 +277,9 @@ For each line on standard input:
 
 If every ref passes, pre-push prints the matched tree and the receipt age, keeps
 the commit-pacing warning, and exits 0. The target is under 5 seconds and no
-suite runs.
+suite runs. This is a performance target, not a demonstrated bound: #649/#650
+must measure content-hashing and admission cost on the actual installed tree.
+The implementation must not weaken the binding to meet the target.
 
 If a ref does not pass, pre-push exits non-zero. It names the ref, the tree and
 the first failing condition, for example
@@ -251,8 +302,10 @@ that a flag is not justified.
 - **Fail closed.** Every missing, unreadable, mismatched, expired or unsigned
   state rejects the push. No code path accepts a receipt it could not fully
   validate.
-- **Content-exact.** One changed byte in any tracked file changes the tree, and
-  the lookup then finds no receipt. A receipt for tree A cannot authorize tree B.
+- **Content-exact within the declared input boundary.** A tracked edit changes
+  the tree. A dependency or generated-input edit changes its manifest digest.
+  Missing input coverage or verification custody refuses reuse. A receipt for tree A
+  cannot authorize tree B.
 - **Not a bypass.** A receipt is created only by running the policy that it
   names, and it is accepted only when that policy satisfies the DL-030
   requirement for the change. Local pre-push strength is therefore exactly what
@@ -307,8 +360,24 @@ This approach hashes every tracked and untracked non-ignored file, so the
 witness can run on uncommitted work. Rejected because the pushed object is a
 commit, not a working directory. A dirty-tree receipt would certify content that
 the push does not contain, or would need a second comparison step to
-reconstruct the commit. A clean-tree precondition gives the same precision with
-no new hashing code, and `git` already computes the tree.
+reconstruct the commit. The clean-tree precondition covers tracked sources;
+content manifests additionally cover the ignored inputs that Git does not bind.
+
+### Hash dependency lock metadata only
+
+Rejected: changing an installed JavaScript file without changing
+`node_modules/.package-lock.json` preserves the proposed metadata digest while
+changing executed code. Editing ignored workspace `dist/` likewise preserves
+the Git tree. These are concrete stale-evidence counterexamples. The chosen
+content manifests detect both, at the cost of reading the actual input bytes.
+
+### Require a permanently immutable dependency installation
+
+A sealed installation could provide stable content identities, but relying on
+platform-specific mount or package-store machinery would exclude ordinary
+installations. Content manifests work with the existing installation layout.
+The witness still needs cooperative verification custody while gates run; permanent
+immutability is not assumed from the package manager or from Git cleanliness.
 
 ### Keep the suite in pre-push and add SSH keepalive or retries
 
@@ -332,12 +401,12 @@ mistake fail closed.
 
 ## Consequences
 
-- A normal push is fast and does not depend on the transport. Verification cost
-  moves to an explicit step that the contributor controls.
+- Suite execution moves out of network transport into an explicit step. Push
+  still pays content-hashing cost, whose elapsed time must be measured.
 - Contributors must commit before they verify. Uncommitted work
   cannot be certified.
-- Any dependency reinstall, Node upgrade or policy edit requires a new witness
-  run. This is intentional.
+- A change to dependency bytes, generated inputs, toolchain or policy requires
+  a new witness. A byte-identical reinstall need not invalidate a receipt.
 - A new pre-push failure mode, "no receipt", becomes the common first-push
   experience. The remediation line must be exact, and #652 must document it.
 - Machine contention moves with the work. On shared workstations, concurrent
@@ -368,6 +437,10 @@ mistake fail closed.
   and the fast policy; its changed manifest digest invalidates earlier receipts.
   #649 does not depend on #611, which itself depends on #649 and #650.
 - Refuses to run, and writes nothing, when `git status --porcelain` is not empty.
+- Audits input declarations, captures dependencies under exclusive custody, runs build
+  first, captures generated inputs, retains custody through the remaining gates, and rechecks
+  the bindings before receipt publication. Missing coverage or custody fails
+  closed. The root declaration and manifest format are part of `policyDigest`.
 - Classifies `base..HEAD` and runs the **selected** policy (`fast` or `full`),
   or `full` when `--policy full` is given. A request for
   a policy weaker than the classification is an error.
@@ -383,6 +456,12 @@ mistake fail closed.
   `policy`; failing run writes none; dirty tree is refused; downgrade request is
   refused; existing receipt is replaced; interrupted write leaves no `.json`
   file.
+- Tests also change dependency bytes while holding lock metadata constant,
+  change ignored `dist/` bytes while holding the Git tree constant, add/remove
+  input files, redirect a symlink, exercise forbidden targets, cooperating writer exclusion and lost custody,
+  and reject incomplete input declarations or absent workflow participation.
+  These are required implementation witnesses, not tests supplied by this
+  decision-only PR.
 
 ### #650 Receipt-validating pre-push
 
@@ -397,7 +476,7 @@ mistake fail closed.
 - Tests cover these cases: valid fast receipt for a fast change; full receipt
   for a fast change; fast receipt for a full change (rejected); missing;
   malformed; bad MAC; missing key; expired; future `completedAt`; each of
-  `classificationBase`, `classification`, `installedDeps`, `node`, `npm`,
+  `classificationBase`, `classification`, `installedDeps`, `generatedInputs`, `node`, `npm`,
   `platform` and `policyDigest` mismatched; a changed tracked file (new tree); a multi-ref push
   where one ref has no receipt; a delete push.
 - No change to `.github/workflows/`. The DL-030 CI lanes are unchanged by this
