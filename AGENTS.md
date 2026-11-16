@@ -79,6 +79,8 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 
 ## Documentation & Planning Map
 
+- **`.claude/skills/bijou/SKILL.md`**: read before building or changing a Bijou app, choosing a
+  component, theming, adding motion, localizing, or testing and recording Bijou output.
 - **`README.md`**: public front door and package quick start.
 - **`docs/README.md`**: live documentation map and bounded chapter-reading command.
 - **[Teaching book](https://github.com/flyingrobots/bijou-job-monitor/tree/main/book)**:

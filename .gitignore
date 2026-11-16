@@ -12,7 +12,9 @@ Thumbs.db
 .idea/
 .vscode/
 .obsidian/
-.claude/
+.claude/*
+# Project skills are shared; local Claude settings stay ignored.
+!.claude/skills/
 .codex/
 *.sublime-workspace
 
