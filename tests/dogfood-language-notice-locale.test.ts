@@ -13,9 +13,13 @@ function languageNotice(from: string): string {
 }
 
 describe('DOGFOOD language-change notice', () => {
-  it('is written in the newly selected language (French to Spanish)', () => {
-    const message = languageNotice('fr');
-    expect(message).toMatch(/^Idioma establecido en /);
-    expect(message).toContain('Español');
+  // Oracle: the four supported locale transitions and their catalog messages.
+  it.each([
+    ['en', 'Langue définie sur français / Français.'],
+    ['fr', 'Idioma establecido en español / Español.'],
+    ['es', 'Sprache auf Deutsch gesetzt.'],
+    ['de', 'Language set to English.'],
+  ])('uses the newly selected language when cycling from %s', (from, expected) => {
+    expect(languageNotice(from)).toBe(expected);
   });
 });
