@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DL-031 records the DOGFOOD contextual drawer contract (#623). A page-owned
+  drawer participates in layout and does not dim the frame. It holds variant
+  and guide metadata, takes focus on open, restores focus to a visible pane on
+  close, and supplies footer hints and help while it has focus.
 - The Components Library (`npm run components`) is a 58-slide deck: a title,
   one slide per section followed by its components, and an end slide. `h`/`l`
   step one slide at a time and stop at both ends; `PgUp`/`PgDn` move between
