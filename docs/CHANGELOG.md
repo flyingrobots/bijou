@@ -12,6 +12,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   through the DOGFOOD catalogs in `en`, `fr`, `es`, and `de`. Stories can opt in
   through a `localize` hook, documented in `docs/development.md`.
 
+### Removed
+
+- DOGFOOD no longer ships the unrendered `release-story-current*.md` sources that
+  described v7.2 as current. The Current Release Story renders
+  `release-story-active*.md`, and its tests assert that source (#585).
+
 ### Added
 
 - Components can resolve a layout direction (#612). `BijouNodeOptions` and
