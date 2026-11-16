@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Components can resolve a layout direction (#612). `BijouNodeOptions` and
+  `BijouContext` gain `direction?: 'ltr' | 'rtl'`, and `createBijou()` and
+  `createTestContext()` accept it. `resolveDirection()` lets the explicit
+  option override the context and defaults to `'ltr'`; `mirrorsLayout()`
+  keeps `pipe` and `accessible` output in logical order. `directionalSide()`,
+  `orderForDirection()`, `mirrorGlyph()` and `mirrorGlyphs()` map logical
+  edges, sequences and directional glyphs (‹ ›, ▸ ◂, → ←) for right-to-left
+  layout. No Component mirrors yet; the family tasks under #573 adopt it.
 - The Components Library (`npm run components`) is a 58-slide deck: a title,
   one slide per section followed by its components, and an end slide. `h`/`l`
   step one slide at a time and stop at both ends; `PgUp`/`PgDn` move between

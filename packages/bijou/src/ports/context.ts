@@ -6,7 +6,7 @@ import type { IOPort } from './io.js';
 import type { ClockPort } from './clock.js';
 import type { StylePort } from './style.js';
 import type { TokenGraph } from '../core/theme/graph.js';
-import type { LayoutDirection } from '../core/direction/direction.js';
+import type { InlineDirection } from '../core/direction/direction.js';
 
 /**
  * Top-level dependency-injection context threaded through every bijou component.
@@ -38,7 +38,7 @@ export interface BijouContext {
    * Logical layout direction for direction-sensitive components.
    * Absent means `'ltr'`. Read it through `resolveDirection()`, never directly.
    */
-  readonly direction?: LayoutDirection | undefined;
+  readonly direction?: InlineDirection | undefined;
 
   /** Resolve styles from a global stylesheet based on component identity. */
   resolveBCSS(identity: { type: string, id?: string | undefined, classes?: string[] | undefined }): Record<string, string>;

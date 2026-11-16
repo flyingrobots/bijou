@@ -20,7 +20,7 @@ import { CYAN_MAGENTA } from '../../core/theme/presets.js';
 import { createThemeAccessors } from '../../core/theme/accessors.js';
 import type { Theme } from '../../core/theme/tokens.js';
 import { systemClock } from '../../core/clock.js';
-import type { LayoutDirection } from '../../core/direction/direction.js';
+import type { InlineDirection } from '../../core/direction/direction.js';
 
 export { mockRuntime, type MockRuntimeOptions } from './runtime.js';
 export { mockIO, type MockIOOptions, type MockIO } from './io.js';
@@ -64,7 +64,7 @@ export interface TestContextOptions {
   /** Style adapter override. Defaults to {@link plainStyle}. */
   style?: StylePort;
   /** Logical layout direction. Omitted means components resolve `'ltr'`. */
-  direction?: LayoutDirection;
+  direction?: InlineDirection;
 }
 
 function isClockPort(value: unknown): value is ClockPort {

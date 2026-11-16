@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { createTestContext } from '../../adapters/test/index.js';
+import { mockIO } from '../../adapters/test/io.js';
+import { mockRuntime } from '../../adapters/test/runtime.js';
+import { plainStyle } from '../../adapters/test/style.js';
+import { createBijou } from '../../factory.js';
 import {
   directionalSide,
   mirrorsLayout,
@@ -23,6 +27,14 @@ describe('resolveDirection', () => {
     const ctx = createTestContext({ direction: 'rtl' });
     expect(resolveDirection({ ctx, direction: 'ltr' })).toBe('ltr');
     expect(resolveDirection({ direction: 'rtl', ctx: createTestContext() })).toBe('rtl');
+  });
+});
+
+describe('createBijou direction', () => {
+  it('carries an explicit direction and leaves it absent by default', () => {
+    const ports = { runtime: mockRuntime(), io: mockIO(), style: plainStyle() };
+    expect(resolveDirection({ ctx: createBijou({ ...ports, direction: 'rtl' }) })).toBe('rtl');
+    expect(createBijou(ports).direction).toBeUndefined();
   });
 });
 
