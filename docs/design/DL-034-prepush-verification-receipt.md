@@ -106,8 +106,8 @@ Grounded in `origin/main` at `63ea8d19`:
 | `node` | `process.version` | Test and typecheck behavior depends on the runtime. |
 | `npm` | `npm --version` | It selects the script runner and the workspace resolution. |
 | `platform` | `${process.platform}-${process.arch}` | Terminal and smoke behavior differs between platforms. A receipt is never portable. |
-| `policy` | The DL-030 policy identity that ran: `fast` or `full` | Pre-push compares it with the policy that the change requires. |
-| `base` | The commit OID of the classification base: `git merge-base <commit> origin/main` | DL-030 classifies against this base, and its fast gates (`test:related`, `dogfood:i18n:debt -- --base`) read it. A different base means a different classification and different related tests. |
+| `policy` | `bijou.verify.fast.v1` or `bijou.verify.full.v1` | These are the DL-030 identities; CLI names `fast` and `full` map to them. Pre-push compares the recorded identity with the policy that the change requires. |
+| `classificationBase` | The commit OID from `git merge-base <commit> origin/main` | Both policies run base-sensitive DOGFOOD completeness and debt gates. Fast additionally selects related tests from this diff. A changed base invalidates either policy's receipt. |
 | `classification` | The classifier output: lane, `dogfood` flag and reason ids | Pre-push reruns the classifier and requires an exact match, so a receipt cannot carry a stale lane. |
 | `policyDigest` | SHA-256 of the canonical JSON of the ordered command list for `policy`, including its environment and the classifier version | Any change to the command set, its order, its environment or the classification rules invalidates the receipt. |
 | `completedAt`, `expiresAt` | ISO-8601 UTC; `expiresAt = completedAt + 24h` | Bounds reuse in time. |
@@ -136,16 +136,19 @@ build output that the policy regenerates.
 
 DL-030 owns the gate lists and the classifier (`scripts/verification-lane.ts`,
 #610). DL-034 does not define gates. The ordered local command list for each
-policy identity (`fast`, `full`) is exported from one manifest, which the
-DL-030 implementation owns. The witness, the inline verification mode (#651) and
-the pre-push validator all read that manifest. They cannot drift apart, and the
+policy identity (`bijou.verify.fast.v1`, `bijou.verify.full.v1`) is exported from
+one manifest, which the DL-030 implementation owns. The witness, the inline
+verification mode (#651) and the pre-push validator all read that manifest.
+They cannot drift apart, and the
 digest in a mismatch message is readable. The tree already contains the
 manifest. The separate digest exists to give a precise diagnosis.
 
 ### Which receipt satisfies which requirement
 
 The required policy is the DL-030 classification of the pushed commit against
-`base`. `BIJOU_FULL_PUSH=1` raises the requirement to `full`, as DL-030 defines.
+`classificationBase`. CLI shorthand `fast` and `full` maps to the versioned
+identities in the receipt. `BIJOU_FULL_PUSH` is retired; use
+`npm run verify:witness -- --policy full` to request the full policy explicitly.
 
 | Required | `fast` receipt | `full` receipt |
 | --- | --- | --- |
@@ -155,6 +158,16 @@ The required policy is the DL-030 classification of the pushed commit against
 The witness runs the required policy by default. `npm run verify:witness --
 --policy full` runs `full` voluntarily. A request for a policy weaker than the
 classification is an error, not a downgrade.
+
+An explicit full run on a fast-classified change records the classifier's
+unchanged fast output in `classification` and `bijou.verify.full.v1` in `policy`.
+Classification describes the change; policy describes the work performed.
+
+The table describes policy compatibility only. Every bound input must still
+match, including `classificationBase` and `classification`, for either policy.
+Running every test does not make a base-sensitive localization check independent
+of its base. Unconditional reuse of full receipts was rejected because a moved
+base can change which strings the touched-file rule must examine.
 
 ## Where It Lives
 
@@ -170,9 +183,11 @@ $(git rev-parse --git-common-dir)/bijou/verify/
   receipt is keyed by tree. A tree verified in one worktree is the same content in
   every other worktree of the same clone. Toolchain and dependency fields still
   have to match the worktree that pushes.
-- One file per tree means that concurrent pushes from different worktrees do
-  not overwrite each other. Each write is atomic: write to `<tree>.json.tmp-<pid>`,
-  `fsync`, then `rename`. An interrupted run leaves no partial receipt.
+- One file per tree and policy keeps different policies separate. Each write is
+  atomic: create a unique temporary file beside `<tree>.<policy>.json`, write
+  and `fsync` it, then `rename` it over the destination. Concurrent writes for
+  the same tree and policy may replace each other; the reader still validates
+  every bound input. An interrupted run leaves no partial destination receipt.
 - `.cache/` was rejected as the location. It is per-worktree, `git clean -X`
   removes it, and it is inside the content area that agents and tools scan.
 
@@ -184,8 +199,8 @@ A receipt is invalid if any one of these conditions is true:
    the requirement (see the table above).
 2. The JSON is malformed, a field is missing, or `schema` is unknown.
 3. `mac` does not verify with the local key, or no key exists.
-4. `base`, `classification`, `installedDeps`, `node`, `npm`, `platform` or
-   `policyDigest` differs from the value that pre-push recomputes now. A fetch
+4. `classificationBase`, `classification`, `installedDeps`, `node`, `npm`,
+   `platform` or `policyDigest` differs from the value that pre-push recomputes now. A fetch
    that moves `origin/main` can therefore invalidate a receipt. This is
    intentional, because the classification and the related tests change with
    the base.
@@ -204,7 +219,8 @@ to it changes `policyDigest`.
 For each line on standard input:
 
 - **Delete push** (`local_oid` is all zeros): no receipt is needed.
-- **Any other push**: compute `base`, run the DL-030 classifier on
+- **Any other push**: compute `base` (the observed `classificationBase`),
+  run the DL-030 classifier on
   `base..local_oid` (path classification takes milliseconds and runs no gates),
   derive the required policy, resolve `local_oid^{tree}`, and validate the
   receipt as described in the previous section. Every pushed ref must pass. One
@@ -257,13 +273,14 @@ that a flag is not justified.
 ## Relationship to DL-030
 
 [DL-030](https://github.com/flyingrobots/bijou/pull/659) (#608) is the authority
-for *what* must be verified: the classifier, the policy identities `fast` and
-`full`, their gate lists, and the escalation rules. DL-034 is the authority for
+for *what* must be verified: the classifier, the policy identities
+`bijou.verify.fast.v1` and `bijou.verify.full.v1`, their gate lists, and the
+escalation rules. DL-034 is the authority for
 *how a local run is proven* to pre-push. Neither record restates the other's
 content.
 
-- DL-030's "Local `git push` runs the fast lane or the full local lane" is
-  carried out by DL-034: the witness runs that lane before the push, and
+- DL-030 selects the policy required at push. The witness runs that policy
+  before the push, and
   pre-push validates the receipt. DL-030's fast-lane pre-push task (#611)
   supplies the classifier call and the policy manifest. #650 supplies the
   receipt check in the hook. Neither task runs the gates inside the hook by
@@ -344,13 +361,15 @@ mistake fail closed.
 ### #649 Witness command
 
 - Adds `npm run verify:witness`, implemented in `scripts/hooks/`. It consumes
-  the DL-030 classifier (#610) and policy manifest (#611). If they have not
-  merged yet, #649 waits for them or adds the manifest with the current hook
-  commands as the `full` policy, and #611 then extends it. The witness does not
-  define gates.
+  the DL-030 policy contract. Initially it adds the shared manifest with the
+  current full local command set under `bijou.verify.full.v1` and selects full
+  conservatively for every change. It records the merge base and a documented
+  full-only classifier version. #611 subsequently integrates #610's classifier
+  and the fast policy; its changed manifest digest invalidates earlier receipts.
+  #649 does not depend on #611, which itself depends on #649 and #650.
 - Refuses to run, and writes nothing, when `git status --porcelain` is not empty.
 - Classifies `base..HEAD` and runs the **selected** policy (`fast` or `full`),
-  or `full` when `--policy full` or `BIJOU_FULL_PUSH=1` is given. A request for
+  or `full` when `--policy full` is given. A request for
   a policy weaker than the classification is an error.
 - Runs every command of that policy in order and stops at the first failure. On
   any failure, or on a signal, it writes no receipt.
@@ -368,8 +387,8 @@ mistake fail closed.
 ### #650 Receipt-validating pre-push
 
 - `.githooks/pre-push` classifies each non-delete pushed ref with the DL-030
-  classifier, derives the required policy (raised to `full` by
-  `BIJOU_FULL_PUSH=1`), and validates the tree with `validateReceipt`. By
+  classifier (the conservative full-only selector until #611), derives the
+  required policy, and validates the tree with `validateReceipt`. By
   default it runs no gates.
 - On any failure it exits non-zero with the ref, the tree, the required policy,
   the reason and the line `Run: npm run verify:witness`.
@@ -378,8 +397,8 @@ mistake fail closed.
 - Tests cover these cases: valid fast receipt for a fast change; full receipt
   for a fast change; fast receipt for a full change (rejected); missing;
   malformed; bad MAC; missing key; expired; future `completedAt`; each of
-  `base`, `classification`, `installedDeps`, `node`, `npm`, `platform` and
-  `policyDigest` mismatched; a changed tracked file (new tree); a multi-ref push
+  `classificationBase`, `classification`, `installedDeps`, `node`, `npm`,
+  `platform` and `policyDigest` mismatched; a changed tracked file (new tree); a multi-ref push
   where one ref has no receipt; a delete push.
 - No change to `.github/workflows/`. The DL-030 CI lanes are unchanged by this
   task.
@@ -393,8 +412,9 @@ mistake fail closed.
   against each pushed tree, and ignores receipts. It writes a receipt on
   success, as a convenience for the next push. It is the existing
   long-transport behavior, made explicit.
-- `inline` decides *where* the policy runs. `BIJOU_FULL_PUSH` decides *which*
-  policy runs. The two settings are orthogonal.
+- `inline` decides *where* the selected policy runs. To request full verification
+  explicitly, run `npm run verify:witness -- --policy full` before a receipt-mode
+  push. `BIJOU_FULL_PUSH` is retired and cannot alter admission.
 - No mode, value or variable skips a check. The only modes are `receipt`
   (default) and `inline`.
 
