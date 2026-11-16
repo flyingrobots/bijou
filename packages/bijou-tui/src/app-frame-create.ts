@@ -39,14 +39,16 @@ export function createFramedApp<PageModel, Msg>(
     controls.notificationOptions,
   );
   const app: App<InternalFrameModel<PageModel, Msg>, FramedAppMsg<Msg>> = {
-    init: () =>
-      initializeFrameApp({
+    init: () => {
+      measureCache.invalidate();
+      return initializeFrameApp({
         options,
         pagesById: registry.pagesById,
         pageOrder: registry.pageOrder,
         defaultPageId: registry.defaultPageId,
         themeRuntime,
-      }),
+      });
+    },
     update: (msg, model) =>
       updateFrameApp(msg, model, {
         options,

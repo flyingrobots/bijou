@@ -20,11 +20,11 @@ interface ContentModel {
 }
 interface ContentMsg { readonly type: 'replace'; readonly content: ContentModel }
 
-function contentApp() {
+function contentApp(initialLines: () => number = () => 100) {
   const page: FramePage<ContentModel, ContentMsg> = {
     id: 'home',
     title: 'Home',
-    init: () => [{ lines: 100, overflowX: 'scroll' }, []],
+    init: () => [{ lines: initialLines(), overflowX: 'scroll' }, []],
     update: (msg, model) => [msg.type === 'replace' ? msg.content : model, []],
     layout: (model) => ({
       kind: 'pane',
@@ -39,6 +39,20 @@ function contentApp() {
 describe('cached measurements preserve changed content semantics', () => {
   beforeAll(() => { setDefaultContext(createTestContext()); });
   afterAll(() => { _resetDefaultContextForTesting(); });
+
+  it('measures fresh page content when the same framed app is initialized again', () => {
+    let lines = 100;
+    const app = contentApp(() => lines);
+    let [model] = app.init();
+    [model] = app.update(wrapFrameMsg({ type: 'bottom' }), model);
+    expect(model.scrollByPage['home']?.['main']?.y).toBe(90);
+
+    lines = 3;
+    [model] = app.init();
+    expect(model.pageModels['home']?.lines).toBe(3);
+    [model] = app.update(wrapFrameMsg({ type: 'bottom' }), model);
+    expect(model.scrollByPage['home']?.['main']?.y).toBe(0);
+  });
 
   it('clamps a previously scrolled pane after content shrinks at the same terminal size', () => {
     const app = contentApp();

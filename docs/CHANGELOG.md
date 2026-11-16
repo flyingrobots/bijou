@@ -23,8 +23,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Framed apps reuse the focused-pane scroll measurement across consecutive
   scroll actions (#589, DL-032). Each runtime owns one single-entry cache keyed
   by a frame input revision, page, pane, columns and rows. Any message other
-  than a scroll action invalidates it, and the measurement Surface is no longer
-  module-global. Scroll behaviour is unchanged.
+  than a scroll action invalidates it, as does initializing the app again.
+  The measurement Surface is no longer module-global. Scroll behaviour is unchanged.
 - DL-037 sets the scope of the DOGFOOD localization touched-file rule (#664).
   A touched file must not add or modify raw visible copy without localizing
   it, and must lower its raw-string debt by at least one entry. Whole-file
