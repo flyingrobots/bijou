@@ -55,6 +55,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DL-034 records the pre-push verification receipt decision (#648). A receipt
+  binds the verified Git tree, installed dependencies, toolchain and command set.
+  It lives under the Git common directory and expires after 24 hours. Pre-push
+  rejects a missing, stale or forged receipt and prints the witness command.
+
 - **Inspectable theme provenance and key-binding conflicts** — rule-authored
   presets retain their definitions when renamed, token graphs expose
   mode-aware direct and transitive reverse dependents without resolving cyclic
