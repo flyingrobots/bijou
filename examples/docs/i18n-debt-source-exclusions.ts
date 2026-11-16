@@ -40,6 +40,14 @@ export const DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS: readonly DogfoodI18nDebtSource
       'examples/docs/i18n-debt-touched.ts',
       'localization touched-file ratchet implementation, not a DOGFOOD product surface',
     ),
+    exclusion(
+      'examples/docs/i18n-debt-touched-added.ts',
+      'localization touched-file ratchet implementation, not a DOGFOOD product surface',
+    ),
+    exclusion(
+      'examples/docs/i18n-debt-touched-path.ts',
+      'localization touched-file ratchet implementation, not a DOGFOOD product surface',
+    ),
   ]);
 
 function exclusion(
