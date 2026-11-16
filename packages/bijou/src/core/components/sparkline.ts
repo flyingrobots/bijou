@@ -22,7 +22,7 @@ const BLOCKS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'] as const
 
 export interface SparklineOptions extends BijouNodeOptions {
   /** Output width in characters. Defaults to `values.length`. */
-  readonly width?: number;
+  readonly width?: number | undefined;
   /** Explicit minimum value for scaling. Defaults to the minimum of the sampled values. */
   readonly min?: number;
   /** Explicit maximum value for scaling. Defaults to the maximum of the sampled values. */

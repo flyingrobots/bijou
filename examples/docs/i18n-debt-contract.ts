@@ -82,8 +82,8 @@ export interface DogfoodMarkdownLocalizationRatchetResult {
 }
 
 export interface DogfoodMarkdownLocalizationSpec {
-  readonly sourceLocale?: string;
-  readonly locales?: readonly string[];
+  readonly sourceLocale?: string | undefined;
+  readonly locales?: readonly string[] | undefined;
   readonly localizedPaths: Readonly<Record<string, string>>;
 }
 

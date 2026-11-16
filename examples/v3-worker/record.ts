@@ -1,7 +1,7 @@
 import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { setDefaultContext } from '@flyingrobots/bijou';
 import { recordDemoGif } from '@flyingrobots/bijou-node';
-import { app } from './main.ts';
+import { app } from './main.js';
 
 export default async function record(): Promise<void> {
   const ctx = createTestContext({

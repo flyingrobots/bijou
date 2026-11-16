@@ -86,7 +86,7 @@ function baseRefFromArgs(args: readonly string[]): string {
     throw new Error('missing value for --base');
   }
   const explicitBase = explicitBaseIndex >= 0 ? args[explicitBaseIndex + 1] : undefined;
-  return explicitBase ?? process.env.DOGFOOD_I18N_BASE_REF ?? DEFAULT_BASE_REF;
+  return explicitBase ?? process.env['DOGFOOD_I18N_BASE_REF'] ?? DEFAULT_BASE_REF;
 }
 
 function changedPathsFromBase(baseRef: string, runGit: (args: readonly string[]) => string): readonly string[] {

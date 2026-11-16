@@ -15,9 +15,9 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -32,7 +32,7 @@ describe('createFramedApp', () => {
       pages: [makePage('home', 'Home', 'main')],
     });
     const result = await runScript(app, [{ key: 'x' }]);
-    expect(result.model.pageModels.home?.count).toBe(1);
+    expect(result.model.pageModels['home']?.count).toBe(1);
   });
 });
 
@@ -64,8 +64,8 @@ describe('createFramedApp', () => {
       keyPriority: 'page-first',
     });
     const result = await runScript(app, [{ key: 'l' }]);
-    expect(result.model.pageModels.home?.count).toBe(1);
-    expect(result.model.scrollByPage.home?.main?.x ?? 0).toBe(0);
+    expect(result.model.pageModels['home']?.count).toBe(1);
+    expect(result.model.scrollByPage['home']?.['main']?.x ?? 0).toBe(0);
   });
 });
 

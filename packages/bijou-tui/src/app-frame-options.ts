@@ -50,7 +50,7 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
     readonly model: FrameModel<PageModel>;
     readonly activePage: FramePage<PageModel, Msg>;
     readonly frameKeys: KeyMap<FrameAction>;
-    readonly globalKeys?: KeyMap<Msg>;
+    readonly globalKeys?: KeyMap<Msg> | undefined;
   }) => BindingSource | string | undefined;
   /** Optional observer that receives every key plus the route that handled it. Returned messages are scoped to the active page. */
   readonly observeKey?: (

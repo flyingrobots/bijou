@@ -23,7 +23,7 @@ describe('step (springs)', () => {
       .build();
     const state = runUntilDone(tl);
     expect(tl.done(state)).toBe(true);
-    expect(tl.values(state).x).toBe(100);
+    expect(tl.values(state)['x']).toBe(100);
   });
   it('wobbly spring overshoots before settling', () => {
     const tl = timeline()
@@ -34,11 +34,11 @@ describe('step (springs)', () => {
     const dt = 1 / 60;
     for (let i = 0; i < 3600; i++) {
       state = tl.step(state, dt);
-      const v = must(tl.values(state).x);
+      const v = must(tl.values(state)['x']);
       if (v > maxValue) maxValue = v;
       if (tl.done(state)) break;
     }
     expect(maxValue).toBeGreaterThan(100);
-    expect(tl.values(state).x).toBe(100);
+    expect(tl.values(state)['x']).toBe(100);
   });
 });

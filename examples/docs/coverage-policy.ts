@@ -8,8 +8,8 @@ export const DOGFOOD_NEXT_COVERAGE_TARGET_PERCENT = Math.min(
 );
 
 export interface DogfoodCoverageFloorOptions {
-  readonly floorPercent?: number;
-  readonly nextTargetPercent?: number;
+  readonly floorPercent?: number | undefined;
+  readonly nextTargetPercent?: number | undefined;
 }
 
 export interface DogfoodCoverageFloorResult {

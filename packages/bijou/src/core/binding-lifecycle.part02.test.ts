@@ -103,6 +103,7 @@ describe('binding lifecycle primitives', () => {
         snapshotVersion: 2,
       });
       const invalidation = record.invalidations[0];
+      if (invalidation === undefined) throw new Error('expected one invalidation');
 
       expect('provider' in record).toBe(false);
       expect('subscription' in record).toBe(false);

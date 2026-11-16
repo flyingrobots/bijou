@@ -22,6 +22,7 @@ import {
 import {
   docsThemeMutedBorderToken,
 } from './app-docs-theme-tokens.js';
+import { dogfoodText } from './story-preview-style.js';
 import { renderEmptyStoryPane } from './app-empty-story-pane.js';
 import type { LandingThemeTokens } from './app-landing.js';
 import type { DocsExplorerModel } from './app-model.js';
@@ -31,6 +32,7 @@ import {
   themedSeparatorSurface,
 } from './app-pane-geometry.js';
 import {
+  localizeStory,
   selectedStory,
   selectedVariantIndex,
 } from './app-story-catalog.js';
@@ -42,7 +44,9 @@ export function renderStoryPane(
   theme: LandingThemeTokens,
   localization: LocalizationPort,
 ): Surface {
-  const story = selectedStory(model);
+  const baseStory = selectedStory(model);
+  const story =
+    baseStory == null ? undefined : localizeStory(baseStory, localization);
   if (story == null) {
     return renderEmptyStoryPane(width, context, theme, localization);
   }
@@ -71,7 +75,12 @@ export function renderStoryPane(
       timeMs: model.previewTimeMs,
     }),
   );
-  const previewTitle = `live preview • ${preset.label} • ${variant.label}`;
+  const previewTitle = dogfoodText(
+    localization,
+    'stories.pane.livePreviewTitle',
+    'live preview • {profile} • {variant}',
+    { profile: preset.label, variant: variant.label },
+  );
   const previewCard = boxSurface(preview, {
     title: previewTitle,
     width: Math.min(
@@ -90,7 +99,12 @@ export function renderStoryPane(
   return insetPaneSurface(
     column([
       themedSeparatorSurface(
-        `docs • ${story.title}`,
+        dogfoodText(
+          localization,
+          'stories.pane.docsTitle',
+          'docs • {title}',
+          { title: story.title },
+        ),
         paneWidth,
         context,
         theme,

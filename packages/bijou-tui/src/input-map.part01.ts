@@ -39,7 +39,7 @@ export interface InputEvent {
 export interface InputFeatureEventPattern {
   readonly featureId: string;
   readonly type: InputFeatureEventType;
-  readonly deviceId?: string;
+  readonly deviceId?: string | undefined;
 }
 export interface InputActionBinding<Action> {
   readonly id: string;

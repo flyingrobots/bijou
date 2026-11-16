@@ -11,11 +11,11 @@ export interface DagNode {
   /** Human-readable display text rendered inside the node box. */
   label: string;
   /** IDs of child nodes this node has outgoing edges to. */
-  edges?: readonly string[];
+  edges?: readonly string[] | undefined;
   /** Short annotation text displayed alongside the label (e.g., a status or count). */
-  badge?: string;
+  badge?: string | undefined;
   /** Compact node wrapper used when `nodeStyle: 'compact'` is active. */
-  compactShape?: DagCompactShape;
+  compactShape?: DagCompactShape | undefined;
   /** Color/style token applied to the node box border. */
   token?: TokenValue;
   /** Background token applied behind the node border and content. */
@@ -27,35 +27,35 @@ export interface DagNode {
   /** @internal Used by dagSlice to mark ghost boundary nodes. */
   _ghost?: boolean;
   /** @internal Ghost label override text (e.g., "... 3 ancestors"). */
-  _ghostLabel?: string;
+  _ghostLabel?: string | undefined;
 }
 export interface DagOptions {
   /** Default color/style token for all node box borders. */
-  nodeToken?: TokenValue;
+  nodeToken?: TokenValue | undefined;
   /** Default background token applied behind node borders and labels. */
   nodeBgToken?: TokenValue;
   /** Color/style token for edge lines and arrowheads. */
-  edgeToken?: TokenValue;
+  edgeToken?: TokenValue | undefined;
   /** Glyph family used for edge lines and junctions. */
-  edgeStyle?: DagEdgeStyle;
+  edgeStyle?: DagEdgeStyle | undefined;
   /** Ordered list of node IDs forming a path to highlight. */
-  highlightPath?: string[];
+  highlightPath?: string[] | undefined;
   /** Color/style token applied to highlighted path edges and nodes. */
-  highlightToken?: TokenValue;
+  highlightToken?: TokenValue | undefined;
   /** ID of the currently selected node (e.g., for keyboard navigation). */
-  selectedId?: string;
+  selectedId?: string | undefined;
   /** Color/style token applied to the selected node box. */
-  selectedToken?: TokenValue;
+  selectedToken?: TokenValue | undefined;
   /** Fixed character width for every node box. Auto-calculated when omitted. */
-  nodeWidth?: number;
+  nodeWidth?: number | undefined;
   /** Node renderer family. `'box'` is the default rich mode, `'compact'` is a one-line fallback. */
-  nodeStyle?: DagNodeStyle;
+  nodeStyle?: DagNodeStyle | undefined;
   /** Maximum total character width for the rendered graph. Defaults to terminal columns. */
-  maxWidth?: number;
+  maxWidth?: number | undefined;
   /** Layout direction. Currently only `'down'` is implemented. */
-  direction?: 'down' | 'right';
+  direction?: 'down' | 'right' | undefined;
   /** Bijou context providing runtime, I/O, style, and theme ports. */
-  ctx?: BijouContext;
+  ctx?: BijouContext | undefined;
 }
 export interface DagNodePosition {
   /** Zero-based row of the top-left corner of the node box. */

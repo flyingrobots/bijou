@@ -43,8 +43,8 @@ export interface UiNode {
   readonly children?: readonly string[];
   readonly layout?: UiLayoutIntent;
   readonly text?: UiTextRef;
-  readonly style?: UiStyleRef;
-  readonly actions?: readonly string[];
+  readonly style?: UiStyleRef | undefined;
+  readonly actions?: readonly string[] | undefined;
   readonly metadata?: Record<string, unknown>;
 }
 
@@ -56,7 +56,7 @@ export interface UiBinding {
     readonly kind: 'state' | 'query' | 'computed';
     readonly path: string;
   };
-  readonly when?: string;
+  readonly when?: string | undefined;
 }
 
 export interface UiAction {
@@ -64,7 +64,7 @@ export interface UiAction {
   readonly label?: UiTextRef;
   readonly command: string;
   readonly keybindings?: readonly string[];
-  readonly targetNodeId?: string;
+  readonly targetNodeId?: string | undefined;
 }
 
 export interface UiTokenUse {

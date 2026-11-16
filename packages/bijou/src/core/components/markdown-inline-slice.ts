@@ -47,7 +47,7 @@ export function sliceStyledVisibleRange(text: string, start: number, end: number
 }
 
 function applyStyledInlineControl(
-  state: { sgr: string[]; osc8?: string },
+  state: { sgr: string[]; osc8?: string | undefined },
   raw: string,
 ): void {
   if (raw.startsWith(`${ESC}]8;;`)) {

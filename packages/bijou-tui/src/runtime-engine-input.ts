@@ -25,7 +25,7 @@ export interface RuntimePointerInputEvent {
   readonly action: RuntimePointerAction;
   readonly x: number;
   readonly y: number;
-  readonly button?: RuntimePointerButton;
+  readonly button?: RuntimePointerButton | undefined;
 }
 
 export type RuntimeInputEvent = RuntimeKeyInputEvent | RuntimePointerInputEvent;
@@ -45,9 +45,9 @@ export interface RuntimeInputRouteContext<
   Model = unknown,
 > {
   readonly layer: RuntimeStackLayer<Model>;
-  readonly retainedLayout?: RuntimeRetainedLayout<Node>;
+  readonly retainedLayout?: RuntimeRetainedLayout<Node> | undefined;
   readonly event: RuntimeInputEvent;
-  readonly hit?: RuntimeLayoutHit<Node>;
+  readonly hit?: RuntimeLayoutHit<Node> | undefined;
 }
 
 export interface RuntimeInputRouteOutcome<Command = unknown, Effect = unknown> {
@@ -68,9 +68,9 @@ export interface RuntimeInputRouteResult<
   readonly effects: readonly Effect[];
   readonly visitedViewIds: readonly string[];
   readonly handledByViewId?: string;
-  readonly handledByNodeId?: string;
+  readonly handledByNodeId?: string | undefined;
   readonly stoppedByViewId?: string;
-  readonly hit?: RuntimeLayoutHit<Node>;
+  readonly hit?: RuntimeLayoutHit<Node> | undefined;
 }
 
 export type RuntimeInputHandler<

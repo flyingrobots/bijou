@@ -10,7 +10,7 @@ export interface PaginatorOptions {
   /** Total number of pages. */
   total: number;
   /** Display style: `'dots'` for dot indicators, `'text'` for "Page X of Y". Defaults to `'dots'`. */
-  style?: 'dots' | 'text';
+  style?: 'dots' | 'text' | undefined;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
 }

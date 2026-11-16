@@ -7,9 +7,9 @@ import type { BijouNodeOptions } from './types.js';
 /** Configuration for rendering a horizontal separator line. */
 export interface SeparatorOptions extends BijouNodeOptions {
   /** Optional centered label text. */
-  label?: string;
+  label?: string | undefined;
   /** Total width in characters (defaults to terminal column count). */
-  width?: number;
+  width?: number | undefined;
   /** Theme token applied to the separator line. */
   borderToken?: TokenValue;
 }

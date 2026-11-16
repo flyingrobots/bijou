@@ -25,6 +25,10 @@ export const DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS: readonly DogfoodI18nDebtSource
       Object.freeze({ path, reason: IMPLEMENTATION_REASON }),
     ),
     exclusion(
+      'examples/docs/app-guide-translations.ts',
+      'translated-article file loader; its literals are a locale id and frontmatter field names, not copy',
+    ),
+    exclusion(
       'examples/docs/i18n-debt-baseline.ts',
       'localization debt baseline data, not a DOGFOOD product surface',
     ),
@@ -34,6 +38,14 @@ export const DOGFOOD_I18N_DEBT_SOURCE_EXCLUSIONS: readonly DogfoodI18nDebtSource
     ),
     exclusion(
       'examples/docs/i18n-debt-touched.ts',
+      'localization touched-file ratchet implementation, not a DOGFOOD product surface',
+    ),
+    exclusion(
+      'examples/docs/i18n-debt-touched-added.ts',
+      'localization touched-file ratchet implementation, not a DOGFOOD product surface',
+    ),
+    exclusion(
+      'examples/docs/i18n-debt-touched-path.ts',
       'localization touched-file ratchet implementation, not a DOGFOOD product surface',
     ),
   ]);

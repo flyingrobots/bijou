@@ -17,26 +17,26 @@ import {
 describe('DX-050 page composition graph validation', () => {
   it('rejects graphs that are not rooted in reading order', () => {
     expectInvalid(mutatePage((page) => {
-      const readingOrder = strings(page.readingOrder);
-      page.readingOrder = [
+      const readingOrder = strings(page['readingOrder']);
+      page['readingOrder'] = [
         readingOrder[1],
         readingOrder[0],
         ...readingOrder.slice(2),
       ];
     }));
     expectInvalid(mutatePage((page) => {
-      const root = recordAt(page.nodes, 0);
-      const hero = recordAt(page.nodes, 1);
-      const facts = recordAt(page.nodes, 2);
-      const rootSlots = records(root.slots);
-      recordAt(rootSlots, 0).childPageNodeIds = [];
-      recordAt(rootSlots, 1).childPageNodeIds = [];
-      hero.slots = [{
-        childPageNodeIds: [facts.pageNodeId],
+      const root = recordAt(page['nodes'], 0);
+      const hero = recordAt(page['nodes'], 1);
+      const facts = recordAt(page['nodes'], 2);
+      const rootSlots = records(root['slots']);
+      recordAt(rootSlots, 0)['childPageNodeIds'] = [];
+      recordAt(rootSlots, 1)['childPageNodeIds'] = [];
+      hero['slots'] = [{
+        childPageNodeIds: [facts['pageNodeId']],
         name: 'cycle-child',
       }];
-      facts.slots = [{
-        childPageNodeIds: [hero.pageNodeId],
+      facts['slots'] = [{
+        childPageNodeIds: [hero['pageNodeId']],
         name: 'cycle-child',
       }];
     }));
@@ -44,13 +44,13 @@ describe('DX-050 page composition graph validation', () => {
 
   it('rejects content that exceeds the bounded terminal surface', () => {
     expectUnsupported(mutatePage((page) => {
-      const root = recordAt(page.nodes, 0);
-      recordAt([root.props], 0).displayTitle = 'x'.repeat(101);
+      const root = recordAt(page['nodes'], 0);
+      recordAt([root['props']], 0)['displayTitle'] = 'x'.repeat(101);
     }));
     expectUnsupported(mutatePage((page) => {
-      const relatedNode = recordAt(page.nodes, 4);
+      const relatedNode = recordAt(page['nodes'], 4);
       const relatedProjects = records(
-        recordAt([relatedNode.props], 0).relatedProjects,
+        recordAt([relatedNode['props']], 0)['relatedProjects'],
       );
       const seed = recordAt(relatedProjects, 0);
       for (let index = 0; index < 30; index++) {
@@ -66,14 +66,14 @@ describe('DX-050 page composition graph validation', () => {
 
   it('rejects whitespace and control characters in canonical routes', () => {
     expectInvalid(mutatePage((page) => {
-      const related = recordAt(page.nodes, 4);
-      const projects = recordAt([related.props], 0).relatedProjects;
-      recordAt(projects, 0).route = '/projects/bad route/';
+      const related = recordAt(page['nodes'], 4);
+      const projects = recordAt([related['props']], 0)['relatedProjects'];
+      recordAt(projects, 0)['route'] = '/projects/bad route/';
     }));
     expectInvalid(mutatePage((page) => {
-      const related = recordAt(page.nodes, 4);
-      const projects = recordAt([related.props], 0).relatedProjects;
-      recordAt(projects, 0).route = '/projects/bad\u0007route/';
+      const related = recordAt(page['nodes'], 4);
+      const projects = recordAt([related['props']], 0)['relatedProjects'];
+      recordAt(projects, 0)['route'] = '/projects/bad\u0007route/';
     }));
   });
 
@@ -88,12 +88,12 @@ describe('DX-050 page composition graph validation', () => {
         { length: 27 },
         (_, index) => `capability-${String(index)}`,
       );
-      page.capabilityRequirements = capabilities;
-      const nodes = records(page.nodes);
+      page['capabilityRequirements'] = capabilities;
+      const nodes = records(page['nodes']);
       nodes.forEach((node) => {
-        node.requiredCapabilities = [];
+        node['requiredCapabilities'] = [];
       });
-      recordAt(nodes, 0).requiredCapabilities = capabilities;
+      recordAt(nodes, 0)['requiredCapabilities'] = capabilities;
     });
     expect(() => lowerProfunctorPageArtifacts(
       inputs,
@@ -107,12 +107,12 @@ describe('DX-050 page composition graph validation', () => {
 
   it('rejects visible text changed by terminal sanitization', () => {
     expectUnsupported(mutatePage((page) => {
-      const hero = recordAt(page.nodes, 1);
-      recordAt([hero.props], 0).summary = 'before\u001b[31mafter';
+      const hero = recordAt(page['nodes'], 1);
+      recordAt([hero['props']], 0)['summary'] = 'before\u001b[31mafter';
     }));
     expectUnsupported(mutatePage((page) => {
-      const hero = recordAt(page.nodes, 1);
-      recordAt([hero.props], 0).summary = 'before\tafter';
+      const hero = recordAt(page['nodes'], 1);
+      recordAt([hero['props']], 0)['summary'] = 'before\tafter';
     }));
   });
 });

@@ -83,8 +83,8 @@ export interface BlockRenderResult<Output = unknown> {
 }
 export interface BlockDefinitionInput<Config = unknown, Output = unknown> {
   readonly metadata: BlockMetadata;
-  readonly data?: ViewDataContract;
-  readonly commands?: readonly CommandIntent[];
+  readonly data?: ViewDataContract | undefined;
+  readonly commands?: readonly CommandIntent[] | undefined;
   readonly render: (input: BlockRenderInput<Config>) => BlockRenderResult<Output>;
 }
 export interface BlockDefinition<Config = unknown, Output = unknown>

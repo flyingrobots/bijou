@@ -41,12 +41,12 @@ export interface RuntimeComponentLayoutRules {
   readonly height: RuntimeComponentSizeMode;
   readonly alignX: RuntimeComponentAlignment;
   readonly alignY: RuntimeComponentAlignment;
-  readonly minWidth?: number;
-  readonly maxWidth?: number;
-  readonly minHeight?: number;
-  readonly maxHeight?: number;
-  readonly fixedWidth?: number;
-  readonly fixedHeight?: number;
+  readonly minWidth?: number | undefined;
+  readonly maxWidth?: number | undefined;
+  readonly minHeight?: number | undefined;
+  readonly maxHeight?: number | undefined;
+  readonly fixedWidth?: number | undefined;
+  readonly fixedHeight?: number | undefined;
 }
 
 export interface RuntimeComponentOverflowRules {

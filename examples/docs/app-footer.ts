@@ -49,7 +49,9 @@ export function buildDocsFooterHint(
           paneSwitch,
           localization,
         );
-  return renderDocsFooterHint({ controls, activeHint });
+  return renderDocsFooterHint(
+    activeHint === undefined ? { controls } : { controls, activeHint },
+  );
 }
 
 export function renderDocsFooterHint(config: {

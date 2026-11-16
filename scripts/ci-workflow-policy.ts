@@ -23,17 +23,17 @@ export function readCiWorkflowPolicy(path: string): CiWorkflowPolicy {
 
 export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   const workflow = asRecord(parse(source), 'workflow');
-  const jobs = asRecord(workflow.jobs, 'workflow.jobs');
-  const testJob = asRecord(jobs.test, 'workflow.jobs.test');
-  const focusedUnitTestsJob = asRecord(jobs.unit_cross_platform, 'workflow.jobs.unit_cross_platform');
-  const focusedUnitTestsPermissions = focusedUnitTestsJob.permissions == null
+  const jobs = asRecord(workflow['jobs'], 'workflow.jobs');
+  const testJob = asRecord(jobs['test'], 'workflow.jobs.test');
+  const focusedUnitTestsJob = asRecord(jobs['unit_cross_platform'], 'workflow.jobs.unit_cross_platform');
+  const focusedUnitTestsPermissions = focusedUnitTestsJob['permissions'] == null
     ? undefined
-    : asRecord(focusedUnitTestsJob.permissions, 'workflow.jobs.unit_cross_platform.permissions');
-  const focusedUnitTestsSteps = asArray(focusedUnitTestsJob.steps, 'workflow.jobs.unit_cross_platform.steps');
-  const steps = asArray(testJob.steps, 'workflow.jobs.test.steps');
+    : asRecord(focusedUnitTestsJob['permissions'], 'workflow.jobs.unit_cross_platform.permissions');
+  const focusedUnitTestsSteps = asArray(focusedUnitTestsJob['steps'], 'workflow.jobs.unit_cross_platform.steps');
+  const steps = asArray(testJob['steps'], 'workflow.jobs.test.steps');
   const i18nPolicyGateIndex = steps.findIndex((step) => {
     const stepRecord = asRecord(step, 'workflow.jobs.test.steps[]');
-    return stepRecord.name === 'DOGFOOD i18n policy gate';
+    return stepRecord['name'] === 'DOGFOOD i18n policy gate';
   });
   if (i18nPolicyGateIndex < 0) {
     throw new Error('CI workflow test job is missing DOGFOOD i18n policy gate step');
@@ -41,12 +41,12 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
 
   const checkoutStep = steps.slice(0, i18nPolicyGateIndex).map((step) => {
     return asRecord(step, 'workflow.jobs.test.steps[]');
-  }).find((step) => typeof step.uses === 'string' && step.uses.startsWith('actions/checkout@'));
+  }).find((step) => typeof step['uses'] === 'string' && step['uses'].startsWith('actions/checkout@'));
   if (checkoutStep == null) {
     throw new Error('CI workflow test job is missing checkout before DOGFOOD i18n policy gate');
   }
 
-  const checkoutWith = asRecord(checkoutStep.with, 'workflow.jobs.test.checkout.with');
+  const checkoutWith = asRecord(checkoutStep['with'], 'workflow.jobs.test.checkout.with');
   const fetchDepth = Number(checkoutWith['fetch-depth']);
   if (!Number.isFinite(fetchDepth)) {
     throw new Error('CI workflow test job checkout fetch-depth must be numeric');
@@ -55,31 +55,31 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   const i18nPolicyGate = asRecord(steps[i18nPolicyGateIndex], 'workflow.jobs.test.i18nPolicyGate');
   const testRunStep = steps.map((step) => {
     return asRecord(step, 'workflow.jobs.test.steps[]');
-  }).find((step) => step.run === 'npm run test:run' || step.run === 'npm test');
+  }).find((step) => step['run'] === 'npm run test:run' || step['run'] === 'npm test');
   if (testRunStep == null) {
     throw new Error('CI workflow test job is missing full test run step');
   }
 
   const focusedPortableStep = focusedUnitTestsSteps.map((step) => {
     return asRecord(step, 'workflow.jobs.unit_cross_platform.steps[]');
-  }).find((step) => step.name === 'Focused portable unit tests');
+  }).find((step) => step['name'] === 'Focused portable unit tests');
   if (focusedPortableStep == null) {
     throw new Error('CI workflow unit_cross_platform job is missing Focused portable unit tests step');
   }
 
   return {
     testJob: {
-      checkoutUses: asString(checkoutStep.uses, 'workflow.jobs.test.checkout.uses'),
+      checkoutUses: asString(checkoutStep['uses'], 'workflow.jobs.test.checkout.uses'),
       checkoutFetchDepth: fetchDepth,
-      i18nPolicyGateName: asString(i18nPolicyGate.name, 'workflow.jobs.test.i18nPolicyGate.name'),
-      i18nPolicyGateRun: asString(i18nPolicyGate.run, 'workflow.jobs.test.i18nPolicyGate.run'),
-      testRunCommand: asString(testRunStep.run, 'workflow.jobs.test.fullTest.run'),
+      i18nPolicyGateName: asString(i18nPolicyGate['name'], 'workflow.jobs.test.i18nPolicyGate.name'),
+      i18nPolicyGateRun: asString(i18nPolicyGate['run'], 'workflow.jobs.test.i18nPolicyGate.run'),
+      testRunCommand: asString(testRunStep['run'], 'workflow.jobs.test.fullTest.run'),
     },
     focusedUnitTestsJob: {
       permissionsContents: focusedUnitTestsPermissions == null
         ? undefined
-        : asString(focusedUnitTestsPermissions.contents, 'workflow.jobs.unit_cross_platform.permissions.contents'),
-      focusedPortableRun: asString(focusedPortableStep.run, 'workflow.jobs.unit_cross_platform.focusedPortable.run'),
+        : asString(focusedUnitTestsPermissions['contents'], 'workflow.jobs.unit_cross_platform.permissions.contents'),
+      focusedPortableRun: asString(focusedPortableStep['run'], 'workflow.jobs.unit_cross_platform.focusedPortable.run'),
     },
   };
 }

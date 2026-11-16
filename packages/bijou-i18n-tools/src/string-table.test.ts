@@ -38,8 +38,8 @@ describe('i18n string table workflow', () => {
 
     expect(parsed.rows).toHaveLength(3);
     expect(catalogs[0]?.entries[0]?.sourceValue).toBe('Preferred language');
-    expect(catalogs[0]?.entries[0]?.translations.fr?.value).toBe('Langue préférée');
-    expect(catalogs[0]?.entries[0]?.translations.es).toBeUndefined();
+    expect(catalogs[0]?.entries[0]?.translations['fr']?.value).toBe('Langue préférée');
+    expect(catalogs[0]?.entries[0]?.translations['es']).toBeUndefined();
   });
 
   it('builds selected-locale runtime catalogs without carrying source or unrelated translations', () => {
@@ -74,7 +74,7 @@ describe('i18n string table workflow', () => {
     const byLocale = runtimeCatalogsByLocaleFromStringTable(table);
 
     expect(Object.keys(byLocale)).toEqual(['de', 'en']);
-    expect(byLocale.de?.map((catalog) => catalog.namespace)).toEqual(['bijou.docs', 'bijou.shell']);
-    expect(byLocale.en?.map((catalog) => catalog.namespace)).toEqual(['bijou.docs', 'bijou.shell']);
+    expect(byLocale['de']?.map((catalog) => catalog.namespace)).toEqual(['bijou.docs', 'bijou.shell']);
+    expect(byLocale['en']?.map((catalog) => catalog.namespace)).toEqual(['bijou.docs', 'bijou.shell']);
   });
 });

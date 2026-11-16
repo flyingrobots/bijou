@@ -113,7 +113,7 @@ export function formatReleaseReadinessReport(
 export function defaultRunCommand(
   step: ReleaseReadinessStep,
   cwd: string,
-): { readonly status: number | null; readonly error?: Error } {
+): { readonly status: number | null; readonly error?: Error | undefined } {
   const result = spawnSync(step.command, step.args, {
     cwd,
     stdio: 'inherit',

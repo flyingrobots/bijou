@@ -5,5 +5,5 @@ import { TABLE_STORY_NAV_WIDTHS } from './stories-helper-table-story-nav-widths.
 export const TABLE_STORY_NAV_COLUMNS: readonly TableColumn[] = TABLE_STORY_COLUMNS.map((column, index) => ({
   header: column.header,
   width: TABLE_STORY_NAV_WIDTHS[index] ?? 12,
-  align: column.align,
+  ...(column.align === undefined ? {} : { align: column.align }),
 }));

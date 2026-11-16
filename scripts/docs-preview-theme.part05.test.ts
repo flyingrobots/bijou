@@ -60,7 +60,7 @@ describe('docs preview app', () => {
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
 
-    expect(result.model.docsModel.focusedPaneByPage.themes).toBe('guide-nav');
+    expect(result.model.docsModel.focusedPaneByPage['themes']).toBe('guide-nav');
     expect(text).toContain('Selected: semantic.primary');
     expect(text).toContain('Channel: red');
     expect(text).not.toContain('edited');
@@ -78,7 +78,7 @@ describe('docs preview app', () => {
       { key: '/' },
       { key: 'n' },
     ], { ctx });
-    const pageModel = result.model.docsModel.pageModels.themes;
+    const pageModel = result.model.docsModel.pageModels['themes'];
 
     expect(result.model.docsModel.commandPaletteKind).toBe('search');
     expect(result.model.docsModel.commandPalette?.query).toBe('n');
@@ -96,7 +96,7 @@ describe('docs preview app', () => {
       { key: KEY_TAB },
       { key: 'G' },
     ], { ctx });
-    const pageModel = result.model.docsModel.pageModels.themes;
+    const pageModel = result.model.docsModel.pageModels['themes'];
 
     expect(pageModel?.themeLabEditor).toBeUndefined();
   });
@@ -120,9 +120,9 @@ describe('docs preview app', () => {
     ], { ctx });
 
     expect(settingsResult.model.docsModel.settingsOpen).toBe(true);
-    expect(settingsResult.model.docsModel.pageModels.themes?.themeLabEditor).toBeUndefined();
+    expect(settingsResult.model.docsModel.pageModels['themes']?.themeLabEditor).toBeUndefined();
     expect(paletteResult.model.docsModel.commandPaletteKind).toBe('command');
     expect(paletteResult.model.docsModel.commandPalette?.query).toBe('n');
-    expect(paletteResult.model.docsModel.pageModels.themes?.themeLabEditor).toBeUndefined();
+    expect(paletteResult.model.docsModel.pageModels['themes']?.themeLabEditor).toBeUndefined();
   });
 });
