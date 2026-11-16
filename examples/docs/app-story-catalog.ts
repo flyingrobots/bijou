@@ -3,6 +3,8 @@ import { COMPONENT_STORIES, findComponentStory } from './stories.js';
 import { resolveDogfoodDocsCoverage } from './coverage.js';
 import type { DocsExplorerModel, StoryFamily } from './app-model.js';
 import { slugify } from './app-slug.js';
+import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
+import { isLocalizableStory } from './stories-localizable.js';
 
 const buildStoryFamilies = (
   stories: readonly ComponentStory[],
@@ -49,6 +51,14 @@ export function buildFamilyItems(
     }
   }
   return items;
+}
+
+/** Resolves a story's copy through the port when the story opts in via `localize`; otherwise returns it unchanged. */
+export function localizeStory(
+  story: ComponentStory,
+  localization: LocalizationPort,
+): ComponentStory {
+  return isLocalizableStory(story) ? story.localize(localization) : story;
 }
 
 export function selectedStory(

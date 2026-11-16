@@ -83,7 +83,7 @@ describe('DOGFOOD i18n debt inventory', () => {
       // Keep #549's two removals, 24 localized release entries, and the typed
       // root-route identifier removed while wiring actual landing lowering,
       // plus the ten layout and init literals removed by the #627 drawer work.
-      expect(inventory.total).toBe(2279);
+      expect(inventory.total).toBe(2248);
       expect(surfaces).not.toContain('app-root-view');
       expect(surfaces).toContain('stories-story-guided-flow');
       expect(surfaces).not.toContain('docs-app');
