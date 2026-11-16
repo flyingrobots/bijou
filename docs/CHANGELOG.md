@@ -159,7 +159,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   (`bijou.verify.fast.v1`, `bijou.verify.full.v1`). One tested path classifier
   selects the policy. Both receipt policies bind the classification base because
   both run base-sensitive localization gates. Local pushes are authorized by a
-  DL-034 witness receipt
+  DL-034 witness receipt with actual dependency/generated-input bindings and
+  declared input coverage. Build precedes the remaining verification gates.
+  The receipt is
   for that policy, the fast lane runs on draft pull requests, and the unchanged
   release-grade full lane is required at merge through a single
   `Verification gate` check (#608).
