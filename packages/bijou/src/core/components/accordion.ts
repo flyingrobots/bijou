@@ -11,19 +11,19 @@ export interface AccordionSection {
   /** Body content shown when the section is expanded. */
   content: string;
   /** Whether the section is expanded. Defaults to `false`. */
-  expanded?: boolean;
+  expanded?: boolean | undefined;
 }
 
 /** Configuration options for the {@link accordion} component. */
 export interface AccordionOptions {
   /** Token used to style the expand/collapse indicator arrows. */
-  indicatorToken?: TokenValue;
+  indicatorToken?: TokenValue | undefined;
   /** Token used to style section titles. */
-  titleToken?: TokenValue;
+  titleToken?: TokenValue | undefined;
   /** Background fill token for section headers (expanded and collapsed). No default — opt-in only. */
   headerBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */
-  ctx?: BijouContext;
+  ctx?: BijouContext | undefined;
 }
 
 /**

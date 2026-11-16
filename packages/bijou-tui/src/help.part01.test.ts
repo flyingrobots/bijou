@@ -46,8 +46,8 @@ describe('helpView', () => {
     const result = helpView(km);
     const lines = result.split('\n').filter((l) => l.startsWith('  '));
     // Both content lines should have the description at the same column
-    const descStart0 = lines[0].indexOf('Quit');
-    const descStart1 = lines[1].indexOf('Force quit');
+    const descStart0 = lines[0]?.indexOf('Quit');
+    const descStart1 = lines[1]?.indexOf('Force quit');
     // The key padding means descriptions won't start at wildly different columns
     // Ctrl+c is 6 chars, q is 1 char — both padded to 6
     expect(descStart0).toBe(descStart1);

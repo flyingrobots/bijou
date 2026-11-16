@@ -22,13 +22,13 @@ import { must } from '@flyingrobots/bijou/adapters/test';
 interface StyledFrame {
   readonly width: number;
   readonly height: number;
-  get(x: number, y: number): { readonly char?: string; readonly fg?: ColorRef; readonly bg?: ColorRef };
+  get(x: number, y: number): { readonly char?: string | undefined; readonly fg?: ColorRef | undefined; readonly bg?: ColorRef | undefined };
 }
 
 function styledTextCells(
   frame: StyledFrame,
   text: string,
-): readonly { readonly char?: string; readonly fg?: ColorRef; readonly bg?: ColorRef }[] {
+): readonly { readonly char?: string | undefined; readonly fg?: ColorRef | undefined; readonly bg?: ColorRef | undefined }[] {
   for (let y = 0; y < frame.height; y++) {
     let row = '';
     for (let x = 0; x < frame.width; x++) row += frame.get(x, y).char ?? ' ';

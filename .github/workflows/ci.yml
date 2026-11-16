@@ -87,6 +87,15 @@ jobs:
       - name: Design-system docs preflight
         if: matrix.node-version == 22
         run: npm run docs:design-system:preflight
+      - name: Component audit (fails on errors not in the baseline)
+        if: matrix.node-version == 22
+        run: npm run audit:components -- --all --check
+      - name: Upload component audit report
+        if: always() && matrix.node-version == 22
+        uses: actions/upload-artifact@v7
+        with:
+          name: component-audit
+          path: audit/component-audit.md
       - name: DOGFOOD coverage gate
         if: matrix.node-version == 22 && needs.changes.outputs.dogfood == 'true'
         run: npm run dogfood:coverage:gate

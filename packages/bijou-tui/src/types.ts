@@ -69,11 +69,11 @@ export interface RunOptions<M = unknown> {
   /** Hide the cursor on startup. */
   hideCursor?: boolean;
   /** Enable mouse input (SGR mode). Default: false. */
-  mouse?: boolean;
+  mouse?: boolean | undefined;
   /** Mouse mode: `press`, `drag` (default), or hover-capable `any`. */
-  mouseMode?: MouseTrackingMode;
+  mouseMode?: MouseTrackingMode | undefined;
   /** Bijou context providing I/O and runtime ports. */
-  ctx?: BijouContext;
+  ctx?: BijouContext | undefined;
   /** Optional middleware to intercept or modify messages. */
   middlewares?: Middleware<M>[];
   /** Optional hook to extend the render pipeline with custom middleware. */
@@ -86,7 +86,7 @@ export interface RunOptions<M = unknown> {
    */
   commandBackpressureThreshold?: number;
   /** Optional BCSS stylesheet string. */
-  css?: string;
+  css?: string | undefined;
 }
 
 export * from './runtime-commands.js';

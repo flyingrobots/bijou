@@ -6,7 +6,7 @@ import type { ToolRegistration } from '../types.js';
 
 interface RawTreeNode {
   label: string;
-  children?: RawTreeNode[];
+  children?: RawTreeNode[] | undefined;
 }
 
 const treeNodeSchema: z.ZodType<RawTreeNode> = z.object({

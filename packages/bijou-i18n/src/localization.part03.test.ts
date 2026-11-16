@@ -36,7 +36,7 @@ function accessorObjectPayload(): object {
 
 function circularObjectPayload(): object {
   const value: Record<string, unknown> = { label: 'Cycle' };
-  value.self = value;
+  value['self'] = value;
   return value;
 }
 

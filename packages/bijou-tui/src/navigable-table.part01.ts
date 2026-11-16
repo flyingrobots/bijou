@@ -21,7 +21,7 @@ export interface NavigableTableOptions {
   /** Data rows as arrays of cell strings. */
   readonly rows: readonly (readonly string[])[];
   /** Maximum number of visible data rows (default: 10). */
-  readonly height?: number;
+  readonly height?: number | undefined;
 }
 export interface NavigableTableInput extends NavigableTableOptions {
   /** Optional focused row index for snapshot-style rendering. */

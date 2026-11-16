@@ -18,7 +18,7 @@ export function focusArea(state: FocusAreaState, options?: FocusAreaRenderOption
   const mode = ctx?.mode ?? 'interactive';
 
   // Pipe and accessible modes: no gutter, full width to content
-  const hasGutter = mode !== 'pipe' && mode !== 'accessible';
+  const hasGutter = options?.gutter !== false && mode !== 'pipe' && mode !== 'accessible';
   const contentWidth = hasGutter ? Math.max(1, state.width - 1) : state.width;
 
   // Clamp scrollX to render-time content width (may differ from state-time

@@ -4,7 +4,7 @@ import {
   column,
   row,
   spacer,
-} from "../_shared/example-surfaces.ts";
+} from "../_shared/example-surfaces.js";
 import type { ComponentEntry } from "./types.js";
 
 export const DISPLAY_PART_01: ComponentEntry[] = [

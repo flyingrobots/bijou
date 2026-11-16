@@ -16,7 +16,7 @@ export interface StoryCaptureVariant {
 
 export interface StoryCaptureRenderInput {
   readonly storyId: string;
-  readonly metadata?: ComponentMetadata;
+  readonly metadata?: ComponentMetadata | undefined;
   readonly profile: StoryCaptureProfile;
   readonly variant: StoryCaptureVariant;
 }
@@ -42,8 +42,8 @@ export interface StoryCaptureMatrixOptions {
 
 export interface StoryCaptureMatrix {
   readonly storyId: string;
-  readonly title?: string;
-  readonly metadata?: ComponentMetadata;
+  readonly title?: string | undefined;
+  readonly metadata?: ComponentMetadata | undefined;
   readonly profiles: readonly StoryCaptureProfile[];
   readonly variants: readonly StoryCaptureVariant[];
   readonly captures: readonly StoryCapture[];

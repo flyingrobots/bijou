@@ -11,10 +11,10 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  MouseMsg,
-  Msg,
-  PageModel,
+  type FramePage,
+  type MouseMsg,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -104,6 +104,6 @@ describe('createFramedApp', () => {
 
     expect(model.settingsScrollY).toBe(scrolledY);
     expect(scrolledY).toBeGreaterThan(0);
-    expect(model.pageModels.home?.count).toBe(0);
+    expect(model.pageModels['home']?.count).toBe(0);
   });
 });

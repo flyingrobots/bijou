@@ -51,7 +51,7 @@ export interface BrowsableListRenderItemState<T> {
   readonly item: BrowsableListItem<T>;
   readonly index: number;
   readonly focused: boolean;
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
 }
 
 export type BrowsableListItemRenderer<T> = (state: BrowsableListRenderItemState<T>) => string;

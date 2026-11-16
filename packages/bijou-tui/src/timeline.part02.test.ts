@@ -12,7 +12,7 @@ describe('init', () => {
       .build();
     const state = tl.init();
     const values = tl.values(state);
-    expect(values.x).toBe(10);
-    expect(values.opacity).toBe(0);
+    expect(values['x']).toBe(10);
+    expect(values['opacity']).toBe(0);
   });
 });

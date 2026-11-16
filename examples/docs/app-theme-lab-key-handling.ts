@@ -9,8 +9,8 @@ import {
 export type { ThemeLabEditorState } from './app-theme-lab-editor-model.js';
 
 export interface ThemeLabEditorPageModel {
-  readonly selectedGuideId?: string;
-  readonly activeShellThemeId?: string;
+  readonly selectedGuideId?: string | undefined;
+  readonly activeShellThemeId?: string | undefined;
   readonly themeLabEditor?: ThemeLabEditorState;
 }
 

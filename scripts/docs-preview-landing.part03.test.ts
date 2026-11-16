@@ -31,7 +31,7 @@ describe('docs preview app', () => {
 
     expect(serializeFrame(must(initial.frames[0]))).toEqual(serializeFrame(must(tinyPulse.frames[tinyPulse.frames.length - 1])));
     expect(serializeFrame(must(initial.frames[0]))).not.toEqual(serializeFrame(must(steppedPulse.frames[steppedPulse.frames.length - 1])));
-    const footer = frameText(must(initial.frames[0])).split('\n')[initial.frames[0]?.height - 1] ?? '';
+    const footer = frameText(must(initial.frames[0])).split('\n')[must(initial.frames[0]).height - 1] ?? '';
     expect(footer).toContain('60 fps • auto/performance');
   });
 });
@@ -46,7 +46,7 @@ describe('docs preview app', () => {
     const pulsed = await runScript(app, [{ pulse: { dt: 1 / 30 } }], { ctx });
 
     expect((pulsed.model).landingFps).toBe(54);
-    const footer = frameText(must(pulsed.frames[pulsed.frames.length - 1])).split('\n')[pulsed.frames[pulsed.frames.length - 1]?.height - 1] ?? '';
+    const footer = frameText(must(pulsed.frames[pulsed.frames.length - 1])).split('\n')[must(pulsed.frames[pulsed.frames.length - 1]).height - 1] ?? '';
     expect(footer).toContain('54 fps • auto/full');
   });
 });

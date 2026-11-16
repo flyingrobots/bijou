@@ -13,7 +13,7 @@ export function summarizeChecks(checks: readonly CheckEntry[]): CheckSummary {
     if (check.bucket in counts) {
       counts[check.bucket] = (counts[check.bucket] ?? 0) + 1;
     } else {
-      counts.other = (counts.other ?? 0) + 1;
+      counts['other'] = (counts['other'] ?? 0) + 1;
     }
   }
   return {

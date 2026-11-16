@@ -1,7 +1,7 @@
 import { ctx } from '../_shared/setup.js';
 import { separatorSurface } from '@flyingrobots/bijou';
 import { statusBarSurface } from '@flyingrobots/bijou-tui';
-import { column, line, renderSurface } from '../_shared/example-surfaces.ts';
+import { column, line, renderSurface } from '../_shared/example-surfaces.js';
 
 const surface = column([
   line(''),
