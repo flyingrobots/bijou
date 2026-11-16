@@ -109,7 +109,7 @@ are rejected at append time.
 
 | kind | payload | Emitted |
 | --- | --- | --- |
-| `session` | `{ source, label, viewport, context, clock, pulses }` | Once, `seq` 0 |
+| `session` | `{ source, label, claim, viewport, context, clock, pulses }` | Once, `seq` 0 |
 | `input` | `{ origin, cmd?, msg }` | Each key, mouse or custom message delivered to `update()` |
 | `resize` | `{ origin, columns, rows }` | Each resize delivered to `update()` |
 | `pulse` | `{ origin, dt }` | Each pulse delivered to `update()` |
@@ -133,6 +133,8 @@ Field details:
   to `'mock'`.
 - `session.pulses`: `'script'` when `pulseFps` is `false`, otherwise
   `{ timerFps: number }`.
+- `session.claim`: `'frame-playback'`. It is the only value v1 emitters write.
+  `'re-execution'` is reserved; see Two Claims below.
 - `origin`: `'script'` for a message from a script step, `'command'` for a
   message that a command emitted or returned, `'timer'` for a bus timer pulse.
   When `origin` is `'command'`, `cmd` gives the command ordinal.
@@ -283,6 +285,58 @@ the recording.
 - The decision can be changed until #600 merges. After that, a change is a
   migration with a new `schema` major version.
 
+## Artifact Layers
+
+Three issues name replay or capture formats: #301 (`.bijoucap` / `.bjcap`),
+#306 (`.bijouplay`) and #456 (replay JSONL). They describe four separate
+layers. Each layer depends only on the layers above it in this list.
+
+| Layer | Holds | Format | Owner |
+| --- | --- | --- | --- |
+| (a) Event stream | Ordered inputs, command lifecycle and results, context, and the frame boundaries that the declared claim needs | `bijou-replay-event/1` JSONL | #456, decided here (#599) |
+| (b) Captured frames | The output that was actually captured: full frames, later deltas, frame timing | `.bijoucap` / `.bjcap` (name open) | #301 |
+| (c) Session manifest | Binds (a) and (b) to source, assets, profiles and package versions, each with an identity (hash or version) | `.bijouplay` | #306 |
+| (d) Media export | GIF, video, stills, rendered from (b) only | `.gif`, `.mp4`, `.webp`, `.png` | #605 (GIF); encoders from PR #579 |
+
+Rules:
+
+- Media export (d) reads captured frames only. It never reads app code or
+  re-runs the app.
+- In v1, (b) does not exist yet. Each `frame` event therefore carries the full
+  captured Surface inline, so that a v1 stream alone is enough for frame
+  playback. This is layer (b) data carried inside layer (a), and it is
+  temporary. When #301 defines `.bijoucap`, it decides if `frame` events keep
+  inline cells or reference captured frames by `hash`. The `hash` rule in this
+  record is the join key between the two layers in both cases.
+- The manifest (c) is the only layer that records source, asset, profile and
+  version identities. The event stream never records them, so that it stays
+  free of paths and environment.
+
+## Two Claims
+
+The format keeps two claims separate, and a stream states its claim in
+`session.claim`.
+
+- **Frame playback** (`'frame-playback'`): the recorded frames can be shown
+  again, in order, exactly as captured. Full `frame` events are sufficient.
+- **Re-execution** (`'re-execution'`, reserved): the app's history can be run
+  again and gives the same frames. This needs sufficient initial state, the
+  recorded results of every effect and command, and every nondeterministic
+  input (time, randomness, I/O). v1 records only the outcome class of
+  commands and no initial model, so a v1 stream cannot support this claim.
+  A later version that adds these facts can emit `'re-execution'`, and readers
+  must not infer it from the presence of `input` events.
+
+The recorded inputs in a v1 stream are evidence of what caused each frame.
+They are not a promise that the frames can be reproduced from them.
+
+| Dependent | Claim it supports |
+| --- | --- |
+| #600 ReplayOutbox | Neither. It is transport: order, validation, serialization. |
+| #602 `runScript()` emission | Frame playback. It also records inputs as causal evidence. |
+| #605 `recordDemoGif()` subscriber | Frame playback, exported to layer (d). |
+| #607 Fixture | Frame playback only. A stable GIF hash proves that captured frames play back exactly. It does not prove re-execution. |
+
 ## Contracts For Dependents
 
 ### #600 ReplayOutbox
@@ -309,6 +363,7 @@ the recording.
   last, also when the run throws (`reason: 'error'`).
 - Builds `frame` payloads from the same Surface passed to `onFrame`, and copies
   the cell facts at once (apps may reuse one Surface).
+- Writes `session.claim: 'frame-playback'`.
 - Does not change `drain()` semantics.
 - Tests: golden JSONL for a small app on a mock clock with `pulseFps: false`;
   two runs are byte-identical; a non-plain custom `msg` fails the run; a run
