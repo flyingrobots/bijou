@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Removed
+
+- DOGFOOD no longer ships the unrendered `release-story-current*.md` sources that
+  described v7.2 as current. The Current Release Story renders
+  `release-story-active*.md`, and its tests assert that source (#585).
+
 ### Fixed
 
 - Theme Lab wraps complete picker labels, hints and editor context before
