@@ -32,7 +32,7 @@ export interface GridOptions {
   /** Named area template rows. */
   readonly areas: readonly string[];
   /** Gap between tracks in columns/rows. Default: 0. */
-  readonly gap?: number;
+  readonly gap?: number | undefined;
   /** Renderer map for named areas. */
   readonly cells: Readonly<Record<string, (width: number, height: number) => string>>;
 }

@@ -5,7 +5,7 @@ export interface ValidationResult {
   /** Whether the value passed validation. */
   valid: boolean;
   /** Human-readable error message when validation fails. */
-  message?: string;
+  message?: string | undefined;
 }
 
 /**

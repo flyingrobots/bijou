@@ -3,8 +3,8 @@ export type WorkerMouseTrackingMode = 'press' | 'drag' | 'any';
 export const DISABLE_MOUSE = '\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l';
 
 interface WorkerMouseModeOptions {
-  readonly mouse?: boolean;
-  readonly mouseMode?: WorkerMouseTrackingMode;
+  readonly mouse?: boolean | undefined;
+  readonly mouseMode?: WorkerMouseTrackingMode | undefined;
 }
 
 export function resolveWorkerMouseMode(

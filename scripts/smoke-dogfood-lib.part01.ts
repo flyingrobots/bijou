@@ -24,7 +24,7 @@ export interface SmokeDogfoodOptions {
 export interface SmokeDogfoodResult {
   readonly name: DogfoodScenarioName;
   readonly status: 'ok' | 'error';
-  readonly reason?: string;
+  readonly reason?: string | undefined;
   readonly output?: string;
 }
 export interface SpawnPlan {

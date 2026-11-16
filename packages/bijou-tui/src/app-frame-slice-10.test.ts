@@ -16,7 +16,7 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  FramePage, MouseMsg, Msg, must,
+  type FramePage, type MouseMsg, type Msg, must,
   isCmdCleanup, QUIT,
 } from './app-frame.test-support.js';
 describe('createFramedApp', () => {
@@ -106,7 +106,7 @@ describe('createFramedApp', () => {
       { key: KEY_ESCAPE },
     ]);
     expect(result.model.activePageId).toBe('home');
-    expect(result.model.pageModels.home?.count).toBe(0);
+    expect(result.model.pageModels['home']?.count).toBe(0);
   });
   it('keeps pane keymaps inactive while a page modal is open', async () => {
     type PaneMsg = { type: 'pane-hit' } | { type: 'close-modal' };
@@ -141,7 +141,7 @@ describe('createFramedApp', () => {
       { key: KEY_ESCAPE },
       { key: KEY_DOWN },
     ]);
-    expect(result.model.pageModels.home?.modalOpen).toBe(false);
-    expect(result.model.pageModels.home?.paneHits).toBe(1);
+    expect(result.model.pageModels['home']?.modalOpen).toBe(false);
+    expect(result.model.pageModels['home']?.paneHits).toBe(1);
   });
 });

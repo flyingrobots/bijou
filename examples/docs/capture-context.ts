@@ -9,10 +9,10 @@ import {
 } from '../../packages/bijou-node/src/index.js';
 
 export interface CaptureContextOptions {
-  readonly captureColumns?: string;
-  readonly captureRows?: string;
-  readonly columns?: string;
-  readonly rows?: string;
+  readonly captureColumns?: string | undefined;
+  readonly captureRows?: string | undefined;
+  readonly columns?: string | undefined;
+  readonly rows?: string | undefined;
   readonly environment: Readonly<Record<string, string | undefined>>;
 }
 

@@ -17,6 +17,6 @@ export interface CreateEventBusOptions {
   onCommandRejected?: (error: unknown) => void;
   onCommandBackpressure?: (info: CommandBackpressureInfo) => void;
   onError?: (message: string, error: unknown) => void;
-  commandBackpressureThreshold?: number;
+  commandBackpressureThreshold?: number | undefined;
   clock?: ClockPort;
 }

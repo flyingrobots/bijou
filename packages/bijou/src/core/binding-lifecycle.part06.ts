@@ -24,7 +24,7 @@ export function normalizeRequiredText(options: RequiredTextOptions): string {
   return normalized;
 }
 export function optionalRequiredText(
-  options: Omit<RequiredTextOptions, 'value'> & { readonly value?: string },
+  options: Omit<RequiredTextOptions, 'value'> & { readonly value?: string | undefined },
 ): string | undefined {
   if (options.value === undefined) {
     return undefined;

@@ -4,7 +4,7 @@ import {
   run, quit, isKeyMsg, isMouseMsg,
   type App, type MouseMsg,
 } from '@flyingrobots/bijou-tui';
-import { badgeSurface, column, contentSurface, line, row, spacer } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, contentSurface, line, row, spacer } from '../_shared/example-surfaces.js';
 
 const ctx = initDefaultContext();
 

@@ -45,7 +45,7 @@ describe('createFramedApp', () => {
       { key: KEY_ENTER },
     ]);
     expect(result.model.activePageId).toBe('home');
-    expect(result.model.pageModels.home?.count).toBe(0);
+    expect(result.model.pageModels['home']?.count).toBe(0);
     expect(result.model.commandPalette).toBeUndefined();
   });
 });

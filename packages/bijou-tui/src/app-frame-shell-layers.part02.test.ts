@@ -13,9 +13,9 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -78,6 +78,6 @@ describe('createFramedApp', () => {
     ]);
     expect(result.model.helpOpen).toBe(true);
     expect(result.model.commandPalette).toBeUndefined();
-    expect(result.model.pageModels.home?.count).toBe(0);
+    expect(result.model.pageModels['home']?.count).toBe(0);
   });
 });

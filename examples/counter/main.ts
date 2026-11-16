@@ -1,7 +1,7 @@
 import { startApp } from '@flyingrobots/bijou-node';
 import { box, kbd } from '@flyingrobots/bijou';
 import { quit, isKeyMsg, type App } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
+import { ansiSurface } from '../_shared/example-surfaces.js';
 
 interface Model {
   count: number;

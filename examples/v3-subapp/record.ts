@@ -1,5 +1,5 @@
 import { recordDemoGif } from '@flyingrobots/bijou-node';
-import { app, ctx } from './main.ts';
+import { app, ctx } from './main.js';
 
 export default async function record(): Promise<void> {
   await recordDemoGif({

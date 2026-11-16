@@ -37,14 +37,14 @@ export interface DogfoodI18nMissingTranslationRatchetResult {
 }
 export interface DogfoodI18nCompletenessOptions {
   readonly table: StringTable;
-  readonly baseTable?: StringTable;
-  readonly locales?: readonly string[];
+  readonly baseTable?: StringTable | undefined;
+  readonly locales?: readonly string[] | undefined;
 }
 export interface DogfoodI18nCompletenessIO {
   readonly args?: readonly string[];
   readonly table?: StringTable;
-  readonly baseTable?: StringTable;
-  readonly locales?: readonly string[];
+  readonly baseTable?: StringTable | undefined;
+  readonly locales?: readonly string[] | undefined;
   readonly stdout?: (text: string) => void;
   readonly stderr?: (text: string) => void;
 }

@@ -10,10 +10,11 @@ import {
   run,
   type App,
   type Cmd,
+  type ViewOutput,
   vstackSurface,
   updateSubApp,
 } from '@flyingrobots/bijou-tui';
-import { centerSurface, line, spacer } from '../_shared/example-surfaces.ts';
+import { centerSurface, line, spacer } from '../_shared/example-surfaces.js';
 
 export const ctx = initDefaultContext();
 
@@ -117,8 +118,12 @@ function row(label: string, content: Surface): Surface {
   return surface;
 }
 
-function ensureSurface(view: Surface | string | { cells?: unknown }): Surface {
-  if (typeof view === 'string' || !('cells' in view)) {
+function isSurfaceView(view: ViewOutput): view is Surface {
+  return 'cells' in view;
+}
+
+function ensureSurface(view: ViewOutput): Surface {
+  if (!isSurfaceView(view)) {
     throw new Error('v3-subapp expects child views to be surface-native');
   }
   return view;

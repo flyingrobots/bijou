@@ -58,6 +58,10 @@ export function routeHelpKey<PageModel, Msg>(
     return [observed, { type: 'close-help' }];
   }
   if (isShellQuitRequest(msg)) return shared.quit(msg, 'help');
+  // The arrows scroll help too, alongside the frame's scroll keys; the frame key map binds only j and k.
+  if (!msg.ctrl && !msg.alt && (msg.key === 'up' || msg.key === 'down')) {
+    return [observed, { type: 'help-scroll', action: msg.key }];
+  }
   const action = dependencies.frameKeys.handle(msg);
   if (action?.type === 'toggle-shell-theme-mode') {
     return [observed, { type: 'toggle-shell-theme-mode' }];

@@ -50,7 +50,7 @@ export interface TestRuntimeSnapshot<Model, M> {
   /** Whether this frame came from initial render or an update turn. */
   readonly cause: 'init' | 'update';
   /** Message that triggered the update render, when applicable. */
-  readonly message?: BusMsg<M>;
+  readonly message?: BusMsg<M> | undefined;
   /** Model value visible to the view at this snapshot. */
   readonly model: Model;
   /** Normalized rendered frame. */

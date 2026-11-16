@@ -14,7 +14,7 @@ export type BadgeVariant = BaseStatusKey | 'accent' | 'primary';
 /** Configuration for rendering a badge. */
 export interface BadgeOptions extends BijouNodeOptions {
   /** Color variant (defaults to `'info'`). */
-  variant?: BadgeVariant;
+  variant?: BadgeVariant | undefined;
 }
 
 /**

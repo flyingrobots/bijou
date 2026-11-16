@@ -39,7 +39,7 @@ export interface ImageViewerModel {
 
 export interface ImageViewerOptions {
   readonly root?: string;
-  readonly initialPath?: string;
+  readonly initialPath?: string | undefined;
   readonly columns?: number;
   readonly rows?: number;
 }

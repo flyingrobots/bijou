@@ -11,7 +11,7 @@ import {
   runScript,
   setDefaultContext,
   _resetDefaultContextForTesting,
-  PageTransition,
+  type PageTransition,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {

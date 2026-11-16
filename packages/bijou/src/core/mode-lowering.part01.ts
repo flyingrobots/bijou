@@ -23,12 +23,12 @@ export type ModeLoweringIssueKind =
 export interface ModeLoweringIssue {
   readonly kind: ModeLoweringIssueKind;
   readonly severity: ModeLoweringSeverity;
-  readonly mode?: OutputMode;
+  readonly mode?: OutputMode | undefined;
   readonly baselineMode?: OutputMode;
   readonly factKind?: ModeLoweringFactKind;
-  readonly key?: string;
-  readonly expected?: ModeLoweringFactValue;
-  readonly actual?: ModeLoweringFactValue;
+  readonly key?: string | undefined;
+  readonly expected?: ModeLoweringFactValue | undefined;
+  readonly actual?: ModeLoweringFactValue | undefined;
   readonly message: string;
 }
 export interface ModeLoweringAssertionResult {
