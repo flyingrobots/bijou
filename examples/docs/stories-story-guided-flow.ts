@@ -1,4 +1,5 @@
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
+import type { GuidedFlowStepStatus } from '../../packages/bijou/src/index.js';
 import { CANONICAL_STORY_PROFILE_PRESETS, guidedFlow } from './stories-runtime.js';
 
 import { BIJOU_STORY_PACKAGE, type DogfoodComponentStory } from './stories-contract.js';
@@ -41,9 +42,9 @@ export function createGuidedFlowStory(localization?: LocalizationPort): GuidedFl
           summary: t['preview.summary'],
           metadata: [t['preview.meta.owner'], t['preview.meta.window']],
           steps: [
-            { title: t['preview.step1.title'], detail: t['preview.step1.detail'], status: 'complete' },
-            { title: t['preview.step2.title'], detail: t['preview.step2.detail'], status: 'current' },
-            { title: t['preview.step3.title'], detail: t['preview.step3.detail'], status: 'pending' },
+            { title: t['preview.step1.title'], detail: t['preview.step1.detail'], status: 'complete' satisfies GuidedFlowStepStatus },
+            { title: t['preview.step2.title'], detail: t['preview.step2.detail'], status: 'current' satisfies GuidedFlowStepStatus },
+            { title: t['preview.step3.title'], detail: t['preview.step3.detail'], status: 'pending' satisfies GuidedFlowStepStatus },
           ],
           sections: [
             { title: t['preview.section.why.title'], content: t['preview.section.why.content'] },

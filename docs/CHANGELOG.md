@@ -8,6 +8,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- DOGFOOD story documentation shows canonical family Content guidance and
+  Ownership, matching the Components Library while preserving the story's own
+  summary and usage advice (#586).
 - The `guidedFlow()` story's docs, variant label, and preview copy resolve
   through the DOGFOOD catalogs in `en`, `fr`, `es`, and `de`. Stories can opt in
   through a `localize` hook, documented in `docs/development.md`.

@@ -3,6 +3,7 @@ import type {
   StoryProfilePreset,
   StoryVariant,
 } from './protocol-types.js';
+import { designFamilyFor } from './design-families.js';
 
 export function storyDocsMarkdown<State>(
   story: ComponentStory<State>,
@@ -34,6 +35,15 @@ export function storyDocsMarkdown<State>(
     '## Avoid when',
     '',
     ...toMarkdownList(story.docs.avoidWhen),
+  );
+
+  const family = designFamilyFor(story);
+  for (const field of ['Content guidance', 'Ownership'] as const) {
+    const items = family?.fields.get(field) ?? [];
+    if (items.length > 0) lines.push('', `## ${field}`, '', ...toMarkdownList(items));
+  }
+
+  lines.push(
     '',
     '## Graceful lowering',
     '',
