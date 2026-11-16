@@ -46,15 +46,21 @@ recorded in one table per language.
 
 ## Pre-Change Baseline
 
-Counts from `examples/docs/content/i18n/<locale>/` and the DOGFOOD catalog:
+Examples checked at Bijou commit `36a77614`, before glossary application:
 
-- "Block" occurs about 167 times per language in articles; the fr and es
-  UI uses "Blocs" and "Bloques" in four catalog rows each.
-- Graceful lowering: fr dégradation (9) and abaissement (5); es reducción
-  (7) and degradación (6); de Herabstufen (8) and Absenken (5).
-- fr story lists use both "Récits" (14) and "Stories" (42).
-- Address form is already vous (fr), tú (es), and du (de) in nearly every
-  string.
+- `examples/docs/i18n/source/dogfood-strings.csv` uses "Blocs" and
+  "Bloques" in translated navigation labels, while the translated
+  `blocks-preview.md` articles use "Block".
+- Articles under `examples/docs/content/i18n/<locale>/` contain competing
+  lowering terms: fr dégradation and abaissement; es reducción and
+  degradación; de Herabstufen and Absenken. Search these literal terms in
+  the corresponding locale directory to inspect their contexts.
+- French `blocks-preview-linkdestinationblock.md` uses "Récits", while
+  `blocks-preview-densecomparisonblock.md` uses "Stories".
+
+These examples establish inconsistent terminology, not a complete count of
+translation debt. The address forms below are editorial choices; a
+native-speaker review remains outstanding.
 
 ## Directions Considered
 

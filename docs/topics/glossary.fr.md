@@ -46,8 +46,8 @@ English labels, because the design-system preflight reads them.
 
 Use **vous** for every instruction, label, and article. French technical
 documentation uses "vous"; "tu" reads as overfamiliar to a professional
-reader. Keep the imperative for action labels: **Ouvrir les réglages** in a
-label (infinitive), **Ouvrez les réglages** in a procedure step.
+reader. Use the infinitive for action labels: **Ouvrir les réglages**.
+Use the imperative in procedure steps: **Ouvrez les réglages**.
 
 ## Typography
 

@@ -45,7 +45,8 @@ English labels, because the design-system preflight reads them.
 ## Compounds
 
 Join a kept English term to a German word with a hyphen: Block-Vorschau,
-Surface-Vertrag, `pipe`-Modus, Component-Stories. Do not write closed
+Surface-Vertrag, `pipe`-Modus. A translated term keeps its chosen rendering,
+as in Komponenten-Stories. Do not write closed
 compounds such as "Blockvorschau", because they hide the product term.
 
 ## Address form
