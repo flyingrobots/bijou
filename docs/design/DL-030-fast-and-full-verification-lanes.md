@@ -163,11 +163,14 @@ or removed). That makes the change visible in review and in receipts.
 | `bijou.verify.fast.v1` | fast | witness, for fast-classified `HEAD` | `fast` job on draft pull requests |
 | `bijou.verify.full.v1` | fast and full | witness, for full-classified `HEAD`, or `--policy full` | every full-lane job; required at merge |
 
-Both local policies always run the DOGFOOD localization gates. A receipt is
-never narrower than the path relevance of a push (DL-034 `policyEnv`).
-The fast policy depends on the merge base, because related tests are chosen
-from the diff. So a fast receipt must also bind the merge-base commit that the
-witness classified against.
+Both local policies always run the DOGFOOD localization gates. Both receipts
+bind `classificationBase` and the classifier output: completeness and debt
+checks compare against that base even when the full test suite runs. A full
+receipt can satisfy a fast requirement only while every other bound input
+matches. A changed base requires a new witness for either policy.
+
+The CLI names `fast` and `full` map to the versioned identities above; receipts
+store the versioned identities, never the CLI shorthand.
 
 ## Lane Contents
 
@@ -349,15 +352,14 @@ the only policy; changing either needs a design note.
   `git merge-base HEAD origin/main` to `HEAD`. It runs the required policy,
   or full when `--policy full` is passed. `--policy fast` on a
   full-classified `HEAD` is an error.
-- The receipt carries `policy` (the identity), `policyDigest` for that
-  identity, and, for `fast.v1` only, `classificationBase` (the merge-base
-  commit). DL-034 owns adding these fields to its schema.
+- The receipt carries `policy` (the versioned identity), `policyDigest` for
+  that identity, `classificationBase` (the merge-base commit), and
+  `classification` for both policies. DL-034 owns these schema fields.
 - Pre-push computes the required policy for each pushed ref with the same
-  classifier and base rule. It accepts a receipt for that tree when one of
-  these is true:
-  - the receipt policy is `full.v1`;
-  - the receipt policy is `fast.v1`, the ref classifies fast, and
-    `classificationBase` equals the current merge base.
+  classifier and base rule. It first validates every DL-034 binding, including
+  the base and classification, and then accepts one of these policy matches:
+  - the receipt policy is `bijou.verify.full.v1`;
+  - the receipt policy is `bijou.verify.fast.v1` and the ref classifies fast.
   In every other case it rejects the push and prints
   `Run: npm run verify:witness`, or `... -- --policy full` when the ref needs
   full and has a fast receipt.
@@ -367,8 +369,9 @@ the only policy; changing either needs a design note.
   before lint.
 - Add the `test:related` script.
 - Tests: fast receipt accepted for a fast ref; fast receipt rejected for a
-  full ref; full receipt accepted for both; fast receipt rejected after the
-  merge base moves; `--policy fast` refused on a full `HEAD`.
+  full ref; full receipt accepted for both with matching bindings; both
+  policies rejected after the merge base or classification changes;
+  `--policy fast` refused on a full `HEAD`.
 - Acceptance evidence: witness and push timings for one docs-only slice and
   one full slice, recorded on the PR.
 
