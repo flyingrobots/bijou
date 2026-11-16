@@ -3359,6 +3359,325 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Le contenu est produit par une IA et exige provenance, preuves ou confiance explicites ; préférez `explainability()`."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "L'utilisateur a besoin de transitions d'état modifiables ou d'un routage pas à pas complet géré par le shell."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Une simple note ou une alerte suffirait à tout dire honnêtement."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.accessible"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Des étapes linéarisées et des libellés de section préservent le même sens guidé dans l'ordre de lecture."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.interactive"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Un bloc groupé garde le résumé, les étapes, les sections et l'action suivante visiblement distincts."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.pipe"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Des sections indentées et une action suivante étiquetée préservent le parcours sans décor superflu."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.static"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Le même rythme de sections reste déterministe sans comportement d'exécution du shell."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Configuration"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.owner"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Responsable : Platform ops"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.window"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Fenêtre : aujourd'hui"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.nextAction"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Ouvrez le gestionnaire de secrets de préproduction et renouvelez le jeton de déploiement."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Gardez le guidage consultatif jusqu'à ce que le secret renouvelé soit confirmé dans les journaux de déploiement."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Note pour l'opérateur"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Le déploiement est sain, mais le jeton qui expire fragilise le chemin actuel tant que la rotation n'est pas terminée."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Pourquoi"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "La latence du canari et le budget d'erreurs sont tous deux sains."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Vérifier la santé du déploiement"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Le jeton actuel expire dans 30 minutes."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Renouveler le secret de préproduction"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Seulement après confirmation du nouveau secret."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Promouvoir le déploiement"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Gardez l'opérateur sur un seul parcours serein au lieu de disperser la séquence entre notes, tiroirs et lignes d'état."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Préparer le déploiement en préproduction"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Bloc réutilisable pour des surfaces d'assistance multi-étapes plus calmes, avec des sections explicites et une seule action suivante évidente."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Le parcours demande une recommandation ou un chemin de configuration serein sans devenir un assistant complet."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Le rythme des sections et l'action suivante doivent rester explicites au lieu de se diluer dans une prose générique."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "La surface relève de l'assistance guidée, mais pas spécifiquement de l'explicabilité de l'IA."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Guidage multi-étapes serein avec une seule action suivante explicite."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "Déploiement en préproduction"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "stories.markdown.releaseNote.intro"
       },
       "kind": "message",
@@ -3431,6 +3750,28 @@
       "sourceLocale": "en",
       "values": {
         "fr": "# Release note"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.docsTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "docs • {title}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.livePreviewTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "fr": "aperçu en direct • {profile} • {variant}"
       }
     },
     {
