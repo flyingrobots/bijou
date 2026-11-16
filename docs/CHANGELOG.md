@@ -66,6 +66,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- A regression test pins component family entries to exactly the eight R52
+  fields, so no comparison or analogue field can return.
+
 - The Components Library no longer renders dimmed. The app frame dims
   everything beneath any overlay, so the Library draws its progress bar inside
   the page instead of as an overlay.
