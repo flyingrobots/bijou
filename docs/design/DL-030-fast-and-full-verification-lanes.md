@@ -354,9 +354,10 @@ the only policy; changing either needs a design note.
 - `scripts/hooks/verify-policy.mjs` exports both identities and their ordered
   command lists, exactly as in "Lane Contents". It is the only definition of
   the local policies.
-- The manifest also declares every eligible gate's filesystem-input roots and
+- The manifest also declares every eligible gate's project filesystem-input roots and
   build/output roots. Tracked inputs are tree-bound; ignored dependency and
-  generated inputs are content-manifest-bound under DL-034. Uncovered inputs
+  generated inputs are content-manifest-bound under DL-034, within its explicit
+  trusted-computing-base and controlled-environment boundary. Uncovered inputs
   or unavailable cooperative verification custody prohibit receipt reuse. Build precedes the
   remaining gates without dropping any gate.
 - `npm run verify:witness` calls `classifyVerificationLane` on the diff from
