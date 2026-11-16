@@ -17,7 +17,7 @@ import type {
 } from './app-model.js';
 
 export function localizationSettingsSection(
-  model: DocsExplorerModel,
+  model: Pick<DocsExplorerModel, 'locale'>,
   localization: LocalizationPort,
 ): FrameSettingSection<DocsMsg> {
   const nextLocale = nextDogfoodLocale(model.locale);
