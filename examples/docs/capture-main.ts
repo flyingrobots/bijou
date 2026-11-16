@@ -1,3 +1,4 @@
+import '../../scripts/docker-seal/require-docker.mjs';
 import {
   run,
   type App,

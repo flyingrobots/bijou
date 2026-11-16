@@ -1,3 +1,4 @@
+import './scripts/docker-seal/require-docker.mjs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 

@@ -1,3 +1,4 @@
+import './docker-seal/require-docker.mjs';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { detectGarbage, PTY_MARKER_PREFIX, rewritePackageManifestToTarballs, stripAnsi, type PtyStep } from './smoke-utils.js';

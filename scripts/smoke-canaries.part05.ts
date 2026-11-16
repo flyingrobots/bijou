@@ -1,3 +1,4 @@
+import './docker-seal/require-docker.mjs';
 import { cpSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';

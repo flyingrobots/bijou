@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+node "$(dirname "$0")/../docker-seal/require-docker.mjs"
 
 # ---------------------------------------------------------------------------
 # Commit pacing check
@@ -10,18 +11,15 @@ DOGFOOD_RELEVANT=false
 
 is_dogfood_relevant_path() {
   case "$1" in
-    .github/workflows/*) return 0 ;;
-    package.json|package-lock.json) return 0 ;;
-    packages/*) return 0 ;;
-    examples/docs/*) return 0 ;;
-    scripts/dogfood-*) return 0 ;;
-    scripts/smoke-dogfood*) return 0 ;;
-    tests/cycles/DF-*) return 0 ;;
-    tests/cycles/*dogfood*) return 0 ;;
-    docs/*) return 0 ;;
-    docs/design/DF-*) return 0 ;;
-    docs/legends/DF-*) return 0 ;;
-    docs/method/legends/DF-*) return 0 ;;
+  .github/workflows/*) return 0 ;;
+  package.json | package-lock.json) return 0 ;;
+  packages/*) return 0 ;;
+  examples/docs/*) return 0 ;;
+  scripts/dogfood-*) return 0 ;;
+  scripts/smoke-dogfood*) return 0 ;;
+  tests/cycles/DF-*) return 0 ;;
+  tests/cycles/*dogfood*) return 0 ;;
+  docs/*) return 0 ;;
   esac
 
   return 1
@@ -31,12 +29,14 @@ changed_paths_for_push() {
   local local_oid="$1"
   local remote_oid="$2"
   local zero_oid="0000000000000000000000000000000000000000"
-  local commits
+  local commits commit
 
   if [ "$remote_oid" = "$zero_oid" ]; then
     commits=$(git rev-list "$local_oid" --not --remotes 2>/dev/null || true)
     if [ -n "$commits" ]; then
-      git diff-tree --no-commit-id --name-only -r -m $commits
+      while IFS= read -r commit; do
+        git diff-tree --no-commit-id --name-only -r -m "$commit"
+      done <<<"$commits"
     fi
     return 0
   fi
@@ -72,7 +72,7 @@ run_dogfood_i18n_gates() {
   npm run dogfood:i18n:debt
 }
 
-while read -r local_ref local_oid remote_ref remote_oid; do
+while read -r local_ref local_oid _remote_ref remote_oid; do
   # Skip delete pushes
   if [ "$local_oid" = "0000000000000000000000000000000000000000" ]; then
     continue

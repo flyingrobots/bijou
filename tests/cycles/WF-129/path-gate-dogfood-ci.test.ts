@@ -56,7 +56,7 @@ describe('WF-129 path-gate DOGFOOD CI', () => {
       "- uses: actions/checkout@v6\n        if: needs.changes.outputs.dogfood == 'true'",
     );
     expect(ci).toContain(
-      "- if: needs.changes.outputs.dogfood == 'true'\n        run: npm run ${{ matrix.lane.command }}",
+      "- if: needs.changes.outputs.dogfood == 'true'\n        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run ${{ matrix.lane.command }}'",
     );
   });
 
