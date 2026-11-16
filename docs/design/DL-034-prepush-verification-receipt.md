@@ -274,6 +274,14 @@ mistake fail closed.
   run. This is intentional.
 - A new pre-push failure mode, "no receipt", becomes the common first-push
   experience. The remediation line must be exact, and #652 must document it.
+- Machine contention moves with the work. On shared workstations, concurrent
+  pre-push campaigns from several agents compete for the same host. The
+  maintainer currently serialises every `git push` through the `git-locks`
+  `host/heavy-work` lock for that reason. After #650 merges, a receipt-mode
+  push is light, so the heavy campaign is the witness run, and the lock belongs
+  around `npm run verify:witness` and around full-mode pushes (#651). The
+  receipt itself does not depend on the lock: a run that was not serialised is
+  still exact, only slower.
 - The hook scripts gain a shared manifest. Code-size and Code Dojo ratchets
   apply to it like any other script.
 - Reversal before #650 merges costs nothing. After #650 merges, a change to the
@@ -333,4 +341,7 @@ mistake fail closed.
 - Says plainly that CI is the remote authority, and that a hand-written or
   copied receipt is a hook bypass.
 - Never recommends `--no-verify` or editing a receipt.
+- On shared workstations, says to run the witness, and any full-mode push,
+  while holding the host heavy-work lock. A receipt-mode push does not need
+  the lock.
 - Adds a `docs/CHANGELOG.md` entry.
