@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DL-037 sets the scope of the DOGFOOD localization touched-file rule (#664).
+  A touched file must not add or modify raw visible copy without localizing
+  it, and must lower its raw-string debt by at least one entry. Whole-file
+  cleanup is no longer required. `npm run dogfood:i18n:debt` now rejects a
+  touched file that adds a raw string, even when its net count falls.
 - DL-031 records the DOGFOOD contextual drawer contract (#623). A page-owned
   drawer participates in layout and does not dim the frame. It holds variant
   and guide metadata, takes focus on open, restores focus to a visible pane on
