@@ -9,9 +9,9 @@ export interface TimelineEvent {
   /** Primary label for the event. */
   label: string;
   /** Optional longer description shown after the label. */
-  description?: string;
+  description?: string | undefined;
   /** Status key determining the dot style and color. Defaults to `'muted'`. */
-  status?: BaseStatusKey;
+  status?: BaseStatusKey | undefined;
 }
 
 /** Configuration options for the {@link timeline} component. */

@@ -70,6 +70,6 @@ describe('bijou-i18n-tools', () => {
       },
     ]);
 
-    expect(catalogs[0]?.entries[0]?.translations.de?.status).toBe('stale');
+    expect(catalogs[0]?.entries[0]?.translations['de']?.status).toBe('stale');
   });
 });

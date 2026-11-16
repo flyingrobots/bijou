@@ -13,10 +13,10 @@ import {
   textView,
   tick,
   _resetDefaultContextForTesting,
-  FramePage,
-  FramedAppMsg,
-  Msg,
-  PageModel,
+  type FramePage,
+  type FramedAppMsg,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 import { must } from '@flyingrobots/bijou/adapters/test';
@@ -109,7 +109,7 @@ describe('createFramedApp', () => {
       update = app.update(returned, model);
       model = update[0];
     }
-    expect(model.pageModels.home?.count).toBe(0);
-    expect(model.pageModels.logs?.count).toBe(1);
+    expect(model.pageModels['home']?.count).toBe(0);
+    expect(model.pageModels['logs']?.count).toBe(1);
   });
 });

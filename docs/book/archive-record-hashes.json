@@ -398,9 +398,9 @@
     {
       "record": "R50",
       "original_path": "docs/design-system/README.md",
-      "original_markdown_sha256": "7cb5f686bca5c2a4a68ce895d717564702950fc97a8a88d9663b7c2e719eae1f",
+      "original_markdown_sha256": "f59f69adc871749e0c5653878f4208305c3e021eea42aed859fe76bf8042e651",
       "latex_path": "chapters/02-design-system-and-reference/0017-readme.tex",
-      "current_latex_sha256": "d1d0d35946b274191b14470303a7baf6e4603e43aeef6c2ebc6babcc13c33e9f",
+      "current_latex_sha256": "ba58aef6078bab76f3470d6f37d819f238ba2e8e6ddd1212cbea692dca4a8037",
       "previous_latex_sha256": "d1d0d35946b274191b14470303a7baf6e4603e43aeef6c2ebc6babcc13c33e9f"
     },
     {
@@ -414,9 +414,9 @@
     {
       "record": "R52",
       "original_path": "docs/design-system/component-families.md",
-      "original_markdown_sha256": "b120de8b83203987714aabcdc151f88c17eee0ad272a30f1ebc105d7fd3535e5",
+      "original_markdown_sha256": "8803307486cda75faa4135fe0c65d3773348c4db456030a7a043f1f063345593",
       "latex_path": "chapters/02-design-system-and-reference/0019-component-families.tex",
-      "current_latex_sha256": "9eff8697a4f6b680f027c12f607ea9d0b617faa4eee42b5aea2334d401d9352c",
+      "current_latex_sha256": "16b9108c3aa92d9b458a3feb1e04cab02d226c9ca7ac27a71da5428880f03406",
       "previous_latex_sha256": "9eff8697a4f6b680f027c12f607ea9d0b617faa4eee42b5aea2334d401d9352c"
     },
     {
@@ -430,9 +430,9 @@
     {
       "record": "R54",
       "original_path": "docs/design-system/foundations.md",
-      "original_markdown_sha256": "a2568f893f7d1c8d062336186b190e2b8998cf16709d43f31f69d621b0bc0a17",
+      "original_markdown_sha256": "caaa4c38becdef85b9b9b01c7b671e9223816de58686adffb24b20c27ca84660",
       "latex_path": "chapters/02-design-system-and-reference/0021-foundations.tex",
-      "current_latex_sha256": "b0054be7d9f110c052e6d977f41fa9ab026843b2db1ec86df51e4c282bd231d3",
+      "current_latex_sha256": "7b5d1677a44a5cacc3089f55f63256b301e68e063c6c7ed160274c418ce3598b",
       "previous_latex_sha256": "b0054be7d9f110c052e6d977f41fa9ab026843b2db1ec86df51e4c282bd231d3"
     },
     {
@@ -486,9 +486,9 @@
     {
       "record": "R61",
       "original_path": "docs/design-system/theme-tokens.md",
-      "original_markdown_sha256": "8ecf378c8ac6929408b8d3f7d0c06a9e5989084b30e6a425ea1e831f56ed8eb7",
+      "original_markdown_sha256": "ed4c9dadfd5dd1b59ff2df816579188cf1c63e16afe7d7dce59a47d1d733d9f3",
       "latex_path": "chapters/02-design-system-and-reference/0028-theme-tokens.tex",
-      "current_latex_sha256": "63ed994286a9feb140c3db6e73a1d9f255d2434339711631db40106bdbc385db",
+      "current_latex_sha256": "39500aaa4aea05cf1da4df95b143069b04f2a2c015a25fb4f546b8def69fbb2d",
       "previous_latex_sha256": "63ed994286a9feb140c3db6e73a1d9f255d2434339711631db40106bdbc385db"
     },
     {
@@ -3390,9 +3390,9 @@
     {
       "record": "R424",
       "original_path": "docs/archive/component-system-audit.md",
-      "original_markdown_sha256": "7634ef8e9e9dbd61943845970f653575d82b13799f0d0887acc42e62f8ba958b",
+      "original_markdown_sha256": "dbe643cbd947a3ea4b8e914e89b0431cf2cade67af40aca79b3d63e7867ede85",
       "latex_path": "chapters/13-audits-and-archive-records/0425-component-system-audit.tex",
-      "current_latex_sha256": "09ac194a4488c7ea73741fd1b2241057fafe57efb624ff7dd02e8f81cb598ffb",
+      "current_latex_sha256": "2d30d9bea7fd1f36e0a55fcf75b1f7b95f989f3b8123700ae01314e1fa6db5f3",
       "previous_latex_sha256": "09ac194a4488c7ea73741fd1b2241057fafe57efb624ff7dd02e8f81cb598ffb"
     },
     {

@@ -26,8 +26,6 @@ const COMPLETE_SECTION = `### Example Family
   - accessible: linearize the content explicitly
 - Related families:
   - \`other()\`
-- Carbon analogue:
-  - tag
 `;
 
 const REPO_ROOT = resolve(import.meta.dirname, '..');

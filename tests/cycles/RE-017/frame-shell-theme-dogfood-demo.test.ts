@@ -27,8 +27,8 @@ describe('RE-017 framed shell theme demo', () => {
     const model = result.model as {
       route: string;
       landingThemeIndex: number;
-      landingToast?: { message: string };
-      docsModel: { activeShellThemeId?: string; pageModels: Record<string, { landingThemeIndex: number }> };
+      landingToast?: { message: string } | undefined;
+      docsModel: { activeShellThemeId?: string | undefined; pageModels: Record<string, { landingThemeIndex: number }> };
     };
     const frame = must(result.frames.at(-1));
 
@@ -54,8 +54,8 @@ describe('RE-017 framed shell theme demo', () => {
     const resultModel = model as {
       landingThemeIndex: number;
       docsModel: {
-        activeShellThemeId?: string;
-        pageModels: Record<string, { landingThemeIndex: number; activeShellThemeId?: string }>;
+        activeShellThemeId?: string | undefined;
+        pageModels: Record<string, { landingThemeIndex: number; activeShellThemeId?: string | undefined }>;
       };
     };
     const frame = normalizeViewOutput(app.view(model), {

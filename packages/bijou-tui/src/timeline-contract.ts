@@ -115,11 +115,11 @@ export type BuilderEntry =
     readonly kind: 'track';
     readonly name: string;
     readonly def: TrackDef;
-    readonly position?: Position;
+    readonly position?: Position | undefined;
   }
   | { readonly kind: 'label'; readonly name: string }
   | {
     readonly kind: 'call';
     readonly name: string;
-    readonly position?: Position;
+    readonly position?: Position | undefined;
   };

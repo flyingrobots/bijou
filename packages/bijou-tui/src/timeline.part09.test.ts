@@ -33,12 +33,12 @@ describe('mixed spring + tween timeline', () => {
     // After a few frames, both should be animating
     const state = runFrames(tl, tl.init(), 10);
     const values = tl.values(state);
-    expect(values.x).toBeGreaterThan(0);
-    expect(values.opacity).toBeGreaterThan(0);
+    expect(values['x']).toBeGreaterThan(0);
+    expect(values['opacity']).toBeGreaterThan(0);
     // Run to completion
     const final = runUntilDone(tl);
-    expect(tl.values(final).x).toBe(100);
-    expect(tl.values(final).opacity).toBe(1);
+    expect(tl.values(final)['x']).toBe(100);
+    expect(tl.values(final)['opacity']).toBe(1);
   });
   it('handles staggered multi-track timeline', () => {
     const tl = timeline()
@@ -49,8 +49,8 @@ describe('mixed spring + tween timeline', () => {
       .build();
     const final = runUntilDone(tl);
     expect(tl.done(final)).toBe(true);
-    expect(tl.values(final).slideIn).toBe(0);
-    expect(tl.values(final).fadeIn).toBe(1);
-    expect(tl.values(final).bounce).toBe(10);
+    expect(tl.values(final)['slideIn']).toBe(0);
+    expect(tl.values(final)['fadeIn']).toBe(1);
+    expect(tl.values(final)['bounce']).toBe(10);
   });
 });

@@ -25,6 +25,6 @@ export async function main(
   writeLine(headerBox('Commit Message', { detail: message, ctx }));
 }
 
-if (fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+if (fileURLToPath(import.meta.url) === resolve(process.argv[1] ?? '')) {
   main().catch(console.error);
 }

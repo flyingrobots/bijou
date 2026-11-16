@@ -16,9 +16,9 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -70,8 +70,8 @@ describe('createFramedApp', () => {
       ctrl: false,
     }, model);
 
-    expect(nextModel.focusedPaneByPage.home).toBe('right');
-    expect(nextModel.scrollByPage.home?.right?.y).toBe(1);
+    expect(nextModel.focusedPaneByPage['home']).toBe('right');
+    expect(nextModel.scrollByPage['home']?.['right']?.y).toBe(1);
     expect(layoutCalls).toBe(3);
 
     app.view(nextModel);
@@ -102,7 +102,7 @@ describe('createFramedApp', () => {
       { key: 'z' },
       { key: KEY_ENTER },
     ]);
-    expect(result.model.pageModels.home?.count).toBe(1);
+    expect(result.model.pageModels['home']?.count).toBe(1);
     expect(result.model.commandPalette).toBeUndefined();
   });
 });

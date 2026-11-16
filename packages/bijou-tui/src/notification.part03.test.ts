@@ -43,7 +43,7 @@ describe('renderNotificationStack', () => {
         screenWidth: 80,
         screenHeight: 24,
       });
-      expect(stripAnsi(overlay?.content)).toContain('[ Retry deploy ]');
+      expect(stripAnsi(overlay?.content ?? '')).toContain('[ Retry deploy ]');
     });
 
   it('preserves leading padding for unfocused actionable buttons', () => {
@@ -96,7 +96,7 @@ describe('renderNotificationStack', () => {
         screenWidth: 44,
         screenHeight: 14,
       });
-      const plain = stripAnsi(overlay?.content);
+      const plain = stripAnsi(overlay?.content ?? '');
       expect(plain).toContain('選択中 😀');
       expect(plain).toContain('deploy');
       expect(plain).toContain('Weiter prüfen');

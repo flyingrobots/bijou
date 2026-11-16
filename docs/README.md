@@ -53,9 +53,13 @@ The glossary and topic finder support practical lookup.
 - [MCP package guide](../examples/docs/content/package-mcp.md)
 - [Project front door](../README.md)
 - [Agent agreements](../AGENTS.md)
+- [Design vocabulary](./topics/design-vocabulary.md): canonical terms, component family fields, and writing style
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)
 - [Changelog](./CHANGELOG.md)
+- [Components Library](../examples/components/README.md): every component, one slide at a time, in every output mode
+- [DOGFOOD](../examples/docs/README.md): the documentation app, in English, French, Spanish, and German
+- [Bijou skill for coding agents](../.claude/skills/bijou/SKILL.md): how to build Bijou apps, choose components, theme, animate, and test
 - [V8 product witness replay](./releases/8.0.0/product-witness-replay.md)
 - [V8 stable acceptance packet](./releases/8.0.0/stable-acceptance.md)
 - [Framed app tutorial](./guides/framed-app-tutorial.md)

@@ -103,7 +103,7 @@ export function releaseStoryMarkdownBody(
   localization?: LocalizationPort,
 ): string {
   const locale = releaseStoryMarkdownLocale(localization?.locale);
-  return renderReleaseStoryMarkdown(readMarkdownDoc(paths[locale ?? 'en']), BIJOU_VERSION);
+  return renderReleaseStoryMarkdown(readMarkdownDoc((locale === undefined ? undefined : paths[locale]) ?? paths.en), BIJOU_VERSION);
 }
 
 export function localizedReleaseStoryMarkdownBody(

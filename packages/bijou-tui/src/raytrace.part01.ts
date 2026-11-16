@@ -26,8 +26,8 @@ export interface RaytraceLookAtRayOptions {
   readonly origin: RaytraceVector3;
   readonly target: RaytraceVector3;
   readonly screen: RaytraceScreenPoint;
-  readonly focalLength?: number;
-  readonly up?: RaytraceVector3;
+  readonly focalLength?: number | undefined;
+  readonly up?: RaytraceVector3 | undefined;
 }
 export interface RaytraceOrbitCameraRayOptions {
   readonly angleRadians: number;

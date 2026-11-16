@@ -6,7 +6,7 @@ import { expectClaims, read, requireRecord, ROOT, sectionBetween } from './roadm
 describe('WF-130 roadmap documentation contracts', () => {
   it('disables Markdown line-length linting for project docs', () => {
     const config = requireRecord(JSON.parse(read('.markdownlint.json')));
-    expect(config.MD013).toBe(false);
+    expect(config['MD013']).toBe(false);
     expect(config['line-length']).toBe(false);
   });
 

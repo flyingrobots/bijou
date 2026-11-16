@@ -15,9 +15,9 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -44,7 +44,7 @@ describe('createFramedApp', () => {
 
     const app = createFramedApp({ pages: [splitPage] });
     const result = await runScript(app, [{ key: KEY_TAB }, { key: KEY_SHIFT_TAB }]);
-    expect(result.model.focusedPaneByPage.home).toBe('left');
+    expect(result.model.focusedPaneByPage['home']).toBe('left');
   });
 });
 
@@ -97,8 +97,8 @@ describe('createFramedApp', () => {
       { key: KEY_DOWN },
     ]);
 
-    expect(result.model.pageModels.home?.leftHits).toBe(1);
-    expect(result.model.pageModels.home?.rightHits).toBe(1);
-    expect(result.model.focusedPaneByPage.home).toBe('right');
+    expect(result.model.pageModels['home']?.leftHits).toBe(1);
+    expect(result.model.pageModels['home']?.rightHits).toBe(1);
+    expect(result.model.focusedPaneByPage['home']).toBe('right');
   });
 });

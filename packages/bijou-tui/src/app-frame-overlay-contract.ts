@@ -21,7 +21,7 @@ export type SettingsRowBehavior = 'cycle-shell-theme';
 export interface ResolvedFrameShellTheme {
   readonly id: string;
   readonly label: string;
-  readonly description?: string;
+  readonly description?: string | undefined;
   readonly shellTheme: FrameShellTheme;
   readonly shellThemeSpec: FrameShellThemeSpec;
   readonly shellThemeId: string;
@@ -36,7 +36,7 @@ export interface FlatSettingsRow<Msg> {
   readonly line: number;
   readonly height: number;
   readonly row: FrameSettingRow<Msg>;
-  readonly behavior?: SettingsRowBehavior;
+  readonly behavior?: SettingsRowBehavior | undefined;
 }
 
 export interface ResolvedSettingsLayout<Msg> {
@@ -57,9 +57,9 @@ export interface ResolvedFrameNotificationCenter<Msg> {
   readonly state: NotificationState<Msg>;
   readonly filters: readonly NotificationHistoryFilter[];
   readonly activeFilter: NotificationHistoryFilter;
-  readonly onFilterChange?: (
+  readonly onFilterChange?: ((
     filter: NotificationHistoryFilter,
-  ) => Msg | undefined;
+  ) => Msg | undefined) | undefined;
 }
 
 export interface ResolvedNotificationCenterLayout<Msg> {

@@ -9,7 +9,7 @@ export interface ReleaseReadinessDocsSnapshot {
   readonly changelog: string;
   readonly releaseGuide: string;
   readonly releasePacketExists: boolean;
-  readonly releasePacketPath?: string;
+  readonly releasePacketPath?: string | undefined;
 }
 export type ReleaseReadinessCheckStatus = 'pass' | 'fail';
 export interface ReleaseReadinessReportCheck {

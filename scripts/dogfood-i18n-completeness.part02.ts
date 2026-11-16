@@ -14,7 +14,7 @@ import { readBaseStringTable } from './dogfood-i18n-completeness.part03.js';
 
 export function evaluateDogfoodI18nMissingTranslationRatchet(options: {
   readonly table: StringTable;
-  readonly locales?: readonly string[];
+  readonly locales?: readonly string[] | undefined;
   readonly baseline?: DogfoodI18nMissingTranslationBaseline;
 }): DogfoodI18nMissingTranslationRatchetResult {
   const baseline =
@@ -125,5 +125,5 @@ export function baseRefFromArgs(args: readonly string[]): string {
   }
   const explicitBase =
     explicitBaseIndex >= 0 ? args[explicitBaseIndex + 1] : undefined;
-  return explicitBase ?? process.env.DOGFOOD_I18N_BASE_REF ?? DEFAULT_BASE_REF;
+  return explicitBase ?? process.env['DOGFOOD_I18N_BASE_REF'] ?? DEFAULT_BASE_REF;
 }

@@ -12,7 +12,7 @@ export interface SpinnerOptions {
   /** Custom animation frames (defaults to braille dot pattern). */
   frames?: string[];
   /** Text label displayed alongside the spinner. */
-  label?: string;
+  label?: string | undefined;
   /** Milliseconds between frame updates (defaults to 80). */
   interval?: number;
   /** Bijou context for I/O, styling, and mode detection. */

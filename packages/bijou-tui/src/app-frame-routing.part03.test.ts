@@ -14,9 +14,9 @@ import {
   surfaceToString,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 import { must } from '@flyingrobots/bijou/adapters/test';

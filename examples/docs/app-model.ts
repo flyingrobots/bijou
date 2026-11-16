@@ -40,16 +40,16 @@ export interface DocsExplorerModel {
   readonly layoutVariant: DocsLayoutVariant;
   readonly familyState: ReturnType<typeof createBrowsableListState<string>>;
   readonly expandedFamilies: Readonly<Record<string, boolean>>;
-  readonly selectedStoryId?: string;
+  readonly selectedStoryId?: string | undefined;
   readonly profileMode: StoryMode;
   readonly variantIndexByStory: Readonly<Record<string, number>>;
   readonly previewTimeMs: number;
   readonly guideState: ReturnType<typeof createBrowsableListState<string>>;
-  readonly selectedGuideId?: string;
+  readonly selectedGuideId?: string | undefined;
   readonly showHints: boolean;
   readonly locale: string;
   readonly landingThemeIndex: number;
-  readonly activeShellThemeId?: string;
+  readonly activeShellThemeId?: string | undefined;
   readonly landingQualityMode: LandingQualityMode;
   readonly counterBlockDemo: CounterDemoModel;
   readonly themeLabEditor?: ThemeLabEditorState;
@@ -96,7 +96,7 @@ export interface RootModel {
   readonly landingTimeMs: number;
   readonly landingFps: number;
   readonly landingThemeIndex: number;
-  readonly landingToast?: LandingToastState;
+  readonly landingToast?: LandingToastState | undefined;
   readonly landingQuitConfirmOpen: boolean;
   readonly themeInspectorOpen: boolean;
   readonly themeInspectorScrollY: number;

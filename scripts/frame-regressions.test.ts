@@ -31,7 +31,7 @@ async function loadExample<Model, M = never>(
   const ctx = createTestContext({
     mode: 'interactive',
     runtime,
-    style: options.style,
+    ...(options.style === undefined ? {} : { style: options.style }),
   });
 
   vi.doMock('@flyingrobots/bijou-node', async () => {

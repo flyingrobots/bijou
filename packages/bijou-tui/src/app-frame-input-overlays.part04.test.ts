@@ -43,7 +43,7 @@ describe('createFramedApp', () => {
     [model] = app.update(ctrlKey(','), model);
     [model] = app.update({ type: 'key', key: 'd', ctrl: false, alt: false, shift: false }, model);
     expect(model.settingsScrollY).toBeGreaterThan(0);
-    expect(model.scrollByPage.home?.main?.y ?? 0).toBe(0);
+    expect(model.scrollByPage['home']?.['main']?.y ?? 0).toBe(0);
   });
 });
 
@@ -85,7 +85,7 @@ describe('createFramedApp', () => {
     const lines = rendered.split('\n');
     const shellLine = lines.findIndex((line) => line.includes('Shell'));
     const rowLine = lines.findIndex((line) => line.includes('Show hints'));
-    const rowX = rowLine >= 0 ? lines[rowLine]?.indexOf('Show hints') : -1;
+    const rowX = rowLine >= 0 ? (lines[rowLine]?.indexOf('Show hints') ?? -1) : -1;
     expect(rendered).toContain('Show hints');
     expect(rendered).toContain('☑ On');
     expect(rendered).toContain('Show active control');

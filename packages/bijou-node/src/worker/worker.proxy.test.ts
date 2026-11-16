@@ -73,7 +73,7 @@ describe('worker proxy runtime', () => {
     );
 
     expect(ctorCalls).toHaveLength(1);
-    expect(ctorCalls[0]?.options.workerData).toMatchObject({
+    expect(ctorCalls[0]?.options['workerData']).toMatchObject({
       isBijouWorker: true,
       options: { mouseMode: 'any' },
       runtime: { columns: 120, rows: 40 },

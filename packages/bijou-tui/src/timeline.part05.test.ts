@@ -24,8 +24,8 @@ describe('position parameter', () => {
     // At 200ms (12 frames), track a should be animating, track b should not
     const mid = runFrames(tl, tl.init(), 12);
     const midValues = tl.values(mid);
-    expect(midValues.a).toBeGreaterThan(0);
-    expect(midValues.b).toBe(0); // b hasn't started yet
+    expect(midValues['a']).toBeGreaterThan(0);
+    expect(midValues['b']).toBe(0); // b hasn't started yet
   });
   it('"<" starts at same time as previous', () => {
     const tl = timeline()
@@ -37,7 +37,7 @@ describe('position parameter', () => {
     // Both should animate together
     const mid = runFrames(tl, tl.init(), 9); // 150ms
     const values = tl.values(mid);
-    expect(values.a).toBeCloseTo(must(values.b), 2);
+    expect(values['a']).toBeCloseTo(must(values['b']), 2);
   });
   it('"+=N" adds gap after previous', () => {
     const tl = timeline()
@@ -61,8 +61,8 @@ describe('position parameter', () => {
       .build();
     // Track starts at 1000ms
     const before = runFrames(tl, tl.init(), 30); // 500ms
-    expect(tl.values(before).a).toBe(0); // not started
+    expect(tl.values(before)['a']).toBe(0); // not started
     const after = runFrames(tl, before, 42); // +700ms = 1200ms total
-    expect(tl.values(after).a).toBeGreaterThan(0); // animating
+    expect(tl.values(after)['a']).toBeGreaterThan(0); // animating
   });
 });

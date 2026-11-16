@@ -8,6 +8,6 @@ export type {
 
 export interface LandingFrameCache {
   key?: string;
-  front?: Surface;
-  back?: Surface;
+  front?: Surface | undefined;
+  back?: Surface | undefined;
 }

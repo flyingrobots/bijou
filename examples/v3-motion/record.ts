@@ -1,8 +1,8 @@
 import { recordDemoGif } from '@flyingrobots/bijou-node';
-import { app, ctx } from './main.ts';
+import { app, ctx } from './main.js';
 
 export default async function record(): Promise<void> {
-  const pulses = Array.from({ length: 10 }, () => ({ pulse: { dt: 1 / 30 } })) as const;
+  const pulses = Array.from({ length: 10 }, () => ({ pulse: { dt: 1 / 30 } }));
 
   await recordDemoGif({
     name: 'v3-motion',

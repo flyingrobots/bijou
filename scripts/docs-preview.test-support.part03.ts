@@ -44,7 +44,7 @@ export function stackedWakeWave(
 export function matchingBijouSvgOverlayGlyphCount(frame: {
   width: number;
   height: number;
-  get(x: number, y: number): { char?: string; fg?: ColorRef };
+  get(x: number, y: number): { char?: string | undefined; fg?: ColorRef | undefined };
 }, timeMs: number): { readonly expected: number; readonly matched: number } {
   const overlay = expectedBijouSvgOverlay(frame.width, frame.height);
   let expected = 0;
@@ -68,7 +68,7 @@ export function matchingBijouSvgOverlayGlyphCount(frame: {
 export function cellsWithoutBackground(frame: {
   width: number;
   height: number;
-  get(x: number, y: number): { bg?: ColorRef; bgRGB?: readonly [number, number, number] };
+  get(x: number, y: number): { bg?: ColorRef | undefined; bgRGB?: readonly [number, number, number] | undefined };
 }) {
   const missing: string[] = [];
   for (let y = 0; y < frame.height; y++) {

@@ -12,9 +12,9 @@ import {
   runScript,
   setDefaultContext,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -90,7 +90,7 @@ describe('createFramedApp', () => {
     let [model] = app.init();
     [model] = app.update({ type: 'inc' }, model);
     [model] = app.update({ type: 'key', key: '/', ctrl: false, alt: false, shift: false }, model);
-    expect(model.pageModels.home?.count).toBe(1);
+    expect(model.pageModels['home']?.count).toBe(1);
     expect(model.commandPaletteKind).toBe('search');
     expect(model.commandPalette?.items).toEqual([{
       id: 'search:0',
@@ -128,7 +128,7 @@ describe('createFramedApp', () => {
       { key: KEY_ENTER },
     ]);
     expect(result.model.activePageId).toBe('docs');
-    expect(result.model.pageModels.docs?.count).toBe(1);
+    expect(result.model.pageModels['docs']?.count).toBe(1);
     expect(result.model.commandPalette).toBeUndefined();
   });
 });

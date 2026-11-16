@@ -7,7 +7,7 @@ import {
   type FramePage,
   type PageTransition,
 } from '@flyingrobots/bijou-tui';
-import { contentSurface } from '../_shared/example-surfaces.ts';
+import { contentSurface } from '../_shared/example-surfaces.js';
 
 initDefaultContext();
 

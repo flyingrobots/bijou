@@ -25,8 +25,28 @@ function number(value: unknown): number {
   return value;
 }
 
+interface GlyphFields {
+  readonly character?: unknown;
+  readonly mask?: unknown;
+  readonly advance?: unknown;
+  readonly left?: unknown;
+  readonly top?: unknown;
+  readonly width?: unknown;
+  readonly height?: unknown;
+  readonly columns?: unknown;
+  readonly rows?: unknown;
+}
+
+interface AtlasFields {
+  readonly version?: unknown;
+  readonly family?: unknown;
+  readonly glyphs?: unknown;
+  readonly fontSha256?: unknown;
+  readonly lineHeight?: unknown;
+}
+
 function entry(value: unknown): [string, RasterFontGlyph] {
-  const g = record(value);
+  const g: GlyphFields = record(value);
   if (typeof g.character !== 'string' || typeof g.mask !== 'string') throw new Error('Invalid prompt font glyph.');
   const mask = Buffer.from(g.mask, MASK_ENCODING);
   if (mask.toString(MASK_ENCODING) !== g.mask) throw new Error('Invalid prompt coverage encoding.');
@@ -37,7 +57,7 @@ function entry(value: unknown): [string, RasterFontGlyph] {
 }
 
 const raw: unknown = JSON.parse(readFileSync(new URL('../../assets/space-grotesk-ascii.json', import.meta.url), 'utf8'));
-const data = record(raw);
+const data: AtlasFields = record(raw);
 if (data.version !== 1 || data.family !== EXPECTED_FONT.family || !Array.isArray(data.glyphs) || data.glyphs.length !== 95
   || data.fontSha256 !== EXPECTED_FONT.sha256) {
   throw new Error('Invalid Space Grotesk prompt atlas.');

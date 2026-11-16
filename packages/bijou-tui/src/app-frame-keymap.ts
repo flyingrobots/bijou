@@ -7,7 +7,7 @@ export interface FrameKeyMapOptions {
   readonly enableSettings?: boolean;
   readonly enableShellThemeModeToggle?: boolean;
   readonly enableNotifications?: boolean;
-  readonly i18n?: I18nRuntime;
+  readonly i18n?: I18nRuntime | undefined;
 }
 
 /** Build the default key map for frame-level actions. */
