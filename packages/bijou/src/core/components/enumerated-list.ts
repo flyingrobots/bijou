@@ -23,11 +23,11 @@ export type BulletStyle =
 /** Configuration options for the {@link enumeratedList} component. */
 export interface EnumeratedListOptions {
   /** Bullet/numbering style. Defaults to `'arabic'`. */
-  readonly style?: BulletStyle;
+  readonly style?: BulletStyle | undefined;
   /** Number of leading spaces for indentation. Defaults to `2`. */
-  readonly indent?: number;
+  readonly indent?: number | undefined;
   /** Starting number for ordered styles. Defaults to `1`. */
-  readonly start?: number;
+  readonly start?: number | undefined;
   /** Bijou context for rendering mode and theme resolution. */
   readonly ctx?: BijouContext;
 }

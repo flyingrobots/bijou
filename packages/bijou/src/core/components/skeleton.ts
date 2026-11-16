@@ -6,9 +6,9 @@ import { sanitizeNonNegativeInt } from '../numeric.js';
 /** Configuration for rendering a skeleton placeholder. */
 export interface SkeletonOptions {
   /** Character width of each skeleton line (defaults to 20). */
-  width?: number;
+  width?: number | undefined;
   /** Number of placeholder lines to render (defaults to 1). */
-  lines?: number;
+  lines?: number | undefined;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }

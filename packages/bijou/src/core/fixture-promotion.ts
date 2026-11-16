@@ -32,8 +32,8 @@ export interface FixturePromotionRecord {
   readonly id: string;
   readonly from: FixturePromotionArtifact;
   readonly to: FixturePromotionArtifact;
-  readonly metadata?: ComponentMetadata;
-  readonly matrix?: StoryCaptureMatrix;
+  readonly metadata?: ComponentMetadata | undefined;
+  readonly matrix?: StoryCaptureMatrix | undefined;
   readonly tags: readonly string[];
   readonly notes: readonly string[];
 }

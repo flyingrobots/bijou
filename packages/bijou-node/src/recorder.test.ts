@@ -102,6 +102,20 @@ describe('recorder', () => {
     expect(gifHeight).toBe(20);
   });
 
+  it('writes frameDelayMs as GIF centiseconds', () => {
+    const surface = createSurface(1, 1);
+    surface.set(0, 0, { char: 'A', fg: '#ffffff', bg: '#000000', empty: false });
+    const outputPath = join(mkdtempSync(join(tmpdir(), 'bijou-recorder-')), 'delay.gif');
+
+    writeSurfaceGif({ outputPath, frames: [surface, surface], frameDelayMs: 80 });
+
+    // GIF89a spec, Graphic Control Extension: 21 F9 04 <packed> <delay u16le, 1/100 s>.
+    const bytes = readFileSync(outputPath);
+    const gce = bytes.indexOf(Buffer.from([0x21, 0xf9, 0x04]));
+    expect(gce).toBeGreaterThan(0);
+    expect(bytes.readUInt16LE(gce + 4)).toBe(8);
+  });
+
   it('sanitizes non-finite and fractional recorder dimensions and delays', () => {
     const surface = createSurface(1, 1);
     surface.set(0, 0, { char: 'A', fg: '#ffffff', bg: '#000000', empty: false });

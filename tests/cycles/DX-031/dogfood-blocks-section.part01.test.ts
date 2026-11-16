@@ -76,7 +76,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('selects focused standard block rows from the Blocks side navigation', async () => {
-    const firstBlock = standardBlocks[0];
+    const firstBlock = must(standardBlocks[0], 'first standard block');
     expect(firstBlock).toBeDefined();
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
@@ -89,7 +89,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       { msg: { type: 'docs', msg: { type: 'guide-next' } } },
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
-    const blockName = firstBlock?.metadata.blockName;
+    const blockName = firstBlock.metadata.blockName;
     expect(pageModel(result.model, 'blocks').selectedGuideId).toBe(blockPreviewGuideId(blockName));
     expect(text).toContain(blockName);
     expect(text).toContain('lowering summary');
@@ -101,7 +101,7 @@ describe('DX-031D DOGFOOD Blocks section', () => {
   afterEach(() => { _resetDefaultContextForTesting(); });
 
   it('moves focus back to the Block Preview parent row from the first preview child', async () => {
-    const firstBlock = standardBlocks[0];
+    const firstBlock = must(standardBlocks[0], 'first standard block');
     expect(firstBlock).toBeDefined();
     const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 150, rows: 43 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'blocks' });
@@ -109,14 +109,14 @@ describe('DX-031D DOGFOOD Blocks section', () => {
       {
         msg: {
           type: 'docs',
-          msg: { type: 'select-guide', guideId: blockPreviewGuideId(firstBlock?.metadata.blockName) },
+          msg: { type: 'select-guide', guideId: blockPreviewGuideId(firstBlock.metadata.blockName) },
         },
       },
       { msg: { type: 'docs', msg: { type: 'guide-prev' } } },
     ], { ctx });
     const blocksModel = pageModel(result.model, 'blocks');
-    const focusedItem = blocksModel.guideState.items[blocksModel.guideState.focusIndex];
-    expect(blocksModel.selectedGuideId).toBe(blockPreviewGuideId(firstBlock?.metadata.blockName));
+    const focusedItem = must(blocksModel.guideState.items[blocksModel.guideState.focusIndex], 'focused guide item');
+    expect(blocksModel.selectedGuideId).toBe(blockPreviewGuideId(firstBlock.metadata.blockName));
     expect(focusedItem.value).toBe('blocks-preview');
   });
 });

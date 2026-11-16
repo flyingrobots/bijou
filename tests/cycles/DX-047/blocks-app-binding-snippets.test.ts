@@ -2,7 +2,7 @@ import { readDocumentationFile as readFileSync } from '../../../scripts/document
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
-import { _resetDefaultContextForTesting } from '@flyingrobots/bijou/adapters/test';
+import { _resetDefaultContextForTesting, must } from '@flyingrobots/bijou/adapters/test';
 import {
   createScriptTestContext as createTestContext,
   runScriptDeterministic as runScript,
@@ -44,7 +44,7 @@ function extractFencedTsBlockAfterHeading(source: string, heading: string): stri
     throw new Error(`Missing TypeScript code fence after heading: ${heading}`);
   }
 
-  return match[1];
+  return must(match[1], 'TypeScript code fence body');
 }
 
 const REQUIRED_COUNTER_BINDING_APIS = [

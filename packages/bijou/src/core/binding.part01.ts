@@ -24,23 +24,23 @@ export interface BindingIssue {
   readonly severity: BindingIssueSeverity;
   readonly code: string;
   readonly message: string;
-  readonly path?: string;
+  readonly path?: string | undefined;
 }
 export interface DataRequirementInput {
   readonly id: string;
   readonly resource: string;
   readonly label?: string;
   readonly description?: string;
-  readonly optional?: boolean;
+  readonly optional?: boolean | undefined;
   readonly facts?: readonly BindingFact[];
 }
 export interface DataRequirement {
   readonly [DATA_REQUIREMENT_BRAND]: true;
   readonly id: RequirementId;
   readonly resource: string;
-  readonly label?: string;
-  readonly description?: string;
-  readonly optional?: boolean;
+  readonly label?: string | undefined;
+  readonly description?: string | undefined;
+  readonly optional?: boolean | undefined;
   readonly facts: readonly BindingFact[];
 }
 export interface DataProviderInput {
@@ -54,8 +54,8 @@ export interface DataProvider {
   readonly [DATA_PROVIDER_BRAND]: true;
   readonly id: ProviderId;
   readonly resource: string;
-  readonly label?: string;
-  readonly description?: string;
+  readonly label?: string | undefined;
+  readonly description?: string | undefined;
   readonly facts: readonly BindingFact[];
 }
 export interface ViewDataRequirementEntry {
@@ -86,8 +86,8 @@ export interface ProviderResolution {
   readonly resource: string;
   readonly optional: boolean;
   readonly status: ProviderResolutionStatus;
-  readonly scopeId?: string;
-  readonly providerId?: ProviderId;
+  readonly scopeId?: string | undefined;
+  readonly providerId?: ProviderId | undefined;
   readonly issues: readonly BindingIssue[];
   readonly facts: readonly BindingFact[];
 }

@@ -8,7 +8,7 @@ export const SCOPE = 'active binding collection';
 export interface ActiveBindingEntryInput {
   readonly owner: BindingLifecycleOwner;
   readonly requirement: DataRequirement;
-  readonly providerId?: string;
+  readonly providerId?: string | undefined;
 }
 
 export interface ActiveBindingEntry {
@@ -26,7 +26,7 @@ export interface ActiveBindingProviderAssignment {
 export interface ActiveBindingContractInput {
   readonly owner: BindingLifecycleOwner;
   readonly contract: ViewDataContract;
-  readonly providerIds?: readonly ActiveBindingProviderAssignment[];
+  readonly providerIds?: readonly ActiveBindingProviderAssignment[] | undefined;
 }
 
 export interface CollectActiveBindingsInput {
@@ -58,7 +58,7 @@ export function normalizeRequiredText(options: RequiredTextOptions): string {
 }
 
 export function optionalRequiredText(
-  options: Omit<RequiredTextOptions, 'value'> & { readonly value?: string },
+  options: Omit<RequiredTextOptions, 'value'> & { readonly value?: string | undefined },
 ): string | undefined {
   if (options.value === undefined) {
     return undefined;

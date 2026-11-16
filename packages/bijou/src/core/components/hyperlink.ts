@@ -6,7 +6,7 @@ import { sanitizePlainTerminalText } from '../text/index.js';
 /** Configuration options for the {@link hyperlink} component. */
 export interface HyperlinkOptions {
   /** Fallback format when OSC 8 links are unavailable. Defaults to `'both'`. */
-  readonly fallback?: 'url' | 'text' | 'both';
+  readonly fallback?: 'url' | 'text' | 'both' | undefined;
   /** Bijou context for rendering mode and theme resolution. */
   readonly ctx?: BijouContext;
 }

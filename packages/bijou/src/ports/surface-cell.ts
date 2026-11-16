@@ -4,19 +4,19 @@ export interface Cell {
   /** The grapheme to display. */
   char: string;
   /** Foreground color reference. Undefined uses the terminal default. */
-  fg?: ColorRef;
+  fg?: ColorRef | undefined;
   /** Background color reference. Undefined uses the terminal default. */
-  bg?: ColorRef;
+  bg?: ColorRef | undefined;
   /** Pre-parsed foreground channels. These take precedence over `fg`. */
-  fgRGB?: readonly [number, number, number];
+  fgRGB?: readonly [number, number, number] | undefined;
   /** Pre-parsed background channels. These take precedence over `bg`. */
-  bgRGB?: readonly [number, number, number];
+  bgRGB?: readonly [number, number, number] | undefined;
   /** Text modifiers such as bold, dim, and underline. */
-  modifiers?: string[];
+  modifiers?: string[] | undefined;
   /** Whether composition treats this cell as a transparent brush hole. */
-  empty?: boolean;
+  empty?: boolean | undefined;
   /** Cell opacity from zero through one. */
-  opacity?: number;
+  opacity?: number | undefined;
 }
 
 export interface CellMask {

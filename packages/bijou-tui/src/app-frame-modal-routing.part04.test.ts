@@ -14,10 +14,10 @@ import {
   surfaceToString,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  Msg,
-  NotificationState,
-  PageModel,
+  type FramePage,
+  type Msg,
+  type NotificationState,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {

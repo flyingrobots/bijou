@@ -65,7 +65,8 @@ export function renderBrailleLineChart(
     const dotRow = dotY % 4;
     const bits =
       (dotX % 2 === 0 ? DOT_LEFT[dotRow] : DOT_RIGHT[dotRow]) ?? 0;
-    grid[row * width + column] |= bits;
+    const cellIndex = row * width + column;
+    grid[cellIndex] = (grid[cellIndex] ?? 0) | bits;
   }
   for (let row = 0; row < height; row++) {
     for (let column = 0; column < width; column++) {

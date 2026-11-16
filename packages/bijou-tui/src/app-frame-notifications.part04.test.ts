@@ -11,7 +11,7 @@ import {
   makePage,
   setDefaultContext,
   _resetDefaultContextForTesting,
-  BijouContext,
+  type BijouContext,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {

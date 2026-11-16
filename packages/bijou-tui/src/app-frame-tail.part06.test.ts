@@ -14,11 +14,11 @@ import {
   surfaceToString,
   textView,
   _resetDefaultContextForTesting,
-  Cmd,
-  FramePage,
-  FramedAppMsg,
-  Msg,
-  PageModel,
+  type Cmd,
+  type FramePage,
+  type FramedAppMsg,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 import { must } from '@flyingrobots/bijou/adapters/test';
@@ -70,7 +70,7 @@ describe('createFramedApp', () => {
     let cmds: Cmd<FramedAppMsg<Msg>>[];
     [model, cmds] = app.update({ type: 'inc' }, model);
 
-    expect(model.pageModels.home?.count).toBe(1);
+    expect(model.pageModels['home']?.count).toBe(1);
     expect(cmds).toHaveLength(1);
 
     const returned = await must(cmds[0])(() => undefined, commandHooks(123));

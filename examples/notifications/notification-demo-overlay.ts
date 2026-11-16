@@ -96,14 +96,15 @@ export function spawnConfiguredNotification(
     variant,
     tone,
     placement,
-    durationMs: duration.value,
-    action:
-      variant === 'ACTIONABLE' && model.actionEnabled
-        ? {
+    ...(duration.value === undefined ? {} : { durationMs: duration.value }),
+    ...(variant === 'ACTIONABLE' && model.actionEnabled
+      ? {
+          action: {
             label: actionLabelForTone(tone),
             payload: { type: 'notification-action', ordinal },
-          }
-        : undefined,
+          },
+        }
+      : {}),
     overflow: model.wrapText ? 'wrap' : 'truncate',
   };
   const notifications = pushNotification(

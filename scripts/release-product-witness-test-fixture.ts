@@ -11,9 +11,9 @@ export const LOADER = import.meta.resolve('tsx');
 export function withCheckout(run: (root: string, env: NodeJS.ProcessEnv) => void): void {
   const root = mkdtempSync(resolve(tmpdir(), 'bijou-witness-checkout-'));
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));
-  env.GIT_CONFIG_NOSYSTEM = '1';
-  env.GIT_CONFIG_GLOBAL = resolve(root, 'empty-git-config');
-  writeFileSync(env.GIT_CONFIG_GLOBAL, '');
+  env['GIT_CONFIG_NOSYSTEM'] = '1';
+  env['GIT_CONFIG_GLOBAL'] = resolve(root, 'empty-git-config');
+  writeFileSync(env['GIT_CONFIG_GLOBAL'], '');
   mkdirSync(resolve(root, 'empty-hooks'));
   const git = (args: readonly string[]): void => {
     execFileSync('git', [...args], { cwd: root, env, timeout: 10_000, stdio: 'pipe' });

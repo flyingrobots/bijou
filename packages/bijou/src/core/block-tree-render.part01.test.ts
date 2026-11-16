@@ -56,7 +56,7 @@ describe('block tree rendering', () => {
       const parent = defineBlock({
         metadata: childMetadata('ModeSpyParent'),
         render: ({ slots }) => {
-          const content = slots?.content;
+          const content = slots?.['content'];
           return { output: typeof content === 'string' ? content : '' };
         },
       });
@@ -119,7 +119,7 @@ describe('block tree rendering', () => {
         slots,
       });
 
-      slots.content = 'mutated content';
+      slots['content'] = 'mutated content';
 
       const rendered = renderBlockTree(node);
 
@@ -129,9 +129,9 @@ describe('block tree rendering', () => {
 
   it('rejects cyclic render-node input records deterministically', () => {
       const cyclicSlots: Record<string, unknown> = { content: 'cyclic content' };
-      cyclicSlots.self = cyclicSlots;
+      cyclicSlots['self'] = cyclicSlots;
       const cyclicConfig: Record<string, unknown> = { width: 40 };
-      cyclicConfig.self = cyclicConfig;
+      cyclicConfig['self'] = cyclicConfig;
 
       expect(() => blockRenderNode(readerSurfaceBlock, { slots: cyclicSlots })).toThrow(
         'block render node: circular reference at input.slots.self',

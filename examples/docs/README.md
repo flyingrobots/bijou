@@ -1,5 +1,7 @@
 # DOGFOOD App Notes
 
+English · [Français](README.fr.md) · [Español](README.es.md) · [Deutsch](README.de.md)
+
 If you are trying to learn Bijou, start with
 [../../docs/DOGFOOD.md](../../docs/book/bijou-designs.pdf#page=292). This file is the
 implementation-facing note for the current DOGFOOD app surface.

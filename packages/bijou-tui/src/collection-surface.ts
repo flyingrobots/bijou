@@ -37,9 +37,9 @@ export function collectionRowsSurface(
   lines: readonly string[],
   options: {
     readonly width: number;
-    readonly selectedRowIndex?: number;
-    readonly selectedRowOverflow?: SelectedRowOverflow;
-    readonly ctx?: BijouContext;
+    readonly selectedRowIndex?: number | undefined;
+    readonly selectedRowOverflow?: SelectedRowOverflow | undefined;
+    readonly ctx?: BijouContext | undefined;
   },
 ): Surface {
   const safeWidth = sanitizePositiveInt(options.width, 1);

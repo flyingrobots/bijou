@@ -1,6 +1,6 @@
 import { runScript } from '@flyingrobots/bijou-tui';
 import { writeSurfaceGif } from '@flyingrobots/bijou-node';
-import { app, ctx } from './main.ts';
+import { app, ctx } from './main.js';
 
 export default async function record(): Promise<void> {
   const result = await runScript(app, [{ key: ' ' }, { key: ' ' }], { ctx });

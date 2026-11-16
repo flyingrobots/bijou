@@ -24,17 +24,17 @@ export interface NotificationMouseTarget<Msg> {
   readonly kind: NotificationMouseTargetKind;
 }
 export interface CellTextStyle {
-  readonly fg?: string;
-  readonly bg?: string;
-  readonly fgRGB?: readonly [number, number, number];
-  readonly bgRGB?: readonly [number, number, number];
-  readonly modifiers?: readonly string[];
+  readonly fg?: string | undefined;
+  readonly bg?: string | undefined;
+  readonly fgRGB?: readonly [number, number, number] | undefined;
+  readonly bgRGB?: readonly [number, number, number] | undefined;
+  readonly modifiers?: readonly string[] | undefined;
 }
 export interface PreparedNotificationHistoryEntry {
   readonly title: ReturnType<typeof prepareWrappedText>;
   readonly metaLine: ReturnType<typeof prepareWrappedText>;
-  readonly messageLine?: ReturnType<typeof prepareWrappedText>;
-  readonly actionLine?: ReturnType<typeof prepareWrappedText>;
+  readonly messageLine?: ReturnType<typeof prepareWrappedText> | undefined;
+  readonly actionLine?: ReturnType<typeof prepareWrappedText> | undefined;
 }
 export const ENTER_DURATION_MS = 180;
 export const EXIT_DURATION_MS = 320;

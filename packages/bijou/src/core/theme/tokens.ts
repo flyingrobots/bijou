@@ -39,21 +39,21 @@ export interface TokenValue {
   /** Foreground color as a `#rrggbb` hex string. */
   hex: string;
   /** Optional background color as a `#rrggbb` hex string. */
-  bg?: string;
+  bg?: string | undefined;
   /** Optional text style modifiers to apply alongside the color. */
-  modifiers?: TextModifier[];
+  modifiers?: TextModifier[] | undefined;
   /**
    * Pre-parsed foreground RGB channels (0–255 each).
    * When present, hot rendering paths use these directly instead of
    * parsing the `hex` string. Populated automatically by theme resolution.
    */
-  fgRGB?: RGB;
+  fgRGB?: RGB | undefined;
   /**
    * Pre-parsed background RGB channels (0–255 each).
    * When present, hot rendering paths use these directly instead of
    * parsing the `bg` string. Populated automatically by theme resolution.
    */
-  bgRGB?: RGB;
+  bgRGB?: RGB | undefined;
 }
 
 /** Color returned for Ink components — `undefined` means "use default terminal color" (NO_COLOR). */

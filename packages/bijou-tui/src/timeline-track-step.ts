@@ -95,6 +95,6 @@ function tweenConfig(track: ResolvedTrack) {
       track.tweenDuration,
       `tween duration for track "${track.name}"`,
     ),
-    ease: track.tweenEase,
+    ...(track.tweenEase !== undefined ? { ease: track.tweenEase } : {}),
   });
 }

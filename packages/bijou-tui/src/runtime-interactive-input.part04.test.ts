@@ -1,4 +1,4 @@
-import { App, counterApp, createInteractiveContext, createSurface, describe, ENTER_ALT_SCREEN, expect, getRenderStageTimings, it, quit, run } from './runtime.test-support.js';
+import { type App, counterApp, createInteractiveContext, createSurface, describe, ENTER_ALT_SCREEN, expect, getRenderStageTimings, it, quit, run } from './runtime.test-support.js';
 
 describe('run', () => {
   describe('interactive mode', () => {

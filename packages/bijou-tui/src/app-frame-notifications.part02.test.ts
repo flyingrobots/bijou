@@ -12,8 +12,8 @@ import {
   setDefaultContext,
   surfaceToString,
   _resetDefaultContextForTesting,
-  Msg,
-  PageModel,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -54,7 +54,7 @@ describe('createFramedApp', () => {
 
     const [pageKeyModel, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
     model = pageKeyModel;
-    expect(model.pageModels.home?.count).toBe(0);
+    expect(model.pageModels['home']?.count).toBe(0);
     expect(cmds).toHaveLength(0);
 
     [model] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);

@@ -1,10 +1,10 @@
 export type DogfoodI18nExportFormat = 'csv' | 'tsv' | 'json';
 
 export interface ParsedDogfoodI18nExportArgs {
-  readonly locale?: string;
+  readonly locale?: string | undefined;
   readonly format: DogfoodI18nExportFormat;
-  readonly out?: string;
-  readonly bundle?: string;
+  readonly out?: string | undefined;
+  readonly bundle?: string | undefined;
   readonly coverage: boolean;
   readonly help: boolean;
 }

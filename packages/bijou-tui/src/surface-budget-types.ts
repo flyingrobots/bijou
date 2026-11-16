@@ -31,5 +31,5 @@ export interface SurfaceBudgetWarning {
   readonly actual: number;
   readonly limit: number;
   readonly message: string;
-  readonly stage?: RenderStage;
+  readonly stage?: RenderStage | undefined;
 }
