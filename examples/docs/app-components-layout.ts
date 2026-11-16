@@ -3,13 +3,10 @@ import type { FrameLayoutNode } from '../../packages/bijou-tui/src/index.js';
 import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { docsThemeUnfocusedGutterToken } from './app-docs-theme-tokens.js';
 import { renderFamiliesPane } from './app-family-pane.js';
-import {
-  DOCS_FLEX_TRACK,
-  DOCS_SIDEBAR_WIDTH,
-} from './app-ids.js';
+import { CONTEXT_DRAWER_PANE_ID } from './app-context-drawer.js';
+import { createDocsShellLayout } from './app-docs-shell-layout.js';
 import type { LandingThemeTokens } from './app-landing.js';
 import type { DocsExplorerModel } from './app-model.js';
-import { docsNavWidthForVariant } from './app-pane-geometry.js';
 import { renderStoryPane } from './app-story-pane.js';
 import { renderVariantsPane } from './app-variants-pane.js';
 
@@ -46,44 +43,14 @@ export function createComponentsPageLayout(
     render: (width, height) =>
       renderVariantsPane(model, width, height, getContext(), theme),
   };
-  if (model.layoutVariant === 'tiny') return main;
-  const navWidth = docsNavWidthForVariant(model.layoutVariant);
-  if (model.layoutVariant !== 'wide') {
-    return {
-      kind: 'grid',
-      gridId: 'docs-shell',
-      columns:
-        model.layoutVariant === 'narrow'
-          ? [1, navWidth, 1, DOCS_FLEX_TRACK]
-          : [1, navWidth, 1, DOCS_FLEX_TRACK, 1],
-      rows: [1, DOCS_FLEX_TRACK, 1],
-      areas:
-        model.layoutVariant === 'narrow'
-          ? ['. . . .', '. family . main', '. . . .']
-          : ['. . . . .', '. family . main .', '. . . . .'],
-      gap: 0,
-      cells: { family, main },
-    };
-  }
-  return {
-    kind: 'grid',
-    gridId: 'docs-shell',
-    columns: [
-      1,
-      DOCS_SIDEBAR_WIDTH,
-      1,
-      DOCS_FLEX_TRACK,
-      1,
-      DOCS_SIDEBAR_WIDTH,
-      1,
-    ],
-    rows: [1, DOCS_FLEX_TRACK, 1],
-    areas: [
-      '. . . . . . .',
-      '. family . main . variants .',
-      '. . . . . . .',
-    ],
-    gap: 0,
-    cells: { family, main, variants },
+  const drawer: FrameLayoutNode = {
+    ...variants,
+    paneId: CONTEXT_DRAWER_PANE_ID,
   };
+  return createDocsShellLayout(
+    'docs-shell',
+    model.layoutVariant,
+    model.contextDrawer.open,
+    { side: family, main, aside: variants, drawer },
+  );
 }

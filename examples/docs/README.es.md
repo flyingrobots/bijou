@@ -81,6 +81,7 @@ darle el foco y usa la rueda para desplazar documentos largos o el contenido de 
 - `Enter` / `Space`: abrir la guía con el foco, expandir una familia, seleccionar un componente o activar la fila con el foco
 - `←` / `→`: contraer o expandir la familia con el foco en el carril izquierdo dentro de `Components`
 - `Tab` / `Shift+Tab`: mover el foco entre paneles
+- `i`: abrir o cerrar el cajón contextual de la página; `Esc` también lo cierra y devuelve el foco al panel de origen
 - `j` / `k`: desplazar el panel de documentación o de demo con el foco
 - `d` / `u`: paginar el panel de documentación o de demo con el foco
 - `1` `2` `3` `4`: cambiar entre los perfiles rich, static, pipe y accessible

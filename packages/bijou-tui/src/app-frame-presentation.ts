@@ -29,6 +29,7 @@ export function resolvePresentedLayerContext<PageModel, Msg>(
   );
   const controlProjection = projectFrameControls(model, {
     pageModalOpen: context.pageModalOpen,
+    contextDrawerFocused: layerMetadata['context-drawer'] != null,
     layers: layerMetadata,
   });
   return {

@@ -21,6 +21,7 @@ export const TRANCHE_E_FRAME_EXPORTS = [
   'FramePage',
   'FramePageLayerKind',
   'FramePageLayerRegistry',
+  'FrameContextDrawerLayerMetadata',
   'FramePageMsg',
   'FramePageUpdateResult',
   'FramePaneScroll',

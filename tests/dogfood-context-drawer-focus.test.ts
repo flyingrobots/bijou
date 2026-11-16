@@ -35,14 +35,14 @@ function focusPane(run: (m: RootModel, s: readonly Step[]) => RootModel, model: 
   return current;
 }
 
-function dimShare(surface: Surface): number {
+function dimCells(surface: Surface): number {
   let dim = 0;
   for (let y = 0; y < surface.height; y += 1) {
     for (let x = 0; x < surface.width; x += 1) {
       if (surface.get(x, y).modifiers?.includes('dim') === true) dim += 1;
     }
   }
-  return dim / (surface.width * surface.height);
+  return dim;
 }
 
 describe('DOGFOOD contextual drawer focus', () => {
@@ -119,8 +119,9 @@ describe('DOGFOOD contextual drawer focus', () => {
       if (frame === undefined) throw new Error('Missing frame.');
       return frame;
     };
-    const closed = dimShare(await frameAfter(['\t']));
-    expect(dimShare(await frameAfter(['\t', 'i']))).toBeLessThanOrEqual(closed + 0.02);
-    expect(dimShare(await frameAfter(['?']))).toBeGreaterThan(0.5);
+    const closed = dimCells(await frameAfter(['\t']));
+    expect(dimCells(await frameAfter(['\t', 'i']))).toBe(closed);
+    // Positive control: a real Overlay (help) does dim the frame behind it.
+    expect(dimCells(await frameAfter(['?']))).toBeGreaterThan(closed);
   });
 });

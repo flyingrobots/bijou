@@ -9,6 +9,7 @@ import {
   type DocsPageId,
 } from './app-ids.js';
 import type { DocsExplorerModel } from './app-model.js';
+import type { LandingQualityMode } from './app-landing.js';
 import { guideItemsForPage } from './app-guide-access.js';
 import { createCounterDemoModel } from './counter-block-demo.js';
 import { DOCS_SHELL_THEME_CHOICES } from './app-shell-theme-state.js';
@@ -51,7 +52,7 @@ export function createInitialExplorerModel(
     locale,
     landingThemeIndex: 0,
     activeShellThemeId: DOCS_SHELL_THEME_CHOICES[0]?.id,
-    landingQualityMode: 'auto',
+    landingQualityMode: 'auto' satisfies LandingQualityMode,
     counterBlockDemo: createCounterDemoModel(5),
     contextDrawer: createContextDrawerState(pageId),
   };

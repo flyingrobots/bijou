@@ -6,8 +6,8 @@ import {
 } from '../../packages/bijou/src/index.js';
 import type { LandingThemeTokens } from './app-landing.js';
 import { docsThemeBorderToken } from './app-docs-theme-tokens.js';
+import { docsShellPaneIds } from './app-context-drawer.js';
 import {
-  COMPONENTS_PAGE_ID,
   DOCS_FAMILY_SEPARATOR_ROWS,
   DOCS_FRAME_CHROME_ROWS,
   DOCS_LAYOUT_VERTICAL_MARGIN_ROWS,
@@ -66,27 +66,9 @@ export function docsNavWidthForVariant(
 export function visiblePaneIdsForLayout(
   pageId: DocsPageId,
   variant: DocsLayoutVariant,
+  drawerOpen = false,
 ): readonly string[] {
-  if (pageId === COMPONENTS_PAGE_ID) {
-    switch (variant) {
-      case 'wide':
-        return ['family-nav', 'story-content', 'story-variants'];
-      case 'standard':
-      case 'narrow':
-        return ['family-nav', 'story-content'];
-      case 'tiny':
-        return ['story-content'];
-    }
-  }
-  switch (variant) {
-    case 'wide':
-      return ['guide-nav', 'guide-content', 'guide-meta'];
-    case 'standard':
-    case 'narrow':
-      return ['guide-nav', 'guide-content'];
-    case 'tiny':
-      return ['guide-content'];
-  }
+  return docsShellPaneIds(pageId, variant, drawerOpen);
 }
 
 export function insetPaneSurface(

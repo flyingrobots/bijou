@@ -15,6 +15,11 @@ import type {
   PulseLikeMsg,
   RootModel,
 } from './app-model.js';
+import {
+  isContextDrawerFocused,
+  routeContextDrawerKey,
+} from './app-context-drawer-focus.js';
+import { syncDocsExplorerViewportLayout } from './app-viewport-sync.js';
 import { updateThemeLabEditorFromKey } from './app-theme-lab-key-handling.js';
 import {
   clampThemeInspectorScroll,
@@ -49,6 +54,12 @@ export function updateDocsRoute(
       updateExplorer,
     );
     if (inspectorUpdate !== undefined) return inspectorUpdate;
+    const drawer = routeContextDrawerKey(model.docsModel, message);
+    const withDrawer = (next: RootModel['docsModel']): RootUpdateResult =>
+      [{ ...model, docsModel: syncDocsExplorerViewportLayout(next) }, []];
+    if (drawer !== undefined && isContextDrawerFocused(model.docsModel)) {
+      return withDrawer(drawer);
+    }
     const docsModel = updateThemeLabEditorFromKey(
       model.docsModel,
       message,
@@ -61,6 +72,7 @@ export function updateDocsRoute(
     if (docsModel !== undefined) {
       return [{ ...model, docsModel }, []];
     }
+    if (drawer !== undefined) return withDrawer(drawer);
   }
   return updateExplorer(message, model);
 }

@@ -49,7 +49,11 @@ export function syncDocsExplorerViewportLayout(
         guideState: resizeListState(pageModel.guideState, height),
       };
     }
-    const paneIds = visiblePaneIdsForLayout(pageId, layoutVariant);
+    const paneIds = visiblePaneIdsForLayout(
+      pageId,
+      layoutVariant,
+      pageModel.contextDrawer.open,
+    );
     const previousFocusedPane = model.focusedPaneByPage[pageId];
     const focusedPane =
       previousFocusedPane != null &&

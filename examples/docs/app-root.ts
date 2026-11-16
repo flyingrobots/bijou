@@ -7,6 +7,7 @@ import {
 } from '../../packages/bijou-tui/src/index.js';
 import { createRuntimeLocalizationPort } from '../../packages/bijou-i18n/src/index.js';
 import { syncDocsSharedSettings } from './app-docs-model-sync.js';
+import { closeInactiveContextDrawers } from './app-context-drawer-focus.js';
 import { createDocsExplorerApp } from './app-explorer.js';
 import { createDocsI18nRuntime } from './app-i18n-runtime.js';
 import { createLandingRenderer } from './app-landing.js';
@@ -73,7 +74,7 @@ export function createDocsApp(
     );
     const reset = resetGuideContentScrollOnGuideSelection(
       model.docsModel,
-      docsModel,
+      closeInactiveContextDrawers(docsModel),
     );
     const synced = syncDocsSharedSettings(
       syncDocsExplorerViewportLayout(reset),

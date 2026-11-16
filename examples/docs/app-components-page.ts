@@ -1,11 +1,16 @@
 import type { BijouContext } from '../../packages/bijou/src/index.js';
 import type {
+  FrameInputArea,
   FramePage,
 } from '../../packages/bijou-tui/src/index.js';
 import type {
   I18nRuntime,
   LocalizationPort,
 } from '../../packages/bijou-i18n/src/index.js';
+import {
+  CONTEXT_DRAWER_PANE_ID,
+  contextDrawerLayers,
+} from './app-context-drawer.js';
 import { createComponentsPageLayout } from './app-components-layout.js';
 import { updateComponentsPage } from './app-components-update.js';
 import { createInitialComponentsExplorerModel } from './app-explorer-init.js';
@@ -24,6 +29,7 @@ import {
   resolveFamilyPaneMouse,
   resolveVariantPaneMouse,
 } from './app-mouse-routes.js';
+import { COMPONENTS_PAGE_ID } from './app-ids.js';
 import { pageTitle } from './app-page-title.js';
 import { documentationSearchItems } from './app-search.js';
 import { renderDocsSearchTitle } from './app-search-title.js';
@@ -41,7 +47,7 @@ export function createComponentsPage(
 ): FramePage<DocsExplorerModel, DocsMsg> {
   return {
     id: pageId,
-    title: () => pageTitle('components', localization),
+    title: () => pageTitle(COMPONENTS_PAGE_ID, localization),
     keyMap: componentsPageKeys,
     init: () => [
       createInitialComponentsExplorerModel(
@@ -61,14 +67,18 @@ export function createComponentsPage(
         mouse: ({ msg, rect }) =>
           resolveFamilyPaneMouse(msg, model, rect),
       },
-      {
-        paneId: 'story-variants',
-        keyMap: variantPaneKeys,
-        helpSource: variantPaneKeys,
-        mouse: ({ msg, rect }) =>
-          resolveVariantPaneMouse(msg, model, rect),
-      },
+      ...['story-variants', CONTEXT_DRAWER_PANE_ID].map(
+        (paneId): FrameInputArea<DocsExplorerModel, DocsMsg> => ({
+          paneId,
+          keyMap: variantPaneKeys,
+          helpSource: variantPaneKeys,
+          mouse: ({ msg, rect }) =>
+            resolveVariantPaneMouse(msg, model, rect),
+        }),
+      ),
     ],
+    layers: (model) =>
+      contextDrawerLayers(model.contextDrawer, variantPaneKeys),
     searchTitle: () =>
       renderDocsSearchTitle(
         dogfoodText(

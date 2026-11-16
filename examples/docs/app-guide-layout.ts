@@ -5,14 +5,11 @@ import { docsThemeUnfocusedGutterToken } from './app-docs-theme-tokens.js';
 import { renderGuideInfoPane } from './app-guide-info-pane.js';
 import { renderGuideNavPane } from './app-guide-nav-pane.js';
 import { renderGuideReaderPane } from './app-guide-reader-pane.js';
-import {
-  DOCS_FLEX_TRACK,
-  DOCS_SIDEBAR_WIDTH,
-  type DocsPageId,
-} from './app-ids.js';
+import { CONTEXT_DRAWER_PANE_ID } from './app-context-drawer.js';
+import { createDocsShellLayout } from './app-docs-shell-layout.js';
+import type { DocsPageId } from './app-ids.js';
 import type { LandingThemeTokens } from './app-landing.js';
 import type { DocsExplorerModel } from './app-model.js';
-import { docsNavWidthForVariant } from './app-pane-geometry.js';
 
 export function createGuidePageLayout(
   pageId: DocsPageId,
@@ -64,44 +61,14 @@ export function createGuidePageLayout(
         localization,
       ),
   };
-  if (model.layoutVariant === 'tiny') return main;
-  const navWidth = docsNavWidthForVariant(model.layoutVariant);
-  if (model.layoutVariant !== 'wide') {
-    return {
-      kind: 'grid',
-      gridId: `docs-${pageId}`,
-      columns:
-        model.layoutVariant === 'narrow'
-          ? [1, navWidth, 1, DOCS_FLEX_TRACK]
-          : [1, navWidth, 1, DOCS_FLEX_TRACK, 1],
-      rows: [1, DOCS_FLEX_TRACK, 1],
-      areas:
-        model.layoutVariant === 'narrow'
-          ? ['. . . .', '. nav . main', '. . . .']
-          : ['. . . . .', '. nav . main .', '. . . . .'],
-      gap: 0,
-      cells: { nav, main },
-    };
-  }
-  return {
-    kind: 'grid',
-    gridId: `docs-${pageId}`,
-    columns: [
-      1,
-      DOCS_SIDEBAR_WIDTH,
-      1,
-      DOCS_FLEX_TRACK,
-      1,
-      DOCS_SIDEBAR_WIDTH,
-      1,
-    ],
-    rows: [1, DOCS_FLEX_TRACK, 1],
-    areas: [
-      '. . . . . . .',
-      '. nav . main . meta .',
-      '. . . . . . .',
-    ],
-    gap: 0,
-    cells: { nav, main, meta },
+  const drawer: FrameLayoutNode = {
+    ...meta,
+    paneId: CONTEXT_DRAWER_PANE_ID,
   };
+  return createDocsShellLayout(
+    `docs-${pageId}`,
+    model.layoutVariant,
+    model.contextDrawer.open,
+    { side: nav, main, aside: meta, drawer },
+  );
 }

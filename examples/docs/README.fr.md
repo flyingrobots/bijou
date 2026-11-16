@@ -74,6 +74,7 @@ lui donner le focus et utilisez la molette pour faire défiler les longs documen
 - `Enter` / `Space` : ouvrir le guide ayant le focus, déplier une famille, sélectionner un composant ou activer la ligne ayant le focus
 - `←` / `→` : replier ou déplier la famille ayant le focus dans la voie de gauche de `Components`
 - `Tab` / `Shift+Tab` : déplacer le focus entre les volets
+- `i` : ouvrir ou fermer le tiroir contextuel de la page ; `Esc` le ferme aussi et rend le focus au volet d’origine
 - `j` / `k` : faire défiler le volet de documentation ou de démonstration ayant le focus
 - `d` / `u` : paginer le volet de documentation ou de démonstration ayant le focus
 - `1` `2` `3` `4` : changer de profil rich, static, pipe et accessible
