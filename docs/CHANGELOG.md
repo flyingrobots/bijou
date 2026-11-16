@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Framed apps reuse the focused-pane scroll measurement across consecutive
+  scroll actions (#589, DL-032). Each runtime owns one single-entry cache keyed
+  by a frame input revision, page, pane, columns and rows. Any message other
+  than a scroll action invalidates it, and the measurement Surface is no longer
+  module-global. Scroll behaviour is unchanged.
 - DL-031 records the DOGFOOD contextual drawer contract (#623). A page-owned
   drawer participates in layout and does not dim the frame. It holds variant
   and guide metadata, takes focus on open, restores focus to a visible pane on

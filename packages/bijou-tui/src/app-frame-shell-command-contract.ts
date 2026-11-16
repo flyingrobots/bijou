@@ -1,4 +1,5 @@
 import type { BijouContext } from '@flyingrobots/bijou';
+import type { FocusedPaneMeasureCache } from './app-frame-scroll-measure-cache.js';
 import type { KeyMap } from './keybindings.js';
 import type { FramePage } from './app-frame-page-contract.js';
 import type { CreateFramedAppOptions } from './app-frame-options.js';
@@ -14,6 +15,7 @@ import type { FrameThemeModeServices } from './app-frame-theme-mode.js';
 import type { FramePresentationDependencies } from './app-frame-presentation.js';
 
 export interface FrameShellCommandDependencies<PageModel, Msg> {
+  readonly measureCache: FocusedPaneMeasureCache;
   readonly options: CreateFramedAppOptions<PageModel, Msg>;
   readonly pagesById: Map<string, FramePage<PageModel, Msg>>;
   readonly frameKeys: KeyMap<FrameAction>;

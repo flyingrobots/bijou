@@ -4,12 +4,6 @@ import type {
   InternalFrameModel,
 } from './app-frame-types.js';
 import {
-  createPanelDockState,
-} from './panel-dock.js';
-import {
-  createPanelVisibilityState,
-} from './panel-state.js';
-import {
   createFocusAreaStateForSurface,
   focusAreaPageDown,
   focusAreaPageUp,
@@ -21,14 +15,13 @@ import {
   focusAreaScrollToX,
   type FocusAreaState,
 } from './focus-area.js';
-import { renderFrameNode } from './app-frame-render.js';
+import { measureFocusedPane } from './app-frame-actions-scroll-measure.js';
 import {
-  findPaneNode,
-  frameBodyRect,
-} from './app-frame-utils.js';
-import { renderPaneSurfaceForMeasurement } from './app-frame-actions-measure.js';
+  createFocusedPaneMeasureCache,
+  type FocusedPaneMeasureCache,
+} from './app-frame-scroll-measure-cache.js';
 
-type ScrollAction = Extract<
+export type ScrollAction = Extract<
   FrameAction,
   {
     type:
@@ -48,6 +41,7 @@ export function scrollFocusedPane<PageModel, Msg>(
   action: ScrollAction,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   options: CreateFramedAppOptions<PageModel, Msg>,
+  cache: FocusedPaneMeasureCache = createFocusedPaneMeasureCache(),
 ): InternalFrameModel<PageModel, Msg> {
   const pageId = model.activePageId;
   const focusedPaneId = model.focusedPaneByPage[pageId];
@@ -55,43 +49,24 @@ export function scrollFocusedPane<PageModel, Msg>(
   const page = pagesById.get(pageId);
   const pageModel = model.pageModels[pageId];
   if (page == null || pageModel === undefined) return model;
-  const layoutTree = page.layout(pageModel);
-  const bodyRect = frameBodyRect(
-    model.columns,
-    model.rows,
-    options.bodyTopRows ?? 1,
-    options.bodyBottomRows ?? 1,
-  );
-  const resolved = renderFrameNode(layoutTree, bodyRect, {
-    model,
+  const key = {
+    revision: cache.revision(),
     pageId,
-    focusedPaneId,
-    scrollByPane: model.scrollByPage[pageId] ?? {},
-    visibility:
-      model.minimizedByPage[pageId] ?? createPanelVisibilityState(),
-    dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
-    frameBackgroundToken: undefined,
-  });
-  const paneRect = resolved.paneRects.get(focusedPaneId);
-  if (
-    paneRect == null
-    || paneRect.width <= 0
-    || paneRect.height <= 0
-  ) {
-    return model;
-  }
-  const paneNode = findPaneNode(layoutTree, focusedPaneId);
-  if (paneNode == null) return model;
-  const contentSurface = renderPaneSurfaceForMeasurement(
-    paneNode.render(paneRect.width, paneRect.height),
-    paneRect.width,
-    paneRect.height,
+    paneId: focusedPaneId,
+    columns: model.columns,
+    rows: model.rows,
+  };
+  const measurement = cache.lookup(key)
+    ?? measureFocusedPane(model, key, page, pageModel, options, cache);
+  if (measurement === undefined) return model;
+  let state = createFocusAreaStateForSurface(
+    { width: measurement.contentWidth, height: measurement.contentHeight },
+    {
+      width: measurement.paneWidth,
+      height: measurement.paneHeight,
+      overflowX: measurement.overflowX,
+    },
   );
-  let state = createFocusAreaStateForSurface(contentSurface, {
-    width: paneRect.width,
-    height: paneRect.height,
-    overflowX: paneNode.overflowX ?? 'hidden',
-  });
   const previous = model.scrollByPage[pageId]?.[focusedPaneId]
     ?? { x: 0, y: 0 };
   state = focusAreaScrollTo(state, previous.y);

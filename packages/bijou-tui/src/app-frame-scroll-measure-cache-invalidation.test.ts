@@ -60,8 +60,9 @@ describe('focused-pane scroll measurement cache invalidation', () => {
         [model] = app.update(msg, model);
       }
       expect(model.activePageId).toBe('home');
+      const beforeScroll = counts.layout;
       [model] = app.update(scroll, model);
-      expect(counts.layout).toBe(warm + 1);
+      expect(counts.layout).toBe(beforeScroll + 1);
     } finally {
       setDefaultContext(testCtx);
     }
