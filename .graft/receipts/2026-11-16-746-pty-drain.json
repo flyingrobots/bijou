@@ -1,0 +1,17 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "C17D38DE-A883-440F-A33C-7EAE5AC107B1",
+  "agent": "codex",
+  "task": "Drain PTY output during Markdown CLI resize-test shutdown (#746)",
+  "bytesConsumed": 2193,
+  "filesRead": ["docs/CHANGELOG.md"],
+  "filesModified": [
+    "tests/markdown-font-cli-resize.py",
+    "docs/CHANGELOG.md",
+    ".graft/receipts/2026-11-16-746-pty-drain.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Graft read_range changelog excerpt only; bounded shell reads of the Python and TypeScript fixtures and standards are excluded from this byte count.",
+  "validation": "Fresh source build passed on Node 22.23.3. Before repair, the default-width real CLI fixture failed its five-second shutdown bound; after repair both resize cases passed. Repetition and normal hook evidence are recorded in the linked PR. No timeout was increased.",
+  "publication": "Normal pre-push gates and hosted CI remain required before merging."
+}
