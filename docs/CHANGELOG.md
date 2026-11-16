@@ -87,6 +87,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The DOGFOOD added-copy gate compares complete matching source groups at base
+  and current revisions. Touching one split file no longer reports unchanged
+  sibling copy as new; added copy and duplicates still fail (#749).
 - The Markdown CLI resize test drains PTY output during shutdown, preventing
   macOS terminal restoration from blocking behind unread output. Its five-second
   shutdown deadline and process-group cleanup remain unchanged (#746).

@@ -1,0 +1,19 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "C17D38DE-A883-440F-A33C-7EAE5AC107B1",
+  "agent": "codex",
+  "task": "Compare matching localization source groups (#749)",
+  "bytesConsumed": 2523,
+  "filesRead": ["docs/CHANGELOG.md"],
+  "filesModified": [
+    "scripts/dogfood-i18n-debt-base.ts",
+    "scripts/dogfood-debt-git-fixture.ts",
+    "scripts/dogfood-i18n-debt-groups.test.ts",
+    "docs/CHANGELOG.md",
+    ".graft/receipts/2026-11-16-749-debt-groups.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Graft changelog excerpt only; bounded shell source reads and live Git/source boundary probes are excluded from the byte count.",
+  "validation": "RED: three real-Git fixture acceptance cases failed while six added-copy and duplicate-copy rejection controls passed. GREEN: all 24 focused tests passed, then all nine new cases passed ten repetitions. Repaired public command with the original clean drawer and Guided flows inventories returned zero without changing their source or ratchets.",
+  "publication": "Normal commit and push hooks, hosted CI and clean review remain required before merging."
+}
