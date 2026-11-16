@@ -245,8 +245,8 @@ status keys fall back to `semantic.muted`.
 Direction-sensitive Components read one resolved inline direction (R26:
 think in start and end, not left and right).
 
-- **`direction` option / `ctx.direction`**: Every Component accepts
-  `direction?: 'ltr' | 'rtl'` through `BijouNodeOptions`; `createBijou()` and
+- **`direction` option / `ctx.direction`**: Component options that extend
+  `BijouNodeOptions` accept `direction?: 'ltr' | 'rtl'`; `createBijou()` and
   `createTestContext()` accept a context-wide `direction`.
 - **`resolveDirection(options)`**: The single resolver. The explicit option
   overrides the context; absent both, the direction is `'ltr'`.
@@ -259,6 +259,9 @@ think in start and end, not left and right).
   Swap directional glyphs (‹ ›, « », ▸ ◂, ▶ ◀, → ←, ⇒ ⇐ and similar) under
   `'rtl'`. Pass only Component-owned affordances; never code, paths, IDs,
   commands or URLs. ASCII `<` and `>` are never swapped.
+
+Illustrative composition for a direction-sensitive Component; per-family
+integration is tracked separately:
 
 ```ts
 const visual = mirrorsLayout(options) ? 'rtl' : 'ltr';
