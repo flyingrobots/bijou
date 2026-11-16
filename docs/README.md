@@ -24,11 +24,13 @@ teaching book and its LaTeX sources now belong to the job-monitor repository.
 Individual source Markdown files remain removed;
 their exact text and hashes survive in the frozen corpus for DOGFOOD and checks.
 
-Translations: the teaching book (about 13,600 words, 106 pages) is the first
-edition to be translated. The planned translated sources will live in the job-monitor repository
+Translations: the teaching book (about 13,600 lexical tokens, 106 pages) is
+the first edition to be translated. The planned translated sources will live
+in the job-monitor repository
 under `book/locales/<locale>/`, at the same relative paths as the English files,
 and will build to `bijou-book.<locale>.pdf` after locale build support
-([#618](https://github.com/flyingrobots/bijou/issues/618)) lands. The complete edition and the archive
+([#618](https://github.com/flyingrobots/bijou/issues/618)) lands.
+The complete edition and the archive
 stay English only, and the English hash pins do not change. See
 [DL-036](./design/DL-036-book-translation-edition.md).
 
