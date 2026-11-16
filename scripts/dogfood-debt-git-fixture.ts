@@ -13,10 +13,19 @@ import { runDogfoodI18nDebtInventory } from './dogfood-i18n-debt.js';
 export function runDebtGitFixture(
   base: Readonly<Record<string, readonly string[]>>,
   current: Readonly<Record<string, readonly string[]>>,
+  environment: NodeJS.ProcessEnv = process.env,
 ): { readonly exitCode: number; readonly stderr: string } {
+  // Hooks export repository locators that override cwd. Git owns the list of
+  // variables to clear before operating on a different, disposable repository.
+  const localNames = new Set(execFileSync('git', ['rev-parse', '--local-env-vars'], {
+    env: environment, encoding: 'utf8', timeout: 5_000, stdio: ['ignore', 'pipe', 'pipe'],
+  }).trim().split('\n'));
+  const fixtureEnvironment = Object.fromEntries(
+    Object.entries(environment).filter(([name]) => !localNames.has(name)),
+  );
   const root = mkdtempSync(join(tmpdir(), 'bijou-debt-groups-'));
   const git = (args: readonly string[]): string => execFileSync('git', [...args], {
-    cwd: root, encoding: 'utf8', timeout: 5_000, stdio: ['ignore', 'pipe', 'pipe'],
+    cwd: root, env: fixtureEnvironment, encoding: 'utf8', timeout: 5_000, stdio: ['ignore', 'pipe', 'pipe'],
   });
   const writeSources = (files: Readonly<Record<string, readonly string[]>>): void => {
     for (const [path, values] of Object.entries(files)) {

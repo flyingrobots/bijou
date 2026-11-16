@@ -1,0 +1,18 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "C17D38DE-A883-440F-A33C-7EAE5AC107B1",
+  "agent": "codex",
+  "task": "Contain real-Git fixtures under inherited hook environments (#749)",
+  "bytesConsumed": 0,
+  "filesRead": [],
+  "filesModified": [
+    "scripts/dogfood-debt-git-fixture.ts",
+    "scripts/dogfood-debt-fixture-isolation.test.ts",
+    "docs/CHANGELOG.md",
+    ".graft/receipts/2026-11-16-749-git-containment.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Bounded shell source reads and Git observations only; no new Graft reads in this repair.",
+  "validation": "The first full pre-push exposed inherited Git locators escaping the temporary fixture cwd. Publication failed; original repair history was preserved and recovery performed separately. RED adversarial tests target disposable parent repositories and detect changed HEAD, index and configuration. Real workspace state guards remain unchanged. GREEN: all 27 focused tests pass after clearing Git-advertised repository-local environment keys before fixture commands.",
+  "publication": "Fresh normal push gates and hosted CI remain required; hook variable instrumentation reports names only."
+}
