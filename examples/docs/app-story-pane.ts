@@ -23,6 +23,8 @@ import {
   docsThemeMutedBorderToken,
 } from './app-docs-theme-tokens.js';
 import { renderEmptyStoryPane } from './app-empty-story-pane.js';
+import { dogfoodText } from './app-localization.js';
+import { renderStoryFacts } from './app-story-facts.js';
 import type { LandingThemeTokens } from './app-landing.js';
 import type { DocsExplorerModel } from './app-model.js';
 import {
@@ -51,10 +53,8 @@ export function renderStoryPane(
     story,
     findStoryProfileIndex(story, model.profileMode),
   );
-  const variant = resolveStoryVariant(
-    story,
-    selectedVariantIndex(model, story.id),
-  );
+  const variantIndex = selectedVariantIndex(model, story.id);
+  const variant = resolveStoryVariant(story, variantIndex);
   const previewWidth = Math.max(
     20,
     Math.min(Math.max(20, paneWidth - 6), preset.width),
@@ -71,7 +71,12 @@ export function renderStoryPane(
       timeMs: model.previewTimeMs,
     }),
   );
-  const previewTitle = `live preview • ${preset.label} • ${variant.label}`;
+  const previewTitle = dogfoodText(
+    localization,
+    'docs.story.previewTitle',
+    'live preview • {profile} • {variant}',
+    { profile: preset.label, variant: variant.label },
+  );
   const previewCard = boxSurface(preview, {
     title: previewTitle,
     width: Math.min(
@@ -90,10 +95,24 @@ export function renderStoryPane(
   return insetPaneSurface(
     column([
       themedSeparatorSurface(
-        `docs • ${story.title}`,
+        dogfoodText(
+          localization,
+          'docs.story.separator',
+          'docs • {title}',
+          { title: story.title },
+        ),
         paneWidth,
         context,
         theme,
+      ),
+      spacer(1, 1),
+      renderStoryFacts(
+        story,
+        variantIndex,
+        variant.label,
+        preset,
+        paneWidth,
+        localization,
       ),
       spacer(1, 1),
       placeSurface(previewCard, {

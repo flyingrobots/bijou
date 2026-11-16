@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The DOGFOOD Components reading path shows the active variant, its position
+  and the variant count, and the active profile inline in the story pane
+  (#624), at every layout width and in all four locales. The facts no longer
+  depend on the wide-only variants pane, so the contextual drawer migration can
+  remove that pane without removing a required fact. The story pane separator
+  and preview title are localized too.
 - DL-031 records the DOGFOOD contextual drawer contract (#623). A page-owned
   drawer participates in layout and does not dim the frame. It holds variant
   and guide metadata, takes focus on open, restores focus to a visible pane on

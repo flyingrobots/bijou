@@ -2237,6 +2237,50 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.story.facts.profile"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Perfil: {profile}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.story.facts.variant"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Variante {index} de {count}: {label}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.story.previewTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "vista previa en vivo • {profile} • {variant}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.story.separator"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "documentación • {title}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.title"
       },
       "kind": "message",
