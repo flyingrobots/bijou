@@ -23,8 +23,8 @@ describe('DF-019 DOGFOOD complete family coverage cycle', () => {
   it('completes DOGFOOD component-family coverage', () => {
     const coverage = resolveDogfoodDocsCoverage(COMPONENT_STORIES);
 
-    expect(coverage.documentedFamilies).toBe(36);
-    expect(coverage.totalFamilies).toBe(36);
+    expect(coverage.documentedFamilies).toBe(37);
+    expect(coverage.totalFamilies).toBe(37);
     expect(coverage.percent).toBe(100);
     expect(coverage.coveredFamilyIds).toContain('transient-app-notifications');
     expect(coverage.coveredFamilyIds).toContain('mode-aware-custom-primitives');

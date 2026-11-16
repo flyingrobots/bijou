@@ -6,7 +6,7 @@
 npm run components
 ```
 
-La bibliothèque de composants est un jeu de 58 diapositives : un titre, une diapositive pour chacune des 14 sections suivie de ses composants, et une diapositive de fin. Une section regroupe des familles de composants apparentées pour faciliter la navigation ; les 42 composants couvrent 35 des 36 familles de `docs/design-system/component-families.md`. Elle montre un composant Bijou à la fois au centre de l'écran, sans rien d'autre pour détourner l'attention. Elle utilise le même catalogue de 42 stories que DOGFOOD et Block Lab, et s'exécute dans le cadre d'application standard de Bijou : la recherche, les réglages et la sortie se comportent donc comme dans DOGFOOD.
+La bibliothèque de composants est un jeu de 58 diapositives : un titre, une diapositive pour chacune des 14 sections suivie de ses composants, et une diapositive de fin. Une section regroupe des familles de composants apparentées pour faciliter la navigation ; les 42 composants couvrent 36 des 37 familles de `docs/design-system/component-families.md`. Elle montre un composant Bijou à la fois au centre de l'écran, sans rien d'autre pour détourner l'attention. Elle utilise le même catalogue de 42 stories que DOGFOOD et Block Lab, et s'exécute dans le cadre d'application standard de Bijou : la recherche, les réglages et la sortie se comportent donc comme dans DOGFOOD.
 
 La bibliothèque s'ouvre sur un écran titre « Components Library », composé en DM Sans. Appuyez sur Enter pour commencer.
 

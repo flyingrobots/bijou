@@ -12,8 +12,8 @@ export function createGuidedFlowStory(localization?: LocalizationPort): GuidedFl
   return {
     kind: 'component',
     id: 'guided-flow',
-    coverageFamilyIds: [],
-    family: 'Structural grouping and inspection',
+    coverageFamilyIds: ['guided-flows'],
+    family: 'Guided flows',
     title: 'guidedFlow()',
     package: BIJOU_STORY_PACKAGE,
     localize: createGuidedFlowStory,

@@ -28,7 +28,7 @@ const WINDOWS_ABSOLUTE_PATH = /\b[A-Za-z]:\\/;
 // Frozen source and delivery evidence retain original paths. Exact hashes prevent
 // these exceptions from admitting new machine-specific content or mutable code.
 const FROZEN_EVIDENCE = new Map([
-  ['docs/book/source-corpus.json', 'a82d8788e3be088f76b134696a35fd283283f018b0cdadbb1e51761aaa20bb6c'],
+  ['docs/book/source-corpus.json', 'c572fbf99570e76b73e4d75319728f7e1e766927339e0df0f9d872da8da723b7'],
   ['docs/book/build-report.json', 'b799ee9fa864da133b4dad4a66483b5aaaf933a51179349621905ccf4233ec2c'],
   ['docs/book/reader-delivery.json', '199e7d6c3d7bca303e03bde778f79d848a2e28c7e9985a331c72fa29d1e7adb9'],
   ['docs/book/history/2026-10-20-before-progressive-build-report.json', 'eed9b35ce2cccffba4c2368cd6a75991f350c3afdfd0a20446867a8796709c46'],

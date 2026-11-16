@@ -158,6 +158,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **Guided flows component family** — the component-families guidance gains a
+  Guided flows entry for `guidedFlow()` with the R52 fields, distinguishing it
+  from Explainability walkthroughs and Path and progress. The `guidedFlow()`
+  story now maps to that family, so the Components Library covers 36 of 37 families
+  (#586).
+
 - DL-032 records the scroll-measurement cache contract: a runtime-owned frame
   input revision, a one-entry cache per framed-app runtime, and the
   acceptance probes for the implementation and its evidence (#587).

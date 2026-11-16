@@ -6,7 +6,7 @@
 npm run components
 ```
 
-Die Components Library ist ein Foliensatz mit 58 Folien: ein Titel, je eine Folie für jeden der 14 Abschnitte, gefolgt von seinen Komponenten, und eine Abschlussfolie. Ein Abschnitt fasst verwandte Komponentenfamilien zum Durchstöbern zusammen; die 42 Komponenten decken 35 der 36 Familien in `docs/design-system/component-families.md` ab. Sie zeigt jeweils eine Bijou-Komponente in der Bildschirmmitte, ohne dass etwas anderes um Aufmerksamkeit konkurriert. Sie nutzt denselben Katalog mit 42 Stories wie DOGFOOD und Block Lab und läuft im Standard-App-Rahmen von Bijou, sodass Suche, Einstellungen und Beenden sich verhalten wie in DOGFOOD.
+Die Components Library ist ein Foliensatz mit 58 Folien: ein Titel, je eine Folie für jeden der 14 Abschnitte, gefolgt von seinen Komponenten, und eine Abschlussfolie. Ein Abschnitt fasst verwandte Komponentenfamilien zum Durchstöbern zusammen; die 42 Komponenten decken 36 der 37 Familien in `docs/design-system/component-families.md` ab. Sie zeigt jeweils eine Bijou-Komponente in der Bildschirmmitte, ohne dass etwas anderes um Aufmerksamkeit konkurriert. Sie nutzt denselben Katalog mit 42 Stories wie DOGFOOD und Block Lab und läuft im Standard-App-Rahmen von Bijou, sodass Suche, Einstellungen und Beenden sich verhalten wie in DOGFOOD.
 
 Die Bibliothek öffnet sich mit einem Titelbildschirm „Components Library“ in DM Sans. Drücke Enter, um zu beginnen.
 

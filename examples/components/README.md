@@ -6,7 +6,7 @@ English · [Français](README.fr.md) · [Español](README.es.md) · [Deutsch](RE
 npm run components
 ```
 
-The Components Library is a deck of 58 slides: a title, a slide for each of 14 sections followed by its components, and an end slide. A section groups related component families for browsing; the 42 components cover 35 of the 36 families in `docs/design-system/component-families.md`. It shows one Bijou component at a time in the centre of the screen, with nothing else competing for attention. It uses the same 42-story catalog as DOGFOOD and Block Lab, and runs inside Bijou's standard app frame, so search, settings, and quit behave as they do in DOGFOOD.
+The Components Library is a deck of 58 slides: a title, a slide for each of 14 sections followed by its components, and an end slide. A section groups related component families for browsing; the 42 components cover 36 of the 37 families in `docs/design-system/component-families.md`. It shows one Bijou component at a time in the centre of the screen, with nothing else competing for attention. It uses the same 42-story catalog as DOGFOOD and Block Lab, and runs inside Bijou's standard app frame, so search, settings, and quit behave as they do in DOGFOOD.
 
 The library opens on a "Components Library" title screen, set in DM Sans. Press Enter to start.
 
