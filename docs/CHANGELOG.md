@@ -55,6 +55,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DL-030 records the fast and full verification lanes: one tested path
+  classifier, a fast lane for local pushes and draft pull requests, and the
+  unchanged release-grade full lane required at merge through a single
+  `Verification gate` check (#608).
+
 - **Inspectable theme provenance and key-binding conflicts** — rule-authored
   presets retain their definitions when renamed, token graphs expose
   mode-aware direct and transitive reverse dependents without resolving cyclic
