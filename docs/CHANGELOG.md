@@ -90,7 +90,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - DOGFOOD shows the language-change notice in the newly selected language,
   so cycling Preferred language from French to Spanish reads in Spanish
   (#582).
-
+- The Markdown CLI resize test drains PTY output during shutdown, preventing
+  macOS terminal restoration from blocking behind unread output. Its five-second
+  shutdown deadline and process-group cleanup remain unchanged (#746).
+- Scrolling a maximized pane (ctrl+f) now clamps to the full body size the
+  frame paints, so the last line is reachable (#669). Scroll measurement used
+  the pane's normal split rectangle before.
 - The Components Library no longer renders dimmed. The app frame dims
   everything beneath any overlay, so the Library draws its progress bar inside
   the page instead of as an overlay.
