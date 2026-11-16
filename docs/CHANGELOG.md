@@ -55,6 +55,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **Replay event envelope decision** — DL-033 fixes `bijou-replay-event/1`:
+  canonical JSONL, per-kind plain-data payloads, one `seq` order, logical
+  `tick`/`atMs` time, and full-Surface frame events as the capture barrier,
+  with contracts for the ReplayOutbox, `runScript()` emission, replay-driven
+  `recordDemoGif()` and the GIF fixture (#599).
+
 - **Inspectable theme provenance and key-binding conflicts** — rule-authored
   presets retain their definitions when renamed, token graphs expose
   mode-aware direct and transitive reverse dependents without resolving cyclic
