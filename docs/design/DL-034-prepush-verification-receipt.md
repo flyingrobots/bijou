@@ -325,12 +325,14 @@ mistake fail closed.
   experience. The remediation line must be exact, and #652 must document it.
 - Machine contention moves with the work. On shared workstations, concurrent
   pre-push campaigns from several agents compete for the same host. The
-  maintainer currently serialises every `git push` through the `git-locks`
-  `host/heavy-work` lock for that reason. After #650 merges, a receipt-mode
-  push is light, so the heavy campaign is the witness run, and the lock belongs
-  around `npm run verify:witness` and around inline-mode pushes (#651). The
-  receipt itself does not depend on the lock: a run that was not serialised is
-  still exact, only slower.
+  maintainer currently admits every `git push` through the `git-locks`
+  `bijou-prepush` semaphore, which has 5 slots (`git locks with --sem
+  bijou-prepush`). This semaphore is the local admission control for
+  verification campaigns. After #650 merges, a receipt-mode push is light, so
+  the heavy campaign is the witness run. The semaphore then belongs around
+  `npm run verify:witness` and around inline-mode pushes (#651), not around
+  receipt-mode pushes. The receipt does not depend on admission: a run that
+  was not admitted is still exact, only slower.
 - The hook scripts gain a shared manifest. Code-size and Code Dojo ratchets
   apply to it like any other script.
 - Reversal before #650 merges costs nothing. After #650 merges, a change to the
@@ -405,6 +407,6 @@ mistake fail closed.
   copied receipt is a hook bypass.
 - Never recommends `--no-verify` or editing a receipt.
 - On shared workstations, says to run the witness, and any inline-mode push,
-  while holding the host heavy-work lock. A receipt-mode push does not need
-  the lock.
+  while holding a `bijou-prepush` semaphore slot. A receipt-mode push does not
+  need a slot.
 - Adds a `docs/CHANGELOG.md` entry.
