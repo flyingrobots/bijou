@@ -80,9 +80,9 @@ describe('DOGFOOD i18n debt inventory', () => {
       const result = evaluateDogfoodI18nDebtRatchet(inventory);
       const surfaces = inventory.bySurface.map((surface) => surface.surface);
 
-      // Keep #549's two removals, 24 localized release entries, the typed
-      // root-route identifier, and the two story-pane strings localized in #624.
-      expect(inventory.total).toBe(2287);
+      // Keep #549's two removals, 24 localized release entries, and the typed
+      // root-route identifier removed while wiring actual landing lowering.
+      expect(inventory.total).toBe(2258);
       expect(surfaces).not.toContain('app-root-view');
       expect(surfaces).toContain('stories-story-guided-flow');
       expect(surfaces).not.toContain('docs-app');

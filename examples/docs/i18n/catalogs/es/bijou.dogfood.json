@@ -2259,28 +2259,6 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
-        "id": "docs.story.previewTitle"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {
-        "es": "vista previa en vivo • {profile} • {variant}"
-      }
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
-        "id": "docs.story.separator"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {
-        "es": "documentación • {title}"
-      }
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
         "id": "docs.title"
       },
       "kind": "message",
@@ -3403,6 +3381,325 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El contenido está mediado por IA y necesita procedencia, evidencia o confianza explícitas; usa `explainability()`."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "La persona usuaria necesita transiciones de estado editables o un enrutado paso a paso completo gestionado por el shell."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Una nota o alerta sencilla ya lo diría todo con honestidad."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.accessible"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Los pasos linealizados y las etiquetas de sección conservan el mismo significado guiado en el orden de lectura."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.interactive"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Un bloque agrupado mantiene el resumen, los pasos, las secciones y la siguiente acción claramente distintos."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.pipe"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Las secciones con sangría y una siguiente acción etiquetada conservan la ruta sin adornos decorativos."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.static"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El mismo ritmo de secciones se mantiene determinista sin comportamiento de shell en tiempo de ejecución."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Configuración"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.owner"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Responsable: Platform ops"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.window"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Ventana: hoy"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.nextAction"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Abre el gestor de secretos de staging y rota el token de despliegue."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Mantén la guía como orientativa hasta que el secreto rotado se confirme en los registros de despliegue."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Nota para la persona operadora"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El despliegue está sano, pero el token que caduca hace frágil la ruta actual hasta que termine la rotación."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Por qué"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "La latencia del canario y el presupuesto de errores están sanos."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Revisar la salud del despliegue"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El token actual caduca en 30 minutos."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Renovar el secreto de staging"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Solo después de confirmar el nuevo secreto."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Promover el despliegue"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Mantén a la persona operadora en una única ruta tranquila en lugar de dispersar la secuencia entre notas, cajones y filas de estado."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Prepara el despliegue en staging"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Bloque reutilizable para superficies de asistencia de varios pasos más tranquilas, con secciones explícitas y una única acción siguiente evidente."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El flujo necesita una recomendación o ruta de configuración tranquila sin convertirse en un asistente completo."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El ritmo de las secciones y la siguiente acción deben seguir siendo explícitos en lugar de diluirse en prosa genérica."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "La superficie es asistencia guiada, pero no específicamente explicabilidad de IA."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Guía de varios pasos tranquila con una única siguiente acción explícita."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Despliegue en staging"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "stories.markdown.releaseNote.intro"
       },
       "kind": "message",
@@ -3475,6 +3772,28 @@
       "sourceLocale": "en",
       "values": {
         "es": "# Release note"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.docsTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "documentación • {title}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.livePreviewTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "vista previa en vivo • {profile} • {variant}"
       }
     },
     {

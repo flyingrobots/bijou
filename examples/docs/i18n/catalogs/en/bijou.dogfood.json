@@ -2259,28 +2259,6 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
-        "id": "docs.story.previewTitle"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {
-        "en": "live preview • {profile} • {variant}"
-      }
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
-        "id": "docs.story.separator"
-      },
-      "kind": "message",
-      "sourceLocale": "en",
-      "values": {
-        "en": "docs • {title}"
-      }
-    },
-    {
-      "key": {
-        "namespace": "bijou.dogfood",
         "id": "docs.title"
       },
       "kind": "message",
@@ -3403,6 +3381,325 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "The content is AI-mediated and needs explicit provenance, evidence, or confidence; prefer `explainability()`."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "The user needs editable state transitions or full step-by-step routing owned by the shell."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "A simple note or alert would already say the whole thing honestly."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.accessible"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Linearized steps and section labels preserve the same guided meaning in reading order."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.interactive"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "One grouped block keeps summary, steps, sections, and next action visibly distinct."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.pipe"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Indented sections and a labeled next action preserve the path without decorative chrome."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.static"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "The same section rhythm stays deterministic without runtime shell behavior."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Setup"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.owner"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Owner: Platform ops"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.window"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Window: Today"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.nextAction"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Open the staging secret manager and rotate the deployment token."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Keep the guidance advisory until the rotated secret is confirmed in the deployment logs."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Operator note"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "The rollout is healthy, but the expiring token makes the current path fragile until rotation is complete."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Why"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Canary latency and error budget are both healthy."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Review rollout health"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "The existing token expires in 30 minutes."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Refresh the staging secret"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Only after the new secret is confirmed."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Promote the rollout"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Keep the operator on one calm path instead of scattering the sequence across notes, drawers, and status rows."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Prepare the staging rollout"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Reusable block for calmer multi-step assistance surfaces with explicit sections and one obvious next action."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "The flow needs one calm recommendation or setup path without becoming a full wizard."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Section rhythm and the next action should stay explicit instead of dissolving into generic prose."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "The surface is guided assistance, but not specifically AI explainability."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Calm multi-step guidance with one explicit next action."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Staging rollout"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "stories.markdown.releaseNote.intro"
       },
       "kind": "message",
@@ -3475,6 +3772,28 @@
       "sourceLocale": "en",
       "values": {
         "en": "# Release note"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.docsTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "docs • {title}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.livePreviewTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "live preview • {profile} • {variant}"
       }
     },
     {

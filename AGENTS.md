@@ -40,9 +40,15 @@ This guide is for AI agents and human operators recovering context in the Bijou 
   over 1,000 lines unless it is named as legacy debt in the code-size baseline;
   files over 500 lines must be explicitly baselined and may hold or shrink, not
   grow.
-- The DOGFOOD localization touched-file rule remains binding: if a branch
-  touches a DOGFOOD TypeScript source file that still has raw visible-copy debt,
-  clean that file or prove the strings non-localizable by scanner policy.
+- The DOGFOOD localization touched-file rule remains binding (scope set by
+  `docs/design/DL-037-dogfood-touched-file-scope.md`): if a branch touches a
+  DOGFOOD TypeScript source file, it must not add or modify raw visible copy
+  without localizing it, and a touched file that still has raw-string debt must
+  end with fewer entries than its base (at least one fewer). Whole-file cleanup
+  is not required. This is not permission to keep debt: the aggregate and
+  per-surface baselines still hold or shrink, and dedicated localization tasks
+  carry the burndown. Strings may instead be proved non-localizable by scanner
+  policy.
 
 ## Design Vocabulary
 
