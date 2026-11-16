@@ -15,8 +15,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   through the DOGFOOD catalogs in `en`, `fr`, `es`, and `de`. Stories can opt in
   through a `localize` hook, documented in `docs/development.md`.
 
+### Removed
+
+- DOGFOOD no longer ships the unrendered `release-story-current*.md` sources that
+  described v7.2 as current. The Current Release Story renders
+  `release-story-active*.md`, and its tests assert that source (#585).
+
 ### Added
 
+- DL-037 sets the scope of the DOGFOOD localization touched-file rule (#664).
+  A touched file must not add or modify raw visible copy without localizing
+  it, and must lower its raw-string debt by at least one entry. Whole-file
+  cleanup is no longer required. `npm run dogfood:i18n:debt` now rejects a
+  touched file that adds a raw string, even when its net count falls.
 - DL-031 records the DOGFOOD contextual drawer contract (#623). A page-owned
   drawer participates in layout and does not dim the frame. It holds variant
   and guide metadata, takes focus on open, restores focus to a visible pane on
@@ -79,6 +90,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The Markdown CLI resize test drains PTY output during shutdown, preventing
+  macOS terminal restoration from blocking behind unread output. Its five-second
+  shutdown deadline and process-group cleanup remain unchanged (#746).
+- Scrolling a maximized pane (ctrl+f) now clamps to the full body size the
+  frame paints, so the last line is reachable (#669). Scroll measurement used
+  the pane's normal split rectangle before.
 - The Components Library no longer renders dimmed. The app frame dims
   everything beneath any overlay, so the Library draws its progress bar inside
   the page instead of as an overlay.

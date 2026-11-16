@@ -82,6 +82,6 @@ describe('current DOGFOOD documentation', () => {
     }
     expect(guideDocBody(guide('latest-features')).startsWith('Historical reference')).toBe(false);
     expect(documentationFileExists(resolve('docs/ARCHITECTURE.md'))).toBe(true);
-    expect(readDocumentationFile(resolve('examples/docs/content/release-story-current.md'), 'utf8')).toContain('v7.2 release story');
+    expect(readDocumentationFile(resolve('examples/docs/content/release-story-active.md'), 'utf8')).toContain('{{RELEASE_VERSION}}');
   });
 });
