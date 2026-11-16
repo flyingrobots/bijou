@@ -6,7 +6,7 @@ export interface DocProblem {
   readonly message: string;
 }
 
-export const REQUIRED_FIELDS = [
+const REQUIRED_FIELDS = [
   'Family',
   'Variants',
   'Use when',

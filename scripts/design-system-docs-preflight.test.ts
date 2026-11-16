@@ -1,7 +1,6 @@
 import { readDocumentationFile as readFileSync } from './documentation-corpus.js';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { REQUIRED_FIELDS } from './design-system-docs-rules.js';
 import {
   parseFamilySections,
   validateComponentFamilyDocs,
@@ -46,7 +45,8 @@ describe('design-system docs preflight', () => {
   });
 
   it('requires exactly the R52 family fields', () => {
-    expect([...REQUIRED_FIELDS]).toEqual([
+    const problems = validateComponentFamilyDocs('### Example Family\n');
+    expect(problems.map((problem) => problem.field)).toEqual([
       'Family',
       'Variants',
       'Use when',
