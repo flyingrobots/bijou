@@ -5,6 +5,7 @@ import type { DocsPageId } from './app-ids.js';
 import type { DocsExplorerModel } from './app-model.js';
 import { guideDocsForPage } from './app-guide-catalog.js';
 import { dogfoodText } from './app-localization.js';
+import { guideTranslation } from './app-guide-translations.js';
 import { BIJOU_RELEASE_LINE } from './app-release-line.js';
 
 const HISTORICAL_GUIDES = new Set([
@@ -19,21 +20,22 @@ export function guideDocTitle(
   doc: GuideDoc,
   localization?: LocalizationPort,
 ): string {
-  return doc.localizedTitle?.(localization) ?? doc.title;
+  return doc.localizedTitle?.(localization) ?? guideTranslation(doc.id, localization?.locale)?.title ?? doc.title;
 }
 
 export function guideDocSummary(
   doc: GuideDoc,
   localization?: LocalizationPort,
 ): string {
-  return doc.localizedSummary?.(localization) ?? doc.summary;
+  return doc.localizedSummary?.(localization) ?? guideTranslation(doc.id, localization?.locale)?.summary ?? doc.summary;
 }
 
 export function guideDocBody(
   doc: GuideDoc,
   localization?: LocalizationPort,
 ): string {
-  const sourceBody = doc.localizedBody?.(localization) ?? doc.body;
+  const translated = doc.localizedBody === undefined ? guideTranslation(doc.id, localization?.locale) : undefined;
+  const sourceBody = doc.localizedBody?.(localization) ?? translated?.body ?? doc.body;
   const body = HISTORICAL_GUIDES.has(doc.id)
     ? `${dogfoodText(localization, 'docs.historicalSourceNotice', 'Historical reference from the preserved documentation archive. Check Latest Features and current package READMEs for behavior added since this source was frozen.')}\n\n---\n\n${sourceBody}`
     : sourceBody;
@@ -41,6 +43,7 @@ export function guideDocBody(
     localization !== undefined &&
     localization.locale !== DEFAULT_LOCALE.id &&
     doc.localizedBody === undefined &&
+    translated === undefined &&
     doc.body.trim().length > 0
   ) {
     return `${englishSourceDocumentationNotice(localization)}\n\n---\n\n${body}`;
