@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { execute, requireFree } from './process.mjs';
+import { windowsCommand, windowsStage } from './windows-stage.mjs';
 import { requireWindowsBootstrapClear, withWindowsDaemonCustody, windowsBootstrapQuarantined } from './windows-quarantine.mjs';
 
 const directory = fileURLToPath(new URL('.', import.meta.url));
@@ -55,7 +56,7 @@ export async function bootstrapWindows(version) {
   const cached = await execute(['docker', 'image', 'inspect', base], { allowFailure: true });
   if (cached.code !== 0) {
     await withWindowsDaemonCustody({ operation: 'pull', base, backing }, async () => {
-      await execute(['docker', 'pull', base], { timeout: 600000, signal: controller.signal,
+      await windowsCommand('pull-base', ['docker', 'pull', base], { timeout: 600000, signal: controller.signal,
         monitor: monitorBacking, onData: (chunk) => process.stdout.write(chunk) });
       monitorBacking();
       const pulled = JSON.parse((await execute(['docker', 'image', 'inspect', base])).output.toString())[0];
@@ -66,18 +67,33 @@ export async function bootstrapWindows(version) {
   if (image.Os !== 'windows' || image.Size > 20 * 1024 ** 3) throw new Error('Windows base exceeds image budget or has wrong OS');
   const scratch = mkdtempSync(join(tmpdir(), 'bijou-windows-image-'));
   try {
-    for (const [file, url, checksum] of downloads) await download(url, checksum, join(scratch, file), controller.signal);
+    for (const [file, url, checksum] of downloads) {
+      await windowsStage(file === 'node.zip' ? 'download-node' : 'download-git',
+        () => download(url, checksum, join(scratch, file), controller.signal));
+    }
     const context = join(scratch, 'context'); mkdirSync(context);
     mkdirSync(join(context, 'git'));
-    const extraction = { timeout: 120000, signal: controller.signal, monitor: () => measure(scratch) };
-    await execute(['tar.exe', '-xf', join(scratch, 'node.zip'), '-C', context], extraction);
+    let lastReport = -Infinity;
+    const extraction = { timeout: 120000, signal: controller.signal, monitor: () => {
+      const started = performance.now();
+      const state = { entries: 0, bytes: 0 };
+      try { measure(scratch, state); }
+      finally {
+        if (performance.now() - lastReport >= 10000) {
+          process.stdout.write(`${JSON.stringify({ bootstrap: 'windows', measurement: 'extraction',
+            entries: state.entries, bytes: state.bytes, elapsedMs: Math.round(performance.now() - started) })}\n`);
+          lastReport = performance.now();
+        }
+      }
+    } };
+    await windowsCommand('extract-node', ['tar.exe', '-xf', join(scratch, 'node.zip'), '-C', context], extraction);
     renameSync(join(context, 'node-v22.23.3-win-x64'), join(context, 'node'));
-    await execute(['tar.exe', '-xf', join(scratch, 'git.tar.bz2'), '-C', join(context, 'git')], extraction);
+    await windowsCommand('extract-git', ['tar.exe', '-xf', join(scratch, 'git.tar.bz2'), '-C', join(context, 'git')], extraction);
     if (measure(scratch) > 1024 * MiB) throw new Error('Windows toolchain context exceeds 1 GiB');
     copyFileSync(join(directory, 'Dockerfile.windows'), join(context, 'Dockerfile'));
     copyFileSync(join(directory, 'marker'), join(context, 'marker'));
     await withWindowsDaemonCustody({ operation: 'build', base, backing, context: scratch }, async () => {
-      await execute(['docker', 'build', '--pull=false', '--tag', 'bijou-sealed-windows-node22:local', context], {
+      await windowsCommand('build-toolchain', ['docker', 'build', '--pull=false', '--tag', 'bijou-sealed-windows-node22:local', context], {
         timeout: 600000, signal: controller.signal, onData: (chunk) => process.stdout.write(chunk),
         monitor: () => { monitorBacking(); measure(scratch); },
       });
