@@ -38,7 +38,8 @@ export function measureFocusedPane<PageModel, Msg>(
     dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
     frameBackgroundToken: undefined,
   });
-  const paneRect = resolved.paneRects.get(paneId);
+  const isMaximized = model.maximizedPaneByPage[pageId]?.maximizedPaneId === paneId;
+  const paneRect = isMaximized ? bodyRect : resolved.paneRects.get(paneId);
   if (
     paneRect == null
     || paneRect.width <= 0
