@@ -5,8 +5,8 @@ import { BIJOU_STORY_PACKAGE, type DogfoodComponentStory } from './stories-contr
 export const STORY_GUIDED_FLOW: DogfoodComponentStory = {
     kind: 'component',
     id: 'guided-flow',
-    coverageFamilyIds: [],
-    family: 'Structural grouping and inspection',
+    coverageFamilyIds: ['guided-flows'],
+    family: 'Guided flows',
     title: 'guidedFlow()',
     package: BIJOU_STORY_PACKAGE,
     docs: {

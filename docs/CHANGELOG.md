@@ -55,6 +55,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **Guided flows component family** — the component-families guidance gains a
+  Guided flows entry for `guidedFlow()` with the R52 fields, distinguishing it
+  from Explainability walkthroughs and Path and progress. The `guidedFlow()`
+  story now maps to that family, so DOGFOOD coverage counts 36 families
+  (#586).
+
 - **Inspectable theme provenance and key-binding conflicts** — rule-authored
   presets retain their definitions when renamed, token graphs expose
   mode-aware direct and transitive reverse dependents without resolving cyclic
