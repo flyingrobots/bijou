@@ -9,7 +9,7 @@ import {
 describe('RE-036 packed-bijou-cells/1 metadata', () => {
   it('rejects invalid scene identity and per-cell ownership', () => {
     const hash = validPackedCellsInput();
-    recordField(hash, 'scene').sceneHash = 'not-a-hash';
+    recordField(hash, 'scene')['sceneHash'] = 'not-a-hash';
     expectReceiptError(hash, 'invalid-scene', '$.scene.sceneHash');
 
     const duplicate = validPackedCellsInput();
@@ -57,7 +57,7 @@ describe('RE-036 packed-bijou-cells/1 metadata', () => {
     expectReceiptError(unknown, 'invalid-focus', '$.focus.focusableNodeIds[0]');
 
     const inconsistent = validPackedCellsInput();
-    recordField(inconsistent, 'focus').focusedNodeId = 'scene.root';
+    recordField(inconsistent, 'focus')['focusedNodeId'] = 'scene.root';
     expectReceiptError(inconsistent, 'invalid-focus', '$.focus.focusedNodeId');
   });
 

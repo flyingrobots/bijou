@@ -27,7 +27,7 @@ export interface FramePage<PageModel, Msg> {
   /** Page layout tree. */
   layout(model: PageModel): FrameLayoutNode;
   /** Optional page keymap. */
-  keyMap?: KeyMap<Msg>;
+  keyMap?: KeyMap<Msg> | undefined;
   /** Optional pane-scoped input layers owned by the focused pane. */
   inputAreas?: (
     model: PageModel,

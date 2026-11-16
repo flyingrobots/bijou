@@ -21,7 +21,7 @@ export interface FilePickerState {
   /** Maximum number of visible entries. */
   readonly height: number;
   /** Optional file extension filter (e.g. `".ts"`). */
-  readonly filter?: string;
+  readonly filter?: string | undefined;
 }
 export interface FilePickerOptions {
   /** Starting directory path. */

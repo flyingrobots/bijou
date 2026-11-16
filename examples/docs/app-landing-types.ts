@@ -60,7 +60,7 @@ export interface LandingModel {
   readonly landingTimeMs: number;
   readonly landingFps: number;
   readonly landingThemeIndex: number;
-  readonly landingToast?: LandingToastState;
+  readonly landingToast?: LandingToastState | undefined;
   readonly docsModel: FrameModel<LandingQualityPageState>;
 }
 

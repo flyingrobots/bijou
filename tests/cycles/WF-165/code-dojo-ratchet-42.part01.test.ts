@@ -32,7 +32,7 @@ describe('WF-165 Code Dojo tranche B debt contract', () => {
     const command = debtScript();
     expect(command).toMatch(/^tsx scripts\/code-dojo-debt\.ts --max \d+$/u);
     const ceiling = Number(
-      command?.match(/--max (?<ceiling>\d+)$/u)?.groups?.ceiling,
+      command?.match(/--max (?<ceiling>\d+)$/u)?.groups?.['ceiling'],
     );
     expect(Number.isSafeInteger(ceiling)).toBe(true);
     expect(ceiling).toBeLessThanOrEqual(42);

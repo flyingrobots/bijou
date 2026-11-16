@@ -39,7 +39,7 @@ describe('done', () => {
       .build();
     const state = runUntilDone(tl);
     expect(tl.done(state)).toBe(true);
-    expect(tl.values(state).x).toBe(1);
-    expect(tl.values(state).y).toBe(50);
+    expect(tl.values(state)['x']).toBe(1);
+    expect(tl.values(state)['y']).toBe(50);
   });
 });

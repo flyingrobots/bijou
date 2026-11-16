@@ -22,7 +22,7 @@ describe('notifications demo', () => {
       { key: 'N' },
     ], { ctx: testCtx });
 
-    const pageModel = must(result.model.pageModels.notifications);
+    const pageModel = must(result.model.pageModels['notifications']);
     expect(pageModel.nextOrdinal).toBe(2);
     expect(pageModel.notifications.items).toHaveLength(1);
     expect(result.model.notificationCenterOpen).toBe(false);

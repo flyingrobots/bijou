@@ -20,8 +20,8 @@ function blockPreviewGuideId(blockName: string): string {
 
 interface FrameCell {
   readonly char?: string;
-  readonly fg?: string | { readonly hex?: string };
-  readonly modifiers?: readonly string[];
+  readonly fg?: string | { readonly hex?: string } | undefined;
+  readonly modifiers?: readonly string[] | undefined;
 }
 
 interface FrameLike {

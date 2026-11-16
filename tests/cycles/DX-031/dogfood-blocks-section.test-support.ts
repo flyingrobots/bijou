@@ -38,7 +38,7 @@ function foregroundStyledTextCellExists(
       char?: string;
       fg?: unknown;
       fgRGB?: unknown;
-      modifiers?: readonly string[];
+      modifiers?: readonly string[] | undefined;
     };
   },
   needle: string,

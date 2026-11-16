@@ -62,7 +62,7 @@ export interface SanitizeTerminalTextOptions {
   /** Preserve OSC 8 hyperlink control sequences. */
   readonly allowHyperlinks?: boolean;
   /** Replacement width for literal tabs. Defaults to 2 spaces. */
-  readonly tabWidth?: number;
+  readonly tabWidth?: number | undefined;
 }
 /**
  * Strip all ANSI SGR escape sequences from a string.

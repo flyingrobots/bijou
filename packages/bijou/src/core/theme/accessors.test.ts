@@ -29,7 +29,7 @@ describe('createThemeAccessors()', () => {
       must((theme.theme.status as Record<string, { hex: string }>)['muted']).hex,
     );
     expect(acc.status('muted').fgRGB).toEqual(
-      must((theme.theme.status as Record<string, { fgRGB?: [number, number, number] }>)['muted']).fgRGB,
+      must((theme.theme.status as Record<string, { fgRGB?: [number, number, number] | undefined }>)['muted']).fgRGB,
     );
   });
 

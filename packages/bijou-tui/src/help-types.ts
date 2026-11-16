@@ -15,7 +15,7 @@ export interface HelpOptions {
   /** Separate each formatted key from its description. Defaults to two spaces. */
   separator?: string;
   /** Add a title above the grouped help. */
-  title?: string;
+  title?: string | undefined;
   /** Label bindings without a group. Defaults to `General`. */
   defaultGroupName?: string;
 }

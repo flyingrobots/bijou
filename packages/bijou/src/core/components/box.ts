@@ -10,15 +10,15 @@ import { resolveFillChar } from './box-fill.js';
 /** Configuration for rendering a bordered box. */
 export interface BoxOptions extends BijouNodeOptions {
   /** Optional title displayed in the top border. */
-  title?: string;
+  title?: string | undefined;
   /** Theme token applied to border characters. */
-  borderToken?: TokenValue;
+  borderToken?: TokenValue | undefined;
   /** Background fill token. Interior spaces are styled with this token's bg color. */
-  bgToken?: TokenValue;
+  bgToken?: TokenValue | undefined;
   /** Inner padding between the border and content (in characters/lines). */
   padding?: { top?: number; bottom?: number; left?: number; right?: number };
   /** Lock outer width (including borders). Content is clipped/padded to fit. */
-  width?: number;
+  width?: number | undefined;
   /**
    * Custom character used for padding/fill areas instead of spaces.
    * Must be a single-width grapheme cluster. Wide characters (e.g. CJK)
@@ -91,7 +91,7 @@ export function box(
 /** Configuration for {@link headerBox}, extending {@link BoxOptions} with label support. */
 export interface HeaderBoxOptions extends BoxOptions {
   /** Optional detail text displayed after the label in a muted style. */
-  detail?: string;
+  detail?: string | undefined;
   /** Theme token applied to the label text. */
   labelToken?: TokenValue;
 }

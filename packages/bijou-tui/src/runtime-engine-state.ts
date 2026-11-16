@@ -4,7 +4,7 @@ export interface RuntimeStateLike {
 
 export interface RuntimeStateMachine<State extends RuntimeStateLike> {
   readonly current: State;
-  readonly previous?: State;
+  readonly previous?: State | undefined;
   readonly transitionCount: number;
 }
 

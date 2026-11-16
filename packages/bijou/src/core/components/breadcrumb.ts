@@ -7,7 +7,7 @@ import { makeBgFill } from '../bg-fill.js';
 /** Configuration options for the {@link breadcrumb} component. */
 export interface BreadcrumbOptions {
   /** Custom separator between breadcrumb segments. Defaults to `' > '` (pipe) or `' › '` (rich). */
-  separator?: string;
+  separator?: string | undefined;
   /** Background fill token for the current (last) breadcrumb segment. No default — opt-in only. */
   currentBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */

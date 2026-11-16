@@ -50,13 +50,14 @@ export function seedDemoNotifications(
         tone: entry.tone,
         placement: entry.placement,
         durationMs: entry.durationMs,
-        action:
-          'actionLabel' in entry
-            ? {
+        ...('actionLabel' in entry
+          ? {
+              action: {
                 label: entry.actionLabel,
                 payload: { type: 'notification-action', ordinal },
-              }
-            : undefined,
+              },
+            }
+          : {}),
         overflow: next.wrapText ? 'wrap' : 'truncate',
       },
       nowMs,

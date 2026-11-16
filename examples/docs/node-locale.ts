@@ -3,12 +3,12 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import type { DogfoodLocalePort } from './locale.js';
 
 export interface NodeDogfoodLocaleEnv {
-  readonly LANG?: string;
-  readonly LANGUAGE?: string;
-  readonly LC_ALL?: string;
-  readonly LC_MESSAGES?: string;
-  readonly HOME?: string;
-  readonly XDG_STATE_HOME?: string;
+  readonly LANG?: string | undefined;
+  readonly LANGUAGE?: string | undefined;
+  readonly LC_ALL?: string | undefined;
+  readonly LC_MESSAGES?: string | undefined;
+  readonly HOME?: string | undefined;
+  readonly XDG_STATE_HOME?: string | undefined;
 }
 
 export interface NodeDogfoodLocaleStorage {
@@ -71,14 +71,8 @@ function readSavedLocale(
 }
 
 function processLocaleEnv(): NodeDogfoodLocaleEnv {
-  return {
-    LANG: process.env.LANG,
-    LANGUAGE: process.env.LANGUAGE,
-    LC_ALL: process.env.LC_ALL,
-    LC_MESSAGES: process.env.LC_MESSAGES,
-    HOME: process.env.HOME,
-    XDG_STATE_HOME: process.env.XDG_STATE_HOME,
-  };
+  const { LANG, LANGUAGE, LC_ALL, LC_MESSAGES, HOME, XDG_STATE_HOME } = process.env;
+  return { LANG, LANGUAGE, LC_ALL, LC_MESSAGES, HOME, XDG_STATE_HOME };
 }
 
 export function createNodeDogfoodLocalePort(

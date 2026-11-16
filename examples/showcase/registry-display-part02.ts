@@ -23,11 +23,11 @@ export const DISPLAY_PART_02: ComponentEntry[] = [
     ].join("\n"),
     render: (w, ctx) =>
       [
-        skeleton({ width: Math.min(30, w), height: 1, ctx }),
-        skeleton({ width: Math.min(20, w), height: 1, ctx }),
-        skeleton({ width: Math.min(25, w), height: 1, ctx }),
+        skeleton({ width: Math.min(30, w), ctx }),
+        skeleton({ width: Math.min(20, w), ctx }),
+        skeleton({ width: Math.min(25, w), ctx }),
         "",
-        skeleton({ width: Math.min(40, w), height: 3, ctx }),
+        skeleton({ width: Math.min(40, w), ctx }),
       ].join("\n"),
   },
   {
@@ -111,8 +111,8 @@ export const DISPLAY_PART_02: ComponentEntry[] = [
     ].join("\n"),
     render: (_w, ctx) =>
       [
-        gradientText("Hello, beautiful terminal!", { ctx }),
-        gradientText("Bijou Component Library", { ctx }),
+        gradientText("Hello, beautiful terminal!", ctx.theme.theme.gradient.brand, { style: ctx.style, noColor: ctx.theme.noColor }),
+        gradientText("Bijou Component Library", ctx.theme.theme.gradient.brand, { style: ctx.style, noColor: ctx.theme.noColor }),
       ].join("\n"),
   },
 ];

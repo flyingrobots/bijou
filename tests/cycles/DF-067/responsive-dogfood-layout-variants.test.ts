@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { stripAnsi, surfaceToString } from '@flyingrobots/bijou';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, must } from '@flyingrobots/bijou/adapters/test';
 import { createDocsApp, resolveDocsLayoutVariant } from '../../../examples/docs/app.js';
 import { normalizeViewOutput } from '../../../packages/bijou-tui/src/view-output.js';
 import { readRepoFile } from '../repo.js';
@@ -28,7 +28,7 @@ function renderEnteredDocs(columns: number, rows: number, openComponents = false
 }
 
 function activePageModel(model: DocsRootModel) {
-  return model.docsModel.pageModels[model.docsModel.activePageId];
+  return must(model.docsModel.pageModels[model.docsModel.activePageId], 'active page model');
 }
 
 describe('DF-067 responsive DOGFOOD layout variants', () => {

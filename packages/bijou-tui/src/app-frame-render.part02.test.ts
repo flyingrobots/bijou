@@ -58,7 +58,8 @@ describe('frame shell chrome surfaces', () => {
       ctx,
     );
 
-    const textCell = target.get(1, 0);
+    // A single-pane page has no focus gutter, so the pane's first cell is column 0.
+    const textCell = target.get(0, 0);
     expect(textCell.char).toBe('A');
     expect(textCell.fg).toBe(expectedFg);
     expect(textCell.bg).toBe(expectedBg);

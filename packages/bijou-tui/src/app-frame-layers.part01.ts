@@ -21,11 +21,11 @@ export type FramePageLayerKind = Extract<
 >;
 export interface FrameLayerMetadata {
   readonly title?: string;
-  readonly hintSource?: FrameLayerHintSource;
+  readonly hintSource?: FrameLayerHintSource | undefined;
   readonly helpSource?: BindingSource;
 }
 export type FramePageLayerRegistry = Partial<
-  Record<FramePageLayerKind, FrameLayerMetadata>
+  Record<FramePageLayerKind, FrameLayerMetadata | undefined>
 >;
 export interface FrameLayerDescriptor {
   readonly id: string;
@@ -34,9 +34,9 @@ export interface FrameLayerDescriptor {
   readonly inputMapId: string;
   readonly dismissible: boolean;
   readonly blocksUnderlyingInput: boolean;
-  readonly title?: string;
-  readonly hintSource?: FrameLayerHintSource;
-  readonly helpSource?: BindingSource;
+  readonly title?: string | undefined;
+  readonly hintSource?: FrameLayerHintSource | undefined;
+  readonly helpSource?: BindingSource | undefined;
 }
 export interface DescribeFrameLayerStackOptions {
   readonly pageModalOpen?: boolean;
@@ -45,9 +45,9 @@ export interface DescribeFrameLayerStackOptions {
 export interface FrameControlProjection {
   readonly layerStack: readonly FrameLayerDescriptor[];
   readonly activeLayer: FrameLayerDescriptor;
-  readonly underlyingLayer?: FrameLayerDescriptor;
-  readonly footerHintSource?: FrameLayerHintSource;
-  readonly helpSource?: BindingSource;
+  readonly underlyingLayer?: FrameLayerDescriptor | undefined;
+  readonly footerHintSource?: FrameLayerHintSource | undefined;
+  readonly helpSource?: BindingSource | undefined;
 }
 export type FrameRuntimeLayer = RuntimeStackLayer<FrameLayerDescriptor>;
 export type FrameRuntimeViewStack = RuntimeViewStack<FrameLayerDescriptor>;

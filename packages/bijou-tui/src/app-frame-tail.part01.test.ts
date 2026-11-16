@@ -12,11 +12,11 @@ import {
   shiftKey,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  MouseMsg,
-  Msg,
-  NotificationState,
-  PageModel,
+  type FramePage,
+  type MouseMsg,
+  type Msg,
+  type NotificationState,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -109,6 +109,6 @@ describe('createFramedApp', () => {
 
     expect(model.notificationCenterScrollY).toBe(scrolledY);
     expect(scrolledY).toBeGreaterThan(0);
-    expect(model.pageModels.home?.count).toBe(0);
+    expect(model.pageModels['home']?.count).toBe(0);
   });
 });

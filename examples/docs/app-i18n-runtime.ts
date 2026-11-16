@@ -29,9 +29,7 @@ export function createDocsI18nRuntime(
     fallbackCatalogs: dogfoodI18nCatalogsForLocale(
       DEFAULT_LOCALE.id,
     ),
-    missingMessage: showMissing
-      ? dogfoodMissingLocalizationMessage
-      : undefined,
+    ...(showMissing ? { missingMessage: dogfoodMissingLocalizationMessage } : {}),
   });
   runtime.loadCatalog(FRAME_I18N_CATALOG);
   loadDogfoodRuntimeCatalogs(

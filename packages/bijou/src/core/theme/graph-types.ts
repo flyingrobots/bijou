@@ -29,13 +29,13 @@ export interface TokenDefinition {
   /** Foreground color definition. */
   fg: ColorDefinition;
   /** Optional background color definition. */
-  bg?: ColorDefinition;
+  bg?: ColorDefinition | undefined;
   /** Optional text style modifiers. */
-  modifiers?: TextModifier[];
+  modifiers?: TextModifier[] | undefined;
   /** Optional cached foreground RGB for direct-token imports. */
-  fgRGB?: RGB;
+  fgRGB?: RGB | undefined;
   /** Optional cached background RGB for direct-token imports. */
-  bgRGB?: RGB;
+  bgRGB?: RGB | undefined;
 }
 
 export interface ThemeRuleCandidateScope {
