@@ -55,6 +55,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DL-032 records the scroll-measurement cache contract: a runtime-owned frame
+  input revision, a one-entry cache per framed-app runtime, and the
+  acceptance probes for the implementation and its evidence (#587).
+
 - **Inspectable theme provenance and key-binding conflicts** — rule-authored
   presets retain their definitions when renamed, token graphs expose
   mode-aware direct and transitive reverse dependents without resolving cyclic
