@@ -90,6 +90,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - A regression test pins component family entries to exactly the eight R52
   fields, so no comparison or analogue field can return.
 
+- The Markdown CLI resize test drains PTY output during shutdown, preventing
+  macOS terminal restoration from blocking behind unread output. Its five-second
+  shutdown deadline and process-group cleanup remain unchanged (#746).
 - Scrolling a maximized pane (ctrl+f) now clamps to the full body size the
   frame paints, so the last line is reachable (#669). Scroll measurement used
   the pane's normal split rectangle before.
