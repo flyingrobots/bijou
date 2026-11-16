@@ -26,19 +26,24 @@ keywords:
 
 ## Decision Summary
 
-DOGFOOD shows Code Dojo debt on one guide, **Code Dojo debt**, on the existing
+This record specifies proposed behavior for #603, #604 and #606. The report
+command, JSON files and guide do not exist yet. Context describes existing
+behavior; this PR implements none of the proposal.
+
+DOGFOOD will show Code Dojo debt on one guide, **Code Dojo debt**, on the existing
 `release` page. The guide renders two committed JSON files and computes
 nothing at render time:
 
 - `docs/code-dojo/debt-report.json` is the current snapshot. The command
-  `npm run code-dojo:report` writes it and `npm run code-dojo:debt` checks it
-  for drift.
+  `npm run code-dojo:report` writes it; explicit report `--check` detects drift.
+  Normal debt commands, hooks and CI remain unchanged.
 - `docs/code-dojo/debt-history.json` is an append-only ledger with one row for
-  each PR that changed the count. The same command appends rows to it. DOGFOOD
+  each recorded PR or goalpost event, including zero-debt goalposts. Explicit
+  recording appends rows idempotently. DOGFOOD
   never walks git.
 
 Two panels ship first (#604): **aggregate and next target**, then **debt by
-source** with top ESLint rules. The **live and stored ceiling** row appears only
+source** with top ESLint rules and files. The **live and stored ESLint** row appears only
 when a report carries live data. **PR deltas** and **goalpost history** ship
 second (#606) from the ledger.
 
@@ -53,12 +58,16 @@ The cost model in the code differs from the one #371 assumed.
    Only live measurement is expensive: a full ESLint run
    (`scripts/code-dojo/eslint-offenders.mjs`, `eslint-results.mjs`) and git
    history walks.
-2. **The debt is zero.** Issue #527 cleared the last twelve file/context
+2. **The stored baseline aggregate is zero.** Issue #527 cleared the last twelve file/context
    entries, and commit `f4a36c54` set the ceiling in
    `"code-dojo:debt": "tsx scripts/code-dojo-debt.ts --max 0"`. Every source
    count is `0` and `nextGoalpostTarget` is `0`. The dashboard's first job is to
    show that the count holds at zero and to make any regression obvious. A
-   burndown frontier comes second.
+   burndown frontier comes second. These are baseline units, not unique files
+   or a live scan: file/context and code-size count entries, mock-ban counts
+   recorded violations, and ESLint counts diagnostic occurrences. A file can
+   contribute to multiple sources. Hard-limit entries are a code-size subset,
+   never added to the aggregate again.
 3. **The history exists only as prose.** The goalpost tranches
    (`112 -> 62 -> 52 -> 42 -> 32 -> 22 -> 12 -> 0`) are recorded in the
    ledger's prose and in commit messages such as `825a2fb8` and `2381b236`.
@@ -92,14 +101,11 @@ The cost model in the code differs from the one #371 assumed.
 
 ## Consequences
 
-- One generated file is committed, and the existing fast gate checks it. A
-  stale report fails `code-dojo:debt`, which reads only JSON and adds no
-  ESLint cost.
-- A PR that changes a baseline must also run `npm run code-dojo:report`. The
-  drift failure tells the author to do this.
-- Live data appears only when a person runs the command with `--live`. The
-  committed report records `"live": null`, and the page then shows no live
-  row. This is not a failure.
+- The snapshot is refreshed explicitly. Opt-in `code-dojo:report --check`
+  detects drift; no check is appended to normal debt, hook or CI commands.
+  The page labels the data a stored snapshot, not a live guarantee.
+- Live data is optional input from #369. The committed report has `"live": null`;
+  files and live comparisons then show unavailable, not invented zero counts.
 - The dashboard stays outside the release gate. No workflow requires it to
   render.
 - This decision is reversible. A later DL record can replace the ledger with
@@ -111,18 +117,17 @@ The cost model in the code differs from the one #371 assumed.
 
 - **Module:** `scripts/code-dojo-debt-report.ts`. It exports a pure function,
   `buildCodeDojoDebtReport(input): CodeDojoDebtReport`, that calls
-  `summarizeCodeDojoDebt()` to compute the counts. Counts therefore cannot
-  drift from the text aggregate.
+  `summarizeCodeDojoDebt()` to compute the counts. Shared calculation and parity
+  tests guard against drift from the text aggregate.
 - **Command:** `"code-dojo:report": "tsx scripts/code-dojo-debt-report.ts"`.
   - With no flags, it writes `docs/code-dojo/debt-report.json`.
-  - `--check` exits `1` with a drift message if the file is stale. Append
-    `node --import tsx scripts/code-dojo-debt-report.ts --check` to
-    `code-dojo:debt`.
-  - `--live --out <path>` also runs ESLint and fills `live`. Never commit its
-    output to the default path.
-  - `--record --pr <n> --title <text>` appends one row to
-    `docs/code-dojo/debt-history.json` when the total differs from the last
-    row.
+  - `--check` exits `1` with a drift message if the selected file is stale.
+    This operation remains optional; normal debt, hooks and CI are unchanged.
+  - `--live-input <path> --out <path>` validates a #369 artifact and fills
+    `live`. It does not implement #369 or implicitly scan. Until that source
+    exists, live data is unavailable. Reject the default committed output path.
+  - `--record <event.json>` validates and appends a #606 history event,
+    including explicit zero-change goalpost events.
 - **Report shape** (`docs/code-dojo/debt-report.json`). Do not include
   timestamps, so that output is byte-stable for `--check`:
 
@@ -139,7 +144,7 @@ The cost model in the code differs from the one #371 assumed.
     { "id": "code-size", "count": 0, "overHardLimit": 0 },
     { "id": "eslint", "count": 0 }
   ],
-  "eslintRules": [{ "ruleId": "string", "count": 0 }],
+  "eslintRules": [],
   "live": null
 }
 ```
@@ -148,12 +153,18 @@ The cost model in the code differs from the one #371 assumed.
   `eslintRules` is the baseline `rules` array, sorted by count descending and
   then by `ruleId`, with at most 10 entries. When `live` is present, it is
   `{ "eslintViolations": n, "eslintFiles": [{ "path": "...", "count": n }] }`,
-  with at most 10 files. This is the #369 live-versus-stored comparison.
+  with at most 10 files sorted by count descending then path. Missing file
+  data is `null`, distinct from a measured empty array. Counts are non-negative
+  integers. Compare live ESLint occurrences only with the stored ESLint source
+  count: signed slack is stored minus live; negative slack signals regression.
+  The aggregate ceiling is a different, mixed-source quantity. Do not call an
+  ESLint-only measurement live aggregate debt.
   Sources keep this fixed order.
 - **Tests:** `scripts/code-dojo-debt-report.test.ts` builds a report from a
   fixture directory and checks a golden JSON. It also asserts that
   `totalViolations` equals `loadCodeDojoDebtSummary().totalViolations`, that
-  `live` is `null` without `--live`, and that `--check` detects a stale file.
+  `live` is `null` without live input, and that `--check` detects a stale file.
+  Cover same-unit comparison and unavailable versus measured zero.
 
 ### #604: snapshot guide
 
@@ -162,14 +173,18 @@ The cost model in the code differs from the one #371 assumed.
   `RELEASE_AND_THEME_GUIDES`. Add a guide id constant to `app-ids.ts`.
 - **Data:** read the report JSON through a small validating reader,
   `examples/docs/app-code-dojo-report.ts`. If the schema is invalid or the file
-  is missing, render an empty-state message and do not throw.
+  is missing, render an empty-state message and do not throw. A proposed
+  `BIJOU_CODE_DOJO_REPORT` path selects an explicitly generated local report;
+  otherwise use the committed snapshot. This connects `--live-input --out`
+  to the guide without scanning during rendering.
 - **Panels, in order:**
   1. Aggregate and next target: total, ceiling, next target, and a status line.
      At `0`, the status line says the count is clear and held at the ceiling.
   2. Debt by source: four rows in contract order, with `overHardLimit` beside
      code size.
-  3. Top ESLint rules, with an empty state at zero.
-  4. Live and stored ceiling, only when `live` is not `null`.
+  3. Top ESLint rules from the baseline and files from the selected live
+     artifact. Files show unavailable without data, distinct from measured empty.
+  4. Live versus stored ESLint occurrences and signed slack when available.
 - **Components:** use existing Bijou stats and table families. Each panel must
   lower to `static`, `pipe`, and `accessible` output without colour-only
   meaning.
@@ -187,23 +202,47 @@ The cost model in the code differs from the one #371 assumed.
 {
   "schema": "code-dojo.debt-history.v1",
   "entries": [
-    { "pr": 527, "title": "string", "before": 12, "after": 0, "goalpost": "string or null" }
+    {
+      "eventId": "stable-source-event-id",
+      "kind": "goalpost",
+      "pr": null,
+      "commit": null,
+      "citation": "verifiable-source-reference",
+      "title": "string",
+      "before": 0,
+      "after": 0,
+      "goalpostId": "stable-goalpost-id",
+      "closesGoalpost": true
+    }
   ]
 }
 ```
 
-  `goalpost` names the goalpost that the row closes. A goalpost counts as met
-  when `before - after` summed over its rows reaches at least 50, or when the
-  count reaches zero.
-- **Backfill:** seed the ledger once from the tranches recorded in
-  `docs/code-dojo-exceptions.md` (`112 -> 62 -> ... -> 0`). Each row cites the
-  PR or commit named there. Leave a field `null` where the ledger names no PR.
-  Do not invent one.
-- **Panels:** recent PR deltas (the last 10 rows, newest first, with signed
-  deltas) and goalpost history (each goalpost with its total reduction and a
-  met or unmet state). Add both to the #604 guide after the snapshot panels.
-- **Tests:** a golden render from a fixture ledger, an empty ledger, and a
-  test that the page code never spawns `git`.
+  Kinds are `pr`, `tranche`, or `goalpost`. Counts and source identifiers may
+  be `null` when evidence is missing; never infer a numeric delta from an
+  unknown count. Require a citation supporting each count and attribution.
+  A PR or commit identity alone does not establish its debt count. All related
+  tranches carry the same `goalpostId`, not only the closing row; unsupported
+  attribution remains `null`.
+- **Recording:** `--record <event.json>` requires a stable unique `eventId`.
+  An identical repeat is a no-op; a conflicting repeat fails without changing
+  the ledger. Record explicit zero-to-zero goalpost events. Never infer the
+  first event's `before` from an absent previous row. Known discontinuities
+  invalidate a claimed continuous series; missing evidence remains unknown.
+- **Accounting:** use evidenced goalpost start and closing counts, counting
+  each tranche once without overlapping PR/tranche double counts. Required
+  reduction is `min(50, start)`. Starting at zero requires holding zero. A
+  tranche does not reset the starting denominator. Gaps, missing boundaries,
+  unsupported attribution or ambiguous overlaps yield `unknown`, not met.
+- **Backfill:** use evidenced tranches in `docs/code-dojo-exceptions.md`, citing
+  actual PRs, commits or prose sections. Retain unknown fields rather than
+  fabricating a complete chain. Label partial backfill as partial history.
+- **Panels:** recent PR deltas show the last ten PR events, with known signed
+  changes or an explicit unknown value. Goalposts show evidenced reduction and
+  met, unmet or unknown states, including zero-debt events. Add both after the
+  snapshot panels.
+- **Tests:** golden, empty and partial ledgers; repeat/conflicting IDs; zero-debt
+  goalposts; unattributed tranches; gap/overlap handling; no `git` spawning.
 
 ## Out of Scope
 

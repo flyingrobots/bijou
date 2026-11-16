@@ -11,7 +11,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Design record DL-029 decides the DOGFOOD Code Dojo debt dashboard: a
   `release` page guide that renders a committed `code-dojo.debt-report.v1`
   snapshot and an append-only `code-dojo.debt-history.v1` ledger, with no live
-  computation at render time (#601).
+  computation at render time (#601). The proposed contracts keep report checks
+  optional, distinguish unavailable live data, and preserve cited history with
+  idempotent recording and explicit unknown or zero-debt goalpost states.
 
 - The Components Library (`npm run components`) is a 58-slide deck: a title,
   one slide per section followed by its components, and an end slide. `h`/`l`
