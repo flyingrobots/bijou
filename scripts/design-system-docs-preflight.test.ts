@@ -1,6 +1,7 @@
 import { readDocumentationFile as readFileSync } from './documentation-corpus.js';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { REQUIRED_FIELDS } from './design-system-docs-rules.js';
 import {
   parseFamilySections,
   validateComponentFamilyDocs,
@@ -26,8 +27,6 @@ const COMPLETE_SECTION = `### Example Family
   - accessible: linearize the content explicitly
 - Related families:
   - \`other()\`
-- Carbon analogue:
-  - tag
 `;
 
 const REPO_ROOT = resolve(import.meta.dirname, '..');
@@ -44,6 +43,24 @@ describe('design-system docs preflight', () => {
 
   it('passes a structurally complete family section', () => {
     expect(validateComponentFamilyDocs(`# Title\n\n${COMPLETE_SECTION}`)).toEqual([]);
+  });
+
+  it('requires exactly the R52 family fields', () => {
+    expect([...REQUIRED_FIELDS]).toEqual([
+      'Family',
+      'Variants',
+      'Use when',
+      'Avoid when',
+      'Content guidance',
+      'Ownership',
+      'Graceful lowering',
+      'Related families',
+    ]);
+  });
+
+  it('does not reject an entry that still carries an extra legacy field', () => {
+    const markdown = `# Title\n\n${COMPLETE_SECTION}- Legacy note:\n  - anything\n`;
+    expect(validateComponentFamilyDocs(markdown)).toEqual([]);
   });
 
   it('fails when a required field is missing', () => {
