@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { must } from '@flyingrobots/bijou/adapters/test';
 import {
   compileGraphqlBijouBlock,
   createGraphqlBijouBlockDebugSummary,
@@ -93,7 +94,7 @@ describe('DX-049 visor-artifact-bundle/1', () => {
       bijouBlock: artifact,
       uiScene: {
         ...scene,
-        nodes: [...scene.nodes, { ...scene.nodes[0], id: 'dogfood.navigation.active' }],
+        nodes: [...scene.nodes, { ...must(scene.nodes[0], 'first scene node'), id: 'dogfood.navigation.active' }],
       },
       debugSummary,
       tokenColors: NAV_TOKEN_COLORS,

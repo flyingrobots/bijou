@@ -109,7 +109,7 @@ describe('DF-062 notification system family audit', () => {
     );
     const [afterSave, saveCmds] = app.update({ type: 'save' }, model);
     model = afterSave;
-    expect(model.pageModels.home?.saved).toBe(true);
+    expect(model.pageModels['home']?.saved).toBe(true);
     expect(saveCmds).toHaveLength(1);
     const notifyMsg = mustFrameMsg(await runFrameCommand(must(saveCmds[0]), 300));
     const [afterNotify, notifyCmds] = app.update(notifyMsg, model);

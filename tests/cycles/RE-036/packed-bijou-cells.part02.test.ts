@@ -12,11 +12,11 @@ describe('RE-036 packed-bijou-cells/1 shape and dimensions', () => {
     expectReceiptError([], 'invalid-shape', '$');
 
     const topLevel = validPackedCellsInput();
-    topLevel.extra = true;
+    topLevel['extra'] = true;
     expectReceiptError(topLevel, 'unknown-field', '$.extra');
 
     const nested = validPackedCellsInput();
-    recordField(nested, 'focus').extra = true;
+    recordField(nested, 'focus')['extra'] = true;
     expectReceiptError(nested, 'unknown-field', '$.focus.extra');
 
     const prototypeField = validPackedCellsInput();
@@ -72,7 +72,7 @@ describe('RE-036 packed-bijou-cells/1 shape and dimensions', () => {
     for (let index = 1; index < bytes.length; index += 1) {
       sparseBytes[index] = bytes[index];
     }
-    sparse.bytes = sparseBytes;
+    sparse['bytes'] = sparseBytes;
     expectReceiptError(sparse, 'invalid-shape', '$.bytes[0]');
 
     const nonEnumerableArrayEntry = validPackedCellsInput();
@@ -100,15 +100,15 @@ describe('RE-036 packed-bijou-cells/1 shape and dimensions', () => {
 
   it('rejects wrong version and policy literals', () => {
     const version = validPackedCellsInput();
-    version.receiptVersion = 'packed-bijou-cells/2';
+    version['receiptVersion'] = 'packed-bijou-cells/2';
     expectReceiptError(version, 'wrong-literal', '$.receiptVersion');
 
     const format = validPackedCellsInput();
-    format.cellFormatId = 'other';
+    format['cellFormatId'] = 'other';
     expectReceiptError(format, 'wrong-literal', '$.cellFormatId');
 
     const glyphs = validPackedCellsInput();
-    glyphs.glyphPolicyId = 'other';
+    glyphs['glyphPolicyId'] = 'other';
     expectReceiptError(glyphs, 'wrong-literal', '$.glyphPolicyId');
   });
 

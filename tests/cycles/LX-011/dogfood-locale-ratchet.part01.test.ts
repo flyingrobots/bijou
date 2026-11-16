@@ -89,13 +89,13 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
         const entry = localeEntries.get(`settings.language.${locale.id}`);
         expect(entry?.values[locale.id]).toEqual(expect.any(String));
         if (locale.id !== 'en') {
-          expect(entry?.values.en).toBeUndefined();
+          expect(entry?.values['en']).toBeUndefined();
         }
       }
-      expect(entries.get('settings.section.localization')?.values.en).toBe('Localization');
+      expect(entries.get('settings.section.localization')?.values['en']).toBe('Localization');
       expect(dogfoodI18nCatalogsForLocale('fr')[0]?.entries.find(
         (entry) => entry.key.id === 'settings.language.label',
-      )?.values.fr).toBe('Langue préférée');
+      )?.values['fr']).toBe('Langue préférée');
     });
 
   it('ratchets guide inspector chrome into the DOGFOOD string table', () => {
@@ -106,18 +106,18 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
       const esEntries = new Map(
         dogfoodI18nCatalogsForLocale('es')[0]?.entries.map((entry) => [entry.key.id, entry]),
       );
-      expect(entries.get('guide.info.title')?.values.en).toBe('guide info');
-      expect(frEntries.get('guide.info.summaryTitle')?.values.fr).toBe('Résumé');
-      expect(esEntries.get('guide.info.currentPostureTitle')?.values.es).toBe('Postura actual');
-      expect(entries.get('guide.info.posture.blocks')?.values.en).toContain('Block authoring');
+      expect(entries.get('guide.info.title')?.values['en']).toBe('guide info');
+      expect(frEntries.get('guide.info.summaryTitle')?.values['fr']).toBe('Résumé');
+      expect(esEntries.get('guide.info.currentPostureTitle')?.values['es']).toBe('Postura actual');
+      expect(entries.get('guide.info.posture.blocks')?.values['en']).toContain('Block authoring');
     });
 
   it('ratchets Theme Lab and Theme Inspector French labels into the DOGFOOD string table', () => {
       const frEntries = new Map(
         dogfoodI18nCatalogsForLocale('fr')[0]?.entries.map((entry) => [entry.key.id, entry]),
       );
-      expect(frEntries.get('docs.page.themes')?.values.fr).toBe('Thèmes');
-      expect(frEntries.get('themeInspector.title')?.values.fr).toBe('Inspecteur de thèmes');
-      expect(frEntries.get('themeLab.title')?.values.fr).toBe('Laboratoire de thèmes');
+      expect(frEntries.get('docs.page.themes')?.values['fr']).toBe('Thèmes');
+      expect(frEntries.get('themeInspector.title')?.values['fr']).toBe('Inspecteur de thèmes');
+      expect(frEntries.get('themeLab.title')?.values['fr']).toBe('Laboratoire de thèmes');
     });
 });

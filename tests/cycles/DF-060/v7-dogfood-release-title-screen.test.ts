@@ -29,7 +29,7 @@ function frameText(frame: { width: number; height: number; get(x: number, y: num
 }
 
 function releasePageModel(model: DocsRootModel) {
-  return model.docsModel.pageModels.release;
+  return must(model.docsModel.pageModels['release'], 'release page model');
 }
 
 describe('DF-060 v7 DOGFOOD release title screen', () => {
@@ -106,9 +106,9 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
     const text = frameText(must(result.frames.at(-1)));
     const releaseModel = releasePageModel(result.model);
 
-    expect(releaseModel.guideState.items[0].value).toBe('release-title-v8');
-    expect(releaseModel.guideState.items[1].value).toBe('release-title-v7-launch');
-    expect(releaseModel.guideState.items[2].value).toBe('release-title-v7');
+    expect(must(releaseModel.guideState.items[0]).value).toBe('release-title-v8');
+    expect(must(releaseModel.guideState.items[1]).value).toBe('release-title-v7-launch');
+    expect(must(releaseModel.guideState.items[2]).value).toBe('release-title-v7');
     expect(releaseModel.selectedGuideId).toBe('release-title-v7-launch');
     expect(text).toContain('V7 Launch Wake');
     expect(text).toContain('A released line leaves a readable trail.');
