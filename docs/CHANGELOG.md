@@ -20,6 +20,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Translation glossaries for French, Spanish, and German
+  (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
+  Block, Surface, Stories, core, and TUI stay English; graceful lowering is
+  abaissement maîtrisé, reducción controlada, and kontrolliertes Absenken;
+  address form is vous, tú, and du. DL-035 records the decision (#588).
 - DL-037 sets the scope of the DOGFOOD localization touched-file rule (#664).
   A touched file must not add or modify raw visible copy without localizing
   it, and must lower its raw-string debt by at least one entry. Whole-file
