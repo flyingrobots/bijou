@@ -13,6 +13,7 @@ const IMPLEMENTATION_PATHS = [
   'examples/docs/i18n-debt-ratchet.ts',
   'examples/docs/i18n-debt-source-scan.ts',
   'examples/docs/i18n-debt-source-context.ts',
+  'examples/docs/i18n-debt-source-alignment.ts',
   'examples/docs/i18n-debt-markdown-discovery.ts',
   'examples/docs/i18n-debt-markdown-spec.ts',
   'examples/docs/i18n-debt-markdown-ratchet.ts',

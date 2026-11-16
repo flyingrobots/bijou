@@ -48,6 +48,12 @@ describe('Components reading path inline variant facts (#624)', () => {
     expect(text).toContain('Variant 1 of 1: Staging rollout');
   });
 
+  it('reports the resolved variant position for a fractional selection', async () => {
+    const text = await componentsText(120, 'en', 'alert', 1.5);
+    expect(text).toContain('Variant 2 of 3: Warning');
+    expect(text).not.toContain('Variant 2.5');
+  });
+
   it.each([
     ['de', 'Variante 2 von 3: Warning', 'Profil: Static'],
     ['es', 'Variante 2 de 3: Warning', 'Perfil: Static'],

@@ -56,8 +56,11 @@ export function renderStoryPane(
     story,
     findStoryProfileIndex(story, model.profileMode),
   );
-  const variantIndex = selectedVariantIndex(model, story.id);
-  const variant = resolveStoryVariant(story, variantIndex);
+  const variant = resolveStoryVariant(
+    story,
+    selectedVariantIndex(model, story.id),
+  );
+  const variantIndex = story.variants.indexOf(variant);
   const previewWidth = Math.max(
     20,
     Math.min(Math.max(20, paneWidth - 6), preset.width),
