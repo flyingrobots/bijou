@@ -20,34 +20,48 @@ keywords:
 - Decision card: [#608](https://github.com/flyingrobots/bijou/issues/608)
 - Parent container: [#376](https://github.com/flyingrobots/bijou/issues/376)
 - Dependents: path classifier [#610](https://github.com/flyingrobots/bijou/issues/610),
-  pre-push fast lane [#611](https://github.com/flyingrobots/bijou/issues/611),
+  policy-aware witness and pre-push [#611](https://github.com/flyingrobots/bijou/issues/611),
   DOGFOOD localization check [#613](https://github.com/flyingrobots/bijou/issues/613),
   required full lane [#614](https://github.com/flyingrobots/bijou/issues/614)
 - Sibling: CI wall-time summary [#609](https://github.com/flyingrobots/bijou/issues/609)
 - Related: strict standards type check [#583](https://github.com/flyingrobots/bijou/issues/583),
   pre-push transport receipt [#479](https://github.com/flyingrobots/bijou/issues/479)
+- Companion record: [DL-034](https://github.com/flyingrobots/bijou/pull/658)
+  pre-push verification receipt ([#648](https://github.com/flyingrobots/bijou/issues/648);
+  witness [#649](https://github.com/flyingrobots/bijou/issues/649),
+  receipt-validating pre-push [#650](https://github.com/flyingrobots/bijou/issues/650)).
+  DL-030 owns classification and the policy set. DL-034 owns the receipt
+  format, the witness mechanics and the validation rules.
 
 ## Decision Summary
 
-Bijou has two verification lanes. Every path in a diff is classified by one
-rule table, and the diff takes the heaviest lane of any path it touches.
-Unknown paths are classified **full**.
+Bijou has two verification policies, **`bijou.verify.fast.v1`** and
+**`bijou.verify.full.v1`**. One rule table classifies every path in a diff,
+and the diff requires the heaviest policy of any path it touches. Unknown paths
+require **full**.
 
-- The **fast lane** runs on every `git push` and on every push to a draft pull
-  request. It runs every Code Dojo ratchet, the code-size gate, a built
-  workspace lint and ESLint, the test type check, the DOGFOOD localization
-  gates when DOGFOOD-relevant paths move, and only the Vitest files related to
-  the change.
-- The **full lane** is the current release-grade lane, unchanged in content. It
-  runs on every pull request that is not a draft, on every push to a draft pull
-  request whose diff classifies full, on every push to `main`, and on release
-  tags. Merge requires a green full lane for the merged head.
-- One always-reporting job, `Verification gate`, becomes the single required
-  status check on `main`. It fails when the lane that the event requires did
-  not pass, so a skipped job can never produce a green merge.
+- **Locally, the suite never runs inside `git push`.** A contributor runs the
+  witness command, `npm run verify:witness`. The witness classifies `HEAD`
+  against its merge base with `origin/main` and runs the required policy, or a
+  stronger one on request. On success it writes a DL-034 receipt bound to the
+  policy identity. Pre-push only checks that each pushed tree has a matching
+  receipt for the policy that the push requires. It runs no gates.
+- **Fast local evidence is sufficient for a fast-classified push.** A
+  `fast` receipt authorizes a push only when every pushed path classifies
+  fast. Any push that touches core runtime, generated assets, DOGFOOD sources,
+  release docs, ratchet baselines, gate definitions or the toolchain, or any
+  unknown path, requires a `full` receipt. A `full` receipt satisfies
+  a push of either class.
+- **In CI**, the fast lane runs on pushes to a draft pull request. The full
+  lane, which is the current release-grade lane with its content unchanged,
+  runs on every pull request that is not a draft, on every push to a draft
+  whose diff classifies full, on `main`, and on release tags.
+- **Merge requires a green CI full lane** for the merged head. One
+  always-reporting job, `Verification gate`, is the single required status
+  check on `main`. CI never reads a local receipt.
 
-No release gate is removed or weakened. The change is *when* the full lane
-runs, not *what* it proves.
+No release gate is removed or weakened. The change is *where and when* each
+policy runs, not *what* it proves.
 
 ## Measured Baseline
 
@@ -111,6 +125,8 @@ is currently blocked by convention, not by GitHub.
 
 | Direction | Strength | Rejected cost |
 | --- | --- | --- |
+| Pre-push runs the classified gates itself (this record's first draft) | No extra command to remember | The remote connection stays open while a full policy runs (#479, #478); it conflicts with DL-034. Replaced by witness plus receipt |
+| Every push requires a full receipt | One policy; simplest receipt | A docs-only push still pays the 5 min 47 s suite locally, which is the cost #376 exists to remove |
 | **Path-classified fast lane, full lane required at merge** | Draft iteration and every local push skip the 331 s suite; release proof unchanged | selected |
 | Keep the single heavy lane | Simplest; nothing to classify | Every push pays about 8.6 min remote (median run) plus the full local suite; #375 and #478 evidence |
 | Fast lane only for fast-classified PRs, no full lane at merge | Fastest docs and test PRs | A green merge would no longer imply the release-grade proof; docs paths feed DOGFOOD (`docs/*` is DOGFOOD-relevant today), so a "docs-only" merge can break DOGFOOD smokes on `main` |
@@ -132,11 +148,32 @@ The merge queue is not rejected on merit; it is deferred. `Verification gate`
 accepts a `merge_group` event in the same way as a non-draft pull request, so a
 queue can be enabled later without a new decision.
 
+## Policy Identities
+
+A policy identity names an ordered command list. The lists below are the
+policies. `scripts/hooks/verify-policy.mjs` (DL-034) holds them as data,
+keyed by identity, and the receipt's `policyDigest` is computed over the
+list for that identity. Editing a list without bumping the `.vN` suffix
+still changes the digest, so every existing receipt becomes invalid.
+The suffix changes when the *meaning* of a policy changes (a gate is added
+or removed). That makes the change visible in review and in receipts.
+
+| Identity | Satisfies | Local use | CI use |
+| --- | --- | --- | --- |
+| `bijou.verify.fast.v1` | fast | witness, for fast-classified `HEAD` | `fast` job on draft pull requests |
+| `bijou.verify.full.v1` | fast and full | witness, for full-classified `HEAD`, or `--policy full` | every full-lane job; required at merge |
+
+Both local policies always run the DOGFOOD localization gates. A receipt is
+never narrower than the path relevance of a push (DL-034 `policyEnv`).
+The fast policy depends on the merge base, because related tests are chosen
+from the diff. So a fast receipt must also bind the merge-base commit that the
+witness classified against.
+
 ## Lane Contents
 
-### Fast lane
+### Fast lane (`bijou.verify.fast.v1`)
 
-| Gate | Command | Local pre-push | CI fast job |
+| Gate | Command | Local witness | CI fast job |
 | --- | --- | --- | --- |
 | Lane classification | `npm run verify:lane` | yes | yes |
 | Code Dojo debt ratchet | `npm run code-dojo:debt` | yes | yes |
@@ -146,7 +183,7 @@ queue can be enabled later without a new decision.
 | Workspace lint (after build) | `npm run lint` | yes | yes |
 | ESLint offenders ratchet | `npm run lint:eslint` | yes | yes |
 | Test type check | `npm run typecheck:test` | yes | yes |
-| DOGFOOD i18n completeness, catalog check, debt | `dogfood:i18n:complete`, `dogfood:i18n:check`, `dogfood:i18n:debt -- --base <base>` | when `dogfood` is true | when `dogfood` is true |
+| DOGFOOD i18n completeness, catalog check, debt | `dogfood:i18n:complete -- --base <base>`, `dogfood:i18n:check`, `dogfood:i18n:debt -- --base <base>` | always | always |
 | Related tests | `npm run test:related -- --base <base>` | yes | yes |
 
 `test:related` runs `vitest related` on the changed source and test files. For
@@ -156,7 +193,11 @@ a diff with no TypeScript paths it runs nothing and prints
 The build is incremental (`tsc -b`, 9 s median in CI). It is in the fast lane
 so lint and ESLint always see built declarations. This fixes defect 1.
 
-### Full lane
+The DOGFOOD localization gates cost 3 s median in CI, so the fast lane always
+runs them. A green fast lane therefore always includes localization coverage
+(#613; the PR #470 finding).
+
+### Full lane (`bijou.verify.full.v1`)
 
 The full lane is the fast lane plus every existing release-grade gate:
 
@@ -174,10 +215,12 @@ The full lane is the fast lane plus every existing release-grade gate:
 - `Bench Gradient` stays informational and is not an input to
   `Verification gate`.
 
-Locally, `BIJOU_FULL_PUSH=1 git push` runs the full local lane: the fast lane
-with `npm run test:run` instead of `test:related`, plus
-`npm run verify:interactive-examples`. This is the existing variable, with its
-meaning extended from "force DOGFOOD gates" to "force the full local lane".
+Locally, `bijou.verify.full.v1` is the current pre-push hook policy. It is
+the fast lane with `npm run test:run` instead of `test:related`, plus
+`npm run verify:interactive-examples`. The cross-platform jobs, DOGFOOD smokes
+and Bench are CI-only. A local full receipt proves the local full policy, not
+the CI full lane. `BIJOU_FULL_PUSH` is retired. Its replacement is
+`npm run verify:witness -- --policy full`.
 
 ## Path Classification
 
@@ -222,8 +265,9 @@ across `/`, as in the current shell `case` patterns.
 
 | Event | Classified fast | Classified full |
 | --- | --- | --- |
-| Local `git push` | fast lane | full local lane |
-| Local `BIJOU_FULL_PUSH=1 git push` | full local lane | full local lane |
+| `npm run verify:witness` | runs `fast.v1`, writes fast receipt | runs `full.v1`, writes full receipt |
+| `npm run verify:witness -- --policy full` | runs `full.v1`, writes full receipt | runs `full.v1`, writes full receipt |
+| Local `git push` (pre-push) | needs fast or full receipt; runs nothing | needs full receipt; runs nothing |
 | `pull_request` on a draft | fast lane | full lane |
 | `pull_request` not a draft, including `ready_for_review` | full lane | full lane |
 | `merge_group` (if enabled later) | full lane | full lane |
@@ -239,9 +283,18 @@ fails when a required job failed, was cancelled, or was skipped.
   fast job (estimated under 150 s: install 33, build 9, lint 11, typecheck 11,
   Code Dojo about 55 without its install, related tests). #611 and #614 record
   the measured result.
-- A local push no longer holds the remote connection around the 879-file
-  suite unless the diff is full or `BIJOU_FULL_PUSH=1` is set. #479 still
-  owns the transport problem for full pushes.
+- A local push never holds the remote connection around any suite. The
+  target time for pre-push is DL-034's target of under 5 s. A docs or test
+  slice runs the fast witness instead of the 5 min 47 s full hook.
+- On a shared workstation, heavy local runs need admission control. Today every
+  `git push` runs the full hook, so agents serialize pushes through the
+  `git locks` semaphore `bijou-prepush` (5 slots). After this decision, the
+  witness run takes that semaphore. Pre-push does no heavy work, so it does
+  not need it.
+- Pre-push classifies the pushed commit against the local `origin/main`.
+  If that ref is stale, the merge base and the required policy can differ from
+  CI's. This is safe: CI classifies again and runs the full lane before merge
+  in all cases.
 - Marking a pull request ready for review costs one full lane run. Review starts
   with the full proof already visible.
 - A diff that changes classification during review (for example, a later
@@ -280,45 +333,67 @@ the only policy; changing either needs a design note.
   id, mixed diffs that escalate, `docs/CHANGELOG.md`, and an unknown path.
   A parity test proves the DOGFOOD patterns match the current shell
   `case` behaviour for every path in `git ls-files`.
-- Out of scope: hooks and workflows.
+- `classifyVerificationLane` maps the lane to the policy identities:
+  `fast` requires `bijou.verify.fast.v1` and `full` requires
+  `bijou.verify.full.v1`. Export the mapping as `requiredPolicy(lane)`.
+- Out of scope: hooks, witness and workflows.
 
-### #611 Pre-push fast lane
+### #611 Policy-aware witness and pre-push
 
-- `scripts/hooks/pre-push` keeps its stdin ref parsing and pipes the pushed
-  paths to `npm run -s verify:lane -- --paths-from - --json`. Its local
-  `is_dogfood_relevant_path` copy is deleted.
-- `.githooks/pre-push` runs one entry point, `scripts/hooks/pre-push`. The
-  hook runs the fast lane gates in the order of the fast-lane table:
-  build first, then lint.
-- `code-dojo:prepush` becomes
-  `npm run code-dojo:debt && npm run code-dojo:strict && npm run build && npm run lint && npm run lint:eslint`.
-- Add `test:related` to `package.json`. It is the related-tests command of
-  the fast lane.
-- `lane=full` or `BIJOU_FULL_PUSH=1` runs the full local lane.
-- The hook prints `pre-push: lane=<lane> (<reason ids>)` first and a
-  not-run list last.
-- Acceptance evidence: before and after timings for one docs-only push and one
-  full push, recorded on the PR.
+#611 builds on #649 and #650 (DL-034) and owns only what is policy-specific.
+
+- `scripts/hooks/verify-policy.mjs` exports both identities and their ordered
+  command lists, exactly as in "Lane Contents". It is the only definition of
+  the local policies.
+- `npm run verify:witness` calls `classifyVerificationLane` on the diff from
+  `git merge-base HEAD origin/main` to `HEAD`. It runs the required policy,
+  or full when `--policy full` is passed. `--policy fast` on a
+  full-classified `HEAD` is an error.
+- The receipt carries `policy` (the identity), `policyDigest` for that
+  identity, and, for `fast.v1` only, `classificationBase` (the merge-base
+  commit). DL-034 owns adding these fields to its schema.
+- Pre-push computes the required policy for each pushed ref with the same
+  classifier and base rule. It accepts a receipt for that tree when one of
+  these is true:
+  - the receipt policy is `full.v1`;
+  - the receipt policy is `fast.v1`, the ref classifies fast, and
+    `classificationBase` equals the current merge base.
+  In every other case it rejects the push and prints
+  `Run: npm run verify:witness`, or `... -- --policy full` when the ref needs
+  full and has a fast receipt.
+- The `is_dogfood_relevant_path` copy and `BIJOU_FULL_PUSH` are removed
+  from `scripts/hooks/pre-push`.
+- `code-dojo:prepush` is removed. Its gates are in both policies, with build
+  before lint.
+- Add the `test:related` script.
+- Tests: fast receipt accepted for a fast ref; fast receipt rejected for a
+  full ref; full receipt accepted for both; fast receipt rejected after the
+  merge base moves; `--policy fast` refused on a full `HEAD`.
+- Acceptance evidence: witness and push timings for one docs-only slice and
+  one full slice, recorded on the PR.
 
 ### #613 DOGFOOD localization check
 
-- Trigger: `dogfood` is true in the `LaneDecision`, never a second path list.
-- Commands: `npm run dogfood:i18n:complete -- --base <base>`,
-  `npm run dogfood:i18n:check`, `npm run dogfood:i18n:debt -- --base <base>`,
-  with the same base that the classifier used.
-- When `dogfood` is false, the fast lane prints exactly
-  `DOGFOOD localization: not evaluated (no DOGFOOD-relevant paths)` in the hook
-  output and in `$GITHUB_STEP_SUMMARY`.
+- Both policies always run `dogfood:i18n:complete -- --base <base>`,
+  `dogfood:i18n:check` and `dogfood:i18n:debt -- --base <base>`, with the
+  same base that the classifier used. The `dogfood` flag never removes them.
+- `dogfood` only selects the CI DOGFOOD smoke jobs and the DOGFOOD coverage
+  gate on draft pull requests.
+- Every lane summary (witness output and `$GITHUB_STEP_SUMMARY`) prints one
+  line per invariant, `evaluated` or `not evaluated`. DOGFOOD
+  localization is always `evaluated`.
 - Golden: the PR #470 case (14 new raw strings in a moved DOGFOOD file) fails
-  the fast lane.
+  `fast.v1`.
 
 ### #614 Required full lane in CI
 
 - `ci.yml` gains a `lane` job, which replaces `changes` and runs
   `npm run verify:lane`. It outputs `lane`, `dogfood` and
   `required` (`fast` or `full`, from the event matrix).
-- A `fast` job runs the fast-lane table. It runs for every pull request
+- A `fast` job runs `bijou.verify.fast.v1` from the same
+  `scripts/hooks/verify-policy.mjs` manifest. It runs for every pull request
   event.
+- No workflow reads, uploads or trusts a local receipt (DL-034).
 - The full-lane jobs (`test (20)`, `test (22)`, both focused unit jobs, both
   DOGFOOD smokes, `Code Dojo`, `Strict standards types`, `Bench Gradient`)
   run when `required == 'full'`.

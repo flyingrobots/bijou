@@ -134,9 +134,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
-- DL-030 records the fast and full verification lanes: one tested path
-  classifier, a fast lane for local pushes and draft pull requests, and the
-  unchanged release-grade full lane required at merge through a single
+- DL-030 records the fast and full verification policies
+  (`bijou.verify.fast.v1`, `bijou.verify.full.v1`). One tested path classifier
+  selects the policy. Local pushes are authorized by a DL-034 witness receipt
+  for that policy, the fast lane runs on draft pull requests, and the unchanged
+  release-grade full lane is required at merge through a single
   `Verification gate` check (#608).
 
 - **Inspectable theme provenance and key-binding conflicts** — rule-authored
