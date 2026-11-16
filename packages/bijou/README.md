@@ -240,6 +240,32 @@ status keys fall back to `semantic.muted`.
 - **`fixturePromotionText()`**: Render that promotion record for review and
   agent output.
 
+### Layout Direction
+
+Direction-sensitive Components read one resolved inline direction (R26:
+think in start and end, not left and right).
+
+- **`direction` option / `ctx.direction`**: Every Component accepts
+  `direction?: 'ltr' | 'rtl'` through `BijouNodeOptions`; `createBijou()` and
+  `createTestContext()` accept a context-wide `direction`.
+- **`resolveDirection(options)`**: The single resolver. The explicit option
+  overrides the context; absent both, the direction is `'ltr'`.
+- **`mirrorsLayout(options)`**: True only for `'rtl'` in `interactive` and
+  `static` modes. `pipe` and `accessible` output keep logical order.
+- **`directionalSide('start' | 'end', direction)`** and
+  **`orderForDirection(items, direction)`**: Map logical edges to physical
+  sides and logical sequences to visual order without mutating the input.
+- **`mirrorGlyph(glyph, direction)`** and **`mirrorGlyphs(text, direction)`**:
+  Swap directional glyphs (‹ ›, « », ▸ ◂, ▶ ◀, → ←, ⇒ ⇐ and similar) under
+  `'rtl'`. Pass only Component-owned affordances; never code, paths, IDs,
+  commands or URLs. ASCII `<` and `>` are never swapped.
+
+```ts
+const visual = mirrorsLayout(options) ? 'rtl' : 'ltr';
+const separator = mirrorGlyphs(' › ', visual);
+const items = orderForDirection(crumbs, visual);
+```
+
 ### Profunctor Page Inspection
 
 - **`lowerProfunctorPageArtifacts()`**: Validate one canonical

@@ -19,3 +19,16 @@ export {
   type PackedBijouCellsScene,
   type PackedBijouCellsValidationCode,
 } from './core/packed-bijou-cells.js';
+
+// Layout direction
+export {
+  resolveDirection,
+  mirrorsLayout,
+  directionalSide,
+  orderForDirection,
+  type InlineDirection,
+  type LogicalSide,
+  type PhysicalSide,
+  type DirectionInput,
+} from './core/direction/direction.js';
+export { mirrorGlyph, mirrorGlyphs } from './core/direction/directional-glyph.js';

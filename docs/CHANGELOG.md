@@ -20,6 +20,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Components can resolve a layout direction (#612). `BijouNodeOptions` and
+  `BijouContext` gain `direction?: 'ltr' | 'rtl'`, and `createBijou()` and
+  `createTestContext()` accept it. `resolveDirection()` lets the explicit
+  option override the context and defaults to `'ltr'`; `mirrorsLayout()`
+  keeps `pipe` and `accessible` output in logical order. `directionalSide()`,
+  `orderForDirection()`, `mirrorGlyph()` and `mirrorGlyphs()` map logical
+  edges, sequences and directional glyphs (‹ ›, ▸ ◂, → ←) for right-to-left
+  layout. No Component mirrors yet; the family tasks under #573 adopt it.
 - DL-037 sets the scope of the DOGFOOD localization touched-file rule (#664).
   A touched file must not add or modify raw visible copy without localizing
   it, and must lower its raw-string debt by at least one entry. Whole-file
