@@ -9,7 +9,7 @@ import { guideTranslation } from './app-guide-translations.js';
 import { BIJOU_RELEASE_LINE } from './app-release-line.js';
 
 const HISTORICAL_GUIDES = new Set([
-  'secondary-example-map', 'blocks-what-are-blocks',
+  'secondary-example-map', 'blocks-what-are-blocks', 'release-title-v7', 'release-title-v7-launch',
   'philosophy-system-style-javascript', 'philosophy-architecture',
   'philosophy-ux-doctrine', 'philosophy-invariants', 'philosophy-design-system',
   `release-whats-new-${BIJOU_RELEASE_LINE.replaceAll('.', '-')}`,

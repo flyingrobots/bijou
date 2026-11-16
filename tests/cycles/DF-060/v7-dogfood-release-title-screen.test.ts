@@ -95,7 +95,8 @@ describe('DF-060 v7 DOGFOOD release title screen', () => {
   });
 
   it('keeps the post-release title selectable behind the current DOGFOOD Release guide', async () => {
-    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 42 } });
+    // The v7 titles are historical, so a three-line archive notice precedes the page; leave room for it.
+    const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 48 } });
     const app = createDocsApp(ctx, { initialRoute: 'docs', initialPageId: 'release' });
     const result = await runScript(app, [{
       msg: {
