@@ -3,6 +3,8 @@ import {
   DOGFOOD_I18N_DEBT_SPLIT_LINEAGES,
   type DogfoodTouchedI18nDebtLineage,
 } from './i18n-debt-lineages.js';
+import { canonicalDogfoodDebtPath } from './i18n-debt-touched-path.js';
+import { addedRawStringViolations } from './i18n-debt-touched-added.js';
 
 export {
   DOGFOOD_I18N_DEBT_SPLIT_LINEAGES,
@@ -23,6 +25,9 @@ export function evaluateDogfoodTouchedI18nDebt(
 ): DogfoodTouchedI18nDebtResult {
   const touched = new Set(touchedPaths.map(canonicalDogfoodDebtPath));
   const currentCounts = debtCountsByPath(inventory);
+  const addedViolations = baseInventory === undefined
+    ? []
+    : addedRawStringViolations(inventory, baseInventory, touched, lineages);
   const baseCounts = baseInventory === undefined ? undefined : debtCountsByPath(baseInventory);
   const handledPaths = new Set<string>();
   const lineageViolations = baseCounts === undefined
@@ -45,9 +50,9 @@ export function evaluateDogfoodTouchedI18nDebt(
   });
 
   return Object.freeze({
-    ok: lineageViolations.length === 0 && violations.length === 0,
+    ok: lineageViolations.length === 0 && violations.length === 0 && addedViolations.length === 0,
     touchedPaths: Object.freeze([...new Set(touchedPaths)].sort()),
-    violations: Object.freeze([...lineageViolations, ...violations]),
+    violations: Object.freeze([...lineageViolations, ...violations, ...addedViolations]),
   });
 }
 
@@ -91,8 +96,4 @@ function debtCountsByPath(inventory: DogfoodI18nDebtInventory): ReadonlyMap<stri
     counts.set(path, (counts.get(path) ?? 0) + 1);
   }
   return counts;
-}
-
-function canonicalDogfoodDebtPath(path: string): string {
-  return path.replace(/\.part\d+(?=\.tsx?$)/u, '');
 }
