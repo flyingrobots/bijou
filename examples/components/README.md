@@ -1,5 +1,7 @@
 # Components Library
 
+English · [Français](README.fr.md) · [Español](README.es.md) · [Deutsch](README.de.md)
+
 ```sh
 npm run components
 ```

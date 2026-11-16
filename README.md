@@ -2,6 +2,8 @@
 
 ![Bijou hero reel: the Bijou title, the render lab's raytracer, a live dashboard, one component in four output modes, DOGFOOD switching from English to Spanish, guidedFlow() and explainability(), the plot grammar, theme changes, and the install command](assets/recordings/hero.webp)
 
+English · [Français](README.fr.md) · [Español](README.es.md) · [Deutsch](README.de.md)
+
 Build terminal applications in TypeScript, from a small CLI to a full-screen workbench.
 
 [Read the teaching book](https://github.com/flyingrobots/bijou-job-monitor/blob/main/book/bijou-book.pdf) · [Design Archive](docs/book/bijou-archive.pdf) · [Read the complete Bijou documentation book](docs/book/bijou-designs.pdf)
