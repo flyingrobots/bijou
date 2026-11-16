@@ -7,7 +7,7 @@ import {
   commandPaletteKeyMap, helpShortSurface, vstackSurface,
   type CommandPaletteItem,
 } from '@flyingrobots/bijou-tui';
-import { contentSurface, spacer } from '../_shared/example-surfaces.ts';
+import { contentSurface, spacer } from '../_shared/example-surfaces.js';
 
 const ctx = initDefaultContext();
 

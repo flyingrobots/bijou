@@ -41,13 +41,13 @@ describe('DOGFOOD i18n export workflow', () => {
       (entry) => entry.key.id === 'settings.language.label',
     );
     expect(DOGFOOD_I18N_CATALOG.namespace).toBe('bijou.dogfood');
-    expect(languageEntry?.values.en).toBe('Preferred language');
-    expect(languageEntry?.values.fr).toBeUndefined();
+    expect(languageEntry?.values['en']).toBe('Preferred language');
+    expect(languageEntry?.values['fr']).toBeUndefined();
     expect(frLanguageEntry?.values).toEqual({
       fr: 'Langue préférée',
     });
-    expect(frLanguageEntry?.values.en).toBeUndefined();
-    expect(frLanguageEntry?.values.es).toBeUndefined();
+    expect(frLanguageEntry?.values['en']).toBeUndefined();
+    expect(frLanguageEntry?.values['es']).toBeUndefined();
   });
   it('uses the committed Dogfood CSV string table as the authoring source', () => {
     const table = dogfoodStringTable();

@@ -35,7 +35,7 @@ interface ThemeLabPaneOptions {
   readonly landingTheme: LandingThemeTokens;
   readonly activeTheme: DocsShellThemeChoice;
   readonly shellThemes: readonly DocsShellThemeChoice[];
-  readonly editorState?: ThemeLabEditorState;
+  readonly editorState?: ThemeLabEditorState | undefined;
   readonly localization?: LocalizationPort;
 }
 

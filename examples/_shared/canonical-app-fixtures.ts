@@ -5,7 +5,7 @@ import type {
   WorkItem,
 } from './canonical-app-contract.js';
 
-export const RELEASES: readonly ReleaseSnapshot[] = [
+export const RELEASES: readonly [ReleaseSnapshot, ...ReleaseSnapshot[]] = [
   {
     id: 'v1.3.0',
     readiness: 78,
@@ -61,7 +61,7 @@ export const INCIDENT_FEED: readonly string[] = [
   '13:58 merge queue drained, entering release candidate freeze state',
 ];
 
-export const BACKLOG: readonly WorkItem[] = [
+export const BACKLOG: readonly [WorkItem, ...WorkItem[]] = [
   {
     id: 'SHELL-101',
     title: 'Stabilize splitPane min constraints',

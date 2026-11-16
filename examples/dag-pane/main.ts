@@ -12,7 +12,7 @@ import {
   dagPanePageDown, dagPanePageUp,
   dagPaneKeyMap, helpShort, vstack,
 } from '@flyingrobots/bijou-tui';
-import { ansiSurface } from '../_shared/example-surfaces.ts';
+import { ansiSurface } from '../_shared/example-surfaces.js';
 
 initDefaultContext();
 const ctx = getDefaultContext();
@@ -91,7 +91,7 @@ const app: App<Model, Msg> = {
           source: nodes,
           width: Math.max(1, msg.columns),
           height: Math.max(1, msg.rows - 3),
-          selectedId: model.pane.selectedId,
+          ...(model.pane.selectedId === undefined ? {} : { selectedId: model.pane.selectedId }),
           ctx,
         }),
         cols: msg.columns,

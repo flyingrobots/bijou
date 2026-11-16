@@ -4,7 +4,7 @@ import {
   run, quit, tick, isKeyMsg, type App,
   animate, sequence, EASINGS,
 } from '@flyingrobots/bijou-tui';
-import { badgeSurface, column, line, row, spacer } from '../_shared/example-surfaces.ts';
+import { badgeSurface, column, line, row, spacer } from '../_shared/example-surfaces.js';
 
 const ctx = initDefaultContext();
 
@@ -31,31 +31,26 @@ const app: App<Model, Msg> = {
     { titleX: -30, card1Opacity: 0, card2Opacity: 0, card3Opacity: 0, barPercent: 0, phase: 'animating' },
     [
       // Orchestrated sequence: title slides in, then cards fade in, then bar fills
-      sequence(
-        animate({
+      sequence<Msg>(
+        animate<Msg>({
           from: -30, to: 0,
           spring: 'wobbly',
-          fps: 60,
           onFrame: (v: number) => ({ type: 'title-x', value: v }),
         }),
-        animate({
+        animate<Msg>({
           type: 'tween', from: 0, to: 1, duration: 300, ease: EASINGS.easeOut,
-          fps: 30,
           onFrame: (v: number) => ({ type: 'card1', value: v }),
         }),
-        animate({
+        animate<Msg>({
           type: 'tween', from: 0, to: 1, duration: 300, ease: EASINGS.easeOut,
-          fps: 30,
           onFrame: (v: number) => ({ type: 'card2', value: v }),
         }),
-        animate({
+        animate<Msg>({
           type: 'tween', from: 0, to: 1, duration: 300, ease: EASINGS.easeOut,
-          fps: 30,
           onFrame: (v: number) => ({ type: 'card3', value: v }),
         }),
-        animate({
+        animate<Msg>({
           type: 'tween', from: 0, to: 100, duration: 800, ease: EASINGS.easeInOut,
-          fps: 30,
           onFrame: (v: number) => ({ type: 'bar', value: v }),
           onComplete: () => ({ type: 'all-done' }),
         }),

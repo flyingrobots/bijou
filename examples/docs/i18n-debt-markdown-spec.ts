@@ -17,9 +17,9 @@ export function readDogfoodMarkdownLocalizationSpec(
   }
   const yaml = markdownFrontmatterYaml(text);
   if (yaml == null) return undefined;
-  const root = objectValue(parseYaml(yaml));
-  const dogfood = objectValue(root?.dogfood);
-  const localization = objectValue(dogfood?.localization);
+  const root: FrontmatterRoot | undefined = objectValue(parseYaml(yaml));
+  const dogfood: FrontmatterDogfood | undefined = objectValue(root?.dogfood);
+  const localization: FrontmatterLocalization | undefined = objectValue(dogfood?.localization);
   if (localization == null) return undefined;
   return Object.freeze({
     sourceLocale: stringValue(localization.sourceLocale),
@@ -52,8 +52,18 @@ function localizedPathMapValue(
   return paths;
 }
 
+interface FrontmatterRoot { readonly dogfood?: unknown }
+interface FrontmatterDogfood { readonly localization?: unknown }
+interface FrontmatterLocalization {
+  readonly sourceLocale?: unknown;
+  readonly locales?: unknown;
+  readonly localized?: unknown;
+}
+interface LocalizedPathEntry { readonly path?: unknown }
+
 function localizedPathValue(value: unknown): string | undefined {
-  return stringValue(value) ?? stringValue(objectValue(value)?.path);
+  const entry: LocalizedPathEntry | undefined = objectValue(value);
+  return stringValue(value) ?? stringValue(entry?.path);
 }
 
 function stringListValue(

@@ -64,12 +64,12 @@ export const DATA_PART_02: ComponentEntry[] = [
     render: (_w, ctx) =>
       stepper(
         [
-          { label: "Account", status: "complete" },
-          { label: "Profile", status: "active" },
-          { label: "Review", status: "pending" },
-          { label: "Done", status: "pending" },
+          { label: "Account" },
+          { label: "Profile" },
+          { label: "Review" },
+          { label: "Done" },
         ],
-        { ctx },
+        { current: 1, ctx },
       ),
   },
   {

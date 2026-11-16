@@ -1,7 +1,7 @@
 interface PtyStepBase {
-  readonly delayMs?: number;
-  readonly label?: string;
-  readonly captureMs?: number;
+  readonly delayMs?: number | undefined;
+  readonly label?: string | undefined;
+  readonly captureMs?: number | undefined;
 }
 
 export interface InputStep extends PtyStepBase {
