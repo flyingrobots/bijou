@@ -53,7 +53,7 @@ responsibilities divide as follows:
    change.
 2. The witness command runs that selected policy, outside the network transport,
    against a clean working tree. It does not always run the exhaustive policy.
-3. The receipt binds the policy identity and every input of its eligible gates;
+3. The receipt binds the policy identity and every project input of its eligible gates;
    an incomplete input declaration makes receipt reuse unavailable.
 4. Pre-push only validates that the receipt the change requires exists and
    matches.
@@ -129,13 +129,15 @@ difference in any tracked file gives a different tree.
 
 The witness **refuses to run** unless `git status --porcelain` is empty, which
 means no staged, unstaged or untracked non-ignored files. This binds tracked
-sources to `HEAD^{tree}`; it says nothing about ignored files. Every filesystem
-input that can affect an eligible gate must be tree-bound or content-manifest-
-bound. Each gate's policy entry must name its input roots and explain the
+sources to `HEAD^{tree}`; it says nothing about ignored files. Every project
+filesystem input that can affect an eligible gate must be tree-bound or
+content-manifest-bound. Each gate's policy entry must name its input roots and explain the
 boundary; an undeclared input or an unprovable boundary disables receipt reuse.
 Git cleanliness is not evidence that ignored configuration or build outputs
-cannot affect verification. Runtime resources outside the tree and dependency
+cannot affect verification. Project resources outside the tree and dependency
 roots must also be declared and manifest-bound if the gate consumes them.
+The trusted computing base below is an explicit exception, not an assertion
+that version strings prove the identity of system files.
 
 ### Actual-content manifests
 
@@ -257,9 +259,7 @@ A receipt is invalid if any one of these conditions is true:
    (clock skew or a fabricated timestamp).
 
 The expiry is 24 hours. Expiry limits age; it does not compensate for missing
-input bindings. A gate that depends on unbound system files or uncontrolled
-time cannot contribute reusable evidence until its inputs are controlled and
-declared. Each witness run removes receipts that are
+project-input bindings or uncontrolled environment inputs. Each witness run removes receipts that are
 older than the expiry. The duration is a constant in the manifest, so a change
 to it changes `policyDigest`.
 
@@ -299,6 +299,23 @@ that a flag is not justified.
 
 ## Security Properties
 
+The trusted local computing base comprises the operating system, system
+libraries, runtime and toolchain executables. This design assumes that base
+remains suitable and unchanged during receipt reuse; it does not hash or attest
+its binaries. Node/npm versions and platform are compatibility and invalidation
+signals, not proof of binary identity. A known computing-base change requires a
+new witness. Undetected changes to that base are outside the content-exact
+guarantee, and the 24-hour expiry does not repair that limitation.
+
+The policy manifest declares and fixes the relevant environment settings used by
+each gate; their canonical names and values contribute to `policyDigest` and
+are recomputed during admission. Gates must control time, random
+seeds and external service responses where these affect the verified outcome,
+or explicitly declare that dependency and make its evidence ineligible for
+reuse. An unchanged project cannot be treated as proof of unchanged external
+state. #649 audits these boundaries before enabling receipts. CI independently
+rechecks the required gates in its own environment.
+
 - **Fail closed.** Every missing, unreadable, mismatched, expired or unsigned
   state rejects the push. No code path accepts a receipt it could not fully
   validate.
@@ -309,7 +326,8 @@ that a flag is not justified.
 - **Not a bypass.** A receipt is created only by running the policy that it
   names, and it is accepted only when that policy satisfies the DL-030
   requirement for the change. Local pre-push strength is therefore exactly what
-  DL-030 decides. The receipt adds no weakening of its own. Writing, editing or copying a receipt by hand counts as hook
+  DL-030 decides. Reuse is conditional on the declared inputs and trusted computing base above;
+  it is not an attestation of the entire machine. Writing, editing or copying a receipt by hand counts as hook
   bypass under `AGENTS.md`, the same as `--no-verify`, and needs the same
   per-operation human permission.
 - **Forgery resistance in scope.** The HMAC key stops receipts that were typed,
