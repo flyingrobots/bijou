@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- DOGFOOD shows the language-change notice in the newly selected language,
+  so cycling Preferred language from French to Spanish reads in Spanish
+  (#582).
+
 - Theme Lab wraps complete picker labels, hints and editor context before
   painting, retaining long Book theme names in narrow columns. Column content
   budgets include both the border and horizontal padding.

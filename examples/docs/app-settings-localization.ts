@@ -1,7 +1,11 @@
 import type {
   FrameSettingSection,
 } from '../../packages/bijou-tui/src/app-frame.js';
-import type { LocalizationPort } from '../../packages/bijou-i18n/src/index.js';
+import {
+  createRuntimeLocalizationPort,
+  type LocalizationPort,
+} from '../../packages/bijou-i18n/src/index.js';
+import { createDocsI18nRuntime } from './app-i18n-runtime.js';
 import {
   dogfoodLocaleLabel,
   nextDogfoodLocale,
@@ -21,6 +25,9 @@ export function localizationSettingsSection(
   localization: LocalizationPort,
 ): FrameSettingSection<DocsMsg> {
   const nextLocale = nextDogfoodLocale(model.locale);
+  const targetLocalization = createRuntimeLocalizationPort(
+    createDocsI18nRuntime({ locale: nextLocale.id }),
+  );
   return {
     id: 'localization',
     title: dogfoodText(
@@ -46,13 +53,13 @@ export function localizationSettingsSection(
         feedback: {
           title: shellText(localization, 'settings.title', 'Settings'),
           message: dogfoodText(
-            localization,
+            targetLocalization,
             'settings.language.feedback',
             'Language set to {language}.',
             {
               language: dogfoodLocaleLabel(
                 nextLocale.id,
-                localization,
+                targetLocalization,
               ),
             },
           ),
