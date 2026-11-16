@@ -45,6 +45,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- New GitHub issues use issue-dag/2 card templates (feature, bug, decision,
+  investigation, research, spike): the first block is the Taskalisk
+  frontmatter (`.dag`, `.id`, `.kind`, `.type`, `.blocked_by`,
+  `.size_hours`), then the card for that type. Open issues were converted
+  to the same format, and cards over 8 hours were split into containers of
+  single-outcome tasks.
 - Published option and record types state `| undefined` where callers pass
   `undefined` explicitly, so code compiled with `exactOptionalPropertyTypes`
   type-checks. The repository now passes `tsconfig.code-standards.json` except
