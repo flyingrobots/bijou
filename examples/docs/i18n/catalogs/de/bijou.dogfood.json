@@ -3071,6 +3071,325 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Der Inhalt stammt von einer KI und braucht explizite Herkunft, Belege oder Konfidenz; nimm stattdessen `explainability()`."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Die Nutzerin oder der Nutzer braucht editierbare Zustandsübergänge oder ein vollständiges Schritt-für-Schritt-Routing durch die Shell."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Ein einfacher Hinweis oder Alert würde schon alles ehrlich sagen."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.accessible"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Linearisierte Schritte und Abschnittsbeschriftungen bewahren dieselbe geführte Bedeutung in Lesereihenfolge."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.interactive"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Ein gruppierter Block hält Zusammenfassung, Schritte, Abschnitte und nächste Aktion sichtbar getrennt."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.pipe"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Eingerückte Abschnitte und eine beschriftete nächste Aktion bewahren den Pfad ohne dekorativen Rahmen."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.static"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Derselbe Abschnittsrhythmus bleibt deterministisch, ohne Shell-Verhalten zur Laufzeit."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Einrichtung"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.owner"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Verantwortlich: Platform ops"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.window"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Zeitfenster: heute"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.nextAction"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Öffne den Staging-Secret-Manager und rotiere das Deployment-Token."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Lass die Anleitung beratend, bis das rotierte Secret in den Deployment-Logs bestätigt ist."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Hinweis für Bedienende"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Das Rollout ist gesund, aber das ablaufende Token macht den aktuellen Pfad fragil, bis die Rotation abgeschlossen ist."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Warum"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Canary-Latenz und Fehlerbudget sind beide in Ordnung."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Rollout-Zustand prüfen"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Das aktuelle Token läuft in 30 Minuten ab."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Das Staging-Secret erneuern"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Erst nachdem das neue Secret bestätigt ist."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Das Rollout freigeben"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Halte die Bedienenden auf einem ruhigen Pfad, statt die Abfolge auf Notizen, Schubladen und Statuszeilen zu verteilen."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Das Staging-Rollout vorbereiten"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Wiederverwendbarer Block für ruhigere mehrstufige Assistenzflächen mit expliziten Abschnitten und einer eindeutigen nächsten Aktion."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Der Ablauf braucht eine ruhige Empfehlung oder einen Einrichtungspfad, ohne zu einem vollständigen Assistenten zu werden."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Abschnittsrhythmus und nächste Aktion sollen explizit bleiben, statt in allgemeiner Prosa aufzugehen."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Die Fläche ist geführte Assistenz, aber nicht speziell KI-Erklärbarkeit."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Ruhige mehrstufige Anleitung mit einer expliziten nächsten Aktion."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Staging-Rollout"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "stories.markdown.releaseNote.intro"
       },
       "kind": "message",
@@ -3143,6 +3462,28 @@
       "sourceLocale": "en",
       "values": {
         "de": "# Release note"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.docsTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Doku • {title}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.livePreviewTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Live-Vorschau • {profile} • {variant}"
       }
     },
     {

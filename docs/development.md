@@ -91,6 +91,29 @@ flat. Pre-push and CI run those gates with `npm run dogfood:i18n:check` so new
 strings cannot land with missing generated catalogs, untranslated
 supported-locale rows, or newly touched raw-string debt.
 
+### Localizing a component story
+
+A Component story's docs, variant labels, and preview copy are static fields,
+so a story opts in by exporting a factory and a `localize` hook. The
+`guidedFlow()` story (`examples/docs/stories-story-guided-flow.ts`) is the
+reference:
+
+1. Put every visible string in a sibling `stories-story-<id>-copy.ts` as a
+   literal `dogfoodText(localization, 'stories.<storyId>.<key>', 'English')`
+   call. The debt scanner only exempts literals passed directly to
+   `dogfoodText`, and the sibling file keeps both files inside Code Dojo size
+   limits.
+2. Export `createXStory(localization?)` that builds the story from that copy,
+   set `localize: createXStory` on it, and export the English default as
+   `createXStory()`.
+3. Add `en`, `fr`, `es`, and `de` rows to `dogfood-strings.csv`, run
+   `npm run dogfood:i18n:build`, and lower the story's entry in
+   `i18n-debt-baseline-stories.ts`.
+
+The story pane calls `localizeStory(story, localization)`
+(`app-story-catalog.ts`), which applies `localize` when present and returns
+other stories unchanged. Code names such as `explainability()` stay untranslated.
+
 ## BlockLab And Preview Workflow
 
 Run focused previews without entering the full DOGFOOD structure:
