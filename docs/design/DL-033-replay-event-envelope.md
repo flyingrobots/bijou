@@ -39,8 +39,9 @@ keywords:
 `bijou-replay-event/1` is a JSONL stream of plain-data events. Each `kind` has
 its own payload schema, and the stream has one total order given by `seq`.
 Time is logical: `tick` counts delivered pulses and `atMs` is elapsed time on
-the injected clock. Wall-clock dates, random identifiers, environment and
-model state are never recorded.
+the injected clock. Recorder-owned fields do not collect wall-clock dates,
+random identifiers, environment or model state. Caller-supplied content is
+not sanitized; the privacy boundary below applies.
 
 Frame events carry the complete rendered Surface as resolved cell facts and a
 content hash. They are the only synchronization barrier for capture consumers.
@@ -51,6 +52,9 @@ The parent sketch is adopted with per-kind payloads (option 2 of #599). Its
 random `eventId`, `sessionId` and `previousEventId` fields are removed because
 `seq` already gives identity and order. Viewport and theme context are part of
 v1 because the parent acceptance criteria need them.
+
+This is a design contract for the open dependent tasks, not an implemented
+replay API. The following grounding describes the existing runtime.
 
 ## Grounding In The Current Code
 
@@ -111,8 +115,8 @@ are rejected at append time.
 | --- | --- | --- |
 | `session` | `{ source, label, claim, viewport, context, clock, pulses }` | Once, `seq` 0 |
 | `input` | `{ origin, cmd?, msg }` | Each key, mouse or custom message delivered to `update()` |
-| `resize` | `{ origin, columns, rows }` | Each resize delivered to `update()` |
-| `pulse` | `{ origin, dt }` | Each pulse delivered to `update()` |
+| `resize` | `{ origin, cmd?, columns, rows }` | Each resize delivered to `update()` |
+| `pulse` | `{ origin, cmd?, dt }` | Each pulse delivered to `update()` |
 | `command` | `{ cmd, phase, outcome? }` | Command start and settle |
 | `debug-fact` | `{ name, value }` | Opt-in facts from the emitter |
 | `frame` | `{ index, width, height, hash, styles, cells }` | After each render |
@@ -137,7 +141,9 @@ Field details:
   `'re-execution'` is reserved; see Two Claims below.
 - `origin`: `'script'` for a message from a script step, `'command'` for a
   message that a command emitted or returned, `'timer'` for a bus timer pulse.
-  When `origin` is `'command'`, `cmd` gives the command ordinal.
+  For `input`, `resize` and `pulse`, `cmd` is required exactly when `origin`
+  is `'command'`; it gives the ordinal assigned to that command. It is absent
+  for script and timer origins.
 - `input.msg`: the delivered message as plain data. For a key step this is the
   parsed `KeyMsg`, not the raw string. A custom `msg` that is not plain JSON is
   rejected; the run fails and does not drop the message silently.
@@ -189,40 +195,60 @@ Field details:
    sort by `atMs` or `tick`.
 2. **Cause before effect.** For each delivered message the emitter appends, in
    this order: the `input`, `resize` or `pulse` event; the `frame` event for
-   the render that `update()` caused; then one `command` `start` event for each
-   returned command, in array order. A `frame` event therefore comes after
+   the render that `update()` caused; then start each returned command in
+   array order, appending its `command` `start` immediately before invoking it.
+   A synchronous command emission may deliver a nested message and frame
+   before the next sibling command starts; do not batch start events ahead
+   of actual invocation. A `frame` event therefore comes after
    every event that produced the frame (#602 acceptance).
 3. **Command messages.** A message that a command emits or returns is appended
    as `input`, `resize` or `pulse` with `origin: 'command'` when the bus
    delivers it. The `command` `settle` event is appended when the command
-   promise settles. Under a mock clock and synchronous or microtask-only
-   commands, this order is deterministic.
-4. **Frame barrier.** A `frame` event closes a frame. The events between two
-   frame events are the causes of the second frame. Consumers emit output only
-   at frame events. A consumer never renders between barriers or merges two
-   barriers.
+   promise settles. Byte stability also requires every condition in the
+   determinism guarantee below; the clock alone does not establish it.
+4. **Frame barrier.** A `frame` event closes a frame. Events between barriers
+   describe intervening activity; a command settlement need not cause the
+   next frame. Consumers emit output only at frame events. A consumer never
+   renders between barriers or merges two barriers.
 5. **Initial frame.** After `session`, the initial render is `frame` index 0,
    followed by `command` `start` events for the `init()` commands.
 6. **Logical time.** `tick` increases by one after each `pulse` event, so the
    pulse event carries the tick count before it. `atMs` is
-   `floor(clock.now() - start)`. A script `delay` advances `atMs` but not
-   `tick`. `pulse.dt` is recorded exactly as delivered, in seconds.
-7. **No wall time.** Absolute dates (`Date.now()`, a mock clock's epoch) are
-   never written. Only elapsed time is.
+   `floor(clock.now() - start)`. A completed script `delay` advances `atMs`
+   but not `tick`; on the mock clock the sleep needs explicit clock advancement
+   and does not advance time itself. `pulse.dt` is recorded exactly as
+   delivered, in seconds.
+7. **No implicit wall time.** Recorder-owned timing fields use elapsed time,
+   not absolute dates or the mock clock's epoch. This does not filter dates
+   that callers put in messages, labels, debug facts or rendered text.
 
 ### Determinism guarantee
 
-Two runs of the same app and steps produce byte-identical JSONL when all of
-these hold: `session.clock` is `'mock'`, `session.pulses` is `'script'`, and
-the app's commands do not depend on real timers, I/O or randomness. With a
-system clock or timer pulses, the stream is still ordered and facts-only, but
-it is not byte-stable.
+Byte identity requires the same app version, initial state, script, replay
+label, viewport, output mode, theme, colour level and rendering configuration.
+Every executed path in `init()`, `update()`, `view()`, commands and callbacks
+must use deterministic inputs and scheduling. They must not read uncontrolled
+randomness, environment, external mutable state, real timers or I/O. The mock
+clock must have the same initial value and explicit advancement schedule;
+`pulseFps` must be `false`. A mock clock alone cannot make arbitrary app code
+deterministic. With system time or timer pulses, order remains defined but
+byte stability is not promised.
 
-The known drain hazard does not change: a command that sleeps on a mock clock
-blocks `drain()`. v1 records runs as they behave today and does not change
-`runScript()` drain semantics. Recorders that need such commands use the
-detached pattern from `examples/hero/clip.ts`. A detached command's message
-still appears as `origin: 'command'` with its ordinal.
+The known drain hazard remains: a command sleeping on a mock clock waits for
+explicit advancement and can block `drain()`. v1 does not change drain
+semantics. The detached pattern in `examples/hero/clip.ts` returns
+`undefined` from a wrapper while retaining the underlying promise. The bus
+therefore settles the **wrapper command** as `empty`; it does not observe the
+underlying promise's settlement, errors or remaining work. A later message
+through that wrapper's captured emitter keeps the wrapper's command ordinal,
+including after its recorded settle event. `pendingCommands` counts bus-owned
+wrappers only, not detached promises. This is limited evidence, not a complete
+effect lifecycle or a re-execution claim.
+
+The recording ends when the existing scripted run stops. Ignore late detached
+emissions after `end`; never append beyond it. A caller needing a detached
+result in the recording must arrange for delivery before that boundary. A
+pending detached result does not extend the recording or hold `drain()` open.
 
 ## What Is And Is Not Recorded
 
@@ -230,7 +256,7 @@ Recorded: script inputs after parsing, resize and pulse facts, command
 lifecycle classes, opt-in debug facts, resolved frame cells and hashes, the
 initial viewport, the output mode, the theme name and the colour level.
 
-Never recorded:
+Not automatically collected by recorder instrumentation:
 
 - environment variables, `argv`, the working directory, file paths, host or
   user names;
@@ -240,10 +266,13 @@ Never recorded:
 - absolute timestamps or random identifiers;
 - raw terminal output or escape sequences (no terminal scrape is replay truth).
 
-Script inputs are recorded as given. A script that types a secret writes that
-secret to the stream, so scripts must not contain secrets. v1 does not record
-live terminal sessions, where a user could type secrets without knowing about
-the recording.
+This is a collection boundary, not a redaction or confidentiality guarantee.
+Plain JSON validation checks representation, not sensitivity. Messages,
+`session.label`, debug facts and rendered cell text are recorded as supplied;
+they can contain paths, user names, timestamps or secrets. Callers must use
+non-sensitive fixtures or sanitize those values before recording. v1 performs
+no heuristic redaction, because it would alter the recorded facts. It does not
+record live terminal sessions.
 
 ## Directions Considered
 
@@ -273,7 +302,8 @@ the recording.
 ## Consequences
 
 - Replay files are larger than input logs because each frame holds every cell.
-  For an 80x24 demo with a few styles, a frame is a few kilobytes of JSON. The
+  Even 1,920 blank cells (80 by 24) take about 15 KiB as JSON tuples, before
+  the style table and event fields. The
   style table limits repetition. Long recordings should use the file-backed
   outbox, and `surface-diff` is the planned size reduction.
 - Colours are resolved at record time, so a replay keeps the theme that was
@@ -335,7 +365,7 @@ They are not a promise that the frames can be reproduced from them.
 | #600 ReplayOutbox | Neither. It is transport: order, validation, serialization. |
 | #602 `runScript()` emission | Frame playback. It also records inputs as causal evidence. |
 | #605 `recordDemoGif()` subscriber | Frame playback, exported to layer (d). |
-| #607 Fixture | Frame playback only. A stable GIF hash proves that captured frames play back exactly. It does not prove re-execution. |
+| #607 Fixture | Frame playback only. A stable GIF hash checks captured frames under fixed rasterizer options and encoder version. It proves neither universal pixel equivalence nor re-execution. |
 
 ## Contracts For Dependents
 
@@ -358,16 +388,33 @@ They are not a promise that the frames can be reproduced from them.
 - `RunScriptOptions` gains an optional `replay` sink (structural, so
   `bijou-tui` does not import `bijou-node`) and an optional `replayLabel`.
   Without it, behaviour and frames do not change.
-- Emits `session`, frame 0, init command starts, then for each delivered
-  message the events in the order that Ordering Rules 2 to 5 give, and `end`
-  last, also when the run throws (`reason: 'error'`).
+- Places replay setup and `app.init()` within the recording failure boundary.
+  Emits `session` before invoking `init()`, then frame 0 and init command
+  starts. Delivered messages follow Ordering Rules 2 to 5; `end` is last.
+- A replay validation, serialization or append failure is sticky: retain the
+  first failure, stop further replay deliveries, and reject the recording
+  call. Do not rely on throwing inside a bus subscriber: current
+  `eventbus-report.ts` catches subscriber exceptions, and command failures
+  also have a reporting path. The replay-aware driver must surface the saved
+  failure across those boundaries and interrupt its wait for `drain()` if
+  necessary. This requirement changes only the opt-in recording path.
+- On a failed recording, append `end` with `reason: 'error'` only if the
+  session was written and the sink can still accept it. If writing fails,
+  preserve the partial artifact as incomplete and reject; never report a
+  successful recording or fabricate a completed stream. No error text is
+  added to the artifact. With no replay sink, existing error/drain behavior
+  remains unchanged.
 - Builds `frame` payloads from the same Surface passed to `onFrame`, and copies
   the cell facts at once (apps may reuse one Surface).
 - Writes `session.claim: 'frame-playback'`.
 - Does not change `drain()` semantics.
 - Tests: golden JSONL for a small app on a mock clock with `pulseFps: false`;
-  two runs are byte-identical; a non-plain custom `msg` fails the run; a run
-  without a sink is unchanged.
+  two runs satisfying all deterministic prerequisites are byte-identical;
+  command-origin input/resize/pulse retain their ordinals; synchronous nested
+  emissions preserve invocation order; a non-plain custom message or a sink
+  failure inside a subscriber rejects the recording; init failure and a
+  failed error-end append remain failures; detached late emissions cannot
+  append after `end`; a run without a sink is unchanged.
 
 ### #605 recordDemoGif as a subscriber
 
@@ -378,7 +425,11 @@ They are not a promise that the frames can be reproduced from them.
   as today. Frame delay comes from `frameDelayMs`, not from `atMs`, so the
   legacy golden still matches.
 - `recordDemoGif(spec)` keeps its signature. It records through an in-memory
-  outbox and renders from the stream.
+  outbox and renders from the stream, retaining the spec's `cellWidth`,
+  `cellHeight`, `foreground`, `background` and `frameDelayMs` options.
+- Frame facts determine cell playback, not unique GIF bytes. Rasterizer
+  options and encoder version also determine those bytes. The v1 JSONL does
+  not embed an export configuration; replay callers supply it.
 - A stream without `frame` events fails with the same error as an empty frame
   list today. A hash mismatch fails, and the frame is not skipped.
 
@@ -387,8 +438,10 @@ They are not a promise that the frames can be reproduced from them.
 - Checks in one replay JSONL fixture made by #602 from a small app (mock
   clock, script pulses, at least one key, one resize and one command-emitted
   message), plus the expected `sha256` of the GIF bytes.
-- The test reads only the fixture file, renders through the #605 path, and
-  compares the hash. It does not import the app.
+- The test uses the fixture as its only app/run data, renders through #605,
+  and compares the hash. It does not import the app. It fixes rasterizer
+  options explicitly and uses the lockfile-pinned encoder version; the hash
+  is scoped to that configuration, not arbitrary consumer defaults.
 - A second test checks that the fixture is canonical: parse and re-serialize
   each line and compare bytes.
 - If the GIF encoder changes its output bytes, update the expected hash in the
