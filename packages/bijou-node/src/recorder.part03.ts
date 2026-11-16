@@ -5,7 +5,8 @@ import { runScript } from '@flyingrobots/bijou-tui';
 import { applyGifPalette, createGifEncoder, quantizeColors } from './gifenc-runtime.js';
 import { DEFAULT_BACKGROUND, DEFAULT_FOREGROUND, fillRect, mixRgb, normalizeRgb, normalizeSurfaceFrame, parseHex, resolvedColorHex, resolvedColorRgb } from './recorder.part01.js';
 import type { NativeDemoSpec, RasterizeOptions, RecorderResult, SurfaceGifOptions } from './recorder.part01.js';
-import { drawBitmapGlyph, drawSpecialGlyph } from './recorder.part02.js';
+import { drawGeometricGlyph } from './recorder-glyphs.js';
+import { drawBitmapGlyph } from './recorder.part02.js';
 
 function drawCell(
   rgba: Uint8Array,
@@ -40,16 +41,13 @@ function drawCell(
     return;
   }
 
-  const drawn = drawSpecialGlyph(rgba, width, height, pixelX, pixelY, cellWidth, cellHeight, cell.char, fg);
-  if (!drawn) {
-    drawBitmapGlyph(rgba, width, height, pixelX + 1, pixelY + 1, cell.char, fg);
+  if (drawGeometricGlyph(rgba, width, height, pixelX, pixelY, cellWidth, cellHeight, cell.char, fg, bg)) {
+    return;
   }
 
+  drawBitmapGlyph(rgba, width, height, pixelX + 1, pixelY + 1, cell.char, fg);
   if (modifiers.has('bold')) {
-    const boldDrawn = drawSpecialGlyph(rgba, width, height, pixelX + 1, pixelY, cellWidth, cellHeight, cell.char, fg);
-    if (!boldDrawn) {
-      drawBitmapGlyph(rgba, width, height, pixelX + 2, pixelY + 1, cell.char, fg);
-    }
+    drawBitmapGlyph(rgba, width, height, pixelX + 2, pixelY + 1, cell.char, fg);
   }
   if (modifiers.has('underline')) {
     fillRect(rgba, width, height, pixelX + 1, pixelY + cellHeight - 2, cellWidth - 2, 1, fg);
@@ -107,7 +105,9 @@ export function writeSurfaceGif(options: SurfaceGifOptions): RecorderResult {
     .map((frame) => rasterizeSurface(frame, rasterOptions));
   const palette = quantizeColors(joinFrames(frames), 256, { format: 'rgb565' });
   const gif = createGifEncoder();
-  const delay = Math.max(2, Math.round(sanitizePositiveInt(options.frameDelayMs, 90) / 10));
+  // GIF stores delays in whole centiseconds (minimum 2 for consistent playback); gifenc takes
+  // milliseconds and divides by 10 itself, so pass the rounded value back in milliseconds.
+  const delay = Math.max(2, Math.round(sanitizePositiveInt(options.frameDelayMs, 90) / 10)) * 10;
 
   for (const frame of frames) {
     const indexed = applyGifPalette(frame, palette);

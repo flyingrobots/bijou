@@ -18,7 +18,7 @@ export interface FramePaneScroll {
 /** Runtime model owned by the frame. */
 export interface FrameModel<PageModel> {
   readonly activePageId: string;
-  readonly activeShellThemeId?: string;
+  readonly activeShellThemeId?: string | undefined;
   readonly pageOrder: readonly string[];
   readonly pageModels: Readonly<Record<string, PageModel>>;
   readonly focusedPaneByPage: Readonly<Record<string, string | undefined>>;
@@ -30,28 +30,28 @@ export interface FrameModel<PageModel> {
   readonly frameTimeMs: number;
   readonly viewTimeMs: number;
   readonly diffTimeMs: number;
-  readonly frameBudgetMs?: number;
+  readonly frameBudgetMs?: number | undefined;
   readonly frameOverBudget: boolean;
   readonly perfHudOpen: boolean;
   readonly helpOpen: boolean;
-  readonly footerVisible?: boolean;
-  readonly footerTranslateY?: number;
-  readonly footerAnimationGeneration?: number;
-  readonly commandPalette?: CommandPaletteState;
-  readonly commandPaletteKind?: 'command' | 'search';
+  readonly footerVisible?: boolean | undefined;
+  readonly footerTranslateY?: number | undefined;
+  readonly footerAnimationGeneration?: number | undefined;
+  readonly commandPalette?: CommandPaletteState | undefined;
+  readonly commandPaletteKind?: 'command' | 'search' | undefined;
   readonly settingsOpen: boolean;
   readonly notificationCenterOpen: boolean;
   readonly quitConfirmOpen: boolean;
   readonly settingsFocusIndex: number;
   readonly settingsScrollY: number;
   readonly notificationCenterScrollY: number;
-  readonly previousPageId?: string;
+  readonly previousPageId?: string | undefined;
   readonly transitionProgress: number;
   readonly transitionGeneration: number;
-  readonly activeTransition?: PageTransition;
-  readonly transitionStartMs?: number;
-  readonly transitionTimeline?: import('./timeline.js').Timeline;
-  readonly transitionTimelineState?: import('./timeline.js').TimelineState;
+  readonly activeTransition?: PageTransition | undefined;
+  readonly transitionStartMs?: number | undefined;
+  readonly transitionTimeline?: import('./timeline.js').Timeline | undefined;
+  readonly transitionTimelineState?: import('./timeline.js').TimelineState | undefined;
   readonly transitionFrame: number;
   readonly minimizedByPage: Readonly<
     Record<string, import('./panel-state.js').PanelVisibilityState>
@@ -74,9 +74,9 @@ export interface InternalFrameModel<
   PageModel,
   Msg,
 > extends FrameModel<PageModel> {
-  readonly commandPaletteEntries?: readonly PaletteEntry<Msg>[];
-  readonly commandPaletteTitle?: string;
-  readonly commandPaletteKind?: PaletteKind;
+  readonly commandPaletteEntries?: readonly PaletteEntry<Msg>[] | undefined;
+  readonly commandPaletteTitle?: string | undefined;
+  readonly commandPaletteKind?: PaletteKind | undefined;
   readonly helpScrollY: number;
   readonly warnedFrameKeyCollisionPages: Readonly<Record<string, true>>;
 }
@@ -84,7 +84,7 @@ export interface InternalFrameModel<
 export interface PaletteEntry<Msg> {
   readonly id: string;
   readonly item: CommandPaletteItem;
-  readonly msgAction?: Msg;
+  readonly msgAction?: Msg | undefined;
   readonly targetPageId?: string;
   readonly frameAction?: FrameAction;
 }
@@ -93,13 +93,15 @@ export interface RenderContext<PageModel, Msg> {
   readonly model: InternalFrameModel<PageModel, Msg>;
   readonly pageId: string;
   readonly focusedPaneId: string | undefined;
+  /** True when the page layout is one pane, so there is no other pane to focus and no focus gutter. */
+  readonly singlePane?: boolean;
   readonly scrollByPane: Readonly<
     Record<string, { readonly x: number; readonly y: number }>
   >;
   readonly visibility: PanelVisibilityState;
   readonly dockState: PanelDockState;
   readonly frameBackgroundToken: TokenValue | undefined;
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
 }
 
 export interface RenderResult {

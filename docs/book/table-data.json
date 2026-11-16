@@ -5207,8 +5207,7 @@
       "Use when",
       "Avoid when",
       "Layer",
-      "Lowering path",
-      "Closest Carbon analogue"
+      "Lowering path"
     ],
     "rows": [
       [
@@ -5217,8 +5216,7 @@
         "grouping related content, creating section rhythm, framing dense text or controls",
         "signaling urgency, transient messaging, or deep application layout",
         "core",
-        "rich frame -> simpler text frame in static/pipe/accessible",
-        "tile / contained section"
+        "rich frame -> simpler text frame in static/pipe/accessible"
       ],
       [
         "badge()",
@@ -5226,8 +5224,7 @@
         "short inline state, counts, labels inside other content",
         "multi-line explanation, required action, or standalone messaging",
         "core",
-        "colored token -> plain text label",
-        "tag"
+        "colored token -> plain text label"
       ],
       [
         "alert()",
@@ -5235,8 +5232,7 @@
         "persistent in-flow status that should remain visible while the user reads or edits nearby content",
         "transient events, stacked interruptions, or app-level runtime events",
         "core",
-        "boxed rich message -> plain emphasized text",
-        "inline notification"
+        "boxed rich message -> plain emphasized text"
       ],
       [
         "separator()",
@@ -5244,8 +5240,7 @@
         "dividing content regions or labeling subsections within a page",
         "primary hierarchy, alerts, or content grouping that needs its own container",
         "core",
-        "decorative rule -> simple text divider",
-        "divider"
+        "decorative rule -> simple text divider"
       ],
       [
         "skeleton()",
@@ -5253,8 +5248,7 @@
         "communicating expected shape during loading",
         "exact progress, actionable status, or long-lived empty state",
         "core",
-        "visual placeholder -> plain placeholder text",
-        "skeleton text / skeleton placeholder"
+        "visual placeholder -> plain placeholder text"
       ],
       [
         "kbd()",
@@ -5262,8 +5256,7 @@
         "showing shortcuts near commands or instructions",
         "representing arbitrary code or primary labels",
         "core",
-        "styled keycap -> bracketed text",
-        "keyboard interaction hint"
+        "styled keycap -> bracketed text"
       ],
       [
         "spinnerFrame() / createSpinner()",
@@ -5271,8 +5264,7 @@
         "unknown-duration ongoing work in a narrow space",
         "progress with known completion, historical logs, or large layout regions",
         "core",
-        "animated rich frame -> static textual status",
-        "inline loading indicator"
+        "animated rich frame -> static textual status"
       ],
       [
         "progressBar() / live progress controllers",
@@ -5280,8 +5272,7 @@
         "known-progress work, install flows, downloads, percentages",
         "binary yes/no states or tiny inline labels",
         "core",
-        "colored bar -> textual percentage/progress summary",
-        "progress bar"
+        "colored bar -> textual percentage/progress summary"
       ],
       [
         "timer() / createTimer() / createStopwatch()",
@@ -5289,8 +5280,7 @@
         "elapsed or remaining time is a first-class fact",
         "generic status or event history",
         "core",
-        "formatted time -> spoken/plain time",
-        "timer / timekeeping pattern"
+        "formatted time -> spoken/plain time"
       ],
       [
         "log()",
@@ -5298,8 +5288,7 @@
         "audit streams, diagnostics, sequential event feeds",
         "replacing notifications, alerts, or structured page UI",
         "core",
-        "styled log line -> plain prefixed log line",
-        "inline notification plus activity log pattern"
+        "styled log line -> plain prefixed log line"
       ],
       [
         "markdown()",
@@ -5307,8 +5296,7 @@
         "rich prose, docs, release notes, help text",
         "tabular data, strongly interactive content, or guaranteed exact layout",
         "core",
-        "rich markdown -> simpler plain text rendering",
-        "expressive text / content block"
+        "rich markdown -> simpler plain text rendering"
       ],
       [
         "hyperlink()",
@@ -5316,8 +5304,7 @@
         "clickable links when the terminal supports them",
         "primary navigation inside a TUI shell",
         "core",
-        "hyperlink -> printed URL/text fallback",
-        "link"
+        "hyperlink -> printed URL/text fallback"
       ],
       [
         "note()",
@@ -5325,8 +5312,7 @@
         "non-interruptive informational aside inside forms and guided flows",
         "alerts, notifications, or content that should compete for attention",
         "core",
-        "styled note -> plain explanatory text",
-        "helper text / inline help"
+        "styled note -> plain explanatory text"
       ],
       [
         "logo()",
@@ -5334,8 +5320,7 @@
         "branding or splash surfaces",
         "essential navigation or state communication",
         "core",
-        "ASCII logo -> simpler ASCII logo",
-        "brand lockup"
+        "ASCII logo -> simpler ASCII logo"
       ]
     ]
   },
@@ -5350,8 +5335,7 @@
       "Use when",
       "Avoid when",
       "Layer",
-      "Lowering path",
-      "Closest Carbon analogue"
+      "Lowering path"
     ],
     "rows": [
       [
@@ -5360,8 +5344,7 @@
         "comparing multiple rows across fixed columns",
         "active row-by-row inspection, hierarchical data, or graph structure",
         "core",
-        "rich table -> simplified textual table",
-        "data table"
+        "rich table -> simplified textual table"
       ],
       [
         "tree()",
@@ -5369,8 +5352,7 @@
         "showing expandable hierarchy or filesystem-like structure in static content",
         "dependency graphs, tabular comparison, or heavily interactive browsing",
         "core",
-        "rich tree -> textual tree",
-        "tree view"
+        "rich tree -> textual tree"
       ],
       [
         "accordion()",
@@ -5378,8 +5360,7 @@
         "progressive disclosure inside one page or form",
         "peer navigation across views, dense row comparison, or app shell navigation",
         "core",
-        "rendered expanded/collapsed text -> plain section list",
-        "accordion"
+        "rendered expanded/collapsed text -> plain section list"
       ],
       [
         "timeline()",
@@ -5387,8 +5368,7 @@
         "chronological history, release/event streams, process storytelling",
         "exact comparison tables or dependency graphs",
         "core",
-        "rich connected timeline -> ordered event list",
-        "structured list / progress narrative"
+        "rich connected timeline -> ordered event list"
       ],
       [
         "tabs()",
@@ -5396,8 +5376,7 @@
         "peer sections where only one pane should be considered active",
         "process progress, deep hierarchy, or command/action lists",
         "core",
-        "active-tab rendering -> plain labeled tab row",
-        "tabs"
+        "active-tab rendering -> plain labeled tab row"
       ],
       [
         "breadcrumb()",
@@ -5405,8 +5384,7 @@
         "showing location/path hierarchy",
         "step-by-step progress, app-global command navigation, or large menus",
         "core",
-        "tokenized path -> plain path text",
-        "breadcrumb"
+        "tokenized path -> plain path text"
       ],
       [
         "paginator()",
@@ -5414,8 +5392,7 @@
         "communicating page position or finite carousel/page count",
         "workflow steps or arbitrary tabs",
         "core",
-        "styled indicator -> plain page summary",
-        "pagination"
+        "styled indicator -> plain page summary"
       ],
       [
         "stepper()",
@@ -5423,8 +5400,7 @@
         "sequential progress through a process",
         "peer page navigation or location hierarchy",
         "core",
-        "styled steps -> textual progress sequence",
-        "progress indicator"
+        "styled steps -> textual progress sequence"
       ],
       [
         "dag() / dagSlice() / dagStats()",
@@ -5432,8 +5408,7 @@
         "dependency reasoning, build pipelines, workflow graphs",
         "simple trees, tables, or ordinary lists",
         "core",
-        "rich graph -> textual graph/metrics",
-        "no exact Carbon equivalent; closest is a specialized data-vis workflow view"
+        "rich graph -> textual graph/metrics"
       ],
       [
         "enumeratedList()",
@@ -5441,8 +5416,7 @@
         "prose-adjacent ordered or unordered lists",
         "row/column comparison, hierarchy, or active selection",
         "core",
-        "list styling -> plain list items",
-        "ordered / unordered list"
+        "list styling -> plain list items"
       ]
     ]
   },
@@ -5457,8 +5431,7 @@
       "Use when",
       "Avoid when",
       "Layer",
-      "Lowering path",
-      "Closest Carbon analogue"
+      "Lowering path"
     ],
     "rows": [
       [
@@ -5467,8 +5440,7 @@
         "collecting short free-form text",
         "long-form editing, large option search, or yes/no questions",
         "core",
-        "interactive prompt -> line input / accessible text prompt",
-        "text input"
+        "interactive prompt -> line input / accessible text prompt"
       ],
       [
         "textarea()",
@@ -5476,8 +5448,7 @@
         "collecting notes, paragraphs, or larger structured text",
         "short scalar fields or action search",
         "core",
-        "interactive editor -> plain multi-line prompt",
-        "text area"
+        "interactive editor -> plain multi-line prompt"
       ],
       [
         "confirm()",
@@ -5485,8 +5456,7 @@
         "single binary confirmation with minimal ambiguity",
         "multiple choices, irreversible review flows needing context, or long forms",
         "core",
-        "interactive yes/no -> plain yes/no prompt",
-        "modal confirmation pattern"
+        "interactive yes/no -> plain yes/no prompt"
       ],
       [
         "select()",
@@ -5494,8 +5464,7 @@
         "short, finite option sets",
         "long searchable catalogs or global app actions",
         "core",
-        "keyboard menu -> numbered list in pipe/accessibility",
-        "dropdown"
+        "keyboard menu -> numbered list in pipe/accessibility"
       ],
       [
         "multiselect()",
@@ -5503,8 +5472,7 @@
         "choosing a set of options",
         "single choice or command execution",
         "core",
-        "checkbox list -> numbered comma-separated selection",
-        "multi-select / checkbox group"
+        "checkbox list -> numbered comma-separated selection"
       ],
       [
         "filter()",
@@ -5512,8 +5480,7 @@
         "option sets that are too large for ordinary select",
         "free-form text entry or global command routing",
         "core",
-        "interactive filter -> textual filtered selection",
-        "combo box"
+        "interactive filter -> textual filtered selection"
       ],
       [
         "group()",
@@ -5521,8 +5488,7 @@
         "compact multi-field forms that still fit one mental step",
         "long multi-step workflows or branching flows",
         "core",
-        "structured prompt flow -> sequential prompts",
-        "form group"
+        "structured prompt flow -> sequential prompts"
       ],
       [
         "wizard()",
@@ -5530,8 +5496,7 @@
         "staged flows, onboarding, setup, or conditional data collection",
         "short forms that fit comfortably on one screen",
         "core",
-        "sequential prompts -> sequential prompts with step text",
-        "progress indicator + stepped form"
+        "sequential prompts -> sequential prompts with step text"
       ]
     ]
   },
@@ -5546,8 +5511,7 @@
       "Use when",
       "Avoid when",
       "Layer",
-      "Lowering path",
-      "Closest Carbon analogue"
+      "Lowering path"
     ],
     "rows": [
       [
@@ -5556,8 +5520,7 @@
         "scrollable content region inside a TUI",
         "static rendering where a plain clipped block is enough",
         "TUI-only",
-        "should lower to the underlying rendered content when interaction is absent",
-        "scrollable region"
+        "should lower to the underlying rendered content when interaction is absent"
       ],
       [
         "pager()",
@@ -5565,8 +5528,7 @@
         "long-form document/log viewer with explicit paging semantics",
         "arbitrary layout container or editable text",
         "TUI-only",
-        "should lower to the content itself or viewport() snapshot",
-        "document viewer"
+        "should lower to the content itself or viewport() snapshot"
       ],
       [
         "focusArea()",
@@ -5574,8 +5536,7 @@
         "pane-local focus signaling for keyboard-heavy shells",
         "ordinary static containers or app-global navigation",
         "TUI-only",
-        "should lower to styled content without focus affordance",
-        "focus treatment pattern"
+        "should lower to styled content without focus affordance"
       ],
       [
         "interactiveAccordion()",
@@ -5583,8 +5544,7 @@
         "accordion content must be navigated and toggled in-place",
         "static documents where accordion() is enough",
         "TUI-only",
-        "lower to accordion() when interactivity is unnecessary",
-        "accordion"
+        "lower to accordion() when interactivity is unnecessary"
       ],
       [
         "navigableTable()",
@@ -5592,8 +5552,7 @@
         "keyboard inspection of dense tabular data",
         "plain read-only comparison tables",
         "TUI-only",
-        "lower to table() in non-interactive contexts",
-        "interactive data table"
+        "lower to table() in non-interactive contexts"
       ],
       [
         "browsableList()",
@@ -5601,8 +5560,7 @@
         "one-dimensional item exploration with active detail context",
         "tabular data, hierarchy, or global command search",
         "TUI-only",
-        "lower to plain list or enumeratedList()",
-        "selectable list / side-nav list"
+        "lower to plain list or enumeratedList()"
       ],
       [
         "filePicker()",
@@ -5610,8 +5568,7 @@
         "filesystem navigation and selection",
         "generic hierarchy unrelated to files",
         "TUI-only",
-        "lower to tree() or plain path list if needed",
-        "file browser pattern"
+        "lower to tree() or plain path list if needed"
       ],
       [
         "dagPane()",
@@ -5619,8 +5576,7 @@
         "keyboard exploration of a DAG with focus semantics",
         "static graph rendering or ordinary trees",
         "TUI-only",
-        "lower to dag() snapshot",
-        "no exact Carbon equivalent"
+        "lower to dag() snapshot"
       ],
       [
         "commandPalette()",
@@ -5628,8 +5584,7 @@
         "app-global actions, navigation, and commands",
         "field-level selection where the result is stored data rather than an immediate action",
         "TUI-only",
-        "lower to documented shortcuts or command list",
-        "command palette / searchable action menu"
+        "lower to documented shortcuts or command list"
       ]
     ]
   },
@@ -5644,8 +5599,7 @@
       "Use when",
       "Avoid when",
       "Layer",
-      "Lowering path",
-      "Closest Carbon analogue"
+      "Lowering path"
     ],
     "rows": [
       [
@@ -5654,8 +5608,7 @@
         "the user must review or decide before continuing",
         "low-severity transient messaging or supplemental context",
         "TUI-only",
-        "lower to in-flow page state or confirmation prompt",
-        "modal"
+        "lower to in-flow page state or confirmation prompt"
       ],
       [
         "drawer()",
@@ -5663,8 +5616,7 @@
         "supplemental context, inspectors, secondary tools",
         "hard-stop confirmation or tiny hint text",
         "TUI-only",
-        "lower to alternate pane or section",
-        "side panel"
+        "lower to alternate pane or section"
       ],
       [
         "tooltip()",
@@ -5672,8 +5624,7 @@
         "brief explanatory text tied to one target",
         "actions, history, or anything that requires scrolling",
         "TUI-only",
-        "lower to inline help text",
-        "tooltip"
+        "lower to inline help text"
       ],
       [
         "toast()",
@@ -5681,8 +5632,7 @@
         "simple ephemeral overlay when the app itself owns timing and lifecycle",
         "history, routing, stacking policy, or reusable notification semantics",
         "TUI-only",
-        "lower to no-op, log line, or in-flow alert depending on app context",
-        "toast notification"
+        "lower to no-op, log line, or in-flow alert depending on app context"
       ],
       [
         "notification stack/history",
@@ -5690,8 +5640,7 @@
         "app-managed transient communication, reviewable archive, runtime warning/error routing, actionable prompts",
         "primary content, durable document structure, or deep multi-step workflows",
         "TUI-only",
-        "lower to logs, alerts, or archived history views; does not belong in core Bijou",
-        "toast notification / actionable notification / notification center"
+        "lower to logs, alerts, or archived history views; does not belong in core Bijou"
       ]
     ]
   },
@@ -5706,8 +5655,7 @@
       "Use when",
       "Avoid when",
       "Layer",
-      "Lowering path",
-      "Closest Carbon analogue"
+      "Lowering path"
     ],
     "rows": [
       [
@@ -5716,8 +5664,7 @@
         "multi-view TUI applications that need a real shell",
         "one-off prompts or a single static page",
         "TUI-only",
-        "lower to a single-page app or plain run() app",
-        "UI shell"
+        "lower to a single-page app or plain run() app"
       ],
       [
         "statusBar()",
@@ -5725,8 +5672,7 @@
         "concise global status, mode, and shortcut context",
         "rich content regions or multi-line explanation",
         "TUI-only",
-        "lower to plain status line text",
-        "UI shell header/footer"
+        "lower to plain status line text"
       ],
       [
         "splitPane()",
@@ -5734,8 +5680,7 @@
         "resizable two-pane workspaces",
         "simple grouping that does not need user-controlled resizing",
         "TUI-only",
-        "lower to stacked content or fixed layout",
-        "resizable split layout"
+        "lower to stacked content or fixed layout"
       ],
       [
         "grid()",
@@ -5743,8 +5688,7 @@
         "dashboard-style multi-region layout",
         "simple two-column layouts or strongly sequential content",
         "TUI-only",
-        "lower to stacked sections or simplified layout",
-        "layout grid"
+        "lower to stacked sections or simplified layout"
       ],
       [
         "flex() / vstack() / hstack() / place()",
@@ -5752,8 +5696,7 @@
         "compositional layout building blocks",
         "semantic grouping or status signaling by themselves",
         "TUI-only building blocks",
-        "lower to simpler text flow or stacked sections",
-        "layout primitives"
+        "lower to simpler text flow or stacked sections"
       ],
       [
         "canvas()",
@@ -5761,8 +5704,7 @@
         "expressive ambient visuals or demos",
         "core application information architecture",
         "TUI-only",
-        "lower to omitted effect or static frame",
-        "expressive motion / generative background"
+        "lower to omitted effect or static frame"
       ]
     ]
   },
@@ -6030,7 +5972,7 @@
       ],
       [
         "50",
-        "docs/design-system/README.md SHA-256: 7cb5f686bca5c2a4a68ce895d717564702950fc97a8a88d9663b7c2e719eae1f"
+        "docs/design-system/README.md SHA-256: f59f69adc871749e0c5653878f4208305c3e021eea42aed859fe76bf8042e651"
       ],
       [
         "51",
@@ -6038,7 +5980,7 @@
       ],
       [
         "52",
-        "docs/design-system/component-families.md SHA-256: b120de8b83203987714aabcdc151f88c17eee0ad272a30f1ebc105d7fd3535e5"
+        "docs/design-system/component-families.md SHA-256: 8803307486cda75faa4135fe0c65d3773348c4db456030a7a043f1f063345593"
       ],
       [
         "53",
@@ -6046,7 +5988,7 @@
       ],
       [
         "54",
-        "docs/design-system/foundations.md SHA-256: a2568f893f7d1c8d062336186b190e2b8998cf16709d43f31f69d621b0bc0a17"
+        "docs/design-system/foundations.md SHA-256: caaa4c38becdef85b9b9b01c7b671e9223816de58686adffb24b20c27ca84660"
       ],
       [
         "55",
@@ -6074,7 +6016,7 @@
       ],
       [
         "61",
-        "docs/design-system/theme-tokens.md SHA-256: 8ecf378c8ac6929408b8d3f7d0c06a9e5989084b30e6a425ea1e831f56ed8eb7"
+        "docs/design-system/theme-tokens.md SHA-256: ed4c9dadfd5dd1b59ff2df816579188cf1c63e16afe7d7dce59a47d1d733d9f3"
       ],
       [
         "62",
@@ -7526,7 +7468,7 @@
       ],
       [
         "424",
-        "docs/archive/component-system-audit.md SHA-256: 7634ef8e9e9dbd61943845970f653575d82b13799f0d0887acc42e62f8ba958b"
+        "docs/archive/component-system-audit.md SHA-256: dbe643cbd947a3ea4b8e914e89b0431cf2cade67af40aca79b3d63e7867ede85"
       ],
       [
         "425",

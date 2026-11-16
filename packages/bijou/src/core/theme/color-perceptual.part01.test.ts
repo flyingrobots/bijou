@@ -43,7 +43,7 @@ describe('OKLAB conversion', () => {
     for (const sample of samples) {
       const roundTrip = oklabToRgb(rgbToOklab([...sample]));
       roundTrip.forEach((channel, index) => {
-        expect(Math.abs(channel - sample[index])).toBeLessThanOrEqual(1);
+        expect(Math.abs(channel - (sample[index] ?? Number.NaN))).toBeLessThanOrEqual(1);
       });
     }
   });

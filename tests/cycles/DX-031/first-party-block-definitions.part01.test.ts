@@ -85,27 +85,21 @@ describe('DX-031C first-party block definitions', () => {
   it('composes declared blocks without rendering them', () => {
       const renderCalls: string[] = [];
       const spyReaderSurfaceBlock = defineBlock({
-        metadata: readerSurfaceBlock.metadata,
-        data: readerSurfaceBlock.data,
-        commands: readerSurfaceBlock.commands,
+        ...readerSurfaceBlock,
         render: (input) => {
           renderCalls.push('ReaderSurface');
           return readerSurfaceBlock.render(input);
         },
       });
       const spyInspectorPanelBlock = defineBlock({
-        metadata: inspectorPanelBlock.metadata,
-        data: inspectorPanelBlock.data,
-        commands: inspectorPanelBlock.commands,
+        ...inspectorPanelBlock,
         render: (input) => {
           renderCalls.push('InspectorPanel');
           return inspectorPanelBlock.render(input);
         },
       });
       const spyAppShellBlock = defineBlock({
-        metadata: appShellBlock.metadata,
-        data: appShellBlock.data,
-        commands: appShellBlock.commands,
+        ...appShellBlock,
         render: (input) => {
           renderCalls.push('AppShell');
           return appShellBlock.render(input);

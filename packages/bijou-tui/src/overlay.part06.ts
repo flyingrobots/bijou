@@ -67,15 +67,15 @@ export interface DrawerBaseOptions {
   /** Screen height in rows, used for sizing. */
   readonly screenHeight: number;
   /** Optional region rectangle to attach inside, instead of full screen. */
-  readonly region?: LayoutRect;
+  readonly region?: LayoutRect | undefined;
   /** Optional title displayed in the top border. */
-  readonly title?: string;
+  readonly title?: string | undefined;
   /** Design token for the border color. */
-  readonly borderToken?: TokenValue;
+  readonly borderToken?: TokenValue | undefined;
   /** Background fill token for the drawer interior. */
-  readonly bgToken?: TokenValue;
+  readonly bgToken?: TokenValue | undefined;
   /** Bijou context for styled output. */
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
 }
 export interface DrawerDefaultOptions extends DrawerBaseOptions {
   /** Side of the screen/region to anchor the drawer. Default: 'right'. */

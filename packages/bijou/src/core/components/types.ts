@@ -10,11 +10,11 @@ export type OverflowBehavior = 'wrap' | 'truncate';
  */
 export interface BijouNodeOptions {
   /** Unique identifier for the component. Used for CSS styling (#id) and layout tracking. */
-  readonly id?: string;
+  readonly id?: string | undefined;
   /** CSS class name(s) for the component. Space-separated. */
-  readonly class?: string;
+  readonly class?: string | undefined;
   /** Optional Bijou context. If omitted, the global default context is used. */
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
   /** Horizontal overflow behavior for constrained text content. Defaults to `'wrap'`. */
-  readonly overflow?: OverflowBehavior;
+  readonly overflow?: OverflowBehavior | undefined;
 }

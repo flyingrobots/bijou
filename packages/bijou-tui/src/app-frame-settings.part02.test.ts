@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, createFramedApp, createTestContext, colorHex, describe, expect, it, makePage, normalizeViewOutput, QUIT, setDefaultContext, _resetDefaultContextForTesting, Cmd, FramedAppMsg, Msg } from './app-frame.test-support.js';
+import { afterAll, beforeAll, createFramedApp, createTestContext, colorHex, describe, expect, it, makePage, normalizeViewOutput, QUIT, setDefaultContext, _resetDefaultContextForTesting, type Cmd, type FramedAppMsg, type Msg } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
   const testCtx = createTestContext();

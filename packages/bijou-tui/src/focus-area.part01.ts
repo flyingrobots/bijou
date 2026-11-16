@@ -35,10 +35,12 @@ export interface FocusAreaOptions {
 export interface FocusAreaRenderOptions {
   /** Whether the pane is currently focused. Default: `true`. */
   readonly focused?: boolean;
+  /** Reserve the left focus-gutter column. Default: `true`; set false when there is nothing else to focus. */
+  readonly gutter?: boolean;
   /** Token for the focused gutter. Default: `theme.ui.focusGutter`. */
-  readonly focusedGutterToken?: TokenValue;
+  readonly focusedGutterToken?: TokenValue | undefined;
   /** Token for the unfocused gutter. Default: `theme.semantic.muted`. */
-  readonly unfocusedGutterToken?: TokenValue;
+  readonly unfocusedGutterToken?: TokenValue | undefined;
   /** Show a scrollbar track on the right edge. Default: `true`. */
   readonly showScrollbar?: boolean;
   /** Token for the scrollbar track. Default: `theme.ui.scrollTrack`. */
@@ -50,7 +52,7 @@ export interface FocusAreaRenderOptions {
   /** Optional BCSS classes for the focus area. */
   readonly classes?: readonly string[];
   /** Bijou context for styling and mode detection. */
-  readonly ctx?: BijouContext;
+  readonly ctx?: BijouContext | undefined;
 }
 export const GUTTER_CHAR = '▎';
 export const EMPTY_CELL: Cell = { char: ' ', empty: false };

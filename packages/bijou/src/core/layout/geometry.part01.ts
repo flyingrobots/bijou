@@ -5,13 +5,13 @@ import { solveSplitAxis } from './geometry.part02.js';
 export type GridTrack = number | `${number}fr`;
 export type SplitLayoutDirection = 'row' | 'column';
 export interface SplitPaneRectOptions {
-  readonly direction?: SplitLayoutDirection;
+  readonly direction?: SplitLayoutDirection | undefined;
   readonly width: number;
   readonly height: number;
   readonly ratio: number;
-  readonly minA?: number;
-  readonly minB?: number;
-  readonly dividerSize?: number;
+  readonly minA?: number | undefined;
+  readonly minB?: number | undefined;
+  readonly dividerSize?: number | undefined;
 }
 export interface SplitPaneRects {
   readonly paneA: LayoutRect;
@@ -21,8 +21,8 @@ export interface SplitPaneRects {
 export interface SplitAxisOptions {
   readonly available: number;
   readonly ratio: number;
-  readonly minA?: number;
-  readonly minB?: number;
+  readonly minA?: number | undefined;
+  readonly minB?: number | undefined;
 }
 export interface SplitAxisSizes {
   readonly paneA: number;
@@ -34,7 +34,7 @@ export interface GridRectOptions {
   readonly columns: readonly GridTrack[];
   readonly rows: readonly GridTrack[];
   readonly areas: readonly string[];
-  readonly gap?: number;
+  readonly gap?: number | undefined;
 }
 export function solveSplitPaneRects(
   options: SplitPaneRectOptions,

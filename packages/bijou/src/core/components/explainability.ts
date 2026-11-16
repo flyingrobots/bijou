@@ -18,29 +18,29 @@ export interface ExplainabilityOptions extends BijouNodeOptions {
   /** Primary recommendation or explanation title. */
   readonly title: string;
   /** Visible provenance label. Defaults to `[AI]`. */
-  readonly label?: string;
+  readonly label?: string | undefined;
   /** Optional artifact kind, such as `Suggestion` or `Summary`. */
-  readonly artifactKind?: string;
+  readonly artifactKind?: string | undefined;
   /** Optional source or actor responsible for the recommendation. */
-  readonly source?: string;
+  readonly source?: string | undefined;
   /** Optional source mode, such as `advisory` or `draft`. */
-  readonly sourceMode?: string;
+  readonly sourceMode?: string | undefined;
   /** Optional rationale describing why the recommendation is present. */
-  readonly rationale?: string;
+  readonly rationale?: string | undefined;
   /** Optional evidence items supporting the recommendation. */
-  readonly evidence?: readonly ExplainabilityEvidenceItem[];
+  readonly evidence?: readonly ExplainabilityEvidenceItem[] | undefined;
   /** Optional clear next action for the user. */
-  readonly nextAction?: string;
+  readonly nextAction?: string | undefined;
   /** Optional governance or review note. */
-  readonly governance?: string;
+  readonly governance?: string | undefined;
   /** Optional confidence. Numbers are formatted as percentages. */
-  readonly confidence?: number | string;
+  readonly confidence?: number | string | undefined;
   /** Optional border token for the visual surface. */
   readonly borderToken?: TokenValue;
   /** Optional background token for the visual surface. */
   readonly bgToken?: TokenValue;
   /** Optional fixed width for the visual surface. */
-  readonly width?: number;
+  readonly width?: number | undefined;
   /** Bijou context for rendering mode and theme resolution. */
   readonly ctx?: BijouContext;
 }

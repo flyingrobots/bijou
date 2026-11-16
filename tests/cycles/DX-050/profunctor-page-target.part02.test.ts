@@ -22,7 +22,7 @@ describe('DX-050 fail-closed input validation', () => {
     );
     expectCode(
       () => lowerProfunctorPageArtifacts(mutatePage((page) => {
-        page.artifactVersion = 'profunctor-page/1';
+        page['artifactVersion'] = 'profunctor-page/1';
       })),
       'BIJOU_PAGE_INPUT_VERSION_UNSUPPORTED',
     );
@@ -39,7 +39,7 @@ describe('DX-050 fail-closed input validation', () => {
     );
     expectCode(
       () => lowerProfunctorPageArtifacts(mutateSourceMap((sourceMap) => {
-        sourceMap.pageId = 'page:project.other';
+        sourceMap['pageId'] = 'page:project.other';
       })),
       'BIJOU_PAGE_INPUT_IDENTITY_MISMATCH',
     );
@@ -48,21 +48,21 @@ describe('DX-050 fail-closed input validation', () => {
   it('rejects duplicate nodes, broken reading order, and source-map drift', () => {
     expectCode(
       () => lowerProfunctorPageArtifacts(mutatePage((page) => {
-        const nodes = records(page.nodes);
-        nodes.push({ ...records(page.nodes)[0] });
+        const nodes = records(page['nodes']);
+        nodes.push({ ...records(page['nodes'])[0] });
       })),
       'BIJOU_PAGE_INPUT_REFERENCE_INVALID',
     );
     expectCode(
       () => lowerProfunctorPageArtifacts(mutatePage((page) => {
-        page.readingOrder = records(page.nodes).slice(0, 4)
-          .map((node) => node.pageNodeId);
+        page['readingOrder'] = records(page['nodes']).slice(0, 4)
+          .map((node) => node['pageNodeId']);
       })),
       'BIJOU_PAGE_INPUT_REFERENCE_INVALID',
     );
     expectCode(
       () => lowerProfunctorPageArtifacts(mutateSourceMap((sourceMap) => {
-        recordAt(sourceMap.entries, 0).templateNodeId = 'template:wrong';
+        recordAt(sourceMap['entries'], 0)['templateNodeId'] = 'template:wrong';
       })),
       'BIJOU_PAGE_INPUT_IDENTITY_MISMATCH',
     );
@@ -71,7 +71,7 @@ describe('DX-050 fail-closed input validation', () => {
   it('rejects source bindings reassigned across page nodes', () => {
     expectCode(
       () => lowerProfunctorPageArtifacts(mutatePage((page) => {
-        recordAt(page.nodes, 0).sourceBindings = {
+        recordAt(page['nodes'], 0)['sourceBindings'] = {
           record: 'source-occurrence:projectCatalog.keep#fact.title',
         };
       })),
@@ -82,7 +82,7 @@ describe('DX-050 fail-closed input validation', () => {
   it('rejects unsupported visible blocks instead of approximating them', () => {
     expectCode(
       () => lowerProfunctorPageArtifacts(mutatePage((page) => {
-        recordAt(page.nodes, 1).blockDefinitionId = 'block:unknown';
+        recordAt(page['nodes'], 1)['blockDefinitionId'] = 'block:unknown';
       })),
       'BIJOU_PAGE_BLOCK_UNSUPPORTED',
     );

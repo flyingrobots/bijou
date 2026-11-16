@@ -47,7 +47,7 @@ export function resolveStyles(
   for (const { rule } of matchedRules) {
     for (const decl of rule.declarations) {
       if (decl.important || !isImportant(finalStyles, decl.property)) {
-        finalStyles[decl.property] = resolveValue(decl.value, graph, mode);
+        finalStyles[decl.property] = resolveValue(decl.value, graph, mode, decl.property);
         if (decl.important) {
           finalStyles[`__important_${decl.property}`] = 'true';
         }
@@ -58,8 +58,8 @@ export function resolveStyles(
   return finalStyles;
 }
 
-/** Resolve a CSS value, handling var(token.path) references via the TokenGraph. */
-function resolveValue(value: string, graph?: TokenGraph, mode: ThemeMode = 'dark'): string {
+/** Resolve var(token.path) via the TokenGraph; `background` takes the token's bg, if any, not its text hex. */
+function resolveValue(value: string, graph?: TokenGraph, mode: ThemeMode = 'dark', property = ''): string {
   if (!graph) return value;
 
   const varRegex = /var\(([^)]+)\)/g;
@@ -68,7 +68,7 @@ function resolveValue(value: string, graph?: TokenGraph, mode: ThemeMode = 'dark
     if (typeof path !== 'string') return 'inherit';
     try {
       const resolved = graph.get(path.trim(), mode);
-      return resolved.hex;
+      return property === 'background' ? (resolved.bg ?? resolved.hex) : resolved.hex;
     } catch {
       return 'inherit';
     }

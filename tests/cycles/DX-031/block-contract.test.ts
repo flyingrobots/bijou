@@ -110,7 +110,7 @@ describe('DX-031 block contract cycle', () => {
       data,
       commands: [openArticle],
       render: ({ slots }) => ({
-        output: slots?.content ?? '',
+        output: slots?.['content'] ?? '',
         facts: [{ kind: 'entity', key: 'block', value: 'ReaderSurface' }],
       }),
     });

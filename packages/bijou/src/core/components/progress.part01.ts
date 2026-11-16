@@ -9,11 +9,11 @@ import { renderByMode } from '../mode-render.js';
 /** Configuration for rendering a progress bar. */
 export interface ProgressBarOptions {
   /** Character-width of the bar (defaults to 20). */
-  width?: number;
+  width?: number | undefined;
   /** Character used for filled segments (defaults to `\u2588` full block). */
-  filled?: string;
+  filled?: string | undefined;
   /** Character used for empty segments (defaults to `\u2810` braille dot). */
-  empty?: string;
+  empty?: string | undefined;
   /** Gradient color stops applied across filled segments. */
   gradient?: GradientStop[];
   /** Theme token for the leading edge of the filled range. Defaults to `semantic.info`. */
@@ -25,7 +25,7 @@ export interface ProgressBarOptions {
   /** Theme token applied to the percentage label. Defaults to `semantic.primary`. */
   labelToken?: TokenValue;
   /** Whether to prepend a percentage label (defaults to `true`). */
-  showPercent?: boolean;
+  showPercent?: boolean | undefined;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }

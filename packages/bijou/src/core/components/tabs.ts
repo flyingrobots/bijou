@@ -17,7 +17,7 @@ export interface TabsOptions {
   /** Zero-based index of the currently active tab. */
   active: number;
   /** Custom separator string between tabs. Defaults to `' | '` (pipe) or `' │ '` (rich). */
-  separator?: string;
+  separator?: string | undefined;
   /** Background fill token for the active tab. Defaults to `surface.muted`. */
   activeBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */

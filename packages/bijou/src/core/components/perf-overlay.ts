@@ -46,7 +46,7 @@ export interface PerfOverlayStats {
 
 export interface PerfOverlayOptions extends BijouNodeOptions {
   /** Panel title. Defaults to `'Perf'`. */
-  readonly title?: string;
+  readonly title?: string | undefined;
   /** Panel width. Defaults to 32. */
   readonly width?: number;
   /** Show a braille area chart of frame time history. Defaults to `true`. */
@@ -54,9 +54,9 @@ export interface PerfOverlayOptions extends BijouNodeOptions {
   /** Height of the braille chart in rows. Defaults to 4. */
   readonly chartHeight?: number;
   /** Border color token. */
-  readonly borderToken?: TokenValue;
+  readonly borderToken?: TokenValue | undefined;
   /** Background color token. */
-  readonly bgToken?: TokenValue;
+  readonly bgToken?: TokenValue | undefined;
 }
 
 function fmt(n: number, decimals: number): string {

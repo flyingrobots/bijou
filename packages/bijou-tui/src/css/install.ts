@@ -12,15 +12,21 @@ export function installBCSSResolver(
   const sheet = parseBCSS(css);
   const themeMode = detectThemeMode(ctx);
 
-  ctx.resolveBCSS = (identity: { type: string; id?: string; classes?: string[] }) => {
+  // A method, not an arrow: contexts cloned for a theme change copy this function, and
+  // `this` is then the clone, so var() resolves against the clone's token graph.
+  ctx.resolveBCSS = function resolveBCSS(
+    this: BijouContext | undefined,
+    identity: { type: string; id?: string; classes?: string[] },
+  ) {
+    const owner = this ?? ctx;
     return resolveStyles(
       identity,
       sheet,
       {
-        width: ctx.runtime.columns,
-        height: ctx.runtime.rows,
+        width: owner.runtime.columns,
+        height: owner.runtime.rows,
       },
-      ctx.tokenGraph,
+      owner.tokenGraph,
       themeMode,
     );
   };

@@ -1,4 +1,4 @@
-import { App, CLEAR_SCREEN, counterApp, createInteractiveContext, createSurface, describe, expect, HOME, it, quit, run, runWithLifecycleHooks, scheduleKeys, scheduleResizes, textView } from './runtime.test-support.js';
+import { type App, CLEAR_SCREEN, counterApp, createInteractiveContext, createSurface, describe, expect, HOME, it, quit, run, runWithLifecycleHooks, scheduleKeys, scheduleResizes, textView } from './runtime.test-support.js';
 
 describe('run', () => {
   describe('interactive mode', () => {

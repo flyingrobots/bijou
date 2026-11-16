@@ -35,7 +35,7 @@ export interface BrailleChartOptions extends BijouNodeOptions {
   /** Explicit maximum value for scaling. Defaults to the maximum of the sampled values. */
   readonly max?: number;
   /** Foreground token for the chart dots. */
-  readonly fgToken?: TokenValue;
+  readonly fgToken?: TokenValue | undefined;
   /** Background token applied to the surface. */
   readonly bgToken?: TokenValue;
 }

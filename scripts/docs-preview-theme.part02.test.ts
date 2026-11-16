@@ -61,7 +61,7 @@ describe('docs preview app', () => {
 
     expect((result.model).route).toBe('docs');
     expect(pageModel.selectedStoryId).toBe('alert');
-    expect(pageModel.variantIndexByStory.alert).toBe(1);
+    expect(pageModel.variantIndexByStory['alert']).toBe(1);
     expect(text).toContain('active variant');
     expect(text).toContain('Current selection');
     expect(text).toContain('Warning');

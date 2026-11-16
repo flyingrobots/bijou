@@ -1,4 +1,4 @@
-import { App, counterApp, createInteractiveContext, describe, EXIT_ALT_SCREEN, expect, it, run, scheduleKeys, SHOW_CURSOR, textView, WRAP_ENABLE } from './runtime.test-support.js';
+import { type App, counterApp, createInteractiveContext, describe, EXIT_ALT_SCREEN, expect, it, run, scheduleKeys, SHOW_CURSOR, textView, WRAP_ENABLE } from './runtime.test-support.js';
 
 describe('run', () => {
   describe('interactive mode', () => {

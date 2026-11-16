@@ -115,8 +115,8 @@ describe('notification state', () => {
         action: { label: 'Retry deploy', payload: { type: 'retry', id: 42 } },
       }, 10);
       state = tickNotifications(state, 250);
-      state = dismissNotification(state, state.items[0]?.id, 300);
-      state = dismissNotification(state, state.items[1]?.id, 310);
+      state = dismissNotification(state, state.items[0]?.id ?? -1, 300);
+      state = dismissNotification(state, state.items[1]?.id ?? -1, 310);
       state = tickNotifications(state, 900);
       expect(countNotificationHistory(state)).toBe(2);
       expect(countNotificationHistory(state, 'ACTIONABLE')).toBe(1);

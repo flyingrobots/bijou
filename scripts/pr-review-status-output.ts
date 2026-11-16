@@ -27,7 +27,7 @@ export function writeReviewStatus(report: ReviewStatusReport): void {
   }
   process.stdout.write(`URL: ${pr.url}\n\n`);
   process.stdout.write(
-    `Checks: pass=${String(checks.counts.pass ?? 0)} pending=${String(checks.counts.pending ?? 0)} fail=${String(checks.counts.fail ?? 0)} skipping=${String(checks.counts.skipping ?? 0)} cancel=${String(checks.counts.cancel ?? 0)}\n`,
+    `Checks: pass=${String(checks.counts['pass'] ?? 0)} pending=${String(checks.counts['pending'] ?? 0)} fail=${String(checks.counts['fail'] ?? 0)} skipping=${String(checks.counts['skipping'] ?? 0)} cancel=${String(checks.counts['cancel'] ?? 0)}\n`,
   );
   process.stdout.write(`Unresolved threads: ${String(unresolved.length)}\n`);
   process.stdout.write(

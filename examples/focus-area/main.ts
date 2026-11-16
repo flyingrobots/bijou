@@ -8,7 +8,7 @@ import {
   focusAreaScrollByX,
   focusAreaKeyMap, helpShort, type FocusAreaState,
 } from '@flyingrobots/bijou-tui';
-import { column, contentSurface, line } from '../_shared/example-surfaces.ts';
+import { column, contentSurface, line } from '../_shared/example-surfaces.js';
 
 const ctx = initDefaultContext();
 

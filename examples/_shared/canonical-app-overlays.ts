@@ -29,7 +29,7 @@ function createInspector(
   const frameWidth = region?.width ?? frame.screenRect.width;
   const frameHeight = region?.height ?? frame.screenRect.height;
   const base = {
-    region,
+    ...(region === undefined ? {} : { region }),
     title: 'Panel Inspector',
     screenWidth: frame.screenRect.width,
     screenHeight: frame.screenRect.height,

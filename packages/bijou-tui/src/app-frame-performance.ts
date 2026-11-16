@@ -11,7 +11,7 @@ export interface FrameTimingSnapshot {
   readonly frameTimeMs: number;
   readonly viewTimeMs: number;
   readonly diffTimeMs: number;
-  readonly frameBudgetMs?: number;
+  readonly frameBudgetMs?: number | undefined;
   readonly frameOverBudget: boolean;
 }
 
@@ -21,12 +21,12 @@ export interface FramePerfHudTelemetry {
   readonly frameTimeMs: number;
   readonly viewTimeMs: number;
   readonly diffTimeMs: number;
-  readonly refreshRate?: number;
+  readonly refreshRate?: number | undefined;
 }
 
 export interface FramePerfHudOverlayOptions {
-  readonly i18n?: I18nRuntime;
-  readonly ctx?: BijouContext;
+  readonly i18n?: I18nRuntime | undefined;
+  readonly ctx?: BijouContext | undefined;
 }
 
 const readStageDuration = (

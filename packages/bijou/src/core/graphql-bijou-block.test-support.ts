@@ -77,7 +77,7 @@ type   ReleaseCard
     @bijouToken( fg: "semantic.action.fg", bg: "semantic.action.bg" )
 }
 `;
-function rowText(surface: { get(x: number, y: number): { char: string; empty?: boolean }; width: number }, y: number): string {
+function rowText(surface: { get(x: number, y: number): { char: string; empty?: boolean | undefined }; width: number }, y: number): string {
   let text = '';
   for (let x = 0; x < surface.width; x++) {
     const cell = surface.get(x, y);

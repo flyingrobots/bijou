@@ -41,7 +41,7 @@ export interface FrameShellTheme {
   /** Mode-aware shell theme families use FrameShellThemeFamily instead. */
   readonly modes?: never;
   /** Optional helper copy shown beneath the row when active. */
-  readonly description?: string;
+  readonly description?: string | undefined;
 }
 
 /** Shell-theme family with selectable modes. */
@@ -74,9 +74,9 @@ export interface FrameShellThemeChange {
   /** Selected shell theme family label. */
   readonly shellThemeLabel: string;
   /** Selected shell theme mode id, when the family is mode-aware. */
-  readonly modeId?: string;
+  readonly modeId?: string | undefined;
   /** Selected shell theme mode label, when the family is mode-aware. */
-  readonly modeLabel?: string;
+  readonly modeLabel?: string | undefined;
   /** Fresh context cloned with the selected theme. */
   readonly ctx: BijouContext;
 }

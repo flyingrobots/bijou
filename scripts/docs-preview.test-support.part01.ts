@@ -82,7 +82,7 @@ export function keyMsg(key: string, options: { ctrl?: boolean; alt?: boolean; sh
     shift: options.shift ?? false,
   };
 }
-export function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string; fg?: ColorRef; bg?: ColorRef } }) {
+export function serializeFrame(frame: { width: number; height: number; get(x: number, y: number): { char?: string | undefined; fg?: ColorRef | undefined; bg?: ColorRef | undefined } }) {
   const cells: string[] = [];
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
@@ -92,7 +92,7 @@ export function serializeFrame(frame: { width: number; height: number; get(x: nu
   }
   return cells.join('\n');
 }
-export function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string } }) {
+export function frameText(frame: { width: number; height: number; get(x: number, y: number): { char?: string | undefined } }) {
   let text = '';
   for (let y = 0; y < frame.height; y++) {
     for (let x = 0; x < frame.width; x++) {
