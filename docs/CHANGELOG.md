@@ -8,6 +8,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DL-038 decides the Wesley boundary (#663). Bijou pins `wesley-cli`
+  exactly to `0.3.0-alpha.3` and spawns the CLI at build time over its
+  `--json` output. Core gets a pure emitter over Wesley L1 IR. A missing or
+  mismatched Wesley is a hard error with no fallback parser.
 - DL-031 records the DOGFOOD contextual drawer contract (#623). A page-owned
   drawer participates in layout and does not dim the frame. It holds variant
   and guide metadata, takes focus on open, restores focus to a visible pane on
