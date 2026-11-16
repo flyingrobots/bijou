@@ -56,7 +56,7 @@ describe('createFramedApp', () => {
       { key: KEY_ENTER },
     ]);
 
-    expect(result.model.pageModels.home?.count).toBe(1);
+    expect(result.model.pageModels['home']?.count).toBe(1);
     expect(result.model.commandPalette).toBeUndefined();
   });
 });
@@ -92,7 +92,7 @@ describe('createFramedApp', () => {
     expect(model.settingsOpen).toBe(true);
 
     const [nextModel, cmds] = app.update({ type: 'key', key: 'x', ctrl: false, alt: false, shift: false }, model);
-    expect(nextModel.pageModels.home?.count).toBe(0);
+    expect(nextModel.pageModels['home']?.count).toBe(0);
     expect(nextModel.settingsOpen).toBe(true);
     expect(cmds).toHaveLength(0);
   });

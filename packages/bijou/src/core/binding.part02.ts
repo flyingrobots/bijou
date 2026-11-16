@@ -38,8 +38,8 @@ export interface CommandIntent<Payload = unknown> {
   readonly [COMMAND_INTENT_BRAND]: true;
   readonly [COMMAND_INTENT_PAYLOAD]?: Payload;
   readonly id: CommandIntentId;
-  readonly label?: string;
-  readonly description?: string;
+  readonly label?: string | undefined;
+  readonly description?: string | undefined;
   readonly facts: readonly BindingFact[];
 }
 export const BINDING_STATUSES: readonly BindingStatus[] = [

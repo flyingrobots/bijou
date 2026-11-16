@@ -24,11 +24,11 @@ export interface CreateBijouOptions {
   /** Style adapter (chalk, plain-text, etc.). */
   style: StylePort;
   /** Explicit theme object. Defaults to {@link CYAN_MAGENTA}. */
-  theme?: Theme;
+  theme?: Theme | undefined;
   /** Named preset themes, keyed by name. Defaults to built-in {@link PRESETS}. */
-  presets?: Record<string, Theme>;
+  presets?: Record<string, Theme> | undefined;
   /** Environment variable that selects a preset or JSON path. Defaults to `"BIJOU_THEME"`. */
-  envVar?: string;
+  envVar?: string | undefined;
   /** Explicit light/dark scheme for adaptive token resolution. Defaults to runtime detection. */
   colorScheme?: ColorScheme;
 }

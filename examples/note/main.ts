@@ -1,4 +1,4 @@
-import { ctx } from '../_shared/setup.ts';
+import { ctx } from '../_shared/setup.js';
 import { note } from '@flyingrobots/bijou';
 
 async function main() {

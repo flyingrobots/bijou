@@ -32,7 +32,7 @@ export interface TranslationRow {
   readonly translatedValue?: unknown;
   readonly status: AuthoringTranslationStatus;
   readonly sourceHash: string;
-  readonly description?: string;
+  readonly description?: string | undefined;
 }
 export function stableStringify(value: unknown): string {
   if (Array.isArray(value)) {

@@ -20,7 +20,7 @@ This section defines the design language behind the library:
   the policy for visualizing data instead of guessing ad hoc each time
 \end{itemize}
 
-This is deliberately closer to Carbon than to an API reference.
+This is deliberately closer to a design-system guide than to an API reference.
 
 \section{What this section is for}\label{record-017-what-this-section-is-for}
 
@@ -224,7 +224,7 @@ Every family should answer:
 
 If a component cannot answer that question, it probably belongs in \texttt{@\allowbreak{}f\allowbreak{}l\allowbreak{}y\allowbreak{}i\allowbreak{}n\allowbreak{}g\allowbreak{}r\allowbreak{}o\allowbreak{}b\allowbreak{}o\allowbreak{}t\allowbreak{}s\allowbreak{}/\allowbreak{}b\allowbreak{}i\allowbreak{}j\allowbreak{}o\allowbreak{}u\allowbreak{}-\allowbreak{}t\allowbreak{}u\allowbreak{}i}, not in core.
 
-\section{Carbon-style documentation standard}\label{record-017-carbon-style-documentation-standard}
+\section{Documentation standard}\label{record-017-documentation-standard}
 
 Every mature component-family page in Bijou should include:
 
@@ -246,8 +246,6 @@ Every mature component-family page in Bijou should include:
   Graceful lowering path
 \item
   Related families
-\item
-  Closest Carbon analogue
 \end{itemize}
 
 The component-family guide now meets this structural baseline and its structure is checked by a repo preflight script. That preflight is intentionally structural: it verifies required family sections and graceful-lowering mode coverage inside the family guide. Semantic accuracy, package/example doc drift, and touched-component doc completeness are still review responsibilities, not something the current script can prove automatically.

@@ -12,7 +12,7 @@ export interface TimerOptions {
   /** Show milliseconds (e.g. `02:30.123`). Default: false. */
   showMs?: boolean;
   /** Optional label prepended to the timer display. */
-  label?: string;
+  label?: string | undefined;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
@@ -94,7 +94,7 @@ export interface LiveControllerConfig {
   /** Optional tick guard — return true to signal completion. */
   readonly onTick?: (elapsedMs: number) => boolean;
   /** Called after cleanup when onTick signals completion. */
-  readonly onComplete?: () => void;
+  readonly onComplete?: (() => void) | undefined;
 }
 /**
  * Discriminated union for timer state machine.

@@ -10,10 +10,10 @@ import {
   setDefaultContext,
   textView,
   _resetDefaultContextForTesting,
-  Cmd,
-  FramePage,
-  Msg,
-  PageModel,
+  type Cmd,
+  type FramePage,
+  type Msg,
+  type PageModel,
 } from './app-frame.test-support.js';
 
 describe('createFramedApp', () => {
@@ -43,7 +43,7 @@ describe('createFramedApp', () => {
       pages: [page('home', 'Home'), page('logs', 'Logs')],
     });
     const result = await runScript(app, []);
-    expect(result.model.pageModels.home?.count).toBe(1);
-    expect(result.model.pageModels.logs?.count).toBe(1);
+    expect(result.model.pageModels['home']?.count).toBe(1);
+    expect(result.model.pageModels['logs']?.count).toBe(1);
   });
 });

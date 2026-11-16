@@ -29,7 +29,7 @@ export interface StatsPanelEntry {
   /** Right-aligned value. */
   readonly value: string;
   /** Optional time-series data rendered as an inline sparkline after the value. */
-  readonly sparkline?: readonly number[];
+  readonly sparkline?: readonly number[] | undefined;
   /** Optional label color override. */
   readonly labelToken?: TokenValue;
   /** Optional value color override. */
@@ -38,13 +38,13 @@ export interface StatsPanelEntry {
 
 export interface StatsPanelOptions extends BijouNodeOptions {
   /** Panel title shown in the top border. */
-  readonly title?: string;
+  readonly title?: string | undefined;
   /** Total width of the panel including borders. Required. */
   readonly width: number;
   /** Border color token. */
-  readonly borderToken?: TokenValue;
+  readonly borderToken?: TokenValue | undefined;
   /** Background color token. */
-  readonly bgToken?: TokenValue;
+  readonly bgToken?: TokenValue | undefined;
   /** Token applied to labels by default. */
   readonly labelToken?: TokenValue;
   /** Token applied to values by default. */

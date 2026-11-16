@@ -1,4 +1,4 @@
-import { App, createInteractiveContext, describe, expect, it, quit, run, scheduleKeys, SHUTDOWN_DRAIN_TIMEOUT_MS, singleCellSurface, textView } from './runtime.test-support.js';
+import { type App, createInteractiveContext, describe, expect, it, quit, run, scheduleKeys, SHUTDOWN_DRAIN_TIMEOUT_MS, singleCellSurface, textView } from './runtime.test-support.js';
 
 describe('run', () => {
   describe('interactive mode', () => {

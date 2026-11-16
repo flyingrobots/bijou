@@ -24,7 +24,7 @@ interface AppRowTokens {
 export function formatFamilyRow(options: {
   readonly row: AppRowDescriptor;
   readonly focused: boolean;
-  readonly selectedStoryId?: string;
+  readonly selectedStoryId?: string | undefined;
   readonly expandedFamilies: Readonly<Record<string, boolean>>;
   readonly ctx: BijouContext;
   readonly tokens: AppRowTokens;
@@ -64,7 +64,7 @@ export function formatFamilyRow(options: {
 export function formatGuideRow(options: {
   readonly item: { readonly label: string; readonly value: string; readonly description?: string };
   readonly focused: boolean;
-  readonly selectedGuideId?: string;
+  readonly selectedGuideId?: string | undefined;
   readonly ctx: BijouContext;
   readonly tokens: AppRowTokens;
 }): string {

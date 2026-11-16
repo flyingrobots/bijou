@@ -136,6 +136,6 @@ export type VisorArtifactBundleHashBody = Omit<VisorArtifactBundleHashes, 'bundl
 
 export type VisorArtifactBundleWithoutHash = Omit<VisorArtifactBundle, 'hashes'> & {
   readonly hashes: VisorArtifactBundleHashBody & {
-    readonly bundleHash?: string;
+    readonly bundleHash?: string | undefined;
   };
 };

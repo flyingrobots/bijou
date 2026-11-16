@@ -15,9 +15,9 @@ import {
   shiftKey,
   textView,
   _resetDefaultContextForTesting,
-  FramePage,
-  NotificationHistoryFilter,
-  NotificationState,
+  type FramePage,
+  type NotificationHistoryFilter,
+  type NotificationState,
   QUIT,
   isCmdCleanup,
 } from './app-frame.test-support.js';
@@ -94,7 +94,7 @@ describe('createFramedApp', () => {
     if (returned === undefined || returned === QUIT || isCmdCleanup(returned)) throw new Error();
     [model] = app.update(returned, model);
 
-    expect(model.pageModels.home?.filterIndex).toBe(1);
+    expect(model.pageModels['home']?.filterIndex).toBe(1);
     expect(model.notificationCenterScrollY).toBe(0);
   });
 });

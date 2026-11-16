@@ -76,7 +76,7 @@ describe('DF-070 DOGFOOD block product polish', () => {
       },
     }], { ctx });
     const text = frameText(must(result.frames.at(-1)));
-    const guideModel = result.model.docsModel.pageModels.guides;
+    const guideModel = must(result.model.docsModel.pageModels['guides'], 'guides page model');
     expect(guideModel.selectedGuideId).toBe('start-here');
     expect(guideModel.guideState.focusIndex).toBe(1);
     expect(text).toContain('- Start Here');

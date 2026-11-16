@@ -49,7 +49,7 @@ describe('LX-012 DOGFOOD i18n debt inventory', () => {
       { msg: { type: 'docs', msg: { type: 'select-guide', guideId: 'guides-i18n-workflow' } } },
     ], { ctx });
     const text = frameText(must(result.frames.at(-1)));
-    const pageModel = result.model.docsModel.pageModels.guides;
+    const pageModel = must(result.model.docsModel.pageModels['guides'], 'guides page model');
 
     expect(pageModel.selectedGuideId).toBe('guides-i18n-workflow');
     expect(text).toContain('i18n Workflow');

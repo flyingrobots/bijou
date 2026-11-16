@@ -47,7 +47,7 @@
     },
     {
       "path": "docs/archive/component-system-audit.md",
-      "sha256": "7634ef8e9e9dbd61943845970f653575d82b13799f0d0887acc42e62f8ba958b"
+      "sha256": "dbe643cbd947a3ea4b8e914e89b0431cf2cade67af40aca79b3d63e7867ede85"
     },
     {
       "path": "docs/archive/dag-exploration.md",
@@ -87,7 +87,7 @@
     },
     {
       "path": "docs/design-system/README.md",
-      "sha256": "7cb5f686bca5c2a4a68ce895d717564702950fc97a8a88d9663b7c2e719eae1f"
+      "sha256": "f59f69adc871749e0c5653878f4208305c3e021eea42aed859fe76bf8042e651"
     },
     {
       "path": "docs/design-system/blocks.md",
@@ -95,7 +95,7 @@
     },
     {
       "path": "docs/design-system/component-families.md",
-      "sha256": "b120de8b83203987714aabcdc151f88c17eee0ad272a30f1ebc105d7fd3535e5"
+      "sha256": "8bb097ca6d240132b457b93ac1ba6f74c40c87132514327531a6606aeb13df41"
     },
     {
       "path": "docs/design-system/data-visualization.md",
@@ -103,7 +103,7 @@
     },
     {
       "path": "docs/design-system/foundations.md",
-      "sha256": "a2568f893f7d1c8d062336186b190e2b8998cf16709d43f31f69d621b0bc0a17"
+      "sha256": "caaa4c38becdef85b9b9b01c7b671e9223816de58686adffb24b20c27ca84660"
     },
     {
       "path": "docs/design-system/patterns.md",
@@ -123,7 +123,7 @@
     },
     {
       "path": "docs/design-system/theme-tokens.md",
-      "sha256": "8ecf378c8ac6929408b8d3f7d0c06a9e5989084b30e6a425ea1e831f56ed8eb7"
+      "sha256": "ed4c9dadfd5dd1b59ff2df816579188cf1c63e16afe7d7dce59a47d1d733d9f3"
     },
     {
       "path": "docs/design/0001-008-byte-packed-surface-representation/008-byte-packed-surface-representation.md",

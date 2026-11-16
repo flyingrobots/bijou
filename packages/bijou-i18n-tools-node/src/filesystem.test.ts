@@ -139,7 +139,7 @@ describe('bijou-i18n-tools-node filesystem helpers', () => {
     const frCatalogs = await loader('fr');
 
     expect(enCatalogs[0]?.namespace).toBe('shell');
-    expect(enCatalogs[0]?.entries[0]?.values.en).toBe('Hello');
-    expect(frCatalogs[0]?.entries[0]?.values.fr).toBe('Bonjour');
+    expect(enCatalogs[0]?.entries[0]?.values['en']).toBe('Hello');
+    expect(frCatalogs[0]?.entries[0]?.values['fr']).toBe('Bonjour');
   });
 });

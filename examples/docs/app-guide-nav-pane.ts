@@ -43,11 +43,12 @@ export function renderGuideNavPane(
   );
   const focusedGuideId =
     guideState.items[guideState.focusIndex]?.value;
+  const activeItemId = loweredMode
+    ? focusedGuideId ?? model.selectedGuideId
+    : model.selectedGuideId;
   const navigation = navigationListBlock.render({
     config: {
-      activeItemId: loweredMode
-        ? focusedGuideId ?? model.selectedGuideId
-        : model.selectedGuideId,
+      ...(activeItemId === undefined ? {} : { activeItemId }),
       items: guideState.items.map((item) => ({
         id: item.value,
         label: item.label,

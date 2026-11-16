@@ -79,10 +79,12 @@ export function renderPageContentInto<PageModel, Msg>(
     model.pageModels[pageId],
     `page model "${pageId}"`,
   );
+  const layout = page.layout(pageModel);
   const renderCtx: RenderContext<PageModel, Msg> = {
     model,
     pageId,
     focusedPaneId: model.focusedPaneByPage[pageId],
+    singlePane: layout.kind === 'pane',
     scrollByPane: model.scrollByPage[pageId] ?? {},
     visibility: model.minimizedByPage[pageId] ?? createPanelVisibilityState(),
     dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
@@ -90,7 +92,7 @@ export function renderPageContentInto<PageModel, Msg>(
     ctx: themeCtx,
   };
   return paintFrameNodeInto(
-    page.layout(pageModel),
+    layout,
     {
       row: offsetRow,
       col: offsetCol,

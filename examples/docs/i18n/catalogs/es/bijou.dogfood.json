@@ -8,7 +8,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "10:42 PR abierto"
+      }
     },
     {
       "key": {
@@ -17,7 +19,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "10:41 pruebas superadas"
+      }
     },
     {
       "key": {
@@ -26,7 +30,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "10:41 pruebas superadas"
+      }
     },
     {
       "key": {
@@ -189,7 +195,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "compacta"
+      }
     },
     {
       "key": {
@@ -198,7 +206,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Evidencia de la versión"
+      }
     },
     {
       "key": {
@@ -207,7 +217,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "regla"
+      }
     },
     {
       "key": {
@@ -216,7 +228,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "documentación"
+      }
     },
     {
       "key": {
@@ -225,7 +239,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "mantener visible la prueba agrupada"
+      }
     },
     {
       "key": {
@@ -234,7 +250,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "reproducción de DF-040"
+      }
     },
     {
       "key": {
@@ -243,7 +261,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "abrir la salida en modo reducido"
+      }
     },
     {
       "key": {
@@ -252,7 +272,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "restricción endurecida"
+      }
     },
     {
       "key": {
@@ -261,7 +283,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "entrada cambiada"
+      }
     },
     {
       "key": {
@@ -270,7 +294,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "vista previa redibujada"
+      }
     },
     {
       "key": {
@@ -279,7 +305,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Por qué cambió esto"
+      }
     },
     {
       "key": {
@@ -354,7 +382,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Usa prosa para la verdad persistente del producto."
+      }
     },
     {
       "key": {
@@ -363,7 +393,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Los modos reducidos conservan los mismos datos de encabezado y cuerpo."
+      }
     },
     {
       "key": {
@@ -372,7 +404,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "block: FormattedDocumentBlock"
+      }
     },
     {
       "key": {
@@ -381,7 +415,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Documento de Blocks"
+      }
     },
     {
       "key": {
@@ -390,7 +426,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "documentación actualizada"
+      }
     },
     {
       "key": {
@@ -399,7 +437,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "PR vinculado"
+      }
     },
     {
       "key": {
@@ -408,7 +448,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "pruebas en verde"
+      }
     },
     {
       "key": {
@@ -417,7 +459,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "revisión"
+      }
     },
     {
       "key": {
@@ -426,7 +470,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Comprobaciones de la versión"
+      }
     },
     {
       "key": {
@@ -512,7 +558,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Abrir historia"
+      }
     },
     {
       "key": {
@@ -521,7 +569,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Los datos de vista previa deben seguir siendo explícitos."
+      }
     },
     {
       "key": {
@@ -530,7 +580,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "advertencia"
+      }
     },
     {
       "key": {
@@ -539,7 +591,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Blocks de DOGFOOD"
+      }
     },
     {
       "key": {
@@ -548,7 +602,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Inventario de documentación"
+      }
     },
     {
       "key": {
@@ -557,7 +613,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "catálogo sincronizado"
+      }
     },
     {
       "key": {
@@ -566,7 +624,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "listo"
+      }
     },
     {
       "key": {
@@ -608,7 +668,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "docs/DOGFOOD.md"
+      }
     },
     {
       "key": {
@@ -617,7 +679,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "documentación"
+      }
     },
     {
       "key": {
@@ -626,7 +690,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "DOGFOOD.md"
+      }
     },
     {
       "key": {
@@ -635,7 +701,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "disponible"
+      }
     },
     {
       "key": {
@@ -644,7 +712,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{count} datos"
+      }
     },
     {
       "key": {
@@ -708,7 +778,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "resumen de reducción"
+      }
     },
     {
       "key": {
@@ -717,7 +789,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "modo {mode}"
+      }
     },
     {
       "key": {
@@ -792,7 +866,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{blockName}"
+      }
     },
     {
       "key": {
@@ -911,7 +987,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Instalar paquetes"
+      }
     },
     {
       "key": {
@@ -1019,7 +1097,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "blocks • vista previa en vivo"
+      }
     },
     {
       "key": {
@@ -1028,7 +1108,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Esc Cerrar"
+      }
     },
     {
       "key": {
@@ -1037,7 +1119,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "? Ayuda"
+      }
     },
     {
       "key": {
@@ -1046,7 +1130,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Página de Blocks"
+      }
     },
     {
       "key": {
@@ -1055,7 +1141,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "/ Buscar"
+      }
     },
     {
       "key": {
@@ -1218,7 +1306,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Buscar en la documentación"
+      }
     },
     {
       "key": {
@@ -1227,7 +1317,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "escribe una consulta"
+      }
     },
     {
       "key": {
@@ -1236,7 +1328,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "4 resultados"
+      }
     },
     {
       "key": {
@@ -1245,7 +1339,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "tabla"
+      }
     },
     {
       "key": {
@@ -1254,7 +1350,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Esc descarta"
+      }
     },
     {
       "key": {
@@ -1263,7 +1361,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Ruta de DOGFOOD guardada"
+      }
     },
     {
       "key": {
@@ -1272,7 +1372,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "normal"
+      }
     },
     {
       "key": {
@@ -1281,7 +1383,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Catálogo"
+      }
     },
     {
       "key": {
@@ -1290,7 +1394,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Detalles"
+      }
     },
     {
       "key": {
@@ -1299,7 +1405,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "DOGFOOD registra actualmente {count} Blocks semánticos de Surface de producto."
+      }
     },
     {
       "key": {
@@ -1308,7 +1416,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Estos Blocks describen las Surfaces visibles de la app DOGFOOD. Son contratos locales de DOGFOOD, no Blocks estándar propios promovidos automáticamente."
+      }
     },
     {
       "key": {
@@ -1328,7 +1438,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface de vista previa en vivo y reducción de Blocks de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1337,7 +1449,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface de contenido de artículos de la documentación de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1346,7 +1460,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface de navegación de documentación y guías de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1366,7 +1482,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface de paleta de comandos del marco de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1375,7 +1493,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface de pistas del pie del marco de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1384,7 +1504,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface de superposición de ayuda de teclado del marco de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1393,7 +1515,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface del centro de notificaciones del marco de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1402,7 +1526,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface del HUD de rendimiento del marco de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1411,7 +1537,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface de consulta y resultados de búsqueda del marco de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1420,7 +1548,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface del menú de ajustes del marco de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1429,7 +1559,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface del inspector lateral de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1438,7 +1570,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface de título y acción de entrada de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -1447,7 +1581,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Punto de entrada de la estación de trabajo de Componentes de Storybook."
+      }
     },
     {
       "key": {
@@ -1456,7 +1592,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Intenciones de comando"
+      }
     },
     {
       "key": {
@@ -1465,7 +1603,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Requisitos de datos"
+      }
     },
     {
       "key": {
@@ -1474,7 +1614,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Familia"
+      }
     },
     {
       "key": {
@@ -1483,7 +1625,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Modos"
+      }
     },
     {
       "key": {
@@ -1492,7 +1636,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Rol"
+      }
     },
     {
       "key": {
@@ -1501,7 +1647,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Escala"
+      }
     },
     {
       "key": {
@@ -1510,7 +1658,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Surface"
+      }
     },
     {
       "key": {
@@ -1519,7 +1669,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Etiquetas"
+      }
     },
     {
       "key": {
@@ -1539,7 +1691,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Los Blocks semánticos que DOGFOOD usa para sus propias Surfaces de producto visibles."
+      }
     },
     {
       "key": {
@@ -1548,7 +1702,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Detalles de la Surface"
+      }
     },
     {
       "key": {
@@ -1557,7 +1713,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Índice de Surfaces"
+      }
     },
     {
       "key": {
@@ -1566,7 +1724,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Blocks de Surface de DOGFOOD"
+      }
     },
     {
       "key": {
@@ -1597,7 +1757,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "DOGFOOD documenta actualmente {documented} de {total} familias de componentes canónicas. Esta guía de campo es honesta sobre su cobertura actual y seguirá creciendo con el tiempo."
+      }
     },
     {
       "key": {
@@ -1606,7 +1768,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{documented}/{total} familias • {percent}%"
+      }
     },
     {
       "key": {
@@ -1615,7 +1779,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Cobertura de la documentación"
+      }
     },
     {
       "key": {
@@ -1624,7 +1790,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "1. Explora las familias de componentes en el carril izquierdo."
+      }
     },
     {
       "key": {
@@ -1633,7 +1801,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "2. Pulsa Enter para expandir una familia o abrir un componente."
+      }
     },
     {
       "key": {
@@ -1642,7 +1812,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "3. Usa Tab para mover el foco entre familias, documentación y variantes."
+      }
     },
     {
       "key": {
@@ -1651,7 +1823,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "4. Pulsa / para buscar en la documentación en cualquier momento."
+      }
     },
     {
       "key": {
@@ -1660,7 +1834,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "5. Pulsa F2 para los ajustes, ? para la ayuda, y q o Esc para salir."
+      }
     },
     {
       "key": {
@@ -1669,7 +1845,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Cómo usar esta documentación"
+      }
     },
     {
       "key": {
@@ -1678,7 +1856,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Bijou es un framework de interfaces de terminal nativo de superficies para crear TUI con estilo, estado y pruebas, sin volver a código de vista basado en cadenas."
+      }
     },
     {
       "key": {
@@ -1687,7 +1867,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "DOGFOOD es la guía de campo viva del framework. La documentación, las vistas previas, el shell y las superficies didácticas están hechos con el propio Bijou, así que la documentación ejercita el mismo runtime y sistema de diseño que describe."
+      }
     },
     {
       "key": {
@@ -1696,7 +1878,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "¿Qué es Bijou?"
+      }
     },
     {
       "key": {
@@ -1716,7 +1900,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{paneSwitch} • -/+ contador de prueba • j/k desplazar • d/u página • g/G inicio/final"
+      }
     },
     {
       "key": {
@@ -1725,7 +1911,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{paneSwitch} • ↑/↓ explorar • Enter abrir • -/+ contador de prueba"
+      }
     },
     {
       "key": {
@@ -1734,7 +1922,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{paneSwitch} • ↑/↓ explorar • Enter abrir • ←/→ contraer/expandir"
+      }
     },
     {
       "key": {
@@ -1743,7 +1933,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{paneSwitch} • j/k desplazar • d/u página • g/G inicio/final"
+      }
     },
     {
       "key": {
@@ -1752,7 +1944,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{paneSwitch} • resumen de la sección"
+      }
     },
     {
       "key": {
@@ -1761,7 +1955,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{paneSwitch} • ↑/↓ explorar • Enter abrir"
+      }
     },
     {
       "key": {
@@ -1770,7 +1966,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Tab siguiente panel"
+      }
     },
     {
       "key": {
@@ -1779,7 +1977,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "? Ayuda • / Buscar • F2 Ajustes • q Salir"
+      }
     },
     {
       "key": {
@@ -1788,7 +1988,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{paneSwitch} • j/k desplazar • d/u página • g/G inicio/final"
+      }
     },
     {
       "key": {
@@ -1808,7 +2010,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "{paneSwitch} • ↑/↓ variante • ,/. alternar • 1-4 perfiles"
+      }
     },
     {
       "key": {
@@ -1927,7 +2131,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Bloques"
+      }
     },
     {
       "key": {
@@ -1936,7 +2142,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Componentes"
+      }
     },
     {
       "key": {
@@ -1945,7 +2153,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Guías"
+      }
     },
     {
       "key": {
@@ -1954,7 +2164,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Paquetes"
+      }
     },
     {
       "key": {
@@ -1963,7 +2175,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Filosofía"
+      }
     },
     {
       "key": {
@@ -1972,7 +2186,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Versión"
+      }
     },
     {
       "key": {
@@ -1992,7 +2208,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Buscar en la documentación"
+      }
     },
     {
       "key": {
@@ -2012,7 +2230,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "bienvenido a bijou"
+      }
     },
     {
       "key": {
@@ -2043,7 +2263,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Esta sección ya tiene un lugar visible en DOGFOOD."
+      }
     },
     {
       "key": {
@@ -2052,7 +2274,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Esta sección aún se está ampliando."
+      }
     },
     {
       "key": {
@@ -2061,7 +2285,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Inventario de creación de Blocks, vista previa y ruta de degradación publicados directamente en DOGFOOD."
+      }
     },
     {
       "key": {
@@ -2081,7 +2307,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Ruta de orientación pensada para el lector de DOGFOOD, con el mapa de la documentación del repositorio."
+      }
     },
     {
       "key": {
@@ -2090,7 +2318,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Páginas explicativas de los paquetes publicados del espacio de trabajo, dentro de DOGFOOD."
+      }
     },
     {
       "key": {
@@ -2099,7 +2329,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Doctrina clave, invariantes de arquitectura y guía del sistema de diseño publicadas en DOGFOOD."
+      }
     },
     {
       "key": {
@@ -2108,7 +2340,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Historia de la versión {version} y guía de migración publicadas en DOGFOOD."
+      }
     },
     {
       "key": {
@@ -2139,7 +2373,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Documentation Of Good Foundational Onboarding and Discovery"
+      }
     },
     {
       "key": {
@@ -2148,7 +2384,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "DOGFOOD"
+      }
     },
     {
       "key": {
@@ -2157,7 +2395,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Esc/q salir • ↑/↓ calidad • ←/→ tema • Enter continuar"
+      }
     },
     {
       "key": {
@@ -2166,7 +2406,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Pulsa [Enter]"
+      }
     },
     {
       "key": {
@@ -2175,7 +2417,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Automática"
+      }
     },
     {
       "key": {
@@ -2184,7 +2428,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Equilibrada"
+      }
     },
     {
       "key": {
@@ -2193,7 +2439,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Rendimiento"
+      }
     },
     {
       "key": {
@@ -2202,7 +2450,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "equilibrado"
+      }
     },
     {
       "key": {
@@ -2211,7 +2461,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "completo"
+      }
     },
     {
       "key": {
@@ -2220,7 +2472,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "rendimiento"
+      }
     },
     {
       "key": {
@@ -2229,7 +2483,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Calidad"
+      }
     },
     {
       "key": {
@@ -2238,7 +2494,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Calidad de portada: {quality}"
+      }
     },
     {
       "key": {
@@ -2621,7 +2879,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Adapta el coste de render al tamaño del terminal. Perfil automático actual: {profile}. Opciones: {options}."
+      }
     },
     {
       "key": {
@@ -2630,7 +2890,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Mantiene expresiva la portada y reduce el trabajo de render en terminales grandes. Opciones: {options}."
+      }
     },
     {
       "key": {
@@ -2639,7 +2901,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Minimiza el trabajo de la portada en terminales enormes y emuladores lentos. Opciones: {options}."
+      }
     },
     {
       "key": {
@@ -2648,7 +2912,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Prioriza la portada más rica incluso en terminales grandes. Opciones: {options}."
+      }
     },
     {
       "key": {
@@ -2657,7 +2923,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Calidad de portada establecida en {quality}."
+      }
     },
     {
       "key": {
@@ -2666,7 +2934,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Calidad de portada"
+      }
     },
     {
       "key": {
@@ -2752,7 +3022,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Apariencia"
+      }
     },
     {
       "key": {
@@ -2761,7 +3033,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Portada"
+      }
     },
     {
       "key": {
@@ -2781,7 +3055,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Shell"
+      }
     },
     {
       "key": {
@@ -2790,7 +3066,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Muestra las pistas de control del panel activo en el pie. Desactívalo para un shell más tranquilo y usa ? para ver todas las teclas."
+      }
     },
     {
       "key": {
@@ -2799,7 +3077,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Pistas desactivadas."
+      }
     },
     {
       "key": {
@@ -2808,7 +3088,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Pistas activadas."
+      }
     },
     {
       "key": {
@@ -2817,7 +3099,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Mostrar pistas"
+      }
     },
     {
       "key": {
@@ -2826,7 +3110,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "No"
+      }
     },
     {
       "key": {
@@ -2835,7 +3121,9 @@
       },
       "kind": "message",
       "sourceLocale": "en",
-      "values": {}
+      "values": {
+        "es": "Sí"
+      }
     },
     {
       "key": {
@@ -3071,6 +3359,325 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El contenido está mediado por IA y necesita procedencia, evidencia o confianza explícitas; usa `explainability()`."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "La persona usuaria necesita transiciones de estado editables o un enrutado paso a paso completo gestionado por el shell."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.avoidWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Una nota o alerta sencilla ya lo diría todo con honestidad."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.accessible"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Los pasos linealizados y las etiquetas de sección conservan el mismo significado guiado en el orden de lectura."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.interactive"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Un bloque agrupado mantiene el resumen, los pasos, las secciones y la siguiente acción claramente distintos."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.pipe"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Las secciones con sangría y una siguiente acción etiquetada conservan la ruta sin adornos decorativos."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.lowering.static"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El mismo ritmo de secciones se mantiene determinista sin comportamiento de shell en tiempo de ejecución."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Configuración"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.owner"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Responsable: Platform ops"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.meta.window"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Ventana: hoy"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.nextAction"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Abre el gestor de secretos de staging y rota el token de despliegue."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Mantén la guía como orientativa hasta que el secreto rotado se confirme en los registros de despliegue."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.note.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Nota para la persona operadora"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.content"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El despliegue está sano, pero el token que caduca hace frágil la ruta actual hasta que termine la rotación."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.section.why.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Por qué"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "La latencia del canario y el presupuesto de errores están sanos."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step1.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Revisar la salud del despliegue"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El token actual caduca en 30 minutos."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step2.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Renovar el secreto de staging"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.detail"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Solo después de confirmar el nuevo secreto."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.step3.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Promover el despliegue"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Mantén a la persona operadora en una única ruta tranquila en lugar de dispersar la secuencia entre notas, cajones y filas de estado."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.preview.title"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Prepara el despliegue en staging"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.summary"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Bloque reutilizable para superficies de asistencia de varios pasos más tranquilas, con secciones explícitas y una única acción siguiente evidente."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen1"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El flujo necesita una recomendación o ruta de configuración tranquila sin convertirse en un asistente completo."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen2"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "El ritmo de las secciones y la siguiente acción deben seguir siendo explícitos en lugar de diluirse en prosa genérica."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.useWhen3"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "La superficie es asistencia guiada, pero no específicamente explicabilidad de IA."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.description"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Guía de varios pasos tranquila con una única siguiente acción explícita."
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.guidedFlow.variant.stagingRollout.label"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "Despliegue en staging"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "stories.markdown.releaseNote.intro"
       },
       "kind": "message",
@@ -3143,6 +3750,28 @@
       "sourceLocale": "en",
       "values": {
         "es": "# Release note"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.docsTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "documentación • {title}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.pane.livePreviewTitle"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "es": "vista previa en vivo • {profile} • {variant}"
       }
     },
     {

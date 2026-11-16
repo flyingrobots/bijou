@@ -27,7 +27,7 @@ export interface SkeletonOverlayOptions {
   readonly pageConfigs: ReadonlyMap<string, SkeletonPageConfig>;
   readonly title: string;
   readonly keyLegend: string;
-  readonly statusMessage?: string | ((ctx: SkeletonStatusContext) => string);
-  readonly tokens?: SkeletonThemeTokens;
+  readonly statusMessage?: (string | ((ctx: SkeletonStatusContext) => string)) | undefined;
+  readonly tokens?: SkeletonThemeTokens | undefined;
   readonly ctx: BijouContext;
 }

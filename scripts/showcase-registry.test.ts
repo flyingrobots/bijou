@@ -64,12 +64,12 @@ function isShowcaseRegistry(value: unknown): value is ShowcaseRegistry {
   if (!isRecord(value)) {
     return false;
   }
-  const categories = value.CATEGORIES;
+  const categories = value['CATEGORIES'];
   return Array.isArray(categories) && categories.every((category) => {
     if (!isRecord(category) || !('title' in category)) {
       return false;
     }
-    return Array.isArray(category.entries);
+    return Array.isArray(category['entries']);
   });
 }
 
