@@ -134,8 +134,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
-- DL-034 records the pre-push verification receipt decision (#648). A receipt
-  binds the verified Git tree, installed dependencies, toolchain and command set.
+- DL-034 records the pre-push verification receipt decision (#648). The witness
+  runs the policy that DL-030 selects (`fast` or `full`). The receipt binds that
+  policy identity, the verified Git tree, the classification base, installed
+  dependencies, toolchain and command set.
   It lives under the Git common directory and expires after 24 hours. Pre-push
   rejects a missing, stale or forged receipt and prints the witness command.
 
