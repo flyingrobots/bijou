@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- Design record DL-029 decides the DOGFOOD Code Dojo debt dashboard: a
+  `release` page guide that renders a committed `code-dojo.debt-report.v1`
+  snapshot and an append-only `code-dojo.debt-history.v1` ledger, with no live
+  computation at render time (#601).
+
 ### Fixed
 
 - Theme Lab wraps complete picker labels, hints and editor context before
