@@ -6,6 +6,7 @@ import {
 
 export type FrameLayerKind =
   | 'workspace'
+  | 'context-drawer'
   | 'page-modal'
   | 'help'
   | 'settings'
@@ -17,16 +18,22 @@ export type FrameLayerOwner = 'frame' | 'page';
 export type FrameLayerHintSource = string | BindingSource;
 export type FramePageLayerKind = Extract<
   FrameLayerKind,
-  'workspace' | 'page-modal'
+  'workspace' | 'context-drawer' | 'page-modal'
 >;
 export interface FrameLayerMetadata {
   readonly title?: string;
   readonly hintSource?: FrameLayerHintSource | undefined;
   readonly helpSource?: BindingSource;
 }
-export type FramePageLayerRegistry = Partial<
-  Record<FramePageLayerKind, FrameLayerMetadata | undefined>
->;
+/** Page-owned context-drawer layer; active only while `paneId` has focus. */
+export interface FrameContextDrawerLayerMetadata extends FrameLayerMetadata {
+  readonly paneId: string;
+}
+export interface FramePageLayerRegistry {
+  readonly workspace?: FrameLayerMetadata | undefined;
+  readonly 'context-drawer'?: FrameContextDrawerLayerMetadata | undefined;
+  readonly 'page-modal'?: FrameLayerMetadata | undefined;
+}
 export interface FrameLayerDescriptor {
   readonly id: string;
   readonly kind: FrameLayerKind;
@@ -40,6 +47,8 @@ export interface FrameLayerDescriptor {
 }
 export interface DescribeFrameLayerStackOptions {
   readonly pageModalOpen?: boolean;
+  /** Push the page `context-drawer` layer directly above `workspace`. */
+  readonly contextDrawerFocused?: boolean;
   readonly layers?: Partial<Record<FrameLayerKind, FrameLayerMetadata>>;
 }
 export interface FrameControlProjection {

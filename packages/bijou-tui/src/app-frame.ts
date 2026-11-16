@@ -23,6 +23,7 @@ export type {
   FramePage,
   FramePageLayerKind,
   FramePageLayerRegistry,
+  FrameContextDrawerLayerMetadata,
   FramePageMsg,
   FramePageUpdateResult,
   FramePaneScroll,

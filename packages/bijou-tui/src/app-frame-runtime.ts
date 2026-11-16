@@ -79,6 +79,7 @@ export type {
   FrameLayerDescriptor,
   FramePageLayerKind,
   FramePageLayerRegistry,
+  FrameContextDrawerLayerMetadata,
   FrameRuntimeLayer,
   FrameRuntimeViewStack,
   DescribeFrameLayerStackOptions,

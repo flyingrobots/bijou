@@ -22,6 +22,7 @@ import type {
 } from './counter-block-demo.js';
 import type { ThemeLabEditorState } from './app-theme-lab-key-handling.js';
 import type { DocsLayoutVariant, DocsPageId } from './app-ids.js';
+import type { ContextDrawerState } from './app-context-drawer.js';
 
 export interface StoryFamily {
   readonly id: string;
@@ -53,6 +54,7 @@ export interface DocsExplorerModel {
   readonly landingQualityMode: LandingQualityMode;
   readonly counterBlockDemo: CounterDemoModel;
   readonly themeLabEditor?: ThemeLabEditorState;
+  readonly contextDrawer: ContextDrawerState;
 }
 
 export type ExplorerMsg =

@@ -20,6 +20,14 @@ export const FRAME_LAYER_BASE: Readonly<
     dismissible: false,
     blocksUnderlyingInput: false,
   },
+  'context-drawer': {
+    id: 'context-drawer',
+    kind: 'context-drawer',
+    owner: 'page',
+    inputMapId: 'page-context-drawer',
+    dismissible: true,
+    blocksUnderlyingInput: false,
+  },
   'page-modal': {
     id: 'page-modal',
     kind: 'page-modal',

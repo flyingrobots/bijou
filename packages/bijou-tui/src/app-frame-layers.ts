@@ -5,6 +5,7 @@ export type {
   FramePageLayerKind,
   FrameLayerMetadata,
   FramePageLayerRegistry,
+  FrameContextDrawerLayerMetadata,
   FrameLayerDescriptor,
   DescribeFrameLayerStackOptions,
   FrameControlProjection,

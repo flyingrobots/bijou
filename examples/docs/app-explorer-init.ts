@@ -15,6 +15,7 @@ import { DOCS_SHELL_THEME_CHOICES } from './app-shell-theme-state.js';
 import { STORY_FAMILIES, buildFamilyItems } from './app-story-catalog.js';
 import { selectGuide } from './app-guide-navigation.js';
 import { selectStory } from './app-family-navigation.js';
+import { createContextDrawerState } from './app-context-drawer.js';
 
 export function createInitialExplorerModel(
   context: BijouContext,
@@ -52,6 +53,7 @@ export function createInitialExplorerModel(
     activeShellThemeId: DOCS_SHELL_THEME_CHOICES[0]?.id,
     landingQualityMode: 'auto',
     counterBlockDemo: createCounterDemoModel(5),
+    contextDrawer: createContextDrawerState(pageId),
   };
   return pageId === BLOCKS_PAGE_ID
     ? selectGuide(pageId, model, COUNTER_DEMO_BLOCK_GUIDE_ID)
