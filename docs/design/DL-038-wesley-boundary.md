@@ -54,6 +54,7 @@ Gathered on 2026-11-15 from the public repository, its releases and crates.io.
 | `0.3.0-alpha.3` changes no compiler source relative to `alpha.2`: IR, hashes and emitted code are identical. | `v0.3.0-alpha.3` release notes |
 | From `alpha.2`, published crates pin siblings exactly (`=X.Y.Z`). Pre-releases must be requested by exact version. | Wesley `CHANGELOG.md`, `RELEASE.md` |
 | `schema lower`, `schema hash`, `schema diff` all take `--schema <path> --json`. | Wesley `docs/cli.md` |
+| `schema hash --json` returns an object with `schemaHash`, an unprefixed SHA-256 hex string; it emits no algorithm field. | Pinned Wesley commit `d080d338`: `crates/wesley-cli/src/main.rs` hash branch and `crates/wesley-core/src/domain/ir.rs` `compute_registry_hash` / `compute_content_hash_bytes`, inspected 2026-11-16. |
 | L1 IR schema (`schemas/ir.schema.json`) requires `version` with `const "1.0.0"` and `additionalProperties: false`. | Wesley `schemas/` |
 | `profunctoroptics/website/packages/page-contract` records `wesley-core 0.3.0-alpha.1`. | #531 |
 | Bijou today: `compileGraphqlBijouBlock` in `packages/bijou/src/core/graphql-bijou-block.part02.ts`, exported from core. Its `sourceHash` is `hashUiSceneValue(artifactBody)`, a hash of the *lowered* body, not of the SDL bytes. | Bijou source |
@@ -143,8 +144,13 @@ executable documentation test against.
    named fields:
    - `sourceDigest` — owner Bijou. `sha256:` of the exact SDL bytes Bijou read,
      computed by Bijou before invoking Wesley.
-   - `semanticDigest` — owner Wesley. The value from `wesley schema hash`,
-     recorded verbatim with Wesley's algorithm label. Bijou never recomputes it.
+   - `semanticDigest` — digest owner Wesley. Read `schemaHash` from
+     `wesley schema hash --json`; require 64 lowercase hexadecimal characters
+     and preserve those characters unchanged. Bijou records it as
+     `{ algorithm: 'sha256', value: schemaHash }`. The algorithm label comes
+     from the pinned Wesley contract, not from a CLI output field. Bijou
+     never recomputes the digest. Missing or malformed hash output fails with
+     `WESLEY_LOWER_FAILED`; a pin bump revalidates this shape and algorithm.
    - `compiler` — owner the build. `{ name: "wesley-cli", version }` taken from
      `wesley --version`, plus `emitter: { name: "bijou-block", version }` and
      a digest of the emitter options that affect output.
