@@ -32,3 +32,22 @@ export function parseContainerVolume(output, hostVolumes) {
   if (hostVolumes.includes(volume.toLowerCase())) throw new Error(`${refusal}: present on the host: ${volume}`);
   return volume;
 }
+
+/**
+ * Ask a started worker for its volume and pass the answer to the guard. A
+ * worker may not list its volume just after it starts, so wait for it within a
+ * bounded number of attempts. Any other answer goes to the guard at once.
+ */
+export async function establishContainerVolume(query, hostVolumes, pause, attempts) {
+  let output = await query();
+  for (let attempt = 1; attempt < attempts && !listsVolume(output); attempt += 1) {
+    await pause();
+    output = await query();
+  }
+  return parseContainerVolume(output, hostVolumes);
+}
+
+function listsVolume(output) {
+  const volumes = JSON.parse(output);
+  return !Array.isArray(volumes) || volumes.some((value) => value !== null);
+}
