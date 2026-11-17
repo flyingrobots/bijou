@@ -24,10 +24,8 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version 22
 
       - name: Code Dojo
-        run: npm run code-dojo:verify
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- npm run code-dojo:verify
