@@ -13,7 +13,7 @@ import { validateWindowsUsage } from './windows-usage.mjs';
 import { windowsCommand } from './windows-stage.mjs';
 import { prepareWorkerProgram } from './windows-worker.mjs';
 import { establishContainerVolume, hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
-import { probeQuota } from './windows-quota-probe.mjs';
+import { probeHostQuota, probeQuota } from './windows-quota-probe.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const command = process.argv.slice(2);
@@ -112,7 +112,9 @@ async function createWorker(network) {
   } catch (error) {
     const probe = await probeQuota(async (user, program) => (await docker(['exec', '--user', user, name, ...ps, program],
       { timeout: 30000 })).output.toString());
-    throw new Error(`${error instanceof Error ? error.message : String(error)}\n${probe}`, { cause: error });
+    const hostProbe = await probeHostQuota(quotaVolume, async (program) => (await execute([...ps, program],
+      { timeout: 60000, signal: controller.signal })).output.toString());
+    throw new Error(`${error instanceof Error ? error.message : String(error)}\n${probe}\n${hostProbe}`, { cause: error });
   }
   dataBaseline = await measure();
   dataBackingStart = backingGrowth;

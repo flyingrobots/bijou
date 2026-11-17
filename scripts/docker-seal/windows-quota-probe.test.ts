@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { probeQuota, quotaProbeProgram, quotaProbeUsers } from './windows-quota-probe.mjs';
+import { hostQuotaProbeProgram, probeHostQuota, probeQuota, quotaProbeProgram, quotaProbeUsers } from './windows-quota-probe.mjs';
 
 describe('Windows quota probe', () => {
   it('reports the facts that each worker identity returns', async () => {
@@ -43,6 +43,48 @@ describe('Windows quota probe', () => {
   it('never asks for a limit other than the 4 GiB hard quota', () => {
     // Harvest every number of seven or more digits; only the threshold and the limit may appear.
     const numbers = quotaProbeProgram.match(/\d{7,}/g) ?? [];
+    expect(numbers.length).toBeGreaterThan(0);
+    expect(new Set(numbers)).toEqual(new Set(['4227858432', '4294967296']));
+  });
+});
+
+describe('Windows host quota probe', () => {
+  const volume = '\\\\?\\Volume{11111111-2222-3333-4444-555555555555}\\';
+
+  it('reports what the host answers about the worker volume', async () => {
+    // Oracle: hosted job 133886801117 showed that no identity inside the worker can change or read the entries.
+    const asked: string[] = [];
+    const run = (program: string): Promise<string> => { asked.push(program); return Promise.resolve(' api-open=ok state=2\r\n'); };
+    await expect(probeHostQuota(volume, run)).resolves.toBe('quota probe on the host: api-open=ok state=2');
+    expect(asked).toEqual([hostQuotaProbeProgram(volume)]);
+  });
+
+  it('reports a host probe that cannot run', async () => {
+    const run = (): Promise<string> => Promise.reject(new Error('powershell exited 1'));
+    await expect(probeHostQuota(volume, run)).resolves.toBe('quota probe on the host: probe failed: powershell exited 1');
+  });
+
+  it.each([
+    ['a drive root', 'D:'],
+    ['a quoted volume', "\\\\?\\Volume{11111111-2222-3333-4444-555555555555}\\'; Remove-Item x; '"],
+    ['an empty name', ''],
+  ])('refuses to build a program for %s', (_name, value) => {
+    expect(() => hostQuotaProbeProgram(value)).toThrow('Host quota probe needs a volume GUID path');
+  });
+
+  it.each([
+    ['the worker volume', `$volume='${volume}'`],
+    ['the account name on the host', "SecurityIdentifier 'S-1-5-93-2-2'"],
+    ['the fsutil answer', 'fsutil quota query $volume'],
+    ['the disk quota API change', '$u.QuotaLimit=4294967296'],
+    ['the entries it can read', 'foreach($entry in $q)'],
+  ])('asks the host for %s', (_name, fragment) => {
+    expect(hostQuotaProbeProgram(volume)).toContain(fragment);
+  });
+
+  it('never asks the host for a limit other than the 4 GiB hard quota', () => {
+    // Harvest every number of seven or more digits outside the volume name.
+    const numbers = hostQuotaProbeProgram(volume).replace(volume, '').match(/\d{7,}/g) ?? [];
     expect(numbers.length).toBeGreaterThan(0);
     expect(new Set(numbers)).toEqual(new Set(['4227858432', '4294967296']));
   });

@@ -17,3 +17,21 @@ export async function probeQuota(run) {
   }
   return lines.join('\n');
 }
+
+/**
+ * PowerShell for the host that reports, in one line, how the host answers the
+ * same 4 GiB quota change on the worker's volume and which entries it can read.
+ */
+export function hostQuotaProbeProgram(volume) {
+  if (!/^\\\\\?\\Volume\{[0-9a-f-]{36}\}\\$/iu.test(volume)) throw new Error('Host quota probe needs a volume GUID path');
+  return `${hostProbeHead}${volume}${hostProbeTail}`;
+}
+const hostProbeHead = "$ErrorActionPreference='Continue'; $volume='";
+const hostProbeTail = "'; $facts=@(\"host-user=$(whoami)\"); try { $name=(New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-93-2-2').Translate([System.Security.Principal.NTAccount]).Value; $facts+=\"account=$name\" } catch { $name='User Manager\\ContainerUser'; $facts+=\"account-error=$($_.Exception.Message)\" }; $out=(fsutil quota query $volume 2>&1 | Out-String).Trim(); $facts+=\"fsutil-query=$LASTEXITCODE $($out.Substring(0, [Math]::Min(600, $out.Length)))\"; try { $q=New-Object -ComObject Microsoft.DiskQuota.1; $q.Initialize($volume, $true); $facts+=\"api-open=ok state=$($q.QuotaState)\"; $count=0; foreach($entry in $q) { if($count -lt 8) { $facts+=\"entry=$($entry.LogonName) used=$([long]$entry.QuotaUsed) limit=$([long]$entry.QuotaLimit)\" }; $count++ }; $facts+=\"entries=$count\"; $u=$q.AddUser($name); $facts+='api-add=ok'; $u.QuotaThreshold=4227858432; $u.QuotaLimit=4294967296; $facts+=\"api-limit=$([long]$u.QuotaLimit)\" } catch { $facts+=\"api-error=$($_.Exception.Message)\" }; ($facts -join ' | ') -replace '\\s+', ' '";
+
+/** Run the host probe and return its report line. */
+export async function probeHostQuota(volume, run) {
+  const report = await Promise.resolve().then(() => run(hostQuotaProbeProgram(volume)))
+    .then((output) => output.trim(), (error) => `probe failed: ${error instanceof Error ? error.message : String(error)}`);
+  return `quota probe on the host: ${report}`;
+}
