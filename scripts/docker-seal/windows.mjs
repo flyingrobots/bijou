@@ -13,7 +13,7 @@ import { validateWindowsUsage } from './windows-usage.mjs';
 import { windowsCommand, windowsStage } from './windows-stage.mjs';
 import { prepareWorkerProgram } from './windows-worker.mjs';
 import { establishContainerVolume, hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
-import { probeHostQuota, probeQuota } from './windows-quota-probe.mjs';
+import { probeHostQuota, probeHyperVQuota, probeQuota } from './windows-quota-probe.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const command = process.argv.slice(2);
@@ -124,7 +124,12 @@ async function createWorker(network) {
       }
     }));
     process.stdout.write(`${hostProbe}\n`);
-    throw new Error(`${error instanceof Error ? error.message : String(error)}\n${probe}\n${hostProbe}`, { cause: error });
+    // A separate container: the sealed worker stays process-isolated.
+    const hyperVProbe = await windowsStage('quota-probe-hyperv', () => probeHyperVQuota(async (program) => (
+      await docker(['run', '--rm', '--isolation', 'hyperv', '--network', 'none', '--memory', '2g', '--storage-opt', 'size=8G',
+        image, ...ps, program], { timeout: 180000 })).output.toString()));
+    process.stdout.write(`${hyperVProbe}\n`);
+    throw new Error(`${error instanceof Error ? error.message : String(error)}\n${probe}\n${hostProbe}\n${hyperVProbe}`, { cause: error });
   }
   dataBaseline = await measure();
   dataBackingStart = backingGrowth;

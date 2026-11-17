@@ -35,3 +35,17 @@ export async function probeHostQuota(volume, run) {
     .then((output) => output.trim().split(/\s*\r?\n\s*/u).join(' | '), (error) => `probe failed: ${error instanceof Error ? error.message : String(error)}`);
   return `quota probe on the host: ${report}`;
 }
+
+/**
+ * Run the worker probe in a separate, Hyper-V isolated container and return
+ * its report line. It answers whether that isolation can set the quota; the
+ * sealed worker itself stays process-isolated.
+ */
+export async function probeHyperVQuota(run) {
+  const report = await Promise.resolve().then(() => run(hyperVQuotaProbeProgram))
+    .then((output) => output.trim().split(/\s*\r?\n\s*/u).join(' | '), (error) => `probe failed: ${error instanceof Error ? error.message : String(error)}`);
+  return `quota probe in a Hyper-V worker: ${report}`;
+}
+
+/** The worker probe, after it turns quota enforcement on for the new container's volume. */
+export const hyperVQuotaProbeProgram = `$out=(fsutil quota enforce C: 2>&1 | Out-String).Trim(); Write-Host "fsutil-enforce=$LASTEXITCODE $out"; ${quotaProbeProgram}`;
