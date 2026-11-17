@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+node "$(dirname "$0")/../docker-seal/require-docker.mjs"
 
 echo "pre-commit: lockfile consistency"
 node --import tsx scripts/check-staged-workspace.ts
-npm ls --all > /dev/null 2>&1
+npm ls --all >/dev/null 2>&1

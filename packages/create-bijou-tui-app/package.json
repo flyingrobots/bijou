@@ -17,7 +17,7 @@
     "build": "tsc -b",
     "prepack": "tsc -b",
     "lint": "tsc --noEmit",
-    "test": "vitest run --config ../../vitest.config.ts"
+    "test": "node ../../scripts/docker-seal/dispatch.mjs -- node node_modules/vitest/vitest.mjs run --config vitest.config.ts packages/create-bijou-tui-app"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
