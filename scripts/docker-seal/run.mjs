@@ -25,7 +25,6 @@ if (!args.slice(0, args.indexOf('--')).includes('--isolated-ci')) {
     '--holder', process.env.AGENT_SESSION_ID || randomUUID(), '--ttl', '3600', '--wait', '30',
     '--note', 'Sealed Bijou dependency and offline verification custody',
     'host/docker/bijou-sealed-tests/', 'host/docker/bijou-sealed-tests-dependencies/', '--', ...session];
-  env.GIT_LOCKS_STORE = '/Users/Shared/git-locks/workstation.git';
 }
 // The session's 30-minute deadline includes container cleanup; do not time out
 // the lock wrapper independently and release custody over surviving writers.

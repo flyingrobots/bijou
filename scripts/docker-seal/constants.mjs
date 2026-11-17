@@ -15,6 +15,6 @@ export function cleanEnvironment() {
   const windows = Object.fromEntries(['SystemRoot', 'WINDIR', 'ComSpec', 'PATHEXT', 'TEMP', 'TMP']
     .filter((key) => process.env[key]).map((key) => [key, process.env[key]]));
   return { ...windows, PATH: process.env.PATH, HOME: process.env.HOME, LANG: 'C.UTF-8', COPYFILE_DISABLE: '1',
-    GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: devNull };
+    // Git maps /dev/null itself on Windows; the device path \\.\nul makes it exit 128.
+    GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null' };
 }
-import { devNull } from 'node:os';
