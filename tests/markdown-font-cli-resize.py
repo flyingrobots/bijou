@@ -14,6 +14,13 @@ import termios
 import time
 
 
+# Admission precedes any PTY, fixture, or child application side effects.
+subprocess.run(
+    ["node", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                          "scripts", "docker-seal", "require-docker.mjs")],
+    check=True, timeout=10,
+)
+
 def cancel(signum, _frame):
     raise SystemExit(128 + signum)
 

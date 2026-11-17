@@ -1,4 +1,5 @@
 #!/usr/bin/env npx tsx
+import './docker-seal/require-docker.mjs';
 
 import { execSync, spawn } from 'node:child_process';
 import { dirname, resolve } from 'node:path';

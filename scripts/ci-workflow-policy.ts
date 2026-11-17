@@ -11,6 +11,8 @@ export interface CiWorkflowTestJobPolicy {
 
 export interface CiWorkflowPolicy {
   readonly testJob: CiWorkflowTestJobPolicy;
+  readonly nodeVersions: readonly number[];
+  readonly focusedPlatforms: readonly string[];
   readonly focusedUnitTestsJob: {
     readonly permissionsContents: string | undefined;
     readonly focusedPortableRun: string;
@@ -55,7 +57,7 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   const i18nPolicyGate = asRecord(steps[i18nPolicyGateIndex], 'workflow.jobs.test.i18nPolicyGate');
   const testRunStep = steps.map((step) => {
     return asRecord(step, 'workflow.jobs.test.steps[]');
-  }).find((step) => step['run'] === 'npm run test:run' || step['run'] === 'npm test');
+  }).find((step) => step['name'] === 'Full test suite');
   if (testRunStep == null) {
     throw new Error('CI workflow test job is missing full test run step');
   }
@@ -66,14 +68,29 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   if (focusedPortableStep == null) {
     throw new Error('CI workflow unit_cross_platform job is missing Focused portable unit tests step');
   }
+  const testMatrix = asRecord(asRecord(testJob['strategy'], 'test.strategy')['matrix'], 'test.matrix');
+  const focusedMatrix = asRecord(asRecord(focusedUnitTestsJob['strategy'], 'focused.strategy')['matrix'], 'focused.matrix');
+  const platforms = asArray(focusedMatrix['include'], 'focused.include').map((entry) => asRecord(entry, 'focused.platform'));
+  const fullTestCommand = asString(testRunStep['run'], 'workflow.jobs.test.fullTest.run');
+  if (!fullTestCommand.startsWith('node scripts/docker-seal/run.mjs --isolated-ci ')) {
+    throw new Error('Full test suite must enter the sealed runner');
+  }
+  for (const platform of platforms) {
+    const os = asString(platform['os'], 'focused.platform.os');
+    if (os.startsWith('windows-') && platform['sealed-runner'] !== 'windows.mjs') {
+      throw new Error('Windows coverage requires the native Windows sealed runner');
+    }
+  }
 
   return {
+    nodeVersions: asArray(testMatrix['node-version'], 'test.node-version').map(Number),
+    focusedPlatforms: platforms.map((entry) => asString(entry['os'], 'focused.platform.os')),
     testJob: {
       checkoutUses: asString(checkoutStep['uses'], 'workflow.jobs.test.checkout.uses'),
       checkoutFetchDepth: fetchDepth,
       i18nPolicyGateName: asString(i18nPolicyGate['name'], 'workflow.jobs.test.i18nPolicyGate.name'),
       i18nPolicyGateRun: asString(i18nPolicyGate['run'], 'workflow.jobs.test.i18nPolicyGate.run'),
-      testRunCommand: asString(testRunStep['run'], 'workflow.jobs.test.fullTest.run'),
+      testRunCommand: fullTestCommand,
     },
     focusedUnitTestsJob: {
       permissionsContents: focusedUnitTestsPermissions == null
