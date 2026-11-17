@@ -54,8 +54,8 @@ describe('Windows host quota probe', () => {
   it('reports what the host answers about the worker volume', async () => {
     // Oracle: hosted job 133886801117 showed that no identity inside the worker can change or read the entries.
     const asked: string[] = [];
-    const run = (program: string): Promise<string> => { asked.push(program); return Promise.resolve(' api-open=ok state=2\r\n'); };
-    await expect(probeHostQuota(volume, run)).resolves.toBe('quota probe on the host: api-open=ok state=2');
+    const run = (program: string): Promise<string> => { asked.push(program); return Promise.resolve('host-user=runner\r\n api-open=ok state=2\r\n'); };
+    await expect(probeHostQuota(volume, run)).resolves.toBe('quota probe on the host: host-user=runner | api-open=ok state=2');
     expect(asked).toEqual([hostQuotaProbeProgram(volume)]);
   });
 
@@ -80,6 +80,13 @@ describe('Windows host quota probe', () => {
     ['the entries it can read', 'foreach($entry in $q)'],
   ])('asks the host for %s', (_name, fragment) => {
     expect(hostQuotaProbeProgram(volume)).toContain(fragment);
+  });
+
+  it('prints each fact when the host answers, so a probe that stops later keeps the earlier facts', () => {
+    // Oracle: hosted job 133892406817 lost the whole host report; the worker removal failed after it.
+    const program = hostQuotaProbeProgram(volume);
+    expect(program).not.toContain('$facts');
+    expect(program.match(/Write-Host /g)?.length).toBeGreaterThanOrEqual(8);
   });
 
   it('never asks the host for a limit other than the 4 GiB hard quota', () => {

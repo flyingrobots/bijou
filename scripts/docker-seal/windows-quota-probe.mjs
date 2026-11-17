@@ -12,7 +12,7 @@ export async function probeQuota(run) {
   const lines = [];
   for (const user of quotaProbeUsers) {
     const report = await run(user, quotaProbeProgram)
-      .then((output) => output.trim(), (error) => `probe failed: ${error instanceof Error ? error.message : String(error)}`);
+      .then((output) => output.trim().split(/\s*\r?\n\s*/u).join(' | '), (error) => `probe failed: ${error instanceof Error ? error.message : String(error)}`);
     lines.push(`quota probe as ${user}: ${report}`);
   }
   return lines.join('\n');
@@ -27,11 +27,11 @@ export function hostQuotaProbeProgram(volume) {
   return `${hostProbeHead}${volume}${hostProbeTail}`;
 }
 const hostProbeHead = "$ErrorActionPreference='Continue'; $volume='";
-const hostProbeTail = "'; $facts=@(\"host-user=$(whoami)\"); try { $name=(New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-93-2-2').Translate([System.Security.Principal.NTAccount]).Value; $facts+=\"account=$name\" } catch { $name='User Manager\\ContainerUser'; $facts+=\"account-error=$($_.Exception.Message)\" }; $out=(fsutil quota query $volume 2>&1 | Out-String).Trim(); $facts+=\"fsutil-query=$LASTEXITCODE $($out.Substring(0, [Math]::Min(600, $out.Length)))\"; try { $q=New-Object -ComObject Microsoft.DiskQuota.1; $q.Initialize($volume, $true); $facts+=\"api-open=ok state=$($q.QuotaState)\"; $count=0; foreach($entry in $q) { if($count -lt 8) { $facts+=\"entry=$($entry.LogonName) used=$([long]$entry.QuotaUsed) limit=$([long]$entry.QuotaLimit)\" }; $count++ }; $facts+=\"entries=$count\"; $u=$q.AddUser($name); $facts+='api-add=ok'; $u.QuotaThreshold=4227858432; $u.QuotaLimit=4294967296; $facts+=\"api-limit=$([long]$u.QuotaLimit)\" } catch { $facts+=\"api-error=$($_.Exception.Message)\" }; ($facts -join ' | ') -replace '\\s+', ' '";
+const hostProbeTail = "'; Write-Host \"host-user=$(whoami)\"; try { $name=(New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-93-2-2').Translate([System.Security.Principal.NTAccount]).Value; Write-Host \"account=$name\" } catch { $name='User Manager\\ContainerUser'; Write-Host \"account-error=$($_.Exception.Message)\" }; try { $q=New-Object -ComObject Microsoft.DiskQuota.1; $q.Initialize($volume, $false); Write-Host \"api-read=ok state=$($q.QuotaState)\"; $count=0; foreach($entry in $q) { if($count -lt 8) { Write-Host \"entry=$($entry.LogonName) used=$([long]$entry.QuotaUsed) limit=$([long]$entry.QuotaLimit)\" }; $count++ }; Write-Host \"entries=$count\" } catch { Write-Host \"api-read-error=$($_.Exception.Message)\" }; try { $w=New-Object -ComObject Microsoft.DiskQuota.1; $w.Initialize($volume, $true); Write-Host 'api-write-open=ok'; $u=$w.AddUser($name); Write-Host 'api-add=ok'; $u.QuotaThreshold=4227858432; $u.QuotaLimit=4294967296; Write-Host \"api-limit=$([long]$u.QuotaLimit)\" } catch { Write-Host \"api-write-error=$($_.Exception.Message)\" }; $out=(fsutil quota query $volume 2>&1 | Out-String).Trim() -replace '\\s+', ' '; Write-Host \"fsutil-query=$LASTEXITCODE $($out.Substring(0, [Math]::Min(600, $out.Length)))\"; Write-Host 'probe=complete'";
 
 /** Run the host probe and return its report line. */
 export async function probeHostQuota(volume, run) {
   const report = await Promise.resolve().then(() => run(hostQuotaProbeProgram(volume)))
-    .then((output) => output.trim(), (error) => `probe failed: ${error instanceof Error ? error.message : String(error)}`);
+    .then((output) => output.trim().split(/\s*\r?\n\s*/u).join(' | '), (error) => `probe failed: ${error instanceof Error ? error.message : String(error)}`);
   return `quota probe on the host: ${report}`;
 }

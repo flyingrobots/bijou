@@ -10,7 +10,7 @@ import { validateWindowsWorker as validate } from './windows-policy.mjs';
 import { templateConsumerManifest } from './consumer-manifest.mjs';
 import { requireWindowsBootstrapClear } from './windows-quarantine.mjs';
 import { validateWindowsUsage } from './windows-usage.mjs';
-import { windowsCommand } from './windows-stage.mjs';
+import { windowsCommand, windowsStage } from './windows-stage.mjs';
 import { prepareWorkerProgram } from './windows-worker.mjs';
 import { establishContainerVolume, hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
 import { probeHostQuota, probeQuota } from './windows-quota-probe.mjs';
@@ -110,10 +110,20 @@ async function createWorker(network) {
   try {
     await docker(['exec', name, ...ps, `& { ${measureProgram} } -Initialize -ExpectedVolume '${quotaVolume}'`], { timeout: 15000 });
   } catch (error) {
-    const probe = await probeQuota(async (user, program) => (await docker(['exec', '--user', user, name, ...ps, program],
-      { timeout: 30000 })).output.toString());
-    const hostProbe = await probeHostQuota(quotaVolume, async (program) => (await execute([...ps, program],
-      { timeout: 60000, signal: controller.signal })).output.toString());
+    // Print each report at once: a later probe or the worker removal can fail and replace this error.
+    const probe = await windowsStage('quota-probe-worker', () => probeQuota(async (user, program) => (
+      await docker(['exec', '--user', user, name, ...ps, program], { timeout: 30000 })).output.toString()));
+    process.stdout.write(`${probe}\n`);
+    const hostProbe = await windowsStage('quota-probe-host', () => probeHostQuota(quotaVolume, async (program) => {
+      let partial = '';
+      try {
+        return (await execute([...ps, program], { timeout: 60000, signal: controller.signal,
+          onData: (chunk) => { partial += chunk.toString(); } })).output.toString();
+      } catch (cause) {
+        throw new Error(`${cause instanceof Error ? cause.message : String(cause)}; partial report: ${partial}`, { cause });
+      }
+    }));
+    process.stdout.write(`${hostProbe}\n`);
     throw new Error(`${error instanceof Error ? error.message : String(error)}\n${probe}\n${hostProbe}`, { cause: error });
   }
   dataBaseline = await measure();
