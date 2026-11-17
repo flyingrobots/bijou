@@ -17,3 +17,37 @@ export function parseHostVolumes(output) {
   if (!Array.isArray(volumes) || !volumes.length || volumes.some((value) => typeof value !== 'string')) throw new Error('Host volume inventory unavailable');
   return volumes.map((value) => value.toLowerCase());
 }
+
+const refusal = 'Independent container quota volume cannot be established';
+
+/**
+ * Accept the worker's volume query only as one volume GUID path that the host
+ * inventory does not contain, so the quota lands on a volume the container owns.
+ */
+export function parseContainerVolume(output, hostVolumes) {
+  const volumes = JSON.parse(output);
+  if (!Array.isArray(volumes) || volumes.length !== 1) throw new Error(`${refusal}: expected one volume, got ${output.trim().slice(0, 500)}`);
+  const [volume] = volumes;
+  if (typeof volume !== 'string' || !/^\\\\\?\\Volume\{[0-9a-f-]{36}\}\\$/iu.test(volume)) throw new Error(`${refusal}: not a volume GUID path: ${JSON.stringify(volume)}`);
+  if (hostVolumes.includes(volume.toLowerCase())) throw new Error(`${refusal}: present on the host: ${volume}`);
+  return volume;
+}
+
+/**
+ * Ask a started worker for its volume and pass the answer to the guard. A
+ * worker may not list its volume just after it starts, so wait for it within a
+ * bounded number of attempts. Any other answer goes to the guard at once.
+ */
+export async function establishContainerVolume(query, hostVolumes, pause, attempts) {
+  let output = await query();
+  for (let attempt = 1; attempt < attempts && !listsVolume(output); attempt += 1) {
+    await pause();
+    output = await query();
+  }
+  return parseContainerVolume(output, hostVolumes);
+}
+
+function listsVolume(output) {
+  const volumes = JSON.parse(output);
+  return !Array.isArray(volumes) || volumes.some((value) => value !== null);
+}

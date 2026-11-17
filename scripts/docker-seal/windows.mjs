@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync, rmSync, existsSync, copyFileSync, readdirSync
 import { fileURLToPath } from 'node:url';
 import { join, isAbsolute, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { setTimeout as pause } from 'node:timers/promises';
 import { execute, readInput, requireFree } from './process.mjs';
 import { snapshot } from './snapshot.mjs';
 import { validateWindowsWorker as validate } from './windows-policy.mjs';
@@ -11,7 +12,7 @@ import { requireWindowsBootstrapClear } from './windows-quarantine.mjs';
 import { validateWindowsUsage } from './windows-usage.mjs';
 import { windowsCommand } from './windows-stage.mjs';
 import { prepareWorkerProgram } from './windows-worker.mjs';
-import { hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
+import { establishContainerVolume, hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const command = process.argv.slice(2);
@@ -100,14 +101,11 @@ async function createWorker(network) {
   validate(await inspect(), network === 'none');
   await docker(['start', name]);
   await docker(['exec', name, ...ps, prepareWorkerProgram]);
-  const volumeResult = await docker(['exec', name, ...ps,
+  const volumeQuery = async () => (await docker(['exec', name, ...ps,
     "$ErrorActionPreference='Stop'; ConvertTo-Json -InputObject @((Get-CimInstance -ClassName Win32_Volume -Filter \"DriveLetter='C:'\").DeviceID) -Compress"],
-  { timeout: 15000 });
-  const volumes = JSON.parse(volumeResult.output.toString());
-  if (!Array.isArray(volumes) || volumes.length !== 1 || typeof volumes[0] !== 'string'
-      || !/^\\\\\?\\Volume\{[0-9a-f-]{36}\}\\$/iu.test(volumes[0])
-      || hostVolumes.includes(volumes[0].toLowerCase())) throw new Error('Independent container quota volume cannot be established');
-  quotaVolume = volumes[0];
+  { timeout: 15000 })).output.toString();
+  quotaVolume = await establishContainerVolume(volumeQuery, hostVolumes,
+    () => pause(1000, undefined, { signal: controller.signal }), 20);
   await docker(['exec', name, ...ps, `& { ${measureProgram} } -Initialize -ExpectedVolume '${quotaVolume}'`], { timeout: 15000 });
   dataBaseline = await measure();
   dataBackingStart = backingGrowth;
