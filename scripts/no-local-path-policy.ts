@@ -20,8 +20,5 @@ function permitted(pathname: string, path: string, dockerSource: boolean): boole
   if (/^[Cc]:\/(?:work|temp|home|node|git|windows)(?:\/|$)/iu.test(normalized)) return true;
   if (/^[Cc]:\/bijou-test-seal$/iu.test(normalized)) return true;
   // Native quota APIs address the independently verified container volume root.
-  if (pathname === 'scripts/docker-seal/windows-measure.ps1' && /^[Cc]:\/$/u.test(normalized)) return true;
-  // Only the two host orchestration boundaries address the shared lock store.
-  return ['scripts/docker-seal/run.mjs', 'scripts/docker-seal/bootstrap.mjs'].includes(pathname)
-    && /^\/Users\/Shared\/git-locks\/workstation\.git$/u.test(normalized);
+  return pathname === 'scripts/docker-seal/windows-measure.ps1' && /^[Cc]:\/$/u.test(normalized);
 }
