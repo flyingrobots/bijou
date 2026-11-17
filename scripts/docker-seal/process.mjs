@@ -21,6 +21,7 @@ export function execute(argv, options = {}) {
       stdio: ['pipe', 'pipe', 'pipe'], detached: process.platform !== 'win32',
     });
     const chunks = []; let bytes = 0; let diagnosticBytes = 0; let failure; let settled = false;
+    let diagnosticTail = Buffer.alloc(0);
     const stop = (error) => {
       if (settled) return;
       failure ??= error;
@@ -41,6 +42,7 @@ export function execute(argv, options = {}) {
     child.stderr.on('data', options.binary ? (chunk) => {
       diagnosticBytes += chunk.length;
       if (diagnosticBytes > LIMITS.log) return stop(new Error('Diagnostic output budget exceeded'));
+      diagnosticTail = Buffer.concat([diagnosticTail, chunk]).subarray(-2000);
       if (chunk.length) options.onDiagnostic?.(chunk.toString());
     } : capture);
     child.on('error', (error) => { failure = error; });
@@ -61,7 +63,7 @@ export function execute(argv, options = {}) {
       options.signal?.removeEventListener('abort', aborted);
       const output = Buffer.concat(chunks);
       if (failure) reject(failure);
-      else if (code !== 0 && !options.allowFailure) reject(new Error(`${argv[0]} exited ${code}: ${output.toString().slice(-2000)}`));
+      else if (code !== 0 && !options.allowFailure) reject(new Error(`${argv[0]} exited ${code}: ${(options.binary ? diagnosticTail : output).toString().slice(-2000)}`));
       else resolve({ code: code ?? 1, output });
     });
     child.stdin.on('error', (error) => { if (error.code !== 'EPIPE') stop(error); });
