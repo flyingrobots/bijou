@@ -33,6 +33,10 @@ Use one term per concept, and define unfamiliar terms at first use (R45 §7.2).
 
 Say "output mode", not "profile", "lowering", or "TUI mode", when you mean `interactive`, `static`, `pipe`, or `accessible`. "Lowering" names the process of rendering for a less capable mode. Introduce it with care in first-use paths (R15).
 
+## Translation glossaries
+
+Each translated locale renders these terms one way, recorded per language: [French](./glossary.fr.md), [Spanish](./glossary.es.md), and [German](./glossary.de.md). Block, Surface, Stories, core, and TUI stay English; output mode names stay English in code font. [DL-035](../design/DL-035-translation-glossary.md) records the decision.
+
 ## Component family fields
 
 Document every component family with these fields, in this order (R52). The design-system docs preflight (`npm run docs:design-system:preflight`) checks that each family has all of them.

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import '../../scripts/docker-seal/require-docker.mjs';
 
 import { PerformanceObserver } from 'node:perf_hooks';
 
