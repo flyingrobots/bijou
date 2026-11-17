@@ -4,6 +4,8 @@ about: "Use when the end state is known and only the work remains."
 labels: lane:inbox, type:enhancement
 ---
 
+# Feature
+
 ```yaml
 .dag: issue-dag/2
 .id: flyingrobots/bijou#NEW
@@ -11,6 +13,18 @@ labels: lane:inbox, type:enhancement
 .type: feature
 .blocked_by: []
 .size_hours: 2
+```
+
+```text
+You are the engineer for this issue. Read all sections of this issue.
+Write tests from section 2e first. Make sure that they fail before you write the code.
+Write the code from section 2b. Make sure that all tests pass.
+Make sure that each item in section 2d (Acceptance Criteria) is true.
+Do not change items that section 4 puts out of scope.
+Use the sealed Docker test runner for all tests. Do not use --no-verify.
+Read AGENTS.md and the Bijou code standards before you change code.
+Open a draft pull request. Link this issue. Write progress comments on the pull request.
+Make the pull request ready only when all items in the Definition of Done are true and CI passes.
 ```
 
 <!--
