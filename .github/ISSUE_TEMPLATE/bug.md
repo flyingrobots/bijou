@@ -13,6 +13,21 @@ labels: lane:inbox, type:bug
 .size_hours: 2
 ```
 
+# Bug
+
+```text
+You are the engineer for this issue. Read all sections of this issue.
+Do not start a fix before section 2f (Diagnosis) is complete.
+Reproduce the symptom in section 2c. Record the cause in section 2f.
+Write a regression test. Make sure that it fails before the fix.
+Fix the cause. Make sure that the test passes after the fix.
+Do not change items that section 4 puts out of scope.
+Use the sealed Docker test runner for all tests. Do not use --no-verify.
+Read AGENTS.md and the Bijou code standards before you change code.
+Open a draft pull request. Link this issue. Write progress comments on the pull request.
+Make the pull request ready only when all items in the Definition of Done are true and CI passes.
+```
+
 <!--
 issue-dag/2 frontmatter (Taskalisk): after GitHub assigns the number, replace NEW in `.id` with it; a block
 whose `.id` does not name the issue fails. Every reference is owner/repo#N, never a bare #N. List each

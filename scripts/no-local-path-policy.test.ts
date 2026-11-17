@@ -33,15 +33,8 @@ describe('fixed container paths versus machine-local paths', () => {
     expect(localPathViolations(path, home)).toEqual([home]);
   });
 
-  it.each(['run.mjs', 'bootstrap.mjs'])('allows only the exact shared lock store in %s', (file) => {
-    const path = `scripts/docker-seal/${file}`;
-    expect(localPathViolations(path, lock)).toEqual([]);
-    expect(localPathViolations(path, `${lock}.backup`)).toEqual([`${lock}.backup`]);
-    expect(localPathViolations(path, `${lock}/config`)).toEqual([`${lock}/config`]);
-  });
-
-  it('rejects the shared lock literal in other tooling', () => {
-    expect(localPathViolations(worker, lock)).toEqual([lock]);
+  it.each(['run.mjs', 'bootstrap.mjs', 'worker.mjs'])('rejects a hard-coded shared lock store in %s', (file) => {
+    expect(localPathViolations(`scripts/docker-seal/${file}`, lock)).toEqual([lock]);
   });
 
   it('admits the volume root only in the native quota program', () => {
