@@ -171,6 +171,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DL-034 records the pre-push verification receipt decision (#648). The witness
+  runs the policy that DL-030 selects (`fast` or `full`). The receipt binds that
+  versioned policy identity, the verified Git tree, `classificationBase`, installed
+  dependencies, toolchain and command set. The base binding applies to full
+  receipts too; a full receipt satisfies fast only when all other bindings match.
+  Dependency and generated-input manifests bind actual file bytes; ignored input
+  coverage and cooperative exclusive custody are required for reusable receipts.
+  It lives under the Git common directory and expires after 24 hours. Pre-push
+  rejects a missing, stale or forged receipt and prints the witness command.
+
 - DL-030 records the fast and full verification policies
   (`bijou.verify.fast.v1`, `bijou.verify.full.v1`). One tested path classifier
   selects the policy. Both receipt policies bind the classification base because
