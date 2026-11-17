@@ -1,3 +1,4 @@
+import './docker-seal/require-docker.mjs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createTestContext } from '../packages/bijou/src/adapters/test/index.js';

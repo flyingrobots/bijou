@@ -79,26 +79,27 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
-      - run: npm ci --engine-strict
-      - run: npm run build
-      - run: npm run lint
-      - run: npm run code:size
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version ${{ matrix.node-version }}
+      # Dependency installation and builds happen in disposable Docker workers.
+      - run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- npm run build
+      - run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && npm run lint'
+      - run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && npm run code:size'
       - name: Design-system docs preflight
         if: matrix.node-version == 22
-        run: npm run docs:design-system:preflight
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run docs:design-system:preflight'
       - name: Component audit (fails on errors not in the baseline)
         if: matrix.node-version == 22
-        run: npm run audit:components -- --all --check
+        run: node scripts/docker-seal/run.mjs --isolated-ci --export audit/component-audit.md -- bash -lc 'npm run build && npm run audit:components -- --all --check'
       - name: Upload component audit report
         if: always() && matrix.node-version == 22
         uses: actions/upload-artifact@v7
         with:
           name: component-audit
-          path: audit/component-audit.md
+          path: ${{ runner.temp }}/bijou-sealed-evidence/*/exports/audit/component-audit.md
       - name: DOGFOOD coverage gate
         if: matrix.node-version == 22 && needs.changes.outputs.dogfood == 'true'
-        run: npm run dogfood:coverage:gate
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run dogfood:coverage:gate'
       - name: DOGFOOD i18n policy gate
         if: matrix.node-version == 22 && needs.changes.outputs.dogfood == 'true'
         shell: bash
@@ -106,23 +107,22 @@ jobs:
           set -euo pipefail
           if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
             git fetch --no-tags --depth=1 origin "${GITHUB_BASE_REF}"
-            npm run dogfood:i18n:complete -- --base FETCH_HEAD
-            npm run dogfood:i18n:debt -- --base FETCH_HEAD
+            node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run dogfood:i18n:complete -- --base FETCH_HEAD && npm run dogfood:i18n:debt -- --base FETCH_HEAD'
           else
-            npm run dogfood:i18n:complete -- --base HEAD^
-            npm run dogfood:i18n:debt -- --base HEAD^
+            node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run dogfood:i18n:complete -- --base HEAD^ && npm run dogfood:i18n:debt -- --base HEAD^'
           fi
-          npm run dogfood:i18n:check
-      - run: npm run test:run
+          node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run dogfood:i18n:check'
+      - name: Full test suite
+        run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && npm run test:run'
       - name: Smoke interactive examples
         if: matrix.node-version == 22
-        run: npm run verify:interactive-examples
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run verify:interactive-examples'
       - name: Typecheck tests
         if: matrix.node-version == 22
-        run: npm run typecheck:test
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run typecheck:test'
       - name: Smoke canary apps
         if: matrix.node-version == 22
-        run: npm run smoke:canaries -- --skip-build
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run smoke:canaries -- --skip-build'
 
   unit_cross_platform:
     name: Focused Unit Tests (${{ matrix.label }}, Node 22)
@@ -135,20 +135,22 @@ jobs:
         include:
           - label: ubuntu
             os: ubuntu-latest
+            sealed-runner: run.mjs --isolated-ci
           - label: windows
-            os: windows-latest
+            os: windows-2022
+            sealed-runner: windows.mjs
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
-          cache: npm
-      - run: npm ci
-      - run: npm run build
-      - run: npm run typecheck:test
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version 22
+      - run: node scripts/docker-seal/${{ matrix.sealed-runner }} -- npm run build
+      - run: node scripts/docker-seal/${{ matrix.sealed-runner }} -- node scripts/docker-seal/dispatch.mjs --build -- npm run typecheck:test
       - name: Focused portable unit tests
         run: >-
-          npm run test:run -- --run
+          node scripts/docker-seal/${{ matrix.sealed-runner }} -- node scripts/docker-seal/dispatch.mjs --build -- npm run test:run -- --run
           packages/bijou-tui/src/eventbus.part01.test.ts
           packages/bijou-tui/src/eventbus.part02.test.ts
           packages/bijou-tui/src/eventbus.part03.test.ts
@@ -195,6 +197,12 @@ jobs:
           scripts/docs-preview-theme.part02.test.ts
           scripts/docs-preview-theme.part03.test.ts
           scripts/docs-preview-theme.part04.test.ts
+          scripts/ci-workflow-policy.test.ts
+          scripts/docker-seal/require-docker.test.ts
+          scripts/docker-seal/windows-policy.test.ts
+          scripts/docker-seal/windows-usage.test.ts
+          scripts/docker-seal/windows-quarantine.test.ts
+          scripts/docker-seal/windows-extraction.test.ts
 
   smoke_dogfood:
     name: Smoke DOGFOOD (${{ matrix.lane.label }})
@@ -218,13 +226,11 @@ jobs:
         if: needs.changes.outputs.dogfood == 'true'
         with:
           node-version: "22"
-          cache: npm
+      - name: Prepare sealed toolchain
+        if: needs.changes.outputs.dogfood == 'true'
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version 22
       - if: needs.changes.outputs.dogfood == 'true'
-        run: npm ci
-      - if: needs.changes.outputs.dogfood == 'true'
-        run: npm run build
-      - if: needs.changes.outputs.dogfood == 'true'
-        run: npm run ${{ matrix.lane.command }}
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run ${{ matrix.lane.command }}'
 
   bench_gradient:
     name: Bench Gradient
@@ -234,16 +240,16 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
-          cache: npm
-      - run: npm ci
-      - run: npm run build
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version 22
       - name: Run trusted gradient benchmark lane
         shell: bash
         run: |
           set -euo pipefail
           OUT_DIR="$RUNNER_TEMP/bijou-bench"
           mkdir -p "$OUT_DIR"
-          npm run -s bench:ci:gradient -- --out "$OUT_DIR/gradient-ci.json" > "$OUT_DIR/gradient-ci-summary.md"
+          node scripts/docker-seal/run.mjs --isolated-ci --export audit/gradient-ci.json --export audit/gradient-ci-summary.md -- bash -lc 'npm run build && mkdir -p audit && npm run -s bench:ci:gradient -- --out audit/gradient-ci.json > audit/gradient-ci-summary.md'
+          cp "$RUNNER_TEMP"/bijou-sealed-evidence/*/exports/audit/gradient-ci.json "$RUNNER_TEMP"/bijou-sealed-evidence/*/exports/audit/gradient-ci-summary.md "$OUT_DIR/"
           {
             echo '## Gradient Benchmark'
             echo

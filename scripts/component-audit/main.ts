@@ -1,3 +1,4 @@
+import '../docker-seal/require-docker.mjs';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { COMPONENT_STORIES } from '../../examples/docs/stories.js';

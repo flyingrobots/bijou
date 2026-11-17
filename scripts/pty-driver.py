@@ -12,6 +12,13 @@ import fcntl
 import struct
 import termios
 
+# Admission precedes any PTY, fixture, or child application side effects.
+subprocess.run(
+    ["node", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                          "scripts", "docker-seal", "require-docker.mjs")],
+    check=True, timeout=10,
+)
+
 sys.dont_write_bytecode = True
 
 MARKER_PREFIX = "__BIJOU_STEP__:"

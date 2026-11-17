@@ -1,8 +1,9 @@
+import './docker-seal/require-docker.mjs';
 import { cpSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { FIXTURE_ROOT, KEEP_TEMP, ROOT, SKIP_BUILD, SKIP_PTY_TESTS, runCommand } from './smoke-canaries.part01.js';
-import { assertOutputFreeOfGarbage, packPublishableUnits, rewriteManifest, runSimpleNpmLifecycle } from './smoke-canaries.part02.js';
+import { assertOutputFreeOfGarbage, disposeCanaryWorkspace, packPublishableUnits, rewriteManifest, runSimpleNpmLifecycle } from './smoke-canaries.part02.js';
 import { assertOutputContains, runTuiCanary } from './smoke-canaries.part04.js';
 
 function runCoreStaticCanary(tempRoot: string, tarballSpecs: Readonly<Record<string, string>>): void {
@@ -67,6 +68,8 @@ function main(): void {
         process.stdout.write('smoke-canaries: PTY smoke tests skipped (BIJOU_SKIP_PTY_TESTS=1). These tests verify ANSI output in a real terminal and should be run before release.\n');
       } else {
         runTuiCanary(tempRoot, tarballSpecs);
+        disposeCanaryWorkspace(resolve(tempRoot, 'generated-tui'), KEEP_TEMP);
+        disposeCanaryWorkspace(resolve(tempRoot, 'cli-runner'), KEEP_TEMP);
       }
       runCoreStaticCanary(tempRoot, tarballSpecs);
       process.stdout.write('smoke-canaries: all canaries passed\n');

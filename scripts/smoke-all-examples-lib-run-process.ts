@@ -1,3 +1,4 @@
+import './docker-seal/require-docker.mjs';
 import { spawn } from 'node:child_process';
 import { detectGarbage, stripAnsi } from './smoke-utils.js';
 import {
