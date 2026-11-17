@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+// Build only the immutable toolchain marker layer. No source or dependencies enter it.
+import { spawnSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
+import { isAbsolute } from 'node:path';
+
+const root = fileURLToPath(new URL('../../', import.meta.url));
+const args = process.argv.slice(2);
+const isolated = args.includes('--isolated-ci');
+if (isolated) {
+  if (process.env.GITHUB_ACTIONS !== 'true' || process.env.RUNNER_ENVIRONMENT !== 'github-hosted' ||
+      !isAbsolute(process.env.RUNNER_TEMP ?? '') || !existsSync(process.env.RUNNER_TEMP) ||
+      !/^\d+$/u.test(process.env.GITHUB_RUN_ID ?? '')) throw new Error('Bootstrap CI mode requires an exclusive GitHub-hosted job VM');
+  if (process.platform === 'win32') {
+    const index = args.indexOf('--node-version');
+    const { bootstrapWindows } = await import('./bootstrap-windows.mjs');
+    await bootstrapWindows(index < 0 ? '22' : args[index + 1]);
+  } else {
+    await import('./bootstrap-owned.mjs');
+  }
+} else {
+const result = spawnSync('git', ['locks', 'with',
+  '--job', `bijou-sealed-bootstrap-${randomUUID()}`,
+  '--holder', process.env.AGENT_SESSION_ID || randomUUID(),
+  '--ttl', '600', '--wait', '30', '--note', 'Bounded sealed toolchain bootstrap',
+  'host/docker/bijou-sealed-probe/', 'host/docker/bijou-sealed-tests/', '--',
+  process.execPath, 'scripts/docker-seal/bootstrap-owned.mjs', ...args], {
+  cwd: root, stdio: 'inherit',
+  env: Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_'))),
+});
+process.exitCode = result.status ?? 2;
+}

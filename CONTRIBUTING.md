@@ -6,8 +6,8 @@ covers the workflow, expectations, and resources for contributors.
 ## Getting Started
 
 1. Fork the repository and clone your fork.
-2. Install dependencies: `npm install`
-3. Set up git hooks: `git config --local core.hooksPath scripts/hooks`
+2. Install dependencies: `npm ci`. Its prepare step installs `.githooks`.
+3. Prepare the sealed Docker toolchain described in [Running tests](docs/guides/sealed-tests.md).
 4. Run the linter: `npm run lint`
 5. Run the test suite: `npm test`
 6. Verify docs references: `npm run docs:inventory`
@@ -34,18 +34,16 @@ Common validation commands:
 
 ## Platform Support
 
-The contributor path is Node-first and should not require a Unix shell for core
-local commands. `npm run clean`, `npm run build`, `npm test`, and
-`npm run typecheck:test` are expected to work on macOS, Linux, and Windows with
-a supported Node.js version.
+Tests require Docker. The launcher copies source and independent Git state into
+a disposable container; test processes cannot write into the original checkout.
+Git hooks use that same boundary. Direct test runners refuse host execution.
+See [Running tests](docs/guides/sealed-tests.md) for setup and evidence limits.
 
-CI keeps the full Node-version matrix on Ubuntu and adds focused Node 22
-build/typecheck/unit-test lanes on Ubuntu and Windows. Maintainers with macOS
-development machines cover macOS locally through the same root scripts before
-push or merge when host-specific behavior matters. Interactive terminal
-smokes, release publishing, and benchmark artifact jobs can remain
-Linux-hosted when they depend on terminal capture tooling, trusted shell
-wrappers, or registry workflow behavior.
+CI retains the full Node-version matrix on Linux and a focused Node 22 Windows
+lane. A Linux container on a Windows or macOS host provides Linux evidence;
+it does not establish native Windows or macOS behavior. Windows checks require
+Windows containers. macOS-specific test coverage remains an explicit limitation
+of the Docker-only policy. Publishing credentials stay outside test containers.
 
 ## Pull Requests
 
