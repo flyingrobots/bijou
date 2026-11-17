@@ -10,6 +10,7 @@ import { templateConsumerManifest } from './consumer-manifest.mjs';
 import { requireWindowsBootstrapClear } from './windows-quarantine.mjs';
 import { validateWindowsUsage } from './windows-usage.mjs';
 import { windowsCommand } from './windows-stage.mjs';
+import { prepareWorkerProgram } from './windows-worker.mjs';
 import { hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -98,8 +99,7 @@ async function createWorker(network) {
     '--log-driver', 'json-file', '--log-opt', 'max-size=1m', '--log-opt', 'max-file=1', image]);
   validate(await inspect(), network === 'none');
   await docker(['start', name]);
-  await docker(['exec', name, ...ps,
-    "$ErrorActionPreference='Stop'; New-Item -ItemType Directory C:\\work\\source,C:\\temp,C:\\home | Out-Null; foreach($path in @('C:\\work','C:\\temp','C:\\home')) { icacls $path /grant '*S-1-5-32-545:(OI)(CI)M'; if($LASTEXITCODE -ne 0) { throw 'Permission setup failed' } }"]);
+  await docker(['exec', name, ...ps, prepareWorkerProgram]);
   const volumeResult = await docker(['exec', name, ...ps,
     "$ErrorActionPreference='Stop'; ConvertTo-Json -InputObject @((Get-CimInstance -ClassName Win32_Volume -Filter \"DriveLetter='C:'\").DeviceID) -Compress"],
   { timeout: 15000 });
