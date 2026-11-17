@@ -14,6 +14,13 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 
 ## CODE_STANDARDS
 
+- **All tests run in sealed Docker copies**, including focused tests, smoke
+  harnesses, benchmarks, Git hooks and CI. Before executing validation, read
+  `docs/guides/sealed-tests.md`. Use the guarded launcher with copy-in source,
+  independent Git storage and remotes removed. Host test execution, host source
+  mounts, Docker-socket exposure and environment-only guard bypasses are forbidden.
+  Report a refused run as blocked; preserve its evidence and fix the boundary.
+
 - The canonical standards artifact is
   **`docs/typescript-code-standards.editors-edition.md`**, copied verbatim from
   the TypeScript Code Standards Editor's Edition source package. Humans and

@@ -40,16 +40,19 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
-          cache: npm
-
-      - run: npm ci
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version 22
 
       - name: Validate release metadata
         id: meta
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
-          npx tsx scripts/release-metadata.ts \
-            --tag "${{ github.event.inputs.tag || github.ref_name }}" \
-            --github-output "$GITHUB_OUTPUT"
+          set -euo pipefail
+          node scripts/docker-seal/run.mjs --isolated-ci --export release-metadata.txt -- node --import tsx scripts/release-metadata.ts --tag "$RELEASE_TAG" --github-output release-metadata.txt
+          outputs=("$RUNNER_TEMP"/bijou-sealed-evidence/*/exports/release-metadata.txt)
+          test "${#outputs[@]}" -eq 1 && test -f "${outputs[0]}"
+          cat "${outputs[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Capture verified release commit
         id: release_sha
@@ -59,38 +62,30 @@ jobs:
           echo "release_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Build
-        run: npm run build
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- npm run build
 
       - name: Lint
-        run: npm run lint
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run lint'
 
       - name: Type check tests
-        run: npm run typecheck:test
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run typecheck:test'
 
       - name: DOGFOOD coverage gate
-        run: npm run dogfood:coverage:gate
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run dogfood:coverage:gate'
 
       - name: Test
-        run: npm run test:run
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run test:run'
 
       - name: Smoke interactive examples
-        run: npm run verify:interactive-examples
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run verify:interactive-examples'
 
       - name: Smoke canary apps
-        run: npm run smoke:canaries -- --skip-build
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run smoke:canaries -- --skip-build'
 
       - name: Verify published files
-        run: |
-          (cd packages/bijou && npm pack --dry-run)
-          (cd packages/bijou-node && npm pack --dry-run)
-          (cd packages/bijou-tui && npm pack --dry-run)
-          (cd packages/bijou-tui-app && npm pack --dry-run)
-          (cd packages/create-bijou-tui-app && npm pack --dry-run)
-          (cd packages/bijou-i18n && npm pack --dry-run)
-          (cd packages/bijou-i18n-tools && npm pack --dry-run)
-          (cd packages/bijou-i18n-tools-node && npm pack --dry-run)
-          (cd packages/bijou-i18n-tools-xlsx && npm pack --dry-run)
-          (cd packages/bijou-mcp && npm pack --dry-run)
+        run: >-
+          node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc
+          'npm run build && (cd packages/bijou && npm pack --dry-run) && (cd packages/bijou-node && npm pack --dry-run) && (cd packages/bijou-tui && npm pack --dry-run) && (cd packages/bijou-tui-app && npm pack --dry-run) && (cd packages/create-bijou-tui-app && npm pack --dry-run) && (cd packages/bijou-i18n && npm pack --dry-run) && (cd packages/bijou-i18n-tools && npm pack --dry-run) && (cd packages/bijou-i18n-tools-node && npm pack --dry-run) && (cd packages/bijou-i18n-tools-xlsx && npm pack --dry-run) && (cd packages/bijou-mcp && npm pack --dry-run)'
 
   smoke_dogfood:
     name: Smoke DOGFOOD (${{ matrix.lane.label }})
@@ -111,11 +106,11 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
-          cache: npm
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version 22
 
-      - run: npm ci
-      - run: npm run build
-      - run: npm run ${{ matrix.lane.command }}
+      - run: node scripts/docker-seal/run.mjs --isolated-ci -- npm run build
+      - run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run ${{ matrix.lane.command }}'
 
   publish_npm:
     name: Publish npm (OIDC)
@@ -136,11 +131,9 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: npm
           registry-url: https://registry.npmjs.org
-
-      - run: npm ci
-      - run: npm run build
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version 24
 
       - name: Verify trusted-publishing toolchain
         shell: bash
@@ -167,12 +160,17 @@ jobs:
           }
           EOF
 
+      - name: Pack inside sealed worker
+        run: >-
+          node scripts/docker-seal/run.mjs --isolated-ci --node-version 24 --export release-package.tgz -- bash -lc
+          'npm run build && cd packages/${{ matrix.package }} && npm pack --pack-destination /tmp && mv /tmp/*.tgz /work/source/release-package.tgz'
+
       - name: Publish packages/${{ matrix.package }}
         uses: ./.github/actions/retry
         with:
           attempts: "3"
           delay_seconds: "15"
-          command: cd packages/${{ matrix.package }} && npm publish --access public --tag "${{ needs.verify.outputs.npm_dist_tag }}" --provenance
+          command: test "$(find "$RUNNER_TEMP/bijou-sealed-evidence" -path '*/exports/release-package.tgz' -type f | wc -l)" -eq 1 && npm publish "$RUNNER_TEMP"/bijou-sealed-evidence/*/exports/release-package.tgz --ignore-scripts --access public --tag "${{ needs.verify.outputs.npm_dist_tag }}" --provenance
 
   github_release:
     name: Create GitHub Release

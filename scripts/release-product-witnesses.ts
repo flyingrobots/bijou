@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import './docker-seal/require-docker.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
