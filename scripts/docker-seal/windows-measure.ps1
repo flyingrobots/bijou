@@ -8,10 +8,10 @@ if ($volumeIdentity.Count -ne 1 -or $volumeIdentity[0].DeviceID -ne $ExpectedVol
 # every owner so Administrator/System-owned writable files cannot escape.
 # https://learn.microsoft.com/windows/win32/fileio/disk-quota-limits
 if ($Initialize) {
-  fsutil quota enforce C: | Out-Null
-  if ($LASTEXITCODE -ne 0) { throw 'Native NTFS quota enforcement unavailable' }
-  fsutil quota modify C: 4227858432 4294967296 ContainerUser | Out-Null
-  if ($LASTEXITCODE -ne 0) { throw 'ContainerUser hard quota unavailable' }
+  $output = fsutil quota enforce C: 2>&1 | Out-String
+  if ($LASTEXITCODE -ne 0) { throw "Native NTFS quota enforcement unavailable: $($output)" }
+  $output = fsutil quota modify C: 4227858432 4294967296 ContainerUser 2>&1 | Out-String
+  if ($LASTEXITCODE -ne 0) { throw "ContainerUser hard quota unavailable: $($output)" }
 }
 $volume = New-Object -ComObject Microsoft.DiskQuota.1
 $volume.Initialize('C:\', $false)
