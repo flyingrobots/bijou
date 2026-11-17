@@ -11,7 +11,7 @@ import { requireWindowsBootstrapClear } from './windows-quarantine.mjs';
 import { validateWindowsUsage } from './windows-usage.mjs';
 import { windowsCommand } from './windows-stage.mjs';
 import { prepareWorkerProgram } from './windows-worker.mjs';
-import { hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
+import { hostVolumeInventory, parseContainerVolume, parseHostVolumes } from './windows-volumes.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const command = process.argv.slice(2);
@@ -103,11 +103,7 @@ async function createWorker(network) {
   const volumeResult = await docker(['exec', name, ...ps,
     "$ErrorActionPreference='Stop'; ConvertTo-Json -InputObject @((Get-CimInstance -ClassName Win32_Volume -Filter \"DriveLetter='C:'\").DeviceID) -Compress"],
   { timeout: 15000 });
-  const volumes = JSON.parse(volumeResult.output.toString());
-  if (!Array.isArray(volumes) || volumes.length !== 1 || typeof volumes[0] !== 'string'
-      || !/^\\\\\?\\Volume\{[0-9a-f-]{36}\}\\$/iu.test(volumes[0])
-      || hostVolumes.includes(volumes[0].toLowerCase())) throw new Error('Independent container quota volume cannot be established');
-  quotaVolume = volumes[0];
+  quotaVolume = parseContainerVolume(volumeResult.output.toString(), hostVolumes);
   await docker(['exec', name, ...ps, `& { ${measureProgram} } -Initialize -ExpectedVolume '${quotaVolume}'`], { timeout: 15000 });
   dataBaseline = await measure();
   dataBackingStart = backingGrowth;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
+import { hostVolumeInventory, parseContainerVolume, parseHostVolumes } from './windows-volumes.mjs';
 
 describe('Windows host volume inventory', () => {
   it('outlasts the hosted runner that needed more than 15 seconds', () => {
@@ -27,4 +27,26 @@ describe('Windows host volume inventory', () => {
       expect(() => parseHostVolumes(output)).toThrow('Host volume inventory unavailable');
     },
   );
+});
+
+describe('Windows container quota volume', () => {
+  const containerVolume = '\\\\?\\Volume{11111111-2222-3333-4444-555555555555}\\';
+  const hostVolumes = ['\\\\?\\volume{ab12cd34-0000-0000-0000-000000000000}\\'];
+
+  it('accepts one volume GUID path that the host does not have', () => {
+    expect(parseContainerVolume(JSON.stringify([containerVolume]), hostVolumes)).toBe(containerVolume);
+  });
+
+  // Oracle: hosted jobs 133850176905 and 133853580349 stopped here with one message for every predicate and no value.
+  it.each([
+    ['no volume', '[]', 'expected one volume, got []'],
+    ['two volumes', JSON.stringify([containerVolume, containerVolume]), 'expected one volume, got ['],
+    ['a non-list', '"C:"', 'expected one volume, got "C:"'],
+    ['a null entry', '[null]', 'not a volume GUID path: null'],
+    ['a drive letter', '["C:\\\\"]', 'not a volume GUID path: "C:\\\\"'],
+    ['a host volume in another case', JSON.stringify([hostVolumes[0]?.toUpperCase()]), 'present on the host: '],
+  ])('refuses %s and reports the predicate and the value', (_name, output, reason) => {
+    expect(() => parseContainerVolume(output, hostVolumes))
+      .toThrow(`Independent container quota volume cannot be established: ${reason}`);
+  });
 });
