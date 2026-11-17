@@ -4,8 +4,6 @@ about: "Use when there is one answerable question and a decision waits on the an
 labels: lane:inbox, type:spike
 ---
 
-# Research
-
 ```yaml
 .dag: issue-dag/2
 .id: flyingrobots/bijou#NEW
@@ -14,6 +12,8 @@ labels: lane:inbox, type:spike
 .blocked_by: []
 .size_hours: 2
 ```
+
+# Research
 
 ```text
 You are the researcher for this issue. Read all sections of this issue.

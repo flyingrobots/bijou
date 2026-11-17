@@ -4,8 +4,6 @@ about: "Use when the facts are known and the open item is which option, and who 
 labels: lane:inbox, type:spike
 ---
 
-# Decision
-
 ```yaml
 .dag: issue-dag/2
 .id: flyingrobots/bijou#NEW
@@ -14,6 +12,8 @@ labels: lane:inbox, type:spike
 .blocked_by: []
 .size_hours: 2
 ```
+
+# Decision
 
 ```text
 You are the analyst for this issue. Read all sections of this issue.

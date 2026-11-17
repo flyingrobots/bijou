@@ -4,8 +4,6 @@ about: "Use for a card that does not fit a typed template. This is the flat nine
 labels: lane:inbox
 ---
 
-# Task
-
 ```yaml
 .dag: issue-dag/2
 .id: flyingrobots/bijou#NEW
@@ -14,6 +12,8 @@ labels: lane:inbox
 .blocked_by: []
 .size_hours: 2
 ```
+
+# Task
 
 ```text
 You are the engineer for this issue. Read all sections of this issue.

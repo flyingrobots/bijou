@@ -4,8 +4,6 @@ about: "Use when there is a symptom and no known cause. No Proposed Solution at 
 labels: lane:inbox, type:bug
 ---
 
-# Bug
-
 ```yaml
 .dag: issue-dag/2
 .id: flyingrobots/bijou#NEW
@@ -14,6 +12,8 @@ labels: lane:inbox, type:bug
 .blocked_by: []
 .size_hours: 2
 ```
+
+# Bug
 
 ```text
 You are the engineer for this issue. Read all sections of this issue.

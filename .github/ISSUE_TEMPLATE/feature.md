@@ -4,8 +4,6 @@ about: "Use when the end state is known and only the work remains."
 labels: lane:inbox, type:enhancement
 ---
 
-# Feature
-
 ```yaml
 .dag: issue-dag/2
 .id: flyingrobots/bijou#NEW
@@ -14,6 +12,8 @@ labels: lane:inbox, type:enhancement
 .blocked_by: []
 .size_hours: 2
 ```
+
+# Feature
 
 ```text
 You are the engineer for this issue. Read all sections of this issue.

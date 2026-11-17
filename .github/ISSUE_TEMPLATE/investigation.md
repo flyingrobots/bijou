@@ -4,8 +4,6 @@ about: "Use when a system matters but we do not yet know what questions to ask a
 labels: lane:inbox, type:spike
 ---
 
-# Investigation
-
 ```yaml
 .dag: issue-dag/2
 .id: flyingrobots/bijou#NEW
@@ -14,6 +12,8 @@ labels: lane:inbox, type:spike
 .blocked_by: []
 .size_hours: 2
 ```
+
+# Investigation
 
 ```text
 You are the investigator for this issue. Read all sections of this issue.

@@ -4,8 +4,6 @@ about: "Use to test an approach with throwaway code inside a time box."
 labels: lane:inbox, type:spike
 ---
 
-# Spike
-
 ```yaml
 .dag: issue-dag/2
 .id: flyingrobots/bijou#NEW
@@ -14,6 +12,8 @@ labels: lane:inbox, type:spike
 .blocked_by: []
 .size_hours: 2
 ```
+
+# Spike
 
 ```text
 You are the engineer for this issue. Read all sections of this issue.
