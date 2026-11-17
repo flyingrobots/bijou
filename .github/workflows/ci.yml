@@ -202,6 +202,7 @@ jobs:
           scripts/docker-seal/windows-policy.test.ts
           scripts/docker-seal/windows-usage.test.ts
           scripts/docker-seal/windows-quarantine.test.ts
+          scripts/docker-seal/windows-extraction.test.ts
 
   smoke_dogfood:
     name: Smoke DOGFOOD (${{ matrix.lane.label }})

@@ -1,5 +1,5 @@
 import './docker-seal/require-docker.mjs';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { detectGarbage, PTY_MARKER_PREFIX, rewritePackageManifestToTarballs, stripAnsi, type PtyStep } from './smoke-utils.js';
 import { ROOT, discoverPublishableUnits, requireJsonRecord, runCommand, tail } from './smoke-canaries.part01.js';
@@ -134,4 +134,9 @@ function collapseWhitespace(text: string): string {
   return compactWhitespace(text).replace(/\s+/g, '');
 }
 
-export { assertOutputFreeOfGarbage, collapseWhitespace, compactWhitespace, packPublishableUnits, parseCheckpointSegments, rewriteManifest, runPtyScenario, runSimpleNpmLifecycle };
+/** Release a passed canary's install so the next canary fits the sealed generated-byte allowance. */
+function disposeCanaryWorkspace(workspace: string, keep: boolean): void {
+  if (!keep) rmSync(workspace, { recursive: true, force: true });
+}
+
+export { assertOutputFreeOfGarbage, disposeCanaryWorkspace, collapseWhitespace, compactWhitespace, packPublishableUnits, parseCheckpointSegments, rewriteManifest, runPtyScenario, runSimpleNpmLifecycle };

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { execute, requireFree } from './process.mjs';
 import { windowsCommand, windowsStage } from './windows-stage.mjs';
+import { gitExtractionCommands } from './windows-extraction.mjs';
 import { requireWindowsBootstrapClear, withWindowsDaemonCustody, windowsBootstrapQuarantined } from './windows-quarantine.mjs';
 
 const directory = fileURLToPath(new URL('.', import.meta.url));
@@ -88,7 +89,9 @@ export async function bootstrapWindows(version) {
     } };
     await windowsCommand('extract-node', ['tar.exe', '-xf', join(scratch, 'node.zip'), '-C', context], extraction);
     renameSync(join(context, 'node-v22.23.3-win-x64'), join(context, 'node'));
-    await windowsCommand('extract-git', ['tar.exe', '-xf', join(scratch, 'git.tar.bz2'), '-C', join(context, 'git')], extraction);
+    for (const { label, argv, timeout } of gitExtractionCommands(scratch, join(context, 'git'))) {
+      await windowsCommand(label, argv, { ...extraction, timeout });
+    }
     if (measure(scratch) > 1024 * MiB) throw new Error('Windows toolchain context exceeds 1 GiB');
     copyFileSync(join(directory, 'Dockerfile.windows'), join(context, 'Dockerfile'));
     copyFileSync(join(directory, 'marker'), join(context, 'marker'));
