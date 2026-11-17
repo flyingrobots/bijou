@@ -43,7 +43,7 @@ describe('Windows container quota volume', () => {
     ['two volumes', JSON.stringify([containerVolume, containerVolume]), 'expected one volume, got ['],
     ['a non-list', '"C:"', 'expected one volume, got "C:"'],
     ['a null entry', '[null]', 'not a volume GUID path: null'],
-    ['a drive letter', '["C:\\\\"]', 'not a volume GUID path: "C:\\\\"'],
+    ['a device name', '["HarddiskVolume3"]', 'not a volume GUID path: "HarddiskVolume3"'],
     ['a host volume in another case', JSON.stringify([hostVolumes[0]?.toUpperCase()]), 'present on the host: '],
   ])('refuses %s and reports the predicate and the value', (_name, output, reason) => {
     expect(() => parseContainerVolume(output, hostVolumes))
