@@ -9,6 +9,8 @@ import { validateWindowsWorker as validate } from './windows-policy.mjs';
 import { templateConsumerManifest } from './consumer-manifest.mjs';
 import { requireWindowsBootstrapClear } from './windows-quarantine.mjs';
 import { validateWindowsUsage } from './windows-usage.mjs';
+import { windowsCommand } from './windows-stage.mjs';
+import { hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const command = process.argv.slice(2);
@@ -120,12 +122,9 @@ async function assignSourceOwner() {
 try {
   backing = JSON.parse((await docker(['info', '--format', '{{json .DockerRootDir}}'])).output.toString());
   lastBackingFree = requireFree(backing);
-  const hostVolumeResult = await execute([...ps,
-    "$ErrorActionPreference='Stop'; ConvertTo-Json -InputObject @((Get-CimInstance -ClassName Win32_Volume).DeviceID) -Compress"],
-  { timeout: 15000, signal: controller.signal, hostPath: backing });
-  hostVolumes = JSON.parse(hostVolumeResult.output.toString());
-  if (!Array.isArray(hostVolumes) || !hostVolumes.length || hostVolumes.some((value) => typeof value !== 'string')) throw new Error('Host volume inventory unavailable');
-  hostVolumes = hostVolumes.map((value) => value.toLowerCase());
+  const hostVolumeResult = await windowsCommand(hostVolumeInventory.label, hostVolumeInventory.argv,
+    { timeout: hostVolumeInventory.timeout, signal: controller.signal, hostPath: backing });
+  hostVolumes = parseHostVolumes(hostVolumeResult.output.toString());
   const toolchain = JSON.parse((await docker(['image', 'inspect', image])).output.toString())[0];
   if (toolchain.Os !== 'windows' || toolchain.Size > 20 * GiB) throw new Error('Windows toolchain image invalid');
   const sourceIndex = process.env.GIT_INDEX_FILE ? resolve(process.cwd(), process.env.GIT_INDEX_FILE) : undefined;
