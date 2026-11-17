@@ -28,9 +28,7 @@ const result = spawnSync('git', ['locks', 'with',
   'host/docker/bijou-sealed-probe/', 'host/docker/bijou-sealed-tests/', '--',
   process.execPath, 'scripts/docker-seal/bootstrap-owned.mjs', ...args], {
   cwd: root, stdio: 'inherit',
-  env: Object.fromEntries(Object.entries({ ...process.env,
-    GIT_LOCKS_STORE: '/Users/Shared/git-locks/workstation.git',
-  }).filter(([key]) => !key.startsWith('GIT_') || key === 'GIT_LOCKS_STORE')),
+  env: Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_'))),
 });
 process.exitCode = result.status ?? 2;
 }
