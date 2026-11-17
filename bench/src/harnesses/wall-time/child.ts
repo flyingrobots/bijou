@@ -1,3 +1,4 @@
+import '../../../../scripts/docker-seal/require-docker.mjs';
 /**
  * Wall-time harness — child process.
  *

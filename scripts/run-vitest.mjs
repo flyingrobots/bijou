@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import './docker-seal/require-docker.mjs';
 import { spawnSync } from 'node:child_process';
 import { readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve, relative } from 'node:path';

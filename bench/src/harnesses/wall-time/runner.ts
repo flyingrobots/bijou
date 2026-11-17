@@ -1,3 +1,4 @@
+import '../../../../scripts/docker-seal/require-docker.mjs';
 import { randomUUID } from 'node:crypto';
 import { computeStats } from '../../stats.js';
 import { SCENARIOS, getScenario } from '../../scenarios/index.js';

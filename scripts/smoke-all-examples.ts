@@ -1,4 +1,5 @@
 #!/usr/bin/env npx tsx
+import './docker-seal/require-docker.mjs';
 
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
