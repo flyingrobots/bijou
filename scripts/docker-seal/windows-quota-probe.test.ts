@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hostQuotaProbeProgram, probeHostQuota, probeQuota, quotaProbeProgram, quotaProbeUsers } from './windows-quota-probe.mjs';
+import { hostQuotaProbeProgram, hyperVQuotaProbeProgram, probeHostQuota, probeHyperVQuota, probeQuota, quotaProbeProgram, quotaProbeUsers } from './windows-quota-probe.mjs';
 
 describe('Windows quota probe', () => {
   it('reports the facts that each worker identity returns', async () => {
@@ -94,5 +94,26 @@ describe('Windows host quota probe', () => {
     const numbers = hostQuotaProbeProgram(volume).replace(volume, '').match(/\d{7,}/g) ?? [];
     expect(numbers.length).toBeGreaterThan(0);
     expect(new Set(numbers)).toEqual(new Set(['4227858432', '4294967296']));
+  });
+});
+
+describe('Windows Hyper-V quota probe', () => {
+  it('reports how a Hyper-V isolated worker answers the same quota probe', async () => {
+    // Oracle: hosted job 133911265792 showed that neither a process-isolated worker nor the host can set the entry.
+    const asked: string[] = [];
+    const run = (program: string): Promise<string> => { asked.push(program); return Promise.resolve('fsutil-enforce=0\r\n user=x | fsutil-modify=0\r\n'); };
+    await expect(probeHyperVQuota(run)).resolves.toBe('quota probe in a Hyper-V worker: fsutil-enforce=0 | user=x | fsutil-modify=0');
+    expect(asked).toEqual([hyperVQuotaProbeProgram]);
+  });
+
+  it('enforces quotas on the new volume, then asks the worker probe questions', () => {
+    expect(hyperVQuotaProbeProgram.startsWith('$out=(fsutil quota enforce C: 2>&1 | Out-String).Trim();')).toBe(true);
+    expect(hyperVQuotaProbeProgram.endsWith(quotaProbeProgram)).toBe(true);
+  });
+
+  it('reports a Hyper-V worker that cannot start', async () => {
+    const run = (): Promise<string> => Promise.reject(new Error('docker exited 125: hypervisor is not present'));
+    await expect(probeHyperVQuota(run))
+      .resolves.toBe('quota probe in a Hyper-V worker: probe failed: docker exited 125: hypervisor is not present');
   });
 });
