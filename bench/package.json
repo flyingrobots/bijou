@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "bench": "node --import tsx src/cli.ts run",
+    "bench": "node ../scripts/docker-seal/dispatch.mjs -- node --import tsx bench/src/cli.ts run",
     "bench:compare": "node --import tsx src/cli.ts compare",
     "lint": "tsc --noEmit"
   },

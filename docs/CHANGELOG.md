@@ -23,6 +23,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Translation glossaries for French, Spanish, and German
+  (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
+  Block, Surface, Stories, core, and TUI stay English; graceful lowering is
+  abaissement maîtrisé, reducción controlada, and kontrolliertes Absenken;
+  address form is vous, tú, and du. DL-035 records the decision (#588).
 - DL-037 sets the scope of the DOGFOOD localization touched-file rule (#664).
   A touched file must not add or modify raw visible copy without localizing
   it, and must lower its raw-string debt by at least one entry. Whole-file
@@ -169,6 +174,27 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   from Explainability walkthroughs and Path and progress. The `guidedFlow()`
   story now maps to that family, so the Components Library covers 36 of 37 families
   (#586).
+
+- DL-034 records the pre-push verification receipt decision (#648). The witness
+  runs the policy that DL-030 selects (`fast` or `full`). The receipt binds that
+  versioned policy identity, the verified Git tree, `classificationBase`, installed
+  dependencies, toolchain and command set. The base binding applies to full
+  receipts too; a full receipt satisfies fast only when all other bindings match.
+  Dependency and generated-input manifests bind actual file bytes; ignored input
+  coverage and cooperative exclusive custody are required for reusable receipts.
+  It lives under the Git common directory and expires after 24 hours. Pre-push
+  rejects a missing, stale or forged receipt and prints the witness command.
+
+- DL-030 records the fast and full verification policies
+  (`bijou.verify.fast.v1`, `bijou.verify.full.v1`). One tested path classifier
+  selects the policy. Both receipt policies bind the classification base because
+  both run base-sensitive localization gates. Local pushes are authorized by a
+  DL-034 witness receipt with actual dependency/generated-input bindings and
+  declared input coverage. Build precedes the remaining verification gates.
+  The receipt is
+  for that policy, the fast lane runs on draft pull requests, and the unchanged
+  release-grade full lane is required at merge through a single
+  `Verification gate` check (#608).
 
 - DL-032 records the scroll-measurement cache contract: a runtime-owned frame
   input revision, a one-entry cache per framed-app runtime, and the

@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { localPathViolations } from './no-local-path-policy.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BINARY_EXTENSIONS = new Set([
@@ -20,10 +21,6 @@ const BINARY_EXTENSIONS = new Set([
   '.woff2',
   '.ttf',
 ]);
-const USER_HOME_SEGMENT = ['/', 'Users', '/'].join('');
-const HOME_SEGMENT = ['/', 'home', '/'].join('');
-const FILE_SCHEME = ['file:', '//'].join('');
-const WINDOWS_ABSOLUTE_PATH = /\b[A-Za-z]:\\/;
 
 // Frozen source and delivery evidence retain original paths. Exact hashes prevent
 // these exceptions from admitting new machine-specific content or mutable code.
@@ -84,18 +81,8 @@ describe('repo hygiene', () => {
       }
 
       const text = buffer.toString('utf8');
-      if (text.includes(USER_HOME_SEGMENT)) {
-        violations.push(`${relativePath}: contains macOS user-home absolute path`);
-      }
-      if (text.includes(HOME_SEGMENT)) {
-        violations.push(`${relativePath}: contains POSIX home absolute path`);
-      }
-      if (text.includes(FILE_SCHEME)) {
-        violations.push(`${relativePath}: contains file URL`);
-      }
-      if (WINDOWS_ABSOLUTE_PATH.test(text)) {
-        violations.push(`${relativePath}: contains Windows absolute path`);
-      }
+      violations.push(...localPathViolations(relativePath, text)
+        .map((path) => `${relativePath}: contains local absolute path: ${path}`));
     }
 
     expect(violations, violations.join('\n')).toEqual([]);

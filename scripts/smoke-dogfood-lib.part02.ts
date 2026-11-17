@@ -1,3 +1,4 @@
+import './docker-seal/require-docker.mjs';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 import { detectGarbage } from './smoke-utils.js';

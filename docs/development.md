@@ -9,6 +9,7 @@ The `examples/` tree is runnable secondary/internal reference material; DOGFOOD 
 - Node.js 20.19.0 or newer in the 20.x line, or Node.js 22.12.0 or newer
 - Node.js 22.12 or newer is recommended for local development
 - npm 8+ (or your preferred npm-compatible package manager)
+- A running Docker daemon for all tests; see [sealed test setup](./guides/sealed-tests.md).
 
 The repository development toolchain is tested against Node.js 20 and 22 in
 CI. Newer Node.js versions are supported by policy; the repository enforces the
@@ -19,19 +20,20 @@ Core build and unit-test coverage runs on Ubuntu for Node 20/22, with focused
 Ubuntu and Windows Node 22 lanes for portable path and bootstrap checks.
 Contributor-facing root scripts such as `npm run clean` and
 `npm run version` are Node scripts so they do not require a Unix shell.
-macOS validation is expected to run locally on maintainer development machines
-instead of on higher-cost GitHub-hosted macOS runners. Release, publish, and
+Maintainers on macOS run the sealed Linux container locally; this does not
+establish native macOS runtime coverage. Release, publish, and
 benchmark workflows may still use Linux-hosted Bash where the workflow itself is
 intentionally platform-specific.
 
 ## Running Tests
 
-Agent review runs follow the guarded Docker and shared-resource rules in [AGENTS.md](../AGENTS.md); run the commands below inside that worker.
+All test entrypoints use the [sealed Docker runner](./guides/sealed-tests.md).
+It copies source into independent Git storage without remotes or host mounts;
+tests run with networking disabled. Git hooks use the same boundary.
 
-Before running tests, build first:
+The test launcher builds the copied workspace before running tests:
 
 ```bash
-npm run build
 npm test
 ```
 
@@ -48,13 +50,9 @@ For long-running verification runs:
 - `npm run soak`
 - `npm run bench`
 
-To skip PTY tests in non-TTY environments, set:
-
-```bash
-BIJOU_SKIP_PTY_TESTS=1
-```
-
-The suite will print an explicit warning and continue without PTY checks.
+PTY checks create their terminals inside the sealed container and do not require
+an interactive host terminal. Host environment variables that skip tests are
+not forwarded into the worker.
 
 ## Localization And i18n
 
