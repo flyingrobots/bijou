@@ -1,3 +1,4 @@
+import './docker-seal/require-docker.mjs';
 import { spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';

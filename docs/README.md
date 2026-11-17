@@ -56,6 +56,7 @@ The glossary and topic finder support practical lookup.
 - [Build your first Bijou app](./guides/getting-started.md): minimal app, packages, layouts, and DOGFOOD controls.
 - [Job Monitor tutorial](https://github.com/flyingrobots/bijou-job-monitor): a complete application and the teaching book.
 - [Developing Bijou](./development.md): toolchain, testing, localization, and contribution workflow.
+- [Run tests in a disposable Docker copy](./guides/sealed-tests.md): copy-in isolation, offline execution, and validation receipts.
 
 ## Current operating references
 
@@ -64,6 +65,7 @@ The glossary and topic finder support practical lookup.
 - [Project front door](../README.md)
 - [Agent agreements](../AGENTS.md)
 - [Design vocabulary](./topics/design-vocabulary.md): canonical terms, component family fields, and writing style
+- Translation glossaries ([French](./topics/glossary.fr.md), [Spanish](./topics/glossary.es.md), [German](./topics/glossary.de.md)): one rendering per Bijou term, address form, and typography; decision in [DL-035](./design/DL-035-translation-glossary.md)
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)
 - [Changelog](./CHANGELOG.md)
