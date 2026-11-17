@@ -13,6 +13,20 @@ labels: lane:inbox, type:spike
 .size_hours: 2
 ```
 
+# Decision
+
+```text
+You are the analyst for this issue. Read all sections of this issue.
+Examine each option in section 2b. Cite the evidence for each consequence.
+Do not make the decision yourself unless section 2d names you.
+Record the decision and the rejected options where the next reader will find them.
+Write the location of that record in a comment on this issue.
+Use the sealed Docker test runner for all tests. Do not use --no-verify.
+Read AGENTS.md and the Bijou code standards before you change code.
+Open a draft pull request. Link this issue. Write progress comments on the pull request.
+Make the pull request ready only when all items in the Definition of Done are true and CI passes.
+```
+
 <!--
 issue-dag/2 frontmatter (Taskalisk): after GitHub assigns the number, replace NEW in `.id` with it; a block
 whose `.id` does not name the issue fails. Every reference is owner/repo#N, never a bare #N. List each

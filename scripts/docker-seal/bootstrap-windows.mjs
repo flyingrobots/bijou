@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, renameSync, rmSync, readdirSync, lstatSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, renameSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { execute, requireFree } from './process.mjs';
 import { windowsCommand, windowsStage } from './windows-stage.mjs';
 import { gitExtractionCommands } from './windows-extraction.mjs';
+import { measureContext } from './windows-context.mjs';
 import { requireWindowsBootstrapClear, withWindowsDaemonCustody, windowsBootstrapQuarantined } from './windows-quarantine.mjs';
 
 const directory = fileURLToPath(new URL('.', import.meta.url));
@@ -28,18 +29,6 @@ async function download(url, checksum, output, signal) {
   const data = Buffer.concat(chunks);
   if (createHash('sha256').update(data).digest('hex') !== checksum) throw new Error('Toolchain checksum mismatch');
   writeFileSync(output, data);
-}
-
-function measure(path, state = { entries: 0, bytes: 0 }) {
-  return readdirSync(path).reduce((total, name) => {
-    if (++state.entries > 100000) throw new Error('Toolchain context exceeds 100000 entries');
-    const child = join(path, name); const stat = lstatSync(child);
-    if (stat.isSymbolicLink()) throw new Error('Toolchain context symlink refused');
-    if (stat.isDirectory()) return total + measure(child, state);
-    state.bytes += stat.size;
-    if (state.bytes > 1024 * MiB) throw new Error('Toolchain context exceeds 1 GiB');
-    return total + stat.size;
-  }, 0);
 }
 
 /** Prepare a checksum-pinned Windows toolchain image without host lifecycle work. */
@@ -78,7 +67,7 @@ export async function bootstrapWindows(version) {
     const extraction = { timeout: 120000, signal: controller.signal, monitor: () => {
       const started = performance.now();
       const state = { entries: 0, bytes: 0 };
-      try { measure(scratch, state); }
+      try { measureContext(scratch, state); }
       finally {
         if (performance.now() - lastReport >= 10000) {
           process.stdout.write(`${JSON.stringify({ bootstrap: 'windows', measurement: 'extraction',
@@ -92,13 +81,13 @@ export async function bootstrapWindows(version) {
     for (const { label, argv, timeout } of gitExtractionCommands(scratch, join(context, 'git'))) {
       await windowsCommand(label, argv, { ...extraction, timeout });
     }
-    if (measure(scratch) > 1024 * MiB) throw new Error('Windows toolchain context exceeds 1 GiB');
+    if (measureContext(scratch) > 1024 * MiB) throw new Error('Windows toolchain context exceeds 1 GiB');
     copyFileSync(join(directory, 'Dockerfile.windows'), join(context, 'Dockerfile'));
     copyFileSync(join(directory, 'marker'), join(context, 'marker'));
     await withWindowsDaemonCustody({ operation: 'build', base, backing, context: scratch }, async () => {
       await windowsCommand('build-toolchain', ['docker', 'build', '--pull=false', '--tag', 'bijou-sealed-windows-node22:local', context], {
         timeout: 600000, signal: controller.signal, onData: (chunk) => process.stdout.write(chunk),
-        monitor: () => { monitorBacking(); measure(scratch); },
+        monitor: () => { monitorBacking(); measureContext(scratch); },
       });
       const built = JSON.parse((await execute(['docker', 'image', 'inspect', 'bijou-sealed-windows-node22:local'])).output.toString())[0];
       if (built.Size - image.Size > 1024 * MiB) throw new Error('Windows toolchain layer exceeds 1 GiB');
