@@ -10,3 +10,6 @@ fixtures/profunctor-page/project-keep/input/* -text
 fixtures/profunctor-page/project-keep/generated/* -text
 examples/docs/fixtures/graphql/navigation-list.graphql -text
 tests/fixtures/RE-036/packed-bijou-cells.v1.json -text
+
+# The image seal marker is compared byte for byte inside the Windows worker.
+scripts/docker-seal/marker -text
