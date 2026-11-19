@@ -8,12 +8,26 @@ function worker(): WindowsWorkerInspection {
   return {
     Config: { Labels: { 'org.bijou.sealed-tests': 'windows-v1' } },
     Mounts: [],
-    HostConfig: { NetworkMode: 'none', CpuCount: 2, Memory: 6 * 1024 ** 3, StorageOpt: { size: '8G' }, Isolation: 'process' },
+    HostConfig: { NetworkMode: 'none', CpuCount: 2, Memory: 6 * 1024 ** 3, Isolation: 'process' },
     NetworkSettings: { Networks: { none: {} } },
   };
 }
 
 describe('Windows worker admission', () => {
+  it.each([['the size that Docker accepted and did not enforce', { size: '8G' }], ['a larger size', { size: '64G' }]])(
+    'refuses a storage option, which can only enlarge the worker volume: %s',
+    (_name, StorageOpt) => {
+      // Oracle: hosted job 135323118345, where size=8G left a 21339549696 byte volume.
+      const candidate = worker();
+      expect(() => { validateWindowsWorker({ ...candidate, HostConfig: { ...candidate.HostConfig, StorageOpt } }, true); }).toThrow('isolation profile');
+    },
+  );
+
+  it('admits an empty storage option record', () => {
+    const candidate = worker();
+    expect(() => { validateWindowsWorker({ ...candidate, HostConfig: { ...candidate.HostConfig, StorageOpt: {} } }, true); }).not.toThrow();
+  });
+
   it('admits the bounded offline profile', () => {
     expect(() => { validateWindowsWorker(worker(), true); }).not.toThrow();
   });
@@ -44,7 +58,6 @@ describe('Windows worker admission', () => {
   it.each([
     { CpuCount: 0 },
     { Memory: 0 },
-    { StorageOpt: {} },
     { SecurityOpt: [['credentialspec=file:', '//domain.json'].join('')] },
   ])('refuses an unbounded or credentialed host configuration: %j', (change) => {
     const candidate = worker();

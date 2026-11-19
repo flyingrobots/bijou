@@ -76,6 +76,29 @@ Linux workers use a read-only root, bounded temporary filesystems, private
 processes and networking, and no Docker socket or host mounts. CPU, memory,
 process, output and runtime limits remain active while commands execute.
 
+Windows workers run as `ContainerUser` with process isolation, no host mounts,
+and no network while tests execute. Their storage limits differ from the Linux
+limits, and each has a different strength:
+
+| Limit | Value | Kind |
+| --- | --- | --- |
+| Worker volume | at most 20 GiB | Hard. The volume refuses writes when it is full. The launcher measures the capacity in each worker and refuses a larger volume. |
+| Data budget | 4 GiB | Sampled. The launcher stops the run when it observes more growth than this since the worker started. |
+| Generated-data budget | 40 MiB | Sampled. The same observation, counted from the end of the offline dependency installation. |
+| Host free space | 50 GiB floor | Sampled. The launcher stops when the filesystem that holds Docker storage has less free space. |
+
+A sampled budget charges the larger of two observations: growth of used space
+on the worker volume, and decreases of free space on the host filesystem that
+holds Docker storage. It can miss use that happens between two samples, and the
+host figure also counts other activity on that filesystem. The receipts record
+these limits under `storage`.
+
+Windows workers have no per-account disk quota. GitHub-hosted Windows runners
+refuse to set or read quota entries for a container, and Docker does not shrink
+a Windows worker volume below its default size: a requested 8 GiB size left a
+21,339,549,696 byte volume (hosted job 135323118345). The launcher therefore
+sets no storage option and refuses a worker that has one.
+
 The Git copy intentionally retains repository history and staged blobs for
 base-sensitive and staged-file checks. Host Git configuration, credential
 stores and ignored local inputs are not copied. This is not a claim that
