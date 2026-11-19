@@ -93,11 +93,12 @@ holds Docker storage. It can miss use that happens between two samples, and the
 host figure also counts other activity on that filesystem. The receipts record
 these limits under `storage`.
 
-Windows workers have no per-account disk quota. GitHub-hosted Windows runners
-refuse to set or read quota entries for a container, and Docker does not shrink
-a Windows worker volume below its default size: a requested 8 GiB size left a
-21,339,549,696 byte volume (hosted job 135323118345). The launcher therefore
-sets no storage option and refuses a worker that has one.
+Windows workers have no per-account disk quota: GitHub-hosted Windows runners
+refuse to set or read quota entries for a container. The launcher requests a
+20 GB worker volume, which is the smallest that Docker gives a Windows worker,
+and refuses a worker with any other storage setting. On hosted runners a
+smaller request still gave a 21,339,549,696 byte volume (job 135323118345), and
+no request gave a 136,229,920,768 byte volume (job 135334072019).
 
 The Git copy intentionally retains repository history and staged blobs for
 base-sensitive and staged-file checks. Host Git configuration, credential

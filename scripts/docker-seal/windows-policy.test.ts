@@ -8,24 +8,22 @@ function worker(): WindowsWorkerInspection {
   return {
     Config: { Labels: { 'org.bijou.sealed-tests': 'windows-v1' } },
     Mounts: [],
-    HostConfig: { NetworkMode: 'none', CpuCount: 2, Memory: 6 * 1024 ** 3, Isolation: 'process' },
+    HostConfig: { NetworkMode: 'none', CpuCount: 2, Memory: 6 * 1024 ** 3, StorageOpt: { size: '20G' }, Isolation: 'process' },
     NetworkSettings: { Networks: { none: {} } },
   };
 }
 
 describe('Windows worker admission', () => {
-  it.each([['the size that Docker accepted and did not enforce', { size: '8G' }], ['a larger size', { size: '64G' }]])(
-    'refuses a storage option, which can only enlarge the worker volume: %s',
-    (_name, StorageOpt) => {
-      // Oracle: hosted job 135323118345, where size=8G left a 21339549696 byte volume.
-      const candidate = worker();
-      expect(() => { validateWindowsWorker({ ...candidate, HostConfig: { ...candidate.HostConfig, StorageOpt } }, true); }).toThrow('isolation profile');
-    },
-  );
-
-  it('admits an empty storage option record', () => {
+  it.each([
+    ['no storage option, which leaves the 127 GB default volume', undefined],
+    ['an empty storage option record', {}],
+    ['a size that Docker raises to its 20 GB minimum', { size: '8G' }],
+    ['a larger size', { size: '64G' }],
+    ['an extra storage option', { size: '20G', other: '1' }],
+  ])('refuses %s', (_name, StorageOpt) => {
+    // Oracle: hosted job 135334072019 measured 136229920768 bytes with no option; job 135323118345 measured 21339549696 with size=8G.
     const candidate = worker();
-    expect(() => { validateWindowsWorker({ ...candidate, HostConfig: { ...candidate.HostConfig, StorageOpt: {} } }, true); }).not.toThrow();
+    expect(() => { validateWindowsWorker({ ...candidate, HostConfig: { ...candidate.HostConfig, StorageOpt } }, true); }).toThrow('isolation profile');
   });
 
   it('admits the bounded offline profile', () => {

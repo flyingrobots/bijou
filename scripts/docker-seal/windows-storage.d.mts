@@ -5,6 +5,7 @@ export interface WorkerStorage {
 }
 export const storageMeasureProgram: string;
 export const storageContract: {
+  readonly requestedSize: string;
   readonly enforcement: string;
   readonly maximumCapacityBytes: number;
   readonly demonstration: string;

@@ -51,9 +51,14 @@ describe('Windows storage contract for receipts', () => {
   });
 
   it('claims no per-account quota and no 8 GiB boundary', () => {
-    // Oracle: the same job showed that a requested 8G size left a 21339549696 byte volume.
+    // Oracle: job 135323118345 showed that a requested 8G size left a 21339549696 byte volume.
     const text = JSON.stringify(storageContract);
     expect(text).not.toMatch(/quota/i);
     expect(text).not.toMatch(/\b8 ?G/i);
+  });
+
+  it('requests the smallest volume that Docker gives a Windows worker', () => {
+    // Oracle: job 135334072019 measured a 136229920768 byte volume when no size was requested.
+    expect(storageContract.requestedSize).toBe('20G');
   });
 });

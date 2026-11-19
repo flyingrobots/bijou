@@ -8,10 +8,12 @@ export const storageMeasureProgram = "$ErrorActionPreference='Stop'; $drive=New-
 
 /**
  * What the receipts may claim about Windows worker storage. The worker volume
- * is the hard limit; Docker does not shrink it below its default size. The
- * usage budgets are sampled observations, not a per-account limit.
+ * is the hard limit: 20G is the smallest size Docker gives a Windows worker,
+ * and with no size the volume is about 127 GB. The usage budgets are sampled
+ * observations, not a per-account limit.
  */
 export const storageContract = Object.freeze({
+  requestedSize: '20G',
   enforcement: 'hard: the worker volume refuses writes when it is full; its capacity is measured in the worker and must not exceed maximumCapacityBytes',
   maximumCapacityBytes,
   demonstration: 'hosted job 135323118345: a worker volume of 21339549696 bytes refused writes with ERROR_DISK_FULL after 21273509888 bytes',

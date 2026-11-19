@@ -91,7 +91,7 @@ async function createWorker(network) {
   dataBaseline = undefined; logBaseline = undefined; dataBackingStart = backingGrowth;
   created = true;
   await docker(['create', '--name', name, '--label', `${label}=windows-v1`, '--isolation', 'process',
-    '--network', network, '--cpu-count', '2', '--memory', '6g',
+    '--network', network, '--cpu-count', '2', '--memory', '6g', '--storage-opt', `size=${storageContract.requestedSize}`,
     '--log-driver', 'json-file', '--log-opt', 'max-size=1m', '--log-opt', 'max-file=1', image]);
   validate(await inspect(), network === 'none');
   await docker(['start', name]);
