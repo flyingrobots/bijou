@@ -52,9 +52,9 @@ async function measure(baseline = false) {
   const result = await docker(['exec', name, ...ps, storageMeasureProgram], { timeout: 15000 });
   const usage = { ...parseWorkerStorage(result.output.toString()), backingFree };
   if (usage.processes < 1 || usage.processes > 256) throw new Error('Windows process budget exceeded');
-  const data = validateWindowsUsage(usage, dataBaseline ?? usage, backingGrowth - dataBackingStart, 4 * GiB);
+  const data = validateWindowsUsage(usage, dataBaseline ?? usage, backingGrowth - dataBackingStart, 4 * GiB, 'data');
   if (baseline) { logBaseline = usage; logBackingStart = backingGrowth; }
-  const generated = logBaseline ? validateWindowsUsage(usage, logBaseline, backingGrowth - logBackingStart, generatedBudget) : 0;
+  const generated = logBaseline ? validateWindowsUsage(usage, logBaseline, backingGrowth - logBackingStart, generatedBudget, 'generated data') : 0;
   Object.assign(usage, { data, generated, backingGrowth });
   return usage;
 }
