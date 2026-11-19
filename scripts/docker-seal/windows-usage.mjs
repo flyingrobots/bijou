@@ -3,22 +3,19 @@ function bytes(value, label) {
   if (!Number.isSafeInteger(value) || value < 0) throw new Error(`Missing or invalid Windows ${label} measurement`);
   return value;
 }
-/** Quota records cover every owner and stream; backing growth also covers metadata. */
+/**
+ * Charge the larger of two sampled observations since the baseline: growth of
+ * used space on the worker volume, and backing growth, which also covers
+ * metadata. Neither can show what happened between two samples.
+ */
 export function validateWindowsUsage(current, baseline, backingGrowth, limit) {
   bytes(current.backingFree, 'backing free');
   if (current.backingFree < 50 * GiB) throw new Error('Windows Docker backing free-space floor reached');
-  if (!current.owners || !Object.keys(current.owners).length) throw new Error('Windows quota accounting is unavailable');
-  if (!baseline.owners || !Object.keys(baseline.owners).length) throw new Error('Windows quota baseline is unavailable');
-  for (const sid of Object.keys(baseline.owners)) {
-    if (!Object.hasOwn(current.owners, sid)) throw new Error('Windows quota owner measurement is incomplete');
+  if (bytes(current.capacityBytes, 'worker capacity') !== bytes(baseline.capacityBytes, 'baseline capacity')) {
+    throw new Error('Windows worker storage capacity changed');
   }
-  let growth = 0;
-  for (const [sid, used] of Object.entries(current.owners)) {
-    if (!/^S-1-/u.test(sid)) throw new Error('Windows quota owner is not a SID');
-    const before = baseline.owners[sid] ?? 0;
-    // A shrink or ownership transfer must never cancel another owner's growth.
-    growth += Math.max(0, bytes(used, 'owner usage') - bytes(before, 'baseline owner usage'));
-  }
+  // A smaller worker volume must never cancel backing growth.
+  const growth = Math.max(0, bytes(current.usedBytes, 'worker used space') - bytes(baseline.usedBytes, 'baseline used space'));
   const measured = Math.max(growth, bytes(backingGrowth, 'backing growth'));
   if (measured > bytes(limit, 'usage limit')) throw new Error('Windows writable-layer allowance exhausted');
   return measured;
