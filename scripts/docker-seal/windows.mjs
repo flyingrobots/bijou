@@ -10,7 +10,7 @@ import { templateConsumerManifest } from './consumer-manifest.mjs';
 import { requireWindowsBootstrapClear } from './windows-quarantine.mjs';
 import { validateWindowsUsage } from './windows-usage.mjs';
 import { parseWorkerStorage, storageContract, storageMeasureProgram } from './windows-storage.mjs';
-import { prepareWorkerProgram } from './windows-worker.mjs';
+import { assignSourceOwnerProgram, prepareWorkerProgram } from './windows-worker.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const command = process.argv.slice(2);
@@ -103,9 +103,7 @@ async function createWorker(network) {
 async function assignSourceOwner() {
   // Git checks ownership of the worktree root as well as .git. The latter is
   // created by ContainerUser; Docker copy leaves the former administrator-owned.
-  await docker(['exec', name, ...ps,
-    "$ErrorActionPreference='Stop'; icacls C:\\work\\source /setowner ContainerUser; if($LASTEXITCODE -ne 0) { throw 'Source ownership assignment failed' }; $expected=([System.Security.Principal.NTAccount]'ContainerUser').Translate([System.Security.Principal.SecurityIdentifier]).Value; $actual=(Get-Acl C:\\work\\source).GetOwner([System.Security.Principal.SecurityIdentifier]).Value; if($actual -ne $expected) { throw 'Source ownership verification failed' }"],
-  { timeout: 15000 });
+  await docker(['exec', name, ...ps, assignSourceOwnerProgram], { timeout: 15000 });
 }
 try {
   backing = JSON.parse((await docker(['info', '--format', '{{json .DockerRootDir}}'])).output.toString());
