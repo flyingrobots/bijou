@@ -27,6 +27,8 @@ export function parseWorkerStorage(output) {
   const { capacityBytes, freeBytes, processes } = answer;
   if (!Number.isSafeInteger(capacityBytes) || capacityBytes <= 0 || !Number.isSafeInteger(freeBytes) || freeBytes < 0
       || freeBytes > capacityBytes || !Number.isSafeInteger(processes)) throw new Error(unavailable);
-  if (capacityBytes > maximumCapacityBytes) throw new Error('Windows worker storage boundary exceeds 20 GiB');
+  if (capacityBytes > maximumCapacityBytes) {
+    throw new Error(`Windows worker storage boundary exceeds 20 GiB: capacity ${String(capacityBytes)} bytes, free ${String(freeBytes)} bytes`);
+  }
   return { capacityBytes, usedBytes: capacityBytes - freeBytes, processes };
 }

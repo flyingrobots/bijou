@@ -13,7 +13,8 @@ describe('Windows worker storage measurement', () => {
 
   it('refuses a worker volume larger than the demonstrated 20 GiB boundary', () => {
     const output = answer({ capacityBytes: 20 * GiB + 1, freeBytes: GiB, processes: 12 });
-    expect(() => parseWorkerStorage(output)).toThrow('Windows worker storage boundary exceeds 20 GiB');
+    // Oracle: hosted job 135329759013 refused a worker and did not say how large its volume was.
+    expect(() => parseWorkerStorage(output)).toThrow('Windows worker storage boundary exceeds 20 GiB: capacity 21474836481 bytes, free 1073741824 bytes');
   });
 
   it.each([
