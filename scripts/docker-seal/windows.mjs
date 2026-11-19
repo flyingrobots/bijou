@@ -14,6 +14,7 @@ import { windowsCommand, windowsStage } from './windows-stage.mjs';
 import { prepareWorkerProgram } from './windows-worker.mjs';
 import { establishContainerVolume, hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
 import { probeHostQuota, probeQuota } from './windows-quota-probe.mjs';
+import { judgeStorageProbe, storageProbeProgram } from './windows-storage-probe.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const command = process.argv.slice(2);
@@ -124,10 +125,45 @@ async function createWorker(network) {
       }
     }));
     process.stdout.write(`${hostProbe}\n`);
-    throw new Error(`${error instanceof Error ? error.message : String(error)}\n${probe}\n${hostProbe}`, { cause: error });
+    const storageProbe = await windowsStage('storage-probe', probeStorage);
+    process.stdout.write(`${storageProbe}\n`);
+    throw new Error(`${error instanceof Error ? error.message : String(error)}\n${probe}\n${hostProbe}\n${storageProbe}`, { cause: error });
   }
   dataBaseline = await measure();
   dataBackingStart = backingGrowth;
+}
+// Fill a disposable worker with the sealed worker's storage settings, to learn
+// what boundary --storage-opt really gives. The 50 GiB host floor guards every
+// docker call here, and the program has its own byte ceiling.
+async function probeStorage() {
+  const probeName = `${name}-storage`;
+  const facts = { requestedSize: '8G', container: 'disposable, process isolation, network none, ContainerUser' };
+  let report = '';
+  try {
+    facts.server = (await docker(['version', '--format', '{{.Server.Version}}'])).output.toString().trim();
+    facts.driver = (await docker(['info', '--format', '{{.Driver}}'])).output.toString().trim();
+    facts.image = JSON.parse((await docker(['image', 'inspect', image])).output.toString())[0].Id;
+    await docker(['create', '--name', probeName, '--label', `${label}=windows-v1`, '--isolation', 'process',
+      '--network', 'none', '--cpu-count', '2', '--memory', '6g', '--storage-opt', 'size=8G',
+      '--log-driver', 'json-file', '--log-opt', 'max-size=1m', '--log-opt', 'max-file=1', image]);
+    await docker(['start', probeName]);
+    await docker(['exec', probeName, ...ps, prepareWorkerProgram]);
+    await docker(['exec', '--user', 'ContainerUser', probeName, ...ps, storageProbeProgram(24 * GiB)],
+      { timeout: 900000, onData: (chunk) => { report += chunk.toString(); } });
+  } catch (cause) {
+    facts.stopped = (cause instanceof Error ? cause.message : String(cause)).slice(-600);
+  }
+  try {
+    await docker(['rm', '--force', probeName], { timeout: 120000, signal: undefined });
+    facts.removed = true;
+  } catch (cause) {
+    facts.removed = (cause instanceof Error ? cause.message : String(cause)).slice(-300);
+  }
+  try {
+    return JSON.stringify({ storageProbe: { ...facts, ...judgeStorageProbe(report, 8 * GiB) } });
+  } catch (cause) {
+    return JSON.stringify({ storageProbe: { ...facts, verdict: 'unreadable', reason: cause instanceof Error ? cause.message : String(cause), report: report.slice(-600) } });
+  }
 }
 async function assignSourceOwner() {
   // Git checks ownership of the worktree root as well as .git. The latter is
