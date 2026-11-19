@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { validateWindowsUsage } from './windows-usage.mjs';
+import { validateWindowsUsage, windowsUsageGrowth } from './windows-usage.mjs';
 
 const GiB = 1024 ** 3;
 const free = 60 * GiB;
@@ -41,5 +41,14 @@ describe('Windows observed-usage budget', () => {
   });
   it('refuses a backing filesystem below the unchanged free-space floor', () => {
     expect(() => validateWindowsUsage({ ...baseline, backingFree: 49 * GiB }, baseline, 0, 10, 'data')).toThrow('free-space floor');
+  });
+});
+
+describe('Windows observed growth', () => {
+  it('reports the two observations separately and charges nothing', () => {
+    expect(windowsUsageGrowth({ ...baseline, usedBytes: 180 }, baseline, 12)).toEqual({ volumeGrowth: 30, backingGrowth: 12 });
+  });
+  it('refuses a missing used-space measurement', () => {
+    expect(() => windowsUsageGrowth({ ...baseline, usedBytes: undefined }, baseline, 0)).toThrow('Missing or invalid Windows worker used space measurement');
   });
 });

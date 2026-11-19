@@ -8,7 +8,7 @@ import { snapshot } from './snapshot.mjs';
 import { validateWindowsWorker as validate } from './windows-policy.mjs';
 import { templateConsumerManifest } from './consumer-manifest.mjs';
 import { requireWindowsBootstrapClear } from './windows-quarantine.mjs';
-import { validateWindowsUsage } from './windows-usage.mjs';
+import { validateWindowsUsage, windowsUsageGrowth } from './windows-usage.mjs';
 import { parseWorkerStorage, storageContract, storageMeasureProgram } from './windows-storage.mjs';
 import { assignSourceOwnerProgram, prepareWorkerProgram } from './windows-worker.mjs';
 
@@ -33,6 +33,7 @@ requireWindowsBootstrapClear();
 mkdirSync(destination, { recursive: true });
 let snap; let created = false; let sealed = false; let cleanupComplete = false;
 let backing; let lastBackingFree; let backingGrowth = 0;
+let generatedPeak = { volumeGrowth: 0, backingGrowth: 0, samples: 0 };
 let dataBaseline; let dataBackingStart = 0; let logBaseline; let logBackingStart = 0;
 const controller = new AbortController();
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => controller.abort());
@@ -54,7 +55,14 @@ async function measure(baseline = false) {
   if (usage.processes < 1 || usage.processes > 256) throw new Error('Windows process budget exceeded');
   const data = validateWindowsUsage(usage, dataBaseline ?? usage, backingGrowth - dataBackingStart, 4 * GiB, 'data');
   if (baseline) { logBaseline = usage; logBackingStart = backingGrowth; }
-  const generated = logBaseline ? validateWindowsUsage(usage, logBaseline, backingGrowth - logBackingStart, generatedBudget, 'generated data') : 0;
+  // MEASUREMENT ONLY (#788): the generated-data budget is observed here, not enforced. Never merge.
+  let generated = 0;
+  if (logBaseline) {
+    const seen = windowsUsageGrowth(usage, logBaseline, backingGrowth - logBackingStart);
+    generatedPeak = { volumeGrowth: Math.max(generatedPeak.volumeGrowth, seen.volumeGrowth),
+      backingGrowth: Math.max(generatedPeak.backingGrowth, seen.backingGrowth), samples: generatedPeak.samples + 1 };
+    generated = Math.max(seen.volumeGrowth, seen.backingGrowth);
+  }
   Object.assign(usage, { data, generated, backingGrowth });
   return usage;
 }
@@ -156,6 +164,7 @@ try {
   }));
   process.exitCode = result.code;
 } finally {
+  process.stdout.write(`${JSON.stringify({ generatedBudgetObservation: { limit: generatedBudget, ...generatedPeak } })}\n`);
   if (created) {
     const state = await docker(['inspect', name], { allowFailure: true, cleanup: true });
     if (state.code === 0) {
