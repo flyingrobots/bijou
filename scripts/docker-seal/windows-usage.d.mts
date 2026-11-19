@@ -3,4 +3,4 @@ export interface WindowsUsage {
   readonly usedBytes: number | undefined;
   readonly backingFree: number;
 }
-export function validateWindowsUsage(current: WindowsUsage, baseline: WindowsUsage, backingGrowth: number, limit: number): number;
+export function validateWindowsUsage(current: WindowsUsage, baseline: WindowsUsage, backingGrowth: number, limit: number, budget: string): number;
