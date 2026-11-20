@@ -20,6 +20,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Design record DL-029 decides the DOGFOOD Code Dojo debt dashboard: a
+  `release` page guide that renders a committed `code-dojo.debt-report.v1`
+  snapshot and an append-only `code-dojo.debt-history.v1` ledger, with no live
+  computation at render time (#601). The proposed contracts keep report checks
+  optional, distinguish unavailable live data, and preserve cited history with
+  idempotent recording and explicit unknown or zero-debt goalpost states.
+
 - Translation glossaries for French, Spanish, and German
   (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
   Block, Surface, Stories, core, and TUI stay English; graceful lowering is
