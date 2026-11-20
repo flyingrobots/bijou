@@ -82,7 +82,8 @@ describe('DOGFOOD i18n debt inventory', () => {
 
       // Keep #549's two removals, 24 localized release entries, and the typed
       // root-route identifier removed while wiring actual landing lowering.
-      expect(inventory.total).toBe(2258);
+      // Alignment option enums are control values, not visible copy (#624).
+      expect(inventory.total).toBe(2256);
       expect(surfaces).not.toContain('app-root-view');
       expect(surfaces).toContain('stories-story-guided-flow');
       expect(surfaces).not.toContain('docs-app');

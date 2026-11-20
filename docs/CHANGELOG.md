@@ -20,6 +20,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The DOGFOOD Components reading path shows the active variant, its position
+  and the variant count, and the active profile inline in the story pane
+  (#624), at every layout width and in all four locales. The facts no longer
+  depend on the wide-only variants pane, so the contextual drawer migration can
+  remove that pane without removing a required fact.
 - Translation glossaries for French, Spanish, and German
   (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
   Block, Surface, Stories, core, and TUI stay English; graceful lowering is
