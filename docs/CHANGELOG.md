@@ -92,6 +92,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- DOGFOOD shows the language-change notice in the newly selected language,
+  so cycling Preferred language from French to Spanish reads in Spanish
+  (#582).
 - The Markdown CLI resize test drains PTY output during shutdown, preventing
   macOS terminal restoration from blocking behind unread output. Its five-second
   shutdown deadline and process-group cleanup remain unchanged (#746).
