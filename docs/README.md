@@ -56,6 +56,7 @@ The glossary and topic finder support practical lookup.
 - [Agent agreements](../AGENTS.md)
 - [Design vocabulary](./topics/design-vocabulary.md): canonical terms, component family fields, and writing style
 - [Browser renderer seam for `ui-scene-ir/1`](./topics/ui-scene-browser/README.md): element mapping, refusals, receipt, and [test plan](./topics/ui-scene-browser/test-plan.md)
+- [Browser host adapter](./topics/bijou-web/README.md): the `@flyingrobots/bijou-web` port contracts, refusals, and [test plan](./topics/bijou-web/test-plan.md)
 - Translation glossaries ([French](./topics/glossary.fr.md), [Spanish](./topics/glossary.es.md), [German](./topics/glossary.de.md)): one rendering per Bijou term, address form, and typography; decision in [DL-035](./design/DL-035-translation-glossary.md)
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)
