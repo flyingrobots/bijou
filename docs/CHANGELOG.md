@@ -27,6 +27,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   no Node.js imports. Output goes to caller-supplied sinks or in-memory
   buffers. `readFile`, `readDir`, `question`, and `rawInput` refuse with a
   typed `WebUnsupportedCapabilityError`. The package is not published to npm.
+- `@flyingrobots/bijou` has a browser renderer seam for `ui-scene-ir/1`
+  (#442). `lowerUiSceneToBrowser()` lowers a scene with a `geordi-browser`
+  target profile to a deterministic element tree and HTML markup that hold only
+  scene facts. `createUiSceneBrowserDom()` builds the tree through a host
+  document, and `createUiSceneBrowserReceipt()` fills `outputs.browser` in a
+  `ui-scene-receipt/1`. The terminal renderer is unchanged. Reference:
+  `docs/topics/ui-scene-browser/README.md`.
 - Translation glossaries for French, Spanish, and German
   (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
   Block, Surface, Stories, core, and TUI stay English; graceful lowering is
