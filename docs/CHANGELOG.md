@@ -28,6 +28,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   A run without a presenter is unchanged. The `static`, `pipe`, and
   `accessible` output modes ignore the presenter. The contract does not cover a
   hardware cursor overlay, OSC 8 hyperlinks, or a window title.
+- `@flyingrobots/bijou` has a browser renderer seam for `ui-scene-ir/1`
+  (#442). `lowerUiSceneToBrowser()` lowers a scene with a `geordi-browser`
+  target profile to a deterministic element tree and HTML markup that hold only
+  scene facts. `createUiSceneBrowserDom()` builds the tree through a host
+  document, and `createUiSceneBrowserReceipt()` fills `outputs.browser` in a
+  `ui-scene-receipt/1`. The terminal renderer is unchanged. Reference:
+  `docs/topics/ui-scene-browser/README.md`.
 - Translation glossaries for French, Spanish, and German
   (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
   Block, Surface, Stories, core, and TUI stay English; graceful lowering is
