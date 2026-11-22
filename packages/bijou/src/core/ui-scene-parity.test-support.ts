@@ -126,6 +126,7 @@ export function withAttribute(
 
 export function deepFreeze<T>(value: T): T {
   if (typeof value !== 'object' || value === null) return value;
-  for (const entry of Object.values(value)) deepFreeze(entry);
+  const entries: unknown[] = Object.values(value);
+  for (const entry of entries) deepFreeze(entry);
   return Object.freeze(value);
 }
