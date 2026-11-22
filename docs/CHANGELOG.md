@@ -20,6 +20,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `@flyingrobots/bijou-web` is a new workspace package for browser hosts
+  (#792). `createWebContext()` composes `createWebClock()`,
+  `createWebRuntime()`, `createWebStyle()`, and `createWebOutputIO()` into a
+  `BijouContext` for all four output modes, with no runtime dependencies and
+  no Node.js imports. Output goes to caller-supplied sinks or in-memory
+  buffers. `readFile`, `readDir`, `question`, and `rawInput` refuse with a
+  typed `WebUnsupportedCapabilityError`. The package is not published to npm.
 - Translation glossaries for French, Spanish, and German
   (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
   Block, Surface, Stories, core, and TUI stay English; graceful lowering is
