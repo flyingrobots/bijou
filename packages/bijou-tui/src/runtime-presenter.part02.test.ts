@@ -1,5 +1,5 @@
 import { counterApp, createInteractiveContext, describe, expect, it, run, scheduleKeys, scheduleResizes } from './runtime.test-support.js';
-import { captureByteWrites, recordingPresenter } from './runtime-presenter.test-support.js';
+import { captureByteWrites, UP, recordingPresenter } from './runtime-presenter.test-support.js';
 import type { SurfacePresenter } from './surface-presenter.js';
 
 describe('run with a SurfacePresenter', () => {
@@ -14,7 +14,7 @@ describe('run with a SurfacePresenter', () => {
       runtime: { columns: 12, rows: 2 },
     });
     const byteWrites = captureByteWrites(ctx);
-    scheduleKeys(ctx, clock, [{ at: 10, key: 'up' }, { at: 30, key: 'q' }]);
+    scheduleKeys(ctx, clock, [{ at: 10, key: UP }, { at: 30, key: 'q' }]);
     scheduleResizes(ctx, clock, [{ at: 20, columns: 14, rows: 3 }]);
 
     const promise = run(counterApp(), { ctx, presenter });
@@ -116,7 +116,7 @@ describe('run with a SurfacePresenter', () => {
     };
     const { clock, ctx } = createInteractiveContext();
     scheduleResizes(ctx, clock, [{ at: 10, columns: 20, rows: 4 }]);
-    scheduleKeys(ctx, clock, [{ at: 20, key: 'up' }, { at: 30, key: 'q' }]);
+    scheduleKeys(ctx, clock, [{ at: 20, key: UP }, { at: 30, key: 'q' }]);
 
     const promise = run(counterApp(), { ctx, presenter });
     await clock.advanceByAsync(50);

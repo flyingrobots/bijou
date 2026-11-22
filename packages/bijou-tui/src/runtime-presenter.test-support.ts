@@ -6,6 +6,10 @@ import {
 import type { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import type { SurfacePresenter } from './surface-presenter.js';
 
+/** Raw terminal input for the arrow keys that `counterApp()` reads. */
+export const UP = '\x1b[A';
+export const DOWN = '\x1b[B';
+
 /** A frame copied inside `present()`, before the runtime swaps framebuffers. */
 export interface PresentedFrame {
   readonly current: Surface;

@@ -1,5 +1,5 @@
 import { type App, createInteractiveContext, describe, expect, it, quit, run, scheduleKeys, scheduleResizes, singleCellSurface } from './runtime.test-support.js';
-import { captureByteWrites, isDirty, recordingPresenter } from './runtime-presenter.test-support.js';
+import { captureByteWrites, DOWN, isDirty, recordingPresenter } from './runtime-presenter.test-support.js';
 
 /** Counter that paints one glyph while its count is above zero. */
 function glyphCounterApp(): App<number> {
@@ -22,7 +22,7 @@ async function runGolden() {
   });
   const byteWrites = captureByteWrites(ctx);
   const host = recordingPresenter();
-  scheduleKeys(ctx, clock, [{ at: 10, key: 'down' }, { at: 30, key: 'q' }]);
+  scheduleKeys(ctx, clock, [{ at: 10, key: DOWN }, { at: 30, key: 'q' }]);
   scheduleResizes(ctx, clock, [{ at: 20, columns: 9, rows: 3 }]);
   const promise = run(glyphCounterApp(), { ctx, presenter: host.presenter });
   await clock.advanceByAsync(50);

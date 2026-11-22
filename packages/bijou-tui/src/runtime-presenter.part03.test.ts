@@ -1,5 +1,5 @@
 import { counterApp, createInteractiveContext, createTestContext, describe, expect, it, run, scheduleKeys, scheduleResizes } from './runtime.test-support.js';
-import { captureByteWrites, recordingPresenter } from './runtime-presenter.test-support.js';
+import { captureByteWrites, UP, recordingPresenter } from './runtime-presenter.test-support.js';
 
 const LOWERED_MODES = ['static', 'pipe', 'accessible'] as const;
 
@@ -42,7 +42,7 @@ describe('run with a SurfacePresenter', () => {
       if (next() % 2 === 0) {
         resizes.push({ at, columns: 12 + (next() % 20), rows: 2 + (next() % 6) });
       } else {
-        keys.push({ at, key: 'up' });
+        keys.push({ at, key: UP });
         ups += 1;
       }
     }

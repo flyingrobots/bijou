@@ -60,8 +60,9 @@ export interface SurfacePresenter {
 
   /**
    * Called when the viewport size changes, before the frame at the new size,
-   * in place of the escape sequence that clears the terminal. The runtime
-   * reports a thrown error as a runtime issue and continues.
+   * in place of the escape sequence that clears the terminal. If this hook
+   * throws, the runtime reports the error as a runtime issue, does not send
+   * that resize message to the app, and continues at the new size.
    *
    * @param cols - New viewport width in cells.
    * @param rows - New viewport height in cells.
