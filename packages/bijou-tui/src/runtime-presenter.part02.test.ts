@@ -80,16 +80,10 @@ describe('run with a SurfacePresenter', () => {
 
   it('presents the crash Surface when present() throws once', async () => {
     const failure = new Error('one bad frame');
-    const host = recordingPresenter();
-    let calls = 0;
-    const presenter: SurfacePresenter = {
-      ...host.presenter,
-      present(current, target, ctx) {
-        calls += 1;
-        if (calls === 1) throw failure;
-        host.presenter.present(current, target, ctx);
-      },
-    };
+    const host = recordingPresenter({
+      present: (call) => (call === 1 ? failure : undefined),
+    });
+    const { presenter } = host;
     const { clock, ctx } = createInteractiveContext();
     scheduleKeys(ctx, clock, [{ at: 10, key: '\r' }]);
 
@@ -107,13 +101,10 @@ describe('run with a SurfacePresenter', () => {
   });
 
   it('reports a throwing onResize and keeps the run alive', async () => {
-    const host = recordingPresenter();
-    const presenter: SurfacePresenter = {
-      ...host.presenter,
-      onResize() {
-        throw new Error('resize refused');
-      },
-    };
+    const host = recordingPresenter({
+      onResize: new Error('resize refused'),
+    });
+    const { presenter } = host;
     const { clock, ctx } = createInteractiveContext();
     scheduleResizes(ctx, clock, [{ at: 10, columns: 20, rows: 4 }]);
     scheduleKeys(ctx, clock, [{ at: 20, key: UP }, { at: 30, key: 'q' }]);

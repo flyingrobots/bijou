@@ -28,6 +28,38 @@ describe('run with a SurfacePresenter', () => {
     expect(byteWrites).toEqual([]);
   });
 
+  it('rejects when enter() throws, before any frame', async () => {
+    const failure = new Error('no device');
+    const host = recordingPresenter({ enter: failure });
+    const { ctx } = createInteractiveContext();
+
+    const outcome = run(counterApp(), {
+      ctx,
+      presenter: host.presenter,
+    }).then(() => 'resolved', (error: unknown) => error);
+
+    expect(await outcome).toBe(failure);
+    expect(host.events).toEqual([]);
+    expect(ctx.io.written.join('')).toBe('');
+  });
+
+  it('rejects when exit() throws, after the last frame', async () => {
+    const failure = new Error('device busy');
+    const host = recordingPresenter({ exit: failure });
+    const { clock, ctx } = createInteractiveContext();
+    scheduleKeys(ctx, clock, [{ at: 10, key: 'q' }]);
+
+    const outcome = run(counterApp(), {
+      ctx,
+      presenter: host.presenter,
+    }).then(() => 'resolved', (error: unknown) => error);
+    await clock.advanceByAsync(30);
+
+    expect(await outcome).toBe(failure);
+    expect(host.kinds()).toEqual(['enter', 'present']);
+    expect(ctx.io.written.join('')).toBe('');
+  });
+
   it('keeps framebuffers clean across 100 rapid resize and key events', async () => {
     const host = recordingPresenter();
     const next = sequence(791);
