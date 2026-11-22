@@ -254,6 +254,17 @@ status keys fall back to `semantic.muted`.
   Review the exact input versions, supported blocks, inspection modes, output
   contracts, diagnostics, and verification commands.
 
+### Browser Renderer Seam
+
+- **`lowerUiSceneToBrowser()`**: Lower a `ui-scene-ir/1` scene with a
+  `geordi-browser` target profile to a deterministic element tree and HTML
+  markup. The output holds only facts the scene declares.
+- **`createUiSceneBrowserDom()`**: Build that tree through a host document.
+- **`createUiSceneBrowserReceipt()`**: Record the browser output in a
+  `ui-scene-receipt/1`.
+- **[Browser renderer seam reference](../../docs/topics/ui-scene-browser/README.md)**:
+  Review the element mapping, options, refusals, and limits.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.
