@@ -38,15 +38,21 @@ export interface WebOutputIO extends IOPort {
 
 const DEFAULT_BUFFER_LIMIT = 1_048_576;
 
-function createBuffer(limit: number): { append(data: string): void; read(): string; clear(): void } {
+interface TextBuffer {
+  readonly append: (data: string) => void;
+  readonly read: () => string;
+  readonly clear: () => void;
+}
+
+function createBuffer(limit: number): TextBuffer {
   let text = '';
   return {
-    append(data) {
+    append: (data) => {
       text += data;
       if (text.length > limit) text = text.slice(text.length - limit);
     },
     read: () => text,
-    clear() { text = ''; },
+    clear: () => { text = ''; },
   };
 }
 

@@ -39,7 +39,7 @@ export function sgr(open: string, close: string): SgrPair {
 export function parseHex(color: string): readonly [number, number, number] | undefined {
   const match = HEX_COLOR.exec(color);
   if (match === null) return undefined;
-  const digits = match[2] ?? [...(match[1] ?? '')].map((digit) => digit + digit).join('');
+  const digits = match[2] ?? (match[1] ?? '').replace(/./gu, '$&$&');
   const value = Number.parseInt(digits, 16);
   return [(value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff];
 }
