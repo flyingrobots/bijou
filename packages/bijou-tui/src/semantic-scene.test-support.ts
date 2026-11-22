@@ -101,7 +101,7 @@ export function panelScene(model: PanelModel): UiSceneIr {
     ['panel.enabled', 'switch', model.enabled ? 'On' : 'Off'],
     ['panel.reset', 'button', 'Reset'],
   ];
-  const nodes: readonly UiNode[] = rows.map(([id, role, value], y) => ({
+  const nodes: readonly UiNode[] = rows.map(([id, role, value], y): UiNode => ({
     id,
     kind: 'text',
     role,
