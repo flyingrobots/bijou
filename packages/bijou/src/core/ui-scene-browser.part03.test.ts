@@ -98,11 +98,19 @@ describe('ui-scene-ir/1 browser seam refusals', () => {
     );
   });
 
-  it('omits a layout number that is not finite', () => {
+  it('refuses a layout number that is not finite', () => {
+    expect(() =>
+      lowerUiSceneToBrowser(
+        withNode(debuggerScene, 'debugger.tick', {
+          layout: { x: Number.NaN, y: 1 },
+        }),
+      ),
+    ).toThrow('ui-scene-ir/1 JSON value must be finite; got NaN');
+  });
+
+  it('keeps a fractional layout number as the scene states it', () => {
     const lowered = lowerUiSceneToBrowser(
-      withNode(debuggerScene, 'debugger.tick', {
-        layout: { x: Number.NaN, y: 1.5, width: Number.POSITIVE_INFINITY },
-      }),
+      withNode(debuggerScene, 'debugger.tick', { layout: { y: 1.5 } }),
     );
     expect(lowered.markup).toContain(
       'data-bijou-source="fixture.debugger:3:1" style="--bijou-y:1.5">',

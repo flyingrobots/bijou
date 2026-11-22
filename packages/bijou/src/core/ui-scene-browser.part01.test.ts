@@ -43,7 +43,7 @@ describe('ui-scene-ir/1 browser seam', () => {
   it('lowers the same scene to the same output every time', () => {
     const first = lowerUiSceneToBrowser(debuggerScene);
     const second = lowerUiSceneToBrowser(
-      JSON.parse(JSON.stringify(debuggerScene)) as typeof debuggerScene,
+      structuredClone(debuggerScene),
     );
     expect(second).toEqual(first);
     expect(first.sceneHash).toBe(hashUiSceneValue(debuggerScene));

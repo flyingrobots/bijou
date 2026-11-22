@@ -19,3 +19,21 @@ export {
   type PackedBijouCellsScene,
   type PackedBijouCellsValidationCode,
 } from './core/packed-bijou-cells.js';
+
+export {
+  UI_SCENE_BROWSER_ENDPOINT_VERSION,
+  createUiSceneBrowserDom,
+  createUiSceneBrowserReceipt,
+  lowerUiSceneToBrowser,
+  lowerUiSceneToBrowserProof,
+  renderUiSceneBrowserMarkup,
+  type UiSceneBrowserAttribute,
+  type UiSceneBrowserDocument,
+  type UiSceneBrowserDomElement,
+  type UiSceneBrowserElement,
+  type UiSceneBrowserEndpointVersion,
+  type UiSceneBrowserLowering,
+  type UiSceneBrowserLoweringOptions,
+  type UiSceneBrowserProof,
+  type UiSceneBrowserTargetProfile,
+} from './core/ui-scene-browser.js';

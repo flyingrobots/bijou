@@ -75,7 +75,7 @@ describe('ui-scene-ir/1 browser seam facts', () => {
 
   it('reads a frozen scene without changing it', () => {
     const frozen = deepFreeze(
-      JSON.parse(JSON.stringify(debuggerScene)) as typeof debuggerScene,
+      structuredClone(debuggerScene),
     );
     const before = stableUiSceneStringify(frozen);
     expect(() => lowerUiSceneToBrowser(frozen)).not.toThrow();
