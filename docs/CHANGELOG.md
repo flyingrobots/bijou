@@ -20,6 +20,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `SurfacePresenter` is a synchronous host seam in `@flyingrobots/bijou-tui`
+  for hosts that are not terminals (#791). Pass one to `run()` as
+  `RunOptions.presenter`. In `interactive` mode the runtime then calls
+  `enter?()`, `present(current, target, ctx)`, `onResize?(cols, rows)`, and
+  `exit?()`, and writes no frame, screen, cursor, or mouse bytes to `ctx.io`.
+  A run without a presenter is unchanged. The `static`, `pipe`, and
+  `accessible` output modes ignore the presenter. The contract does not cover a
+  hardware cursor overlay, OSC 8 hyperlinks, or a window title.
 - Translation glossaries for French, Spanish, and German
   (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
   Block, Surface, Stories, core, and TUI stay English; graceful lowering is

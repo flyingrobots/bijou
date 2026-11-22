@@ -67,6 +67,7 @@ src/
 ├── eventbus.ts      # EventBus — centralized event emitter
 ├── keys.ts          # parseKey() — raw bytes → KeyMsg
 ├── screen.ts        # ANSI sequences, enterScreen, renderSurfaceFrame
+├── surface-presenter.ts # SurfacePresenter — host seam for non-terminal frames
 ├── commands.ts      # quit(), tick(), batch()
 ├── spring.ts        # Spring physics + tween engine + easings
 ├── animate.ts       # animate(), sequence() — TEA commands
