@@ -20,6 +20,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `@flyingrobots/bijou-tui` has a semantic scene app contract (#794).
+  `SemanticSceneApp` is an `App` that also projects its model to a
+  `ui-scene-ir/1` scene and maps a declared action to a message.
+  `createSemanticSceneController()` validates each scene, dispatches only
+  action ids that the current scene declares, and sends each message through
+  the `EventBus` to `update()`. An undeclared or removed action id gives a
+  typed diagnostic and no state change. The terminal runtime is unchanged.
+  Reference: `docs/topics/semantic-scene-app/README.md`.
 - `@flyingrobots/bijou` has a browser renderer seam for `ui-scene-ir/1`
   (#442). `lowerUiSceneToBrowser()` lowers a scene with a `geordi-browser`
   target profile to a deterministic element tree and HTML markup that hold only
