@@ -52,3 +52,16 @@ export {
   type UiSceneParityVersion,
   type UiSceneParityWitness,
 } from './core/ui-scene-parity.js';
+
+// Layout direction
+export {
+  resolveDirection,
+  mirrorsLayout,
+  directionalSide,
+  orderForDirection,
+  type InlineDirection,
+  type LogicalSide,
+  type PhysicalSide,
+  type DirectionInput,
+} from './core/direction/direction.js';
+export { mirrorGlyph, mirrorGlyphs } from './core/direction/directional-glyph.js';

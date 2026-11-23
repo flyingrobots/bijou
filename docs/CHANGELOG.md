@@ -82,6 +82,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Components can resolve a layout direction (#612). `BijouNodeOptions` and
+  `BijouContext` gain `direction?: 'ltr' | 'rtl'`, and `createBijou()` and
+  `createTestContext()` accept it. `resolveDirection()` lets the explicit
+  option override the context and defaults to `'ltr'`; `mirrorsLayout()`
+  keeps `pipe` and `accessible` output in logical order. `directionalSide()`,
+  `orderForDirection()`, `mirrorGlyph()` and `mirrorGlyphs()` map logical
+  edges, sequences and directional glyphs (‹ ›, ▸ ◂, → ←) for right-to-left
+  layout. No Component mirrors yet; the family tasks under #573 adopt it.
 - Design record DL-029 decides the DOGFOOD Code Dojo debt dashboard: a
   `release` page guide that renders a committed `code-dojo.debt-report.v1`
   snapshot and an append-only `code-dojo.debt-history.v1` ledger, with no live

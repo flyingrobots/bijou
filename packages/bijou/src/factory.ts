@@ -12,6 +12,7 @@ import { fromDTCG, parseDTCGDocument } from './core/theme/dtcg.js';
 import { detectColorScheme, detectOutputMode } from './core/detect/tty.js';
 import { systemClock } from './core/clock.js';
 import type { ClockPort } from './ports/clock.js';
+import type { InlineDirection } from './core/direction/direction.js';
 
 /** Options for {@link createBijou}. */
 export interface CreateBijouOptions {
@@ -31,6 +32,8 @@ export interface CreateBijouOptions {
   envVar?: string | undefined;
   /** Explicit light/dark scheme for adaptive token resolution. Defaults to runtime detection. */
   colorScheme?: ColorScheme;
+  /** Logical layout direction for direction-sensitive components. Omitted means `'ltr'`. */
+  direction?: InlineDirection | undefined;
 }
 
 /**
@@ -82,6 +85,7 @@ export function createBijou(options: CreateBijouOptions): BijouContext {
     clock,
     style,
     tokenGraph: theme.tokenGraph,
+    ...(options.direction === undefined ? {} : { direction: options.direction }),
     resolveBCSS: () => ({}),
     ...createThemeAccessors(theme),
   };
