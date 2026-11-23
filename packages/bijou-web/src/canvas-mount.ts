@@ -1,3 +1,4 @@
+import type { BijouContext } from '@flyingrobots/bijou';
 import { run, type App } from '@flyingrobots/bijou-tui';
 import { controlApp } from './canvas-app.js';
 import type { BijouCanvasContainer, BijouCanvasElement } from './canvas-contract.js';
@@ -6,7 +7,7 @@ import { abortedError, isGpuBackendUnavailable } from './canvas-errors.js';
 import { createFrameBridge } from './canvas-frames.js';
 import { globalCanvasHost } from './canvas-host.js';
 import { negotiateBackend, type LadderRequest, type LadderResult } from './canvas-ladder.js';
-import type { MountBijouCanvasOptions, MountedBijouCanvas } from './canvas-options.js';
+import type { BijouCanvasApp, MountBijouCanvasOptions, MountedBijouCanvas } from './canvas-options.js';
 import { createCanvasStage } from './canvas-stage.js';
 import { createRetargetableSurface, type CanvasGeometry } from './canvas-surface.js';
 import { runTextMount } from './canvas-text.js';
@@ -29,6 +30,11 @@ async function prepare<C extends BijouCanvasElement>(
   }
 }
 
+/** The app itself, or the app a factory builds from the run's context. */
+function resolveApp<Model>(app: BijouCanvasApp<Model>, ctx: BijouContext): App<Model, unknown> {
+  return typeof app === 'function' ? app(ctx) : app;
+}
+
 /**
  * Mount a TEA app on a `<canvas>` that this function owns inside `container`.
  *
@@ -45,24 +51,24 @@ async function prepare<C extends BijouCanvasElement>(
  * is exhausted, and with `BIJOU_WEB_CANVAS_ABORTED` when `options.signal`
  * aborts first. Nothing stays in `container` after a rejection.
  *
- * @param app - The TEA app.
+ * @param app - The TEA app, or a function that builds it from the run's context.
  * @param container - The element the canvas and textarea are added to.
  * @param options - Presenter factories, canvas factory, cell size and policy.
  * @returns The running mount.
  */
 export async function mountBijouCanvas<Model, C extends BijouCanvasElement>(
-  app: App<Model, unknown>,
+  app: BijouCanvasApp<Model>,
   container: BijouCanvasContainer,
   options: MountBijouCanvasOptions<C>,
 ): Promise<MountedBijouCanvas<Model, C>> {
   if (options.signal?.aborted === true) throw abortedError();
-  const control = controlApp(app);
   const clock = options.clock ?? createWebClock();
   const contextOptions = { ...options.context, clock };
   const mode = options.mode ?? createWebContext(contextOptions).mode;
   if (mode !== 'interactive') {
     const textCtx = createWebInteractiveContext({ ...contextOptions, mode });
-    return runTextMount(run(control.app, { ctx: textCtx }), () => control.model(), textCtx);
+    const textControl = controlApp(resolveApp(app, textCtx));
+    return runTextMount(run(textControl.app, { ctx: textCtx, css: options.css }), () => textControl.model(), textCtx);
   }
   const watch = watchCanvasBox(container, options.host ?? globalCanvasHost, options.cellPx, options.signal);
   const surface = createRetargetableSurface(() => watch.geometry());
@@ -82,6 +88,8 @@ export async function mountBijouCanvas<Model, C extends BijouCanvasElement>(
     runtime: { ...options.context?.runtime, columns: geometry.grid.columns, rows: geometry.grid.rows },
     input: { ...options.input, textarea, surface },
   });
+  const runCtx: BijouContext = { ...ctx, io: { ...ctx.io, onData: (callback: (payload: unknown) => void) => control.onData(callback) } };
+  const control = controlApp(resolveApp(app, runCtx));
   let fault: { readonly error: unknown } | undefined;
   const fail = (error: unknown): void => {
     fault ??= { error };
@@ -93,8 +101,7 @@ export async function mountBijouCanvas<Model, C extends BijouCanvasElement>(
     stage.apply(next);
     ctx.runtime.resize(next.grid.columns, next.grid.rows);
   });
-  const runCtx = { ...ctx, io: { ...ctx.io, onData: (callback: (payload: unknown) => void) => control.onData(callback) } };
-  const done = run(control.app, { ctx: runCtx, presenter: bridge, mouse: true })
+  const done = run(control.app, { ctx: runCtx, presenter: bridge, mouse: true, css: options.css })
     .then(() => { if (fault !== undefined) throw fault.error; })
     .finally(() => {
       stage.teardown();
