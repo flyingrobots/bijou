@@ -9,16 +9,9 @@ export interface RefusedApp {
 }
 
 /**
- * Checked by tests/web-gpu/node-imports.test.ts, which builds each app's
- * module with the showcase's Vite configuration and expects this refusal.
+ * None today: every example app the showcase lists bundles with no Node.js
+ * built-in. tests/web-gpu/node-imports.test.ts builds each one, and
+ * tests/web-gpu/app-host-reach.test.ts walks each import graph for Node
+ * host APIs. An app that regresses would be listed here, with its refusal.
  */
-export const REFUSED_APPS: readonly RefusedApp[] = [
-  {
-    id: 'components', title: 'Components library', module: 'examples/components/library.ts', code: 'BIJOU_WEB_GPU_NODE_IMPORT',
-    reason: 'node:fs imported by examples/components/library-font.ts',
-  },
-  {
-    id: 'hero', title: 'Hero', module: 'examples/hero/app.ts', code: 'BIJOU_WEB_GPU_NODE_IMPORT',
-    reason: 'node:fs imported by examples/docs/app-cylinder-font.ts',
-  },
-];
+export const REFUSED_APPS: readonly RefusedApp[] = [];

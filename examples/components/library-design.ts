@@ -1,6 +1,7 @@
-import { parseFamilySections } from '../../scripts/design-system-docs-parser.js';
-import { readDocumentationFile } from '../../scripts/documentation-corpus.js';
 import type { ComponentStory } from '../_stories/protocol.js';
+// The family sections of docs/design-system/component-families.md, as
+// `npm run components:data` (scripts/components-browser-data.ts) parses them.
+import FAMILY_SECTIONS from './generated/component-families.json' with { type: 'json' };
 
 /** Fields of a design-system component family, named as in "Component Families" (book record R52). */
 export const DESIGN_FIELDS = [
@@ -39,8 +40,7 @@ function fieldsOf(lines: readonly string[]): Map<DesignField, string[]> {
   return fields;
 }
 
-const DOC = new URL('../../docs/design-system/component-families.md', import.meta.url);
-const FAMILIES: readonly DesignFamily[] = parseFamilySections(readDocumentationFile(DOC, 'utf8'))
+const FAMILIES: readonly DesignFamily[] = FAMILY_SECTIONS
   .map((section) => ({ name: section.title, fields: fieldsOf(section.lines) }));
 
 const functions = (text: string): string[] =>

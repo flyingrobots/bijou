@@ -7,6 +7,7 @@ import { createBlockLabFrameApp } from '../docs/storybook-app.js';
 import { createHeroApp } from './app.js';
 import { createClipContext, KEY, recordClip } from './clip.js';
 import { createPerfTracker } from './perf.js';
+import { nodeMemory } from './perf-node.js';
 import { captioned, endCard } from './reel-cards.js';
 import { CELL, writeAnimation, writeStills } from './encode.js';
 import { applyTransition } from './transition.js';
@@ -63,7 +64,7 @@ const library = await recordClip(createLibraryApp(libraryCtx.ctx, { component: '
 
 // 4. The hero app's own scenes: DAG/heatmap/flamegraph, plot grammar, render lab.
 const heroCtx = createClipContext(COLS, ROWS);
-const perf = createPerfTracker();
+const perf = createPerfTracker(nodeMemory);
 const heroBase = createHeroApp({ ctx: heroCtx.ctx, perf: perf.sample }, { cols: COLS, rows: ROWS });
 const hero = await recordClip({ ...heroBase, view: (model) => perf.measure(() => heroBase.view(model)) }, heroCtx, {
   seconds: 18, fps: FPS,

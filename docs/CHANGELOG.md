@@ -6,6 +6,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- The web GPU showcase mounts the Components library and the hero app, and
+  its browser suite switches `counter -> components -> hero` and toggles the
+  three ten times. Both apps now import in a browser: their fonts, DOGFOOD
+  catalogs, example snippets and design-system families are imported instead
+  of read from disk at module load (the snippets and families as generated
+  JSON, kept current by `npm run components:data` and a drift test), and the
+  hero perf overlay reads memory through a port with a Node and a browser
+  adapter. Their terminal output is unchanged (#809).
+
 ### Changed
 
 - The `guidedFlow()` story's docs, variant label, and preview copy resolve
@@ -14,6 +25,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The DOGFOOD locale ratchet's language-cycle cases no longer time out on hosted
+  runners. Each rendered 79 settings-toast ticks, each a full page render, and
+  took 10 to 15 s hosted against a 15 s limit. They now use a scripted clock
+  that lets the toast expire in two ticks (`tests/helpers/scripted-compressed-time.ts`),
+  and take about 4 to 5 s per file hosted. No assertion changed; a new case pins
+  that the compressed run ends on the same frame as real-time ticking (#778).
+- The DOGFOOD touched-file rule compares a touched split lineage, such as a
+  story helper of `examples/docs/stories.ts`, against the whole lineage at the
+  base. It had read only the changed files at the base, so every raw string of
+  their unchanged siblings was reported as added copy (#809).
 - The web GPU showcase's page chrome, on both its pages, is now a Vite + React
   app built only from shadcn components installed from the `@flyingrobots`
   registry, with a theme-book light, dark and system theme that persists, big
