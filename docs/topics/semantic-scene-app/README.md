@@ -65,6 +65,13 @@ it runs the returned commands with `bus.runCmd()`, so a message that a command
 returns goes through the same bus. When `update()` returns the same model
 object, the frame is kept and the commands still run.
 
+Listeners get the frames one at a time, in commit order. A listener may call
+`invoke()` while it handles a frame. The frame that this call commits waits
+until every listener has the current frame, so each listener sees each frame
+once. When a listener throws, the controller drops the frames that wait for
+delivery and the bus reports the error. The next committed frame is delivered
+as usual.
+
 A command that returns `QUIT` stops the controller.
 
 ## Dispatch

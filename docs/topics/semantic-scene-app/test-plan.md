@@ -58,14 +58,23 @@ toggle action.
 
 ## Import graph: `semantic-scene.part06.test.ts`
 
-The test follows the relative imports of `semantic-scene.ts` through the source
-files they reach.
+The tests follow the relative imports of `semantic-scene.ts` through the source
+files they reach. The scanner is in `semantic-scene-imports.test-support.ts`.
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
 | SSA-24 | The reached files import no package except `@flyingrobots/bijou`. | `reaches the controller and imports only the bijou core package` | Implemented |
 | SSA-25 | No reached file, and no name imported from a package, is a DOM or browser module. | `imports no DOM or browser module or name` | Implemented |
 | SSA-26 | No reached file names the `document` or `window` global. | `names no document or window global in any reached file` | Implemented |
+| SSA-27 | The scanner reads side-effect, multi-line and re-export statements. | `reads side-effect, multi-line and re-export statements` | Implemented |
+| SSA-28 | The graph follows a side-effect import to a file that the checks read. | `follows a side-effect import to a file that the checks then read` | Implemented |
+
+## Re-entrant listeners: `semantic-scene.part07.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| SSA-29 | A listener that invokes an action while it handles a frame does not make any listener skip a frame or see one twice. | `gives every listener each frame once, in commit order` | Implemented |
+| SSA-30 | A listener that throws does not stop delivery of later frames. | `delivers later frames after a listener throws` | Implemented |
 
 ## Not covered
 

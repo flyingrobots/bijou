@@ -101,7 +101,7 @@ export interface SemanticSceneController<Model, M> {
   crash(): SemanticSceneCrash<Model> | undefined;
   /** Dispatch an action that the current scene declares. */
   invoke(request: UiActionRequest): SemanticSceneInvocationResult<Model, M>;
-  /** Call `listener` after each new frame. */
+  /** Call `listener` with each new frame, once, in commit order. */
   subscribe(
     listener: (frame: SemanticSceneFrame<Model>) => void,
   ): EventBusDisposable;

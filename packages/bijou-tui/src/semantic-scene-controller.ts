@@ -1,5 +1,6 @@
 import { resolveClock } from '@flyingrobots/bijou';
 import { createEventBus } from './eventbus-create.js';
+import { createFrameQueue } from './semantic-scene-frames.js';
 import type {
   SemanticSceneApp,
   SemanticSceneController,
@@ -37,7 +38,7 @@ export function createSemanticSceneController<Model, M>(
   };
   let status: SemanticSceneStatus = 'running';
   let crashed: SemanticSceneCrash<Model> | undefined;
-  const listeners = new Set<(frame: SemanticSceneFrame<Model>) => void>();
+  const frames = createFrameQueue<Model>();
   const bus = options.bus ?? createEventBus<M>({ clock: resolveClock(ctx) });
 
   const fail = (
@@ -67,7 +68,7 @@ export function createSemanticSceneController<Model, M>(
     status = 'stopped';
     updates.dispose();
     quits.dispose();
-    listeners.clear();
+    frames.clear();
     if (options.bus === undefined) bus.dispose();
   };
 
@@ -92,7 +93,7 @@ export function createSemanticSceneController<Model, M>(
       return;
     }
     try {
-      for (const listener of listeners) listener(current);
+      frames.publish(current);
     } finally {
       execute(commands);
     }
@@ -134,14 +135,7 @@ export function createSemanticSceneController<Model, M>(
       if (crashed !== undefined) return { status: 'crashed', crash: crashed };
       return { status: 'dispatched', invocation, message };
     },
-    subscribe(listener) {
-      listeners.add(listener);
-      return {
-        dispose() {
-          listeners.delete(listener);
-        },
-      };
-    },
+    subscribe: (listener) => frames.subscribe(listener),
     stop,
   };
 }

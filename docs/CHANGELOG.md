@@ -26,8 +26,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `createSemanticSceneController()` validates each scene, dispatches only
   action ids that the current scene declares, and sends each message through
   the `EventBus` to `update()`. An undeclared or removed action id gives a
-  typed diagnostic and no state change. The terminal runtime is unchanged.
-  Reference: `docs/topics/semantic-scene-app/README.md`.
+  typed diagnostic and no state change. Listeners get each frame once, in
+  commit order, also when a listener invokes an action. The terminal runtime
+  is unchanged. Reference: `docs/topics/semantic-scene-app/README.md`.
 - `SurfacePresenter` is a synchronous host seam in `@flyingrobots/bijou-tui`
   for hosts that are not terminals (#791). Pass one to `run()` as
   `RunOptions.presenter`. In `interactive` mode the runtime then calls

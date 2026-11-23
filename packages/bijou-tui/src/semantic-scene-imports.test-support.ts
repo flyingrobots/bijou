@@ -1,8 +1,11 @@
 import { dirname, join, normalize } from 'node:path';
 
-/** An `import` or `export` statement with a `from` clause. */
+/**
+ * An `import` or `export` statement with a `from` clause, or a side-effect
+ * `import './module.js'`. Group 1 is the clause; group 2 is the specifier.
+ */
 const specifierPattern =
-  /(?:import|export)([^;]*?)from\s+['"]([^'"]+)['"]/gsu;
+  /^\s*(?:import|export)\b(?:([^;'"]*?)\bfrom\s*|\s*)['"]([^'"]+)['"]/gmu;
 
 /** One module specifier and the names that its statement imports. */
 export interface ImportStatement {
