@@ -72,9 +72,13 @@ The seam maps no role to ARIA. The host reads `data-bijou-role`:
 | `alert`, `group`, `log`, `region`, `status`, `toolbar` | the seam's `div` or `span` | `role` with the same value |
 | any other, or none | the seam's `div` or `span` | `tabindex="0"` when the node has an action |
 
-Every attribute that the seam lowers is kept. `ui-scene-ir/1` has no field
-for a checked state, and the seam lowers no `node.metadata`, so a `switch`
-gets no `aria-checked` and no ARIA `role`. Its text is its only state.
+Every attribute that the seam lowers is kept. A `switch` node that declares
+`state.checked` is lowered with `data-bijou-checked`; the host then writes
+`role="switch"` and `aria-checked` with the same `true` or `false` on its
+`<button>`, and patches `aria-checked` in place when the state changes. A
+`switch` without the state gets neither attribute, and the state on a node
+whose role is not `switch` is ignored by the host. The state has no mixed
+value.
 
 ## Keyed patching
 

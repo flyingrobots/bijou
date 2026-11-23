@@ -68,6 +68,7 @@ attributes, in this order, when the scene has the fact:
 | `data-bijou-i18n-key` | `node.text.key` for i18n text |
 | `data-bijou-source` | The node's `sourceMap` entry |
 | `data-bijou-fg-token`, `data-bijou-bg-token`, `data-bijou-border-token` | `node.style` token names |
+| `data-bijou-checked` | `node.state.checked`, as `true` or `false`; absent when the node declares no state |
 | `data-bijou-modifiers` | `node.style.modifiers`, separated by spaces |
 | `style` | Layout intent and resolved token colors |
 
@@ -79,7 +80,10 @@ host style sheet chooses the unit. With `tokenColors`, it also holds `color`,
 Text is the literal value, or the i18n fallback, or the i18n key when there is
 no fallback. The seam does not look up a locale catalog.
 
-`node.metadata` is not lowered.
+`node.metadata` is not lowered. `node.state.checked` is the one declared
+state: the seam lowers it for any node and attaches no meaning to the role.
+The field is optional, so a scene that declares no state keeps its canonical
+bytes and its `sceneHash`.
 
 ## Example
 

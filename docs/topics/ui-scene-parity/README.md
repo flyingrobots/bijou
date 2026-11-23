@@ -86,7 +86,7 @@ the browser facts and compares the result with what the terminal drew.
 | `text-sanitized` | `text` | The terminal renderer removes control sequences and replaces tabs and line breaks. The browser output keeps the text and escapes it as markup. |
 | `text-overdrawn` | `text` | The terminal renderer draws nodes in scene order onto one grid, so a later node replaces the cells of an earlier one. The browser output keeps both texts. The witness skips `fg-color`, `bg-color`, and `modifiers` for the earlier node. |
 | `coordinate-normalized` | `x`, `y` | The terminal renderer uses 0 for a missing coordinate, drops the fraction of a number, and starts a span at column 0 when the text starts left of the target. The browser output states the number as the scene gives it, or states nothing. |
-| `browser-only-fact` | `role`, `component`, `action`, `binding`, `border-token`, `width`, `height` | The terminal output has no place for the fact. The browser output carries it as an attribute or a custom property. |
+| `browser-only-fact` | `role`, `component`, `action`, `binding`, `border-token`, `checked`, `width`, `height` | The terminal output has no place for the fact. The browser output carries it as an attribute or a custom property. |
 
 For a node that the terminal did not draw, the witness reports the `node`
 finding and the `browser-only-fact` findings, and no other fact.
@@ -125,6 +125,9 @@ node kind other than `group` or `text`.
   carry the role.
 - **No color-format parity.** The witness compares color strings exactly.
   The cases cover six-digit lowercase hex colors only.
+- **No checked-state parity.** `node.state.checked` is a `browser-only-fact`
+  gap. The terminal renderer draws no toggle state; the text of the node is
+  its only state there.
 - **No behavior parity.** Neither renderer runs an action or resolves a
   binding. The browser output names both on the element. The terminal output
   names neither; the `ui-scene-receipt/1` lists their ids for both targets.

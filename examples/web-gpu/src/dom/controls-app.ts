@@ -35,6 +35,7 @@ export function controlsScene(model: ControlsModel): UiSceneIr {
   const nodes = ROWS.map(([id, role], y): UiNode => ({
     id, kind: 'text', parentId: 'app', layout: { x: 0, y },
     ...(role === undefined ? {} : { role }),
+    ...(id === 'app.enabled' ? { state: { checked: model.enabled } } : {}),
     text: { kind: 'literal', value: text(model, id) },
   }));
   const actions = ROWS.flatMap(([id, , command]): UiAction[] => (command === undefined ? [] : [{ id, command, targetNodeId: id }]));

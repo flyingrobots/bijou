@@ -82,3 +82,27 @@ describe('mountBijouDom() keyed in-place patching', () => {
     handle.stop();
   });
 });
+
+describe('mountBijouDom() switch state', () => {
+  it('writes role="switch" and aria-checked, and flips aria-checked in place', () => {
+    const { doc, handle, node } = mountControls();
+    const toggle = node('app.enabled');
+    expect([toggle.getAttribute('role'), toggle.getAttribute('aria-checked')]).toEqual(['switch', 'true']);
+
+    doc.dispatch(toggle, 'click');
+    expect(node('app.enabled')).toBe(toggle);
+    expect(toggle.getAttribute('aria-checked')).toBe('false');
+
+    doc.dispatch(toggle, 'click');
+    expect(node('app.enabled')).toBe(toggle);
+    expect(toggle.getAttribute('aria-checked')).toBe('true');
+    handle.stop();
+  });
+
+  it('writes no aria-checked for a switch that declares no state, or a node that is not a switch', () => {
+    const { handle, node } = mountControls();
+    expect(node('app.increment').getAttribute('aria-checked')).toBeNull();
+    expect(node('app.increment').getAttribute('role')).toBeNull();
+    handle.stop();
+  });
+});

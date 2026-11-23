@@ -87,6 +87,14 @@ differs moves the caret to the end, and Enter or Space on a `<button>` whose
 | DOM-31 | A plain element that replaces the focused one gets `tabindex="-1"` and focus. | `makes a replacement plain element focusable before focusing it` | Implemented |
 | DOM-32 | Replacing an input drops its composition state. | `clears the composition state of an input that a new element replaces` | Implemented |
 
+## Switch state: `dom-elements.test.ts`, `dom-patch.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| DOM-33 | A switch that declares the state gets `role="switch"` and `aria-checked`. | `adds role="switch" and aria-checked for a switch that declares the state` | Implemented |
+| DOM-34 | A switch without the state, and the state on another role, keep today's rendering. | `keeps today's rendering for a switch without the state`; `ignores the state on a node that is not a switch` | Implemented |
+| DOM-35 | A state change updates `aria-checked` on the same element. | `writes role="switch" and aria-checked, and flips aria-checked in place` | Implemented |
+
 ## Real browser: `examples/web-gpu/e2e/dom.e2e.ts`
 
 This case runs with `npm run test:browser:web-gpu` in Google Chrome, outside
@@ -94,4 +102,4 @@ the sealed runner. Its page is `examples/web-gpu/dom.html`.
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| DOM-27 | Real Chromium: focus, selection, IME, and single-fire button activation in Mode 2. A click, Enter and Space on a focused `<button>` each dispatch once; typing, a caret move and an IME commit keep the same `<input>` element focused, with its selection; no diagnostic, console or page error. | `mountBijouDom() in Chromium: one dispatch per activation, and typing or composing keeps the input element, focus and selection` | Implemented |
+| DOM-27 | Real Chromium: focus, selection, IME, and single-fire button activation in Mode 2. A click, Enter and Space on a focused `<button>` each dispatch once; typing, a caret move and an IME commit keep the same `<input>` element focused, with its selection; a switch toggled twice flips `aria-checked` on the same element; no diagnostic, console or page error. | `mountBijouDom() in Chromium: one dispatch per activation, and typing or composing keeps the input element, focus and selection` | Implemented |

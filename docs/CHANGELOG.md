@@ -8,6 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `ui-scene-ir/1` nodes can declare an optional `state.checked` boolean,
+  validated by `validateUiSceneIr()` (`invalid-node-state`). The browser seam
+  lowers it as `data-bijou-checked`, and `mountBijouDom()` writes
+  `role="switch"` and `aria-checked` for a `switch` node, patched in place. A
+  scene that declares no state keeps its canonical bytes and hash. The parity
+  witness records the state as a `browser-only-fact` gap (#807).
+
+### Added
+
 - The web GPU showcase mounts the Components library and the hero app, and
   its browser suite switches `counter -> components -> hero` and toggles the
   three ten times. Both apps now import in a browser: their fonts, DOGFOOD
