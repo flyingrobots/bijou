@@ -53,10 +53,11 @@ export function createControlsApp(options: ControlsOptions = {}): SemanticSceneA
         case 'reset': return [{ ...model, count: 0 }, []];
         case 'rename': return [{ ...model, name: msg.name }, []];
         case 'toggle': return [{ ...model, enabled: !model.enabled }, []];
-        case 'theme': return [model, [effect(() => options.onTheme?.())]];
+        case 'theme': return [model, [effect(() => { options.onTheme?.(); })]];
         case 'direction': return [{ ...model, dir: model.dir === 'ltr' ? 'rtl' : 'ltr' }, []];
         case 'tick': return [{ ...model, ticks: model.ticks + 1 }, []];
         case 'chip': return [{ ...model, showChip: false }, []];
+        default: return [model, []];
       }
     },
     view: () => createSurface(1, 1),

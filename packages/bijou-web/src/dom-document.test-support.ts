@@ -1,6 +1,7 @@
 import type { BijouDomEvent } from './dom-contract.js';
 
 type Listener = (event: BijouDomEvent) => void;
+const fail = (message: string): never => { throw new Error(message); };
 
 /** Counts of host writes, for asserting bounded in-place patches. */
 export interface DomCounts { created: number; writes: number }
@@ -29,9 +30,7 @@ export class FakeElement {
     setProperty: (name: string, value: string): void => { this.doc.counts.writes += 1; this.properties.set(name, value); },
     removeProperty: (name: string): void => { this.doc.counts.writes += 1; this.properties.delete(name); },
   };
-  selectionStart = 0;
-  selectionEnd = 0;
-  #value = '';
+  selectionStart = 0; selectionEnd = 0; #value = '';
   constructor(readonly doc: FakeDocument, readonly tagName: string) {}
   get ownerDocument(): FakeDocument { return this.doc; }
   get value(): string { return this.#value; }
@@ -39,9 +38,7 @@ export class FakeElement {
   /** Change the value as typing does, without counting a host write. */
   userValue(next: string, start = next.length, end = start, host = false): void {
     if (host && next === this.#value) return;
-    this.#value = next;
-    this.selectionStart = start;
-    this.selectionEnd = end;
+    [this.#value, this.selectionStart, this.selectionEnd] = [next, start, end];
   }
   getAttribute(name: string): string | null { return this.attributes.get(name) ?? null; }
   setAttribute(name: string, value: string): void { this.doc.counts.writes += 1; this.attributes.set(name, value); }
@@ -80,9 +77,7 @@ export class FakeElement {
   }
   /** The descendant whose `data-bijou-node-id` is `nodeId`. */
   node(nodeId: string): FakeElement {
-    const found = this.find((element) => element.getAttribute('data-bijou-node-id') === nodeId);
-    if (found === undefined) throw new Error(`no element for ${nodeId}`);
-    return found;
+    return this.find((element) => element.getAttribute('data-bijou-node-id') === nodeId) ?? fail(`no element for ${nodeId}`);
   }
   find(test: (element: FakeElement) => boolean): FakeElement | undefined {
     for (const child of this.childNodes) {
@@ -114,8 +109,7 @@ export class FakeDocument {
   createTextNode(data: string): FakeText { this.counts.created += 1; return new FakeText(this, data); }
   /** Listeners still attached to any element this document created. */
   liveListeners(): number {
-    return [this.body, ...this.elements].reduce((sum, element) =>
-      sum + [...element.listeners.values()].reduce((count, set) => count + set.size, 0), 0);
+    return [this.body, ...this.elements].flatMap((element) => [...element.listeners.values()]).reduce((sum, set) => sum + set.size, 0);
   }
   /** Deliver an event from `target` up through its ancestors. */
   dispatch(target: FakeElement, type: string, fields: Partial<BijouDomEvent> = {}): FakeEvent {
@@ -147,12 +141,9 @@ export class FakeDocument {
     this.dispatch(input, 'compositionstart');
     for (const step of steps) { input.userValue(step); this.dispatch(input, 'input', { isComposing: true }); }
     input.userValue(committed);
-    if (endFirst) {
-      this.dispatch(input, 'compositionend');
-      this.dispatch(input, 'input', { isComposing: false });
-      return;
-    }
-    this.dispatch(input, 'input', { isComposing: true });
+    const last = (): void => { this.dispatch(input, 'input', { isComposing: !endFirst }); };
+    if (!endFirst) last();
     this.dispatch(input, 'compositionend');
+    if (endFirst) last();
   }
 }
