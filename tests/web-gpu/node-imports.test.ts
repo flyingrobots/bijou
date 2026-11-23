@@ -40,8 +40,9 @@ describe('examples/web-gpu bundle has no Node.js built-in', () => {
   });
 
   it('refuses a direct import of a Node built-in and names the importer', async () => {
-    expect(message(await bundle('examples/web-gpu/vite.config.ts'))).toContain(
-      'BIJOU_WEB_GPU_NODE_IMPORT: node:module imported by examples/web-gpu/vite.config.ts',
+    // The config imports node:module, node:path and node:url; whichever resolves first is named.
+    expect(message(await bundle('examples/web-gpu/vite.config.ts'))).toMatch(
+      /BIJOU_WEB_GPU_NODE_IMPORT: node:(module|path|url) imported by examples\/web-gpu\/vite\.config\.ts/u,
     );
   });
 });
