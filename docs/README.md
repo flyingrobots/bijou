@@ -56,6 +56,7 @@ The glossary and topic finder support practical lookup.
 - [Agent agreements](../AGENTS.md)
 - [Design vocabulary](./topics/design-vocabulary.md): canonical terms, component family fields, and writing style
 - [Browser renderer seam for `ui-scene-ir/1`](./topics/ui-scene-browser/README.md): element mapping, refusals, receipt, and [test plan](./topics/ui-scene-browser/test-plan.md)
+- [Terminal and browser parity witness for `ui-scene-ir/1`](./topics/ui-scene-parity/README.md): equal facts, named gaps, refusals, limits, and [test plan](./topics/ui-scene-parity/test-plan.md)
 - [Semantic scene app contract](./topics/semantic-scene-app/README.md): `ui-scene-ir/1` projection, action dispatch, diagnostics, and [test plan](./topics/semantic-scene-app/test-plan.md)
 - [Browser host adapter](./topics/bijou-web/README.md): the `@flyingrobots/bijou-web` port contracts, refusals, and [test plan](./topics/bijou-web/test-plan.md)
 - [DOM host](./topics/bijou-web-dom/README.md): `mountBijouDom()` element mapping, keyed patching, events, focus fallback, theme sync, and [test plan](./topics/bijou-web-dom/test-plan.md)

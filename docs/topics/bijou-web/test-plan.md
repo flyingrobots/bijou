@@ -91,3 +91,75 @@ named test. A name with `%s` is one parameterized test.
 | WEB-54 | The scan covers the package sources. | `ships source files to scan` | Implemented |
 | WEB-55 | No source file imports Node.js or names `process` or `Buffer`. | `%s uses no Node.js import, process, or Buffer` | Implemented |
 | WEB-56 | The manifest has no runtime dependencies, and the build uses no Node.js typings. | `declares zero runtime dependencies and no Node.js typings` | Implemented |
+
+## Keyboard and shortcuts: `interactive-keys.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-57 | Navigation, function, Enter, Escape, Tab, and Backspace keys deliver the terminal host's key names and raw encodings, and prevent the default. | `delivers the %s key as %s and its raw encoding` | Implemented |
+| WEB-58 | Ctrl+C delivers `c` with `ctrl`, and the byte `0x03` on raw input. | `delivers Ctrl+C as ctrl and c` | Implemented |
+| WEB-59 | Shift+Tab sets `shift`, and Alt sets `alt`. | `delivers Shift+Tab, and Alt as the alt modifier` | Implemented |
+| WEB-60 | Printable keys carry `text`; an uppercase ASCII letter is lowercase plus `shift`. | `delivers printable text with the text payload, and uppercase as shifted` | Implemented |
+| WEB-61 | Modifier-only, dead, and unidentified keys deliver nothing and are not prevented. | `ignores the %s key without preventing it` | Implemented |
+| WEB-62 | macOS Meta+R/W/T/L/C/V reach the browser. | `lets macOS Meta+%s reach the browser` | Implemented |
+| WEB-63 | F12 and the non-interceptable chords on other platforms reach the browser. | `lets the non-macOS chord %o reach the browser` | Implemented |
+| WEB-64 | Ctrl+R, Ctrl+L, and Ctrl+W reach the application on other platforms. | `delivers Ctrl+%s to the application on non-macOS` | Implemented |
+| WEB-65 | A macOS Meta chord outside the list is delivered as `alt`. | `delivers macOS Meta chords outside the list as alt` | Implemented |
+| WEB-66 | A caller-supplied predicate replaces the default policy. | `honors a caller-supplied pass-through predicate` | Implemented |
+
+## IME and mobile input: `interactive-text.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-67 | A full composition delivers accented, CJK, and astral text once, on `compositionend`. | `delivers committed %s once after a full composition` | Implemented |
+| WEB-68 | `compositionend` before `input` delivers once and empties the textarea. | `delivers once when compositionend arrives before input` | Implemented |
+| WEB-69 | `input` before `compositionend` delivers once. | `delivers once when input arrives before compositionend` | Implemented |
+| WEB-70 | `keydown` is ignored and not prevented while composing. | `suppresses keydown while composing, by state and by isComposing` | Implemented |
+| WEB-71 | A cancelled composition delivers nothing. | `delivers nothing for a cancelled composition` | Implemented |
+| WEB-72 | The duplicate guard is spent once, so later identical text is delivered. | `delivers a repeat of the same text typed after the composition settled` | Implemented |
+| WEB-73 | `input` without a composition delivers its text. | `delivers input that has no composition, as on a mobile keyboard` | Implemented |
+| WEB-74 | A mobile delete is the `backspace` key. | `delivers a mobile delete as the backspace key` | Implemented |
+
+## Paste: `interactive-text.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-75 | Single-line paste delivers whole and prevents the default insert. | `delivers single-line paste text and prevents the default insert` | Implemented |
+| WEB-76 | Paste reads `text/plain`. | `asks the clipboard for plain text` | Implemented |
+| WEB-77 | One trailing line break is trimmed. | `trims one trailing line break from %j` | Implemented |
+| WEB-78 | Multi-line paste is rejected and never produces an Enter key. | `rejects multi-line paste %j without an Enter key` | Implemented |
+| WEB-79 | Missing clipboard data delivers nothing. | `delivers nothing when clipboardData is %s` | Implemented |
+| WEB-80 | A paste of only a line break delivers nothing and is not reported as rejected. | `delivers nothing for a paste of only a line break` | Implemented |
+| WEB-81 | Control characters are stripped from pasted text. | `strips control characters so paste cannot forge escape sequences` | Implemented |
+
+## Pointer and wheel: `interactive-pointer.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-82 | `cellFromPoint()` returns 0-based cells. | `maps client (%f, %f) to the 0-based cell (%i, %i)` | Implemented |
+| WEB-83 | Points outside the surface, and non-finite points, clamp to the grid. | `clamps client (%f, %f) to (%i, %i)` | Implemented |
+| WEB-84 | A surface with no area maps to cell (0, 0). | `maps every point to cell (0, 0) when the surface has no area` | Implemented |
+| WEB-85 | Hit-testing follows the runtime size. | `follows the runtime size after a resize` | Implemented |
+| WEB-86 | Cell (0, 0) is `col: 0, row: 0` in the message and `1;1` in the SGR packet. | `emits 0-based cells in the structured message and 1-based cells only in the SGR packet` | Implemented |
+| WEB-87 | The last cell is (79, 23) in the message and `80;24` on the wire. | `emits the last cell as (79, 23) and as 80;24 on the wire` | Implemented |
+| WEB-88 | A drag is press, move, release with the left button. | `maps a left-button drag from press through move to release` | Implemented |
+| WEB-89 | A move reports the held button and the motion code. | `maps a move with buttons %i to %s and code %i` | Implemented |
+| WEB-90 | Left, middle, and right buttons press and release with their codes. | `maps pointer button %i to %s` | Implemented |
+| WEB-91 | Other pointer buttons deliver nothing. | `ignores pointer buttons beyond the first three` | Implemented |
+| WEB-92 | Shift, Alt or Meta, and Ctrl carry into the message and the packet. | `carries shift, alt (or meta), and ctrl into the message and the packet` | Implemented |
+| WEB-93 | A drag that leaves the surface clamps to the edge cell. | `clamps a drag that leaves the surface to the edge cell` | Implemented |
+| WEB-94 | Wheel up and down map to scroll codes; a zero delta is ignored; the wheel listener is not passive. | `maps wheel up and down, ignores a zero delta, and prevents page scroll` | Implemented |
+
+## Lifecycle: `interactive-lifecycle.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-95 | No listener attaches until a stream is subscribed, and none remains after it is disposed. | `attaches no listener until something subscribes` | Implemented |
+| WEB-96 | A disposed handle stops delivering at once, and a second `dispose()` is harmless. | `stops delivering at once on dispose, and a second dispose is harmless` | Implemented |
+| WEB-97 | Disposing one subscriber leaves the others. | `keeps delivering to a second subscriber after the first disposes` | Implemented |
+| WEB-98 | `io.dispose()` removes every listener and ends every stream, and is idempotent. | `removes every listener and stops every stream on io.dispose(), twice over` | Implemented |
+| WEB-99 | A subscription after `io.dispose()` is inert. | `gives an inert handle to a subscription made after io.dispose()` | Implemented |
+| WEB-100 | Resize columns and rows reach `onResize()` until disposed. | `forwards resize columns and rows to onResize until disposed` | Implemented |
+| WEB-101 | `rawInput()` no longer refuses, and output still works. | `no longer refuses rawInput, and still writes output` | Implemented |
+| WEB-102 | The adapter works without a textarea or a surface. | `works with no textarea and no surface` | Implemented |
+| WEB-103 | 1,000 mixed events leave zero listeners after dispose. | `leaves zero listeners after 1,000 mixed resize, key, and pointer events` | Implemented |
