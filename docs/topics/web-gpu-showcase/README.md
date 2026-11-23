@@ -74,11 +74,9 @@ Geordi comes from two tarballs in `examples/web-gpu/vendor/`, packed at the
 commit that `geordi-pin.json` records, and installed through `file:`
 development dependencies whose `integrity` the lockfile records. The sealed
 dependency worker receives those tarballs with the manifests, so the sealed
-build is offline. The pin also records Geordi's procedural glyph table, which
-the Canvas 2D presenter needs and the package does not ship, a workaround for
-flyingrobots/geordi#205; the page refuses
-to start Canvas 2D unless the table hashes to the package's own
-`PROCEDURAL_GLYPH_TABLE_SHA256`.
+build is offline. The tarballs are the only vendored files: the
+`@flyingrobots/geordi-bijou-gpu` package ships Geordi's procedural glyph table,
+so the Canvas 2D presenter needs no table from the page.
 
 ## Presenters
 
@@ -92,7 +90,7 @@ colours are `#E6EDF3` and `#0D1117`.
 | --- | --- | --- |
 | WebGPU | `createWebGPUSurfacePresenter(canvas, { atlas })` | The HUD reads `captureFrame()`, so the receipt is probed. |
 | WebGL2 | `createWebGL2SurfacePresenter({ canvas, atlas, canonicalReadback: true })` | Every frame is read back, so the receipt is probed. |
-| Canvas 2D | `createCanvas2DSurfacePresenter({ canvas, atlas, proceduralTable })` | Computed on the CPU and always `software-probed`. |
+| Canvas 2D | `createCanvas2DSurfacePresenter({ canvas, atlas })` | Computed on the CPU and always `software-probed`. |
 
 A mount's `cellPx` is fixed. When the watcher reports a new device pixel
 ratio, the atlas has a new cell size and the page mounts the app again.

@@ -11,7 +11,9 @@ verified is [the showcase topic](../../docs/topics/web-gpu-showcase/README.md).
 
 ## Run the page
 
-From the repository root, after `npm ci`:
+From the repository root, after `npm ci --ignore-scripts` (the browser suite
+is the one lane outside the sealed runner, so a plain `npm ci` would run every
+dependency's lifecycle scripts on this machine; the CI job installs the same way):
 
 ```sh
 npm run web-gpu
@@ -60,9 +62,10 @@ runs the tests in `tests/web-gpu/`.
 
 `@flyingrobots/geordi-core` and `@flyingrobots/geordi-bijou-gpu` are not on
 npm. The page uses tarballs packed from one Geordi commit, in `vendor/`, and
-records the commit and every SHA-256 in `geordi-pin.json`. To move the pin, in
-a Geordi checkout at the new commit (`<bijou>` stands for this repository's
-root; the commands are illustrative):
+records the commit and every SHA-256 in `geordi-pin.json`. The tarballs are the
+only vendored files. To move the pin, in a clean Geordi checkout at the new
+commit (`<bijou>` stands for this repository's root; the commands are
+illustrative):
 
 ```sh
 pnpm install --frozen-lockfile
@@ -70,27 +73,30 @@ pnpm --filter @flyingrobots/geordi-core build
 pnpm --filter @flyingrobots/geordi-bijou-gpu build
 pnpm --filter @flyingrobots/geordi-core pack --pack-destination <bijou>/examples/web-gpu/vendor
 pnpm --filter @flyingrobots/geordi-bijou-gpu pack --pack-destination <bijou>/examples/web-gpu/vendor
-cp fixtures/bijou-gpu/procedural-glyphs.json <bijou>/examples/web-gpu/vendor/
 ```
 
-`pnpm pack` names each tarball after the package version, so a new version
-gives new file names. Then, in Bijou:
+Pack twice, to two directories, and compare `shasum -a 256`: the digests must
+match. `pnpm pack` names each tarball after the package version, so a new
+version gives new file names; an unchanged version overwrites the old file
+under the same name. Then, in Bijou:
 
-1. Delete the old tarballs from `vendor/`.
+1. Delete any old tarball whose name changed from `vendor/`.
 2. In `geordi-pin.json`, set the commit, and each package's `version`,
-   `tarball` and `sha256` (from `shasum -a 256`), and the procedural table's
-   `sha256`.
+   `tarball` and `sha256` (from `shasum -a 256`).
 3. In the root `package.json`, point the `@flyingrobots/geordi-core` and
    `@flyingrobots/geordi-bijou-gpu` development dependencies at the new
    `file:examples/web-gpu/vendor/<name>-<version>.tgz` paths.
-4. Run `npm install --package-lock-only --ignore-scripts` so the lockfile
-   records the new tarballs and their integrity.
+4. In `package-lock.json`, set each package's `version`, `resolved` and
+   `integrity`. Run `npm install --package-lock-only --ignore-scripts` to
+   update `version`, `resolved` and the package's `dependencies` after a
+   version change. It does **not** refresh `integrity` for a `file:` tarball,
+   and it leaves the old value when the file name is unchanged, so set
+   `integrity` yourself to `sha512-` plus the base64 of
+   `openssl dgst -sha512 -binary <tarball>`.
+5. Run `npm ci --ignore-scripts`, which fails on an integrity mismatch, then
+   `npm run web-gpu:typecheck` and the browser suite.
 
-`tests/web-gpu/geordi-pin.test.ts` recomputes every digest and checks that the
-manifest, the lockfile and the pin agree. `.gitattributes` keeps the vendored
-files byte-exact on a checkout that converts line endings.
-
-The vendored `procedural-glyphs.json` is a workaround for
-flyingrobots/geordi#205: the Canvas 2D presenter needs the table and the
-pinned package does not ship it. Once a pinned package ships the table, the
-vendored copy can go.
+`tests/web-gpu/geordi-pin.test.ts` recomputes every digest, checks that the
+manifest, the lockfile and the pin agree, and that `vendor/` holds nothing but
+the two tarballs. `.gitattributes` keeps the tarballs byte-exact on a checkout
+that converts line endings.

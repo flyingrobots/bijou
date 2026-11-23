@@ -15,9 +15,9 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | WGPU-01 | The pin names one full Geordi commit. | `names one full Geordi commit` | Implemented |
 | WGPU-02 | The pin lists the core and bijou-gpu packages. | `pins both packed packages, core and bijou-gpu` | Implemented |
 | WGPU-03 | Each tarball has the SHA-256 the pin records. | `%s tarball matches its recorded SHA-256` | Implemented |
-| WGPU-04 | The vendored procedural glyph table has the SHA-256 the pin records. | `%s matches its recorded SHA-256` | Implemented |
+| WGPU-04 | The pin lists no file besides the two tarballs, and `vendor/` holds nothing else, so no glyph table is vendored. | `pins no file besides the two tarballs, and vendors nothing else` | Implemented |
 | WGPU-05 | The manifest and lockfile resolve each package from its tarball, with matching npm integrity. | `%s resolves from the vendored tarball with npm integrity` | Implemented |
-| WGPU-23 | Every pinned file is `-text` in `.gitattributes`, so a CRLF checkout keeps its bytes. | `keeps every pinned file byte-exact on checkout through .gitattributes` | Implemented |
+| WGPU-23 | Every pinned tarball is `-text` in `.gitattributes`, so a CRLF checkout keeps its bytes. | `keeps every pinned file byte-exact on checkout through .gitattributes` | Implemented |
 | WGPU-06 | The sealed dependency worker receives the lockfile's repository tarballs, and refuses a path outside the repository or with a backslash. | `lists the vendored Geordi tarballs the lockfile resolves`, `refuses %s` in `scripts/docker-seal/local-tarballs.test.ts` | Implemented |
 
 ## No Node built-in: `tests/web-gpu/node-imports.test.ts` (sealed)
