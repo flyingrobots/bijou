@@ -85,6 +85,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DOGFOOD docs pages have a contextual drawer (#627). `i` opens it and moves
+  focus into it; `Esc` or `i` closes it and returns focus to the pane that had
+  focus, or to the page's content pane if a resize has hidden that pane. The
+  drawer is a layout pane in all four layout variants, not an Overlay, so it
+  never dims the frame. It is closed by default and closes on page change.
+  `bijou-tui` adds a `context-drawer` frame layer directly above `workspace`.
+  A page declares it through `layers()` with the drawer `paneId`, and the
+  frame puts it in the layer stack only while that pane has focus.
 - The DOGFOOD Components reading path shows the active variant, its position
   and the variant count, and the active profile inline in the story pane
   (#624), at every layout width and in all four locales. The facts no longer

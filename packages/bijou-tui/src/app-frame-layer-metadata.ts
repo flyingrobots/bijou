@@ -78,7 +78,11 @@ export function resolveLayerMetadata<PageModel, Msg>(
       ? message('notifications.title', 'Notifications')
       : `${center.title} • ${frameNotificationFilterLabel(options.i18n, center.activeFilter)}`;
   const pageLayers = activePage.layers?.(activePageModel);
+  const drawer = pageLayers?.['context-drawer'];
+  const drawerFocused = drawer != null &&
+    model.focusedPaneByPage[model.activePageId] === drawer.paneId;
   return {
+    ...(drawerFocused ? { 'context-drawer': drawer } : {}),
     workspace: {
       title: activePageTitle,
       hintSource: workspaceHintSource,

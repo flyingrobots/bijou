@@ -85,7 +85,8 @@ describe('DOGFOOD i18n debt inventory', () => {
       // and the spring timeline preview's localized camera label (#809).
       // Alignment option enums are control values, not visible copy (#624).
       // The guidedFlow story's status discriminants are typed, not copy (#586).
-      expect(inventory.total).toBe(2252);
+      // Ten layout and init literals were removed by the #627 drawer work.
+      expect(inventory.total).toBe(2242);
       expect(surfaces).not.toContain('app-root-view');
       expect(surfaces).toContain('stories-story-guided-flow');
       expect(surfaces).not.toContain('docs-app');

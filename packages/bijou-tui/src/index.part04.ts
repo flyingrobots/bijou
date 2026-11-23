@@ -20,6 +20,7 @@ export {
   type FrameLayerDescriptor,
   type FramePageLayerKind,
   type FramePageLayerRegistry,
+  type FrameContextDrawerLayerMetadata,
   type FrameControlProjection,
   type FrameRuntimeLayer,
   type FrameRuntimeViewStack,

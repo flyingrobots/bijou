@@ -82,6 +82,7 @@ focus it and use the wheel to scroll long docs or help content.
 - `Enter` / `Space`: open the focused guide, expand a family, select a component, or activate the focused row
 - `←` / `→`: collapse or expand the focused family on the left lane inside `Components`
 - `Tab` / `Shift+Tab`: move focus between panes
+- `i`: open or close the page's contextual drawer; `Esc` also closes it and returns focus to the pane you came from
 - `j` / `k`: scroll the focused docs or demo pane
 - `d` / `u`: page the focused docs or demo pane
 - `1` `2` `3` `4`: switch rich, static, pipe, and accessible profiles

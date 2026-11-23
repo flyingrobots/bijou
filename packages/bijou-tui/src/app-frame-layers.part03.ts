@@ -31,6 +31,13 @@ export function describeFrameRuntimeViewStack<PageModel>(
     toRuntimeViewLayer(frameLayer('workspace', options)),
   );
 
+  if (options.contextDrawerFocused) {
+    stack = pushRuntimeView(
+      stack,
+      toRuntimeViewLayer(frameLayer('context-drawer', options)),
+    );
+  }
+
   if (options.pageModalOpen) {
     stack = pushRuntimeView(
       stack,

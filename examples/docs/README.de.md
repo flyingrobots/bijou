@@ -79,6 +79,7 @@ und mit dem Mausrad scrollst du lange Dokumente oder Hilfeinhalte.
 - `Enter` / `Space`: den fokussierten Leitfaden öffnen, eine Familie aufklappen, eine Komponente auswählen oder die fokussierte Zeile aktivieren
 - `←` / `→`: die fokussierte Familie in der linken Spur innerhalb von `Components` einklappen oder aufklappen
 - `Tab` / `Shift+Tab`: den Fokus zwischen den Bereichen wechseln
+- `i`: die Kontextschublade der Seite öffnen oder schließen; `Esc` schließt sie ebenfalls und gibt den Fokus an den vorherigen Bereich zurück
 - `j` / `k`: den fokussierten Dokumentations- oder Demo-Bereich scrollen
 - `d` / `u`: den fokussierten Dokumentations- oder Demo-Bereich seitenweise blättern
 - `1` `2` `3` `4`: zwischen den Profilen rich, static, pipe und accessible wechseln

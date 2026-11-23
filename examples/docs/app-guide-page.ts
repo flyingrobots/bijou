@@ -7,6 +7,7 @@ import type {
   I18nRuntime,
   LocalizationPort,
 } from '../../packages/bijou-i18n/src/index.js';
+import { contextDrawerLayers } from './app-context-drawer.js';
 import { createInitialExplorerModel } from './app-explorer-init.js';
 import { createGuidePageLayout } from './app-guide-layout.js';
 import { updateGuidePage } from './app-guide-update.js';
@@ -53,6 +54,7 @@ export function createGuidePage(
       updateGuidePage(pageId, message, model, i18n, options),
     inputAreas: (model) =>
       createGuideInputAreas(pageId, model),
+    layers: (model) => contextDrawerLayers(model.contextDrawer),
     searchTitle: () =>
       renderDocsSearchTitle(
         dogfoodText(
