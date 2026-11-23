@@ -12,6 +12,8 @@ const KEY_ENTER = '\r';
 
 const KEY_F2 = '\x1bOQ';
 
+// This case deliberately runs the real-time toast once as the oracle: 3.2 s in the
+// sealed runner, so 30 s leaves about three times the hosted slowdown of margin.
 const LANGUAGE_CYCLE_TEST_TIMEOUT_MS = 30_000;
 
 const COMPRESSED_FRAME_BUDGET = 12;
