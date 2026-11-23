@@ -75,11 +75,12 @@ function devicePixelRatio(): number {
 function watchDevicePixelRatio(onChange: () => void): () => void {
   const matchMedia: unknown = Reflect.get(globalThis, 'matchMedia');
   if (typeof matchMedia !== 'function') return () => undefined;
+  const media = (text: string): unknown => Reflect.apply(matchMedia, globalThis, [text]);
   let query: MediaQueryLike | undefined;
   const listener = (): void => { arm(); onChange(); };
   function arm(): void {
     query?.removeEventListener('change', listener);
-    const next: unknown = Reflect.apply(matchMedia, globalThis, [`(resolution: ${String(devicePixelRatio())}dppx)`]);
+    const next = media(`(resolution: ${String(devicePixelRatio())}dppx)`);
     query = isMediaQuery(next) ? next : undefined;
     query?.addEventListener('change', listener);
   }

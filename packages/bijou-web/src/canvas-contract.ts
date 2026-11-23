@@ -87,7 +87,7 @@ export type BijouCanvasPresenterFactory<C> = (
 ) => BijouCanvasPresenter | Promise<BijouCanvasPresenter>;
 
 /** Injected factories, one per backend. A missing one is skipped by `'auto'`. */
-export type BijouCanvasPresenters<C> = { readonly [B in BijouCanvasBackend]?: BijouCanvasPresenterFactory<C> };
+export type BijouCanvasPresenters<C> = Readonly<Partial<Record<BijouCanvasBackend, BijouCanvasPresenterFactory<C>>>>;
 
 /** Why `'auto'` passed over a backend. */
 export interface BijouCanvasFallbackReason {

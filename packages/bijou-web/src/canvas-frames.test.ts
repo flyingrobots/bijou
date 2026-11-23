@@ -42,7 +42,7 @@ describe('mountBijouCanvas() frames', () => {
     expect(presenter?.presents[0]).toMatchObject({ force: true, width: 80, height: 24 });
     expect(handle.ctx.runtime.columns).toBe(80);
     expect(handle.ctx.runtime.rows).toBe(24);
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('coalesces every runtime frame between two animation frames into one present', async () => {
@@ -62,7 +62,7 @@ describe('mountBijouCanvas() frames', () => {
     expect(presents.at(-1)).toMatchObject({ force: false });
     expect(presents.at(-1)?.dirty).toBeGreaterThan(0);
     expect(handle.model()).toEqual({ count: 3 });
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('resizes the presenter and the grid when the container box changes', async () => {
@@ -74,7 +74,7 @@ describe('mountBijouCanvas() frames', () => {
     expect(presenter?.resizes.at(-1)).toEqual({ cssWidth: 400, cssHeight: 240, dpr: 1 });
     expect(presenter?.presents.at(-1)).toMatchObject({ force: true, width: 40, height: 12 });
     expect([handle.ctx.runtime.columns, handle.ctx.runtime.rows]).toEqual([40, 12]);
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('uses the device-pixel content box and follows DPR changes', async () => {
@@ -88,7 +88,7 @@ describe('mountBijouCanvas() frames', () => {
     await env.drive();
     expect(env.backends.created[0]?.resizes.at(-1)).toEqual({ cssWidth: 800, cssHeight: 480, dpr: 2 });
     expect([handle.ctx.runtime.columns, handle.ctx.runtime.rows]).toEqual([160, 48]);
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('refuses a Surface without packed storage instead of dropping its dirty bits', () => {

@@ -13,7 +13,7 @@ describe('mountBijouCanvas() stress', () => {
       env.press('a');
       await handle.switchBackend(targets[cycle % 3] ?? 'webgl2');
       await env.drive(2);
-      await handle.stop();
+      await env.stop(handle);
       expect(env.container.children).toEqual([]);
       expect(env.listeners()).toBe(0);
       expect(env.host.liveObservers()).toBe(0);

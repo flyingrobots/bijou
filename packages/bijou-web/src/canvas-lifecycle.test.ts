@@ -43,7 +43,7 @@ describe('mountBijouCanvas() lifecycle', () => {
     env.host.box(800, 480);
     const handle = await mounting;
     expect(handle.backend).toBe('webgpu');
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('aborts a mount whose async WebGPU init is still pending, and disposes the late presenter', async () => {
@@ -128,7 +128,7 @@ describe('mountBijouCanvas() lifecycle', () => {
 
   it('refuses loudly when the host has no ResizeObserver', async () => {
     const env = createCanvasEnv();
-    const { host: _unused, ...withoutHost } = env.options();
+    const withoutHost = { ...env.options(), host: undefined };
     await expect(mountBijouCanvas(counterApp, env.container, withoutHost))
       .rejects.toMatchObject({ code: 'BIJOU_WEB_CANVAS_NO_RESIZE_OBSERVER' });
     expect(env.container.children).toEqual([]);

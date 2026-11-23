@@ -16,7 +16,7 @@ describe('mountBijouCanvas() backend ladder', () => {
     expect(handle.fallbackReasons).toEqual([]);
     expect(env.backends.attempts).toEqual(['webgpu#1']);
     expect(env.container.canvases()).toEqual([env.maker.made[0]]);
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('tries webgpu, then webgl2, then canvas2d in strict order and records each exact reason', async () => {
@@ -31,7 +31,7 @@ describe('mountBijouCanvas() backend ladder', () => {
       { backend: 'webgl2', code: 'GEORDI_E_BIJOU_BACKEND_UNAVAILABLE', reason: 'no webgl2 on this host' },
     ]);
     expect(env.container.canvases().map((canvas) => canvas.id)).toEqual([3]);
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('mounts a fresh canvas after a backend fails once it has bound a context', async () => {
@@ -45,7 +45,7 @@ describe('mountBijouCanvas() backend ladder', () => {
     expect(canvas2dCanvas?.bound()).toBe('2d');
     expect(handle.canvas).toBe(canvas2dCanvas);
     expect(handle.fallbackReasons.map((entry) => entry.reason)).toEqual(['no webgpu on this host', 'device lost at configure']);
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('skips a backend that has no factory in auto mode and says so', async () => {
@@ -56,7 +56,7 @@ describe('mountBijouCanvas() backend ladder', () => {
       { backend: 'webgpu', code: 'BIJOU_WEB_CANVAS_NO_FACTORY', reason: 'no webgpu presenter factory was supplied' },
       { backend: 'webgl2', code: 'BIJOU_WEB_CANVAS_NO_FACTORY', reason: 'no webgl2 presenter factory was supplied' },
     ]);
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('stops loudly on a renderer fault in auto mode and never falls back', async () => {
@@ -102,6 +102,6 @@ describe('mountBijouCanvas() backend ladder', () => {
     const handle = await mountAt(env, { isBackendUnavailable: () => true });
     expect(handle.backend).toBe('webgl2');
     expect(handle.fallbackReasons[0]?.code).toBe('GEORDI_E_BIJOU_RENDERER_FAULT');
-    await handle.stop();
+    await env.stop(handle);
   });
 });

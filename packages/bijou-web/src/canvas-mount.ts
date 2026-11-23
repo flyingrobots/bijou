@@ -93,7 +93,7 @@ export async function mountBijouCanvas<Model, C extends BijouCanvasElement>(
     stage.apply(next);
     ctx.runtime.resize(next.grid.columns, next.grid.rows);
   });
-  const runCtx = { ...ctx, io: { ...ctx.io, onData: control.onData } };
+  const runCtx = { ...ctx, io: { ...ctx.io, onData: (callback: (payload: unknown) => void) => control.onData(callback) } };
   const done = run(control.app, { ctx: runCtx, presenter: bridge, mouse: true })
     .then(() => { if (fault !== undefined) throw fault.error; })
     .finally(() => {

@@ -72,6 +72,8 @@ export interface CanvasEnv {
   press(key: string): void;
   /** Run timers, microtasks, promise callbacks and frames until the mount settles. */
   drive(rounds?: number): Promise<void>;
+  /** Call `stop()` and drive the fake clock until it resolves. */
+  stop(handle: { stop(): Promise<void> }): Promise<void>;
   /** Listeners still attached to every textarea and canvas the test saw. */
   listeners(): number;
 }
@@ -110,6 +112,11 @@ export function createCanvasEnv(): CanvasEnv {
         time += 20;
         clockHost.frame(time);
       }
+    },
+    async stop(handle) {
+      const stopping = handle.stop();
+      await this.drive();
+      await stopping;
     },
     listeners: () => [...container.ownerDocument.textareas, ...maker.made]
       .reduce((sum, target) => sum + target.listenerCount(), 0),

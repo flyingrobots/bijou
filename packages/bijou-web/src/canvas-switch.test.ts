@@ -46,7 +46,7 @@ describe('mountBijouCanvas() switchBackend()', () => {
     newCanvas?.dispatch('pointerdown', withPrevent({ clientX: 15, clientY: 25, button: 0 }));
     expect(env.container.ownerDocument.activeElement).toBe(textarea);
     expect(handle.cellFromPoint(15, 25)).toEqual({ col: 1, row: 1 });
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('re-presents the last frame on the new presenter at once', async () => {
@@ -57,7 +57,7 @@ describe('mountBijouCanvas() switchBackend()', () => {
     const presents = env.backends.created[1]?.presents ?? [];
     expect(presents[0]).toMatchObject({ force: true, width: 80, height: 24 });
     expect(env.backends.created[1]?.resizes).toEqual([{ cssWidth: 800, cssHeight: 480, dpr: 1 }]);
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('keeps the current backend when the switch target is unavailable', async () => {
@@ -71,7 +71,7 @@ describe('mountBijouCanvas() switchBackend()', () => {
     env.press('a');
     await env.drive();
     expect(handle.model()).toEqual({ count: 1 });
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('runs overlapping switches one after another', async () => {
@@ -81,13 +81,13 @@ describe('mountBijouCanvas() switchBackend()', () => {
     expect(handle.backend).toBe('canvas2d');
     expect(env.container.canvases()).toEqual([env.maker.made[2]]);
     expect(env.backends.live()).toBe(1);
-    await handle.stop();
+    await env.stop(handle);
   });
 
   it('refuses a switch after stop()', async () => {
     const env = createCanvasEnv();
     const handle = await mounted(env);
-    await handle.stop();
+    await env.stop(handle);
     await expect(handle.switchBackend('webgl2')).rejects.toMatchObject({ code: 'BIJOU_WEB_CANVAS_STOPPED' });
     expect(env.maker.made).toHaveLength(1);
   });
