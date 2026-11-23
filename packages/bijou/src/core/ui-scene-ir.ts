@@ -5,6 +5,7 @@ export type {
   UiLayoutIntent,
   UiNode,
   UiNodeKind,
+  UiNodeState,
   UiSceneIr,
   UiSceneIrVersion,
   UiSceneIssueCode,

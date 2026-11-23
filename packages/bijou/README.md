@@ -240,6 +240,35 @@ status keys fall back to `semantic.muted`.
 - **`fixturePromotionText()`**: Render that promotion record for review and
   agent output.
 
+### Layout Direction
+
+Direction-sensitive Components read one resolved inline direction (R26:
+think in start and end, not left and right).
+
+- **`direction` option / `ctx.direction`**: Component options that extend
+  `BijouNodeOptions` accept `direction?: 'ltr' | 'rtl'`; `createBijou()` and
+  `createTestContext()` accept a context-wide `direction`.
+- **`resolveDirection(options)`**: The single resolver. The explicit option
+  overrides the context; absent both, the direction is `'ltr'`.
+- **`mirrorsLayout(options)`**: True only for `'rtl'` in `interactive` and
+  `static` modes. `pipe` and `accessible` output keep logical order.
+- **`directionalSide('start' | 'end', direction)`** and
+  **`orderForDirection(items, direction)`**: Map logical edges to physical
+  sides and logical sequences to visual order without mutating the input.
+- **`mirrorGlyph(glyph, direction)`** and **`mirrorGlyphs(text, direction)`**:
+  Swap directional glyphs (‹ ›, « », ▸ ◂, ▶ ◀, → ←, ⇒ ⇐ and similar) under
+  `'rtl'`. Pass only Component-owned affordances; never code, paths, IDs,
+  commands or URLs. ASCII `<` and `>` are never swapped.
+
+Illustrative composition for a direction-sensitive Component; per-family
+integration is tracked separately:
+
+```ts
+const visual = mirrorsLayout(options) ? 'rtl' : 'ltr';
+const separator = mirrorGlyphs(' › ', visual);
+const items = orderForDirection(crumbs, visual);
+```
+
 ### Profunctor Page Inspection
 
 - **`lowerProfunctorPageArtifacts()`**: Validate one canonical
@@ -253,6 +282,27 @@ status keys fall back to `semantic.muted`.
 - **[Profunctor Page Inspection reference](../../docs/book/bijou-designs.pdf#page=425)**:
   Review the exact input versions, supported blocks, inspection modes, output
   contracts, diagnostics, and verification commands.
+
+### Browser Renderer Seam
+
+- **`lowerUiSceneToBrowser()`**: Lower a `ui-scene-ir/1` scene with a
+  `geordi-browser` target profile to a deterministic element tree and HTML
+  markup. The output holds only facts the scene declares.
+- **`createUiSceneBrowserDom()`**: Build that tree through a host document.
+- **`createUiSceneBrowserReceipt()`**: Record the browser output in a
+  `ui-scene-receipt/1`.
+- **[Browser renderer seam reference](../../docs/topics/ui-scene-browser/README.md)**:
+  Review the element mapping, options, refusals, and limits.
+
+### Terminal and Browser Parity Witness
+
+- **`witnessUiSceneParity()`**: Lower one `ui-scene-ir/1` scene on the
+  terminal target and on the browser target, then report each fact as equal, a
+  named gap, or a mismatch.
+- **`compareUiSceneLowerings()`**: Compare a terminal lowering and a browser
+  lowering that already exist.
+- **[Parity witness reference](../../docs/topics/ui-scene-parity/README.md)**:
+  Review the facts that must be equal, the named gaps, and the limits.
 
 ## Documentation
 

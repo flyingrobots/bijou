@@ -109,6 +109,7 @@ If you need to reset after a bad input sequence, use `Ctrl-C` to hard-exit.
 | [`@flyingrobots/bijou`](../../packages/bijou/) | Core toolkit: prompts, surfaces, components, themes, blocks, ports, and pure contracts. |
 | [`@flyingrobots/bijou-tui`](../../packages/bijou-tui/) | Interactive runtime: TEA loop, input, layout, motion, overlays, and shell support. |
 | [`@flyingrobots/bijou-node`](../../packages/bijou-node/) | Node.js adapters for IO, terminal hosting, styling, and worker helpers. |
+| [`@flyingrobots/bijou-web`](../../packages/bijou-web/) | Browser adapters for the clock, runtime, style, and output IO ports. Workspace only; not published to npm. |
 | [`@flyingrobots/bijou-tui-app`](../../packages/bijou-tui-app/) | Batteries-included framed shell and higher-level app composition. |
 | [`create-bijou-tui-app`](../../packages/create-bijou-tui-app/) | Project scaffolder for hosted Bijou TUI apps. |
 | [`@flyingrobots/bijou-mcp`](../../packages/bijou-mcp/) | MCP server package for exposing Bijou-backed tools and structured output. |

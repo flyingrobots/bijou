@@ -3,7 +3,6 @@ import {
   type BijouContext,
 } from '@flyingrobots/bijou';
 import type { EventBus } from './eventbus.js';
-import { renderSurfaceFrame } from './screen.js';
 import { RuntimeFramebuffers } from './runtime-buffers.js';
 import type { RuntimeSession } from './runtime-contract.js';
 import {
@@ -11,8 +10,9 @@ import {
   formatRuntimeDetail,
   writeErrorLine,
 } from './runtime-format.js';
+import type { RuntimeHost } from './runtime-host.js';
 
-/** Enter the terminal-visible crash state exactly once. */
+/** Enter the host-visible crash state exactly once. */
 export function enterRuntimeCrashMode<Model, M>(
   phase: 'update' | 'render' | 'resize',
   error: unknown,
@@ -23,6 +23,7 @@ export function enterRuntimeCrashMode<Model, M>(
   bus: EventBus<M>,
   viewport: () => { columns: number; rows: number },
   shutdown: (error?: unknown) => void,
+  host: RuntimeHost,
 ): void {
   if (session.crashMode) return;
   if (session.fatalError === null) session.fatalError = error;
@@ -54,13 +55,7 @@ export function enterRuntimeCrashMode<Model, M>(
         ? 'Press Enter to exit.'
         : 'Stdin is not interactive; exiting automatically.',
     ].join('\n'), size.columns, size.rows);
-    renderSurfaceFrame(
-      ctx.io,
-      buffers.current,
-      surface,
-      ctx.style,
-      buffers.output,
-    );
+    host.present(buffers.current, surface, buffers.output);
     buffers.replaceFront(surface);
     if (!ctx.runtime.stdinIsTTY) shutdown(session.fatalError);
   } catch (renderError) {
