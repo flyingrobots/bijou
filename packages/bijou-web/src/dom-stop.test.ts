@@ -41,15 +41,19 @@ describe('mountBijouDom() teardown', () => {
     expect(result.status).toBe('ignored');
   });
 
-  it('stops the controller and attaches nothing when the first scene cannot be lowered', () => {
+  it('stops the controller and attaches nothing when the first scene cannot be lowered', async () => {
     const doc = new FakeDocument();
     const container = doc.createElement('main');
     doc.body.appendChild(container);
     const host = createFakeClockHost();
-    const ctx = createWebContext({ clock: createWebClock({ host }) });
+    const clock = createWebClock({ host });
+    const ctx = createWebContext({ clock });
     const scene = controlsScene({ count: 0, name: '', enabled: true, dir: 'ltr', ticks: 0, showChip: true });
     const app: SemanticSceneApp<ControlsModel> = {
-      init: () => [{ count: 0, name: '', enabled: true, dir: 'ltr', ticks: 0, showChip: true }, []],
+      init: () => [{ count: 0, name: '', enabled: true, dir: 'ltr', ticks: 0, showChip: true }, [() => {
+        const interval = clock.setInterval(() => undefined, 1000);
+        return () => { interval.dispose(); };
+      }]],
       update: (_msg, model) => [model, []],
       view: () => createSurface(1, 1),
       viewScene: () => ({ ...scene, nodes: scene.nodes.map((node): UiNode => node.id === 'app' ? { ...node, kind: 'box' } : node) }),
@@ -57,6 +61,8 @@ describe('mountBijouDom() teardown', () => {
     };
 
     expect(() => mountBijouDom(app, container, { ctx })).toThrow(/Cannot lower ui-scene-ir\/1 node app \(box\)/u);
+    expect(host.liveTimers()).toBe(1);
+    await new Promise<void>((resolve) => { queueMicrotask(resolve); });
     expect(container.childNodes.length).toBe(0);
     expect(doc.liveListeners()).toBe(0);
     expect(host.liveTimers()).toBe(0);

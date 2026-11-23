@@ -17,8 +17,9 @@ export class FakeText {
 
 /**
  * An in-memory element. It models the browser rules the patcher relies on:
- * a moved node leaves its old parent, removing the focused node drops focus to
- * `body`, and setting an `<input>` value that differs moves the caret to the end.
+ * a moved node leaves its old parent, moving or removing the focused node drops
+ * focus to `body`, only a focusable element takes focus, and setting an
+ * `<input>` value that differs moves the caret to the end.
  */
 export class FakeElement {
   parentNode: FakeElement | null = null;
@@ -55,9 +56,8 @@ export class FakeElement {
   removeChild(node: FakeElement | FakeText): void { this.doc.counts.writes += 1; this.detach(node); }
   detach(node: FakeElement | FakeText): void {
     const index = this.childNodes.indexOf(node);
-    if (index < 0) throw new Error('not a child');
-    this.childNodes.splice(index, 1);
-    node.parentNode = null;
+    if (index < 0) fail('not a child');
+    this.childNodes.splice(index, 1); node.parentNode = null;
     const active = this.doc.activeElement;
     if (node instanceof FakeElement && active !== null && node.contains(active)) this.doc.activeElement = this.doc.body;
   }
@@ -66,12 +66,12 @@ export class FakeElement {
     return false;
   }
   addEventListener(type: string, listener: Listener): void {
-    const set = this.listeners.get(type) ?? new Set<Listener>();
-    set.add(listener);
-    this.listeners.set(type, set);
+    this.listeners.set(type, (this.listeners.get(type) ?? new Set<Listener>()).add(listener));
   }
   removeEventListener(type: string, listener: Listener): void { this.listeners.get(type)?.delete(listener); }
-  focus(): void { if (this.doc.body.contains(this)) this.doc.activeElement = this; }
+  /** As in a browser, only a connected control or an element with `tabindex` takes focus. */
+  focus(): void { if (this.focusable() && this.doc.body.contains(this)) this.doc.activeElement = this; }
+  focusable(): boolean { return this.tagName === 'button' || this.tagName === 'input' || this.attributes.has('tabindex'); }
   get textContent(): string {
     return this.childNodes.map((child) => child instanceof FakeText ? child.data : child.textContent).join('');
   }

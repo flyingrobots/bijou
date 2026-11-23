@@ -64,6 +64,20 @@ describe('mountBijouDom() event bridge', () => {
     mounted.handle.stop();
   });
 
+  it('dispatches typed text that repeats a committed composition after the scene changed the value', () => {
+    const mounted = mountControls();
+    const input = mounted.node('app.name');
+    mounted.doc.compose(input, ['a'], 'Ada');
+    mounted.handle.controller.invoke({ actionId: 'app.name', value: 'Bo' });
+    const log = messages(mounted);
+
+    mounted.doc.type(input, 'Ada');
+
+    expect(log).toEqual([{ type: 'rename', name: 'Ada' }]);
+    expect(mounted.handle.controller.frame().model.name).toBe('Ada');
+    mounted.handle.stop();
+  });
+
   it('dispatches nothing while a composition is in progress, and keeps its text', () => {
     const mounted = mountControls();
     const log = messages(mounted);
