@@ -16,4 +16,3 @@ scripts/docker-seal/marker -text
 
 # The web-gpu showcase pins these Geordi files by SHA-256 (examples/web-gpu/geordi-pin.json).
 examples/web-gpu/vendor/*.tgz binary
-examples/web-gpu/vendor/procedural-glyphs.json -text

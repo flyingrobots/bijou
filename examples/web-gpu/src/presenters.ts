@@ -1,29 +1,13 @@
-import { parseJsonValue } from '@flyingrobots/geordi-core';
 import {
   createCanvas2DSurfacePresenter, createWebGL2SurfacePresenter, createWebGPUSurfacePresenter,
-  decodeProceduralGlyphTable, PROCEDURAL_GLYPH_TABLE_SHA256, sha256Hex, utf8Bytes,
   type EndpointReceipt, type GlyphAtlas, type GpuSurfacePresenter, type WebGL2SurfacePresenter,
   type WebGpuSurfacePresenter,
 } from '@flyingrobots/geordi-bijou-gpu';
 import type { BijouCanvasBackend, BijouCanvasPresenter, BijouCanvasPresenters } from '@flyingrobots/bijou-web';
-import proceduralTableText from '../vendor/procedural-glyphs.json?raw';
 
 /** The theme defaults every presenter paints unset colours with. */
 export const SHOWCASE_DEFAULT_FG = '#E6EDF3';
 export const SHOWCASE_DEFAULT_BG = '#0D1117';
-
-/**
- * The Canvas 2D presenter needs Geordi's procedural glyph table, which the
- * pinned package does not ship. The vendored copy must hash to the digest the
- * package itself pins, or the Canvas 2D backend refuses to start.
- */
-function proceduralTable(): ReturnType<typeof decodeProceduralGlyphTable> {
-  const digest = sha256Hex(utf8Bytes(proceduralTableText));
-  if (digest !== PROCEDURAL_GLYPH_TABLE_SHA256) {
-    throw new Error(`BIJOU_WEB_GPU_PROCEDURAL_TABLE_MISMATCH: ${digest} is not ${PROCEDURAL_GLYPH_TABLE_SHA256}`);
-  }
-  return decodeProceduralGlyphTable(parseJsonValue(proceduralTableText));
-}
 
 /** A presenter the page created, with what the HUD reads from it. */
 export interface TrackedPresenter {
@@ -93,7 +77,7 @@ export function createShowcasePresenters(atlas: GlyphAtlas): ShowcasePresenters 
         return track('webgl2', canvas, presenter, live);
       },
       canvas2d: (canvas) => track('canvas2d', canvas, createCanvas2DSurfacePresenter({
-        canvas, atlas, proceduralTable: proceduralTable(), ...colours, dpr: window.devicePixelRatio,
+        canvas, atlas, ...colours, dpr: window.devicePixelRatio,
       }), live),
     },
     presenterFor: (canvas) => (canvas === null ? undefined : live.get(canvas)),
