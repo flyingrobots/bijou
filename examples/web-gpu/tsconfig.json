@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": false,
+    "paths": {
+      "@flyingrobots/bijou": ["../../packages/bijou/src/index.ts"],
+      "@flyingrobots/bijou/perf": ["../../packages/bijou/src/core/render/packed-cell.ts"],
+      "@flyingrobots/bijou/viz": ["../../packages/bijou/src/core/viz/index.ts"],
+      "@flyingrobots/bijou-i18n": ["../../packages/bijou-i18n/src/index.ts"],
+      "@flyingrobots/bijou-tui": ["../../packages/bijou-tui/src/index.ts"],
+      "@flyingrobots/bijou-web": ["../../packages/bijou-web/src/index.ts"],
+      "@flyingrobots/bijou-node": ["./src/browser-start-app.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

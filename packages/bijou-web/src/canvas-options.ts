@@ -1,4 +1,5 @@
-import type { OutputMode } from '@flyingrobots/bijou';
+import type { BijouContext, OutputMode } from '@flyingrobots/bijou';
+import type { App } from '@flyingrobots/bijou-tui';
 import type {
   BijouCanvasBackend, BijouCanvasBackendChoice, BijouCanvasElement,
   BijouCanvasFallbackReason, BijouCanvasHost, BijouCanvasPresenters, BijouCanvasTextarea,
@@ -49,7 +50,16 @@ export interface MountBijouCanvasOptions<C extends BijouCanvasElement> {
   readonly input?: Pick<WebInteractiveIOOptions, 'platform' | 'passThrough' | 'onPasteRejected'>;
   /** Abort a mount that has not resolved yet. */
   readonly signal?: BijouCanvasAbortSignal;
+  /** A BCSS stylesheet for the run, as `RunOptions.css`. */
+  readonly css?: string;
 }
+
+/**
+ * The app to mount, or a function that builds it from the context it runs
+ * with. The function is called once, before `init()`, with the run's context;
+ * in `interactive` mode its runtime already has the mounted grid.
+ */
+export type BijouCanvasApp<Model> = App<Model, unknown> | ((ctx: BijouContext) => App<Model, unknown>);
 
 /** A running canvas mount. */
 export interface MountedBijouCanvas<Model, C extends BijouCanvasElement> {

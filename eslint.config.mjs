@@ -75,6 +75,16 @@ export default tseslint.config(
     },
   },
   {
+    // The browser showcase needs DOM types, which the shared project leaves out.
+    files: ["examples/web-gpu/**/*.ts"],
+    languageOptions: {
+      parserOptions: {
+        project: ["./examples/web-gpu/tsconfig.json", "./examples/web-gpu/tsconfig.e2e.json"],
+        tsconfigRootDir,
+      },
+    },
+  },
+  {
     files: coreFiles,
     rules: {
       "no-restricted-imports": [

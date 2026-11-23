@@ -1,4 +1,4 @@
-// Audited networked preparation: only package manifests/lock are present here.
+// Audited networked preparation: only package manifests/lock and the lockfile's repository tarballs are present here.
 import { readFileSync, readdirSync, mkdirSync, writeFileSync, rmSync, openSync, closeSync, fstatSync, readSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';

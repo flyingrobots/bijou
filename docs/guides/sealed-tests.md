@@ -52,7 +52,10 @@ node scripts/docker-seal/run.mjs -- sh -c 'npm run build && npm run lint && npm 
 ```
 
 Package downloads happen in a separate bounded setup worker that receives only
-package manifests and the lockfile. Package lifecycle scripts are disabled
+package manifests, the lockfile, and the repository tarballs the lockfile
+resolves with `file:` (the vendored Geordi packages of `examples/web-gpu`,
+listed by `scripts/docker-seal/local-tarballs.mjs`). npm checks each tarball
+against its lockfile `integrity`. Package lifecycle scripts are disabled
 there. Tests and lifecycle execution run afterward with networking disabled.
 Missing offline dependencies fail the run; the launcher does not restore
 network access as a fallback.
@@ -110,3 +113,18 @@ refuses reuse. Inspect the recorded worker and establish that its writers have
 stopped before recovering it. Lease expiry alone does not establish that fact.
 Never bypass admission, attach the source checkout, or run the failed test on
 the host to obtain a passing result.
+
+## The one suite outside the seal
+
+The browser suite of `examples/web-gpu` (`npm run test:browser:web-gpu`) does not
+run in the sealed runner. The sealed workers have no browser and no GPU, and the
+suite's job is to show that the built showcase renders, takes input and recovers
+in a real Chrome. It runs on a developer machine and in the CI job "Browser Suite
+(web-gpu, Chrome)". It is the only exception to the rule that all tests run
+sealed, and `AGENTS.md` records it.
+
+The showcase's build and typecheck, and every test that does not need a browser,
+still run in the seal. `tests/web-gpu/ci-browser-job.test.ts`, which runs sealed,
+holds the CI job to installing the locked dependencies and running the suite.
+See [`examples/web-gpu/README.md`](../../examples/web-gpu/README.md) for the
+commands and for what each run does and does not show.

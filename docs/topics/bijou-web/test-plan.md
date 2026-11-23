@@ -223,3 +223,14 @@ named test. A name with `%s` is one parameterized test.
 | WEB-136 | A host without `ResizeObserver` refuses loudly. | `refuses loudly when the host has no ResizeObserver` | Implemented |
 | WEB-137 | 50 mount, switch and stop cycles retain nothing. | `leaves zero listeners, observers, timers or presenters after 50 mount, switch and stop cycles` | Implemented |
 | WEB-138 | Real DOM elements and a Geordi-shaped presenter satisfy the structural interfaces at compile time. | `accepts the real DOM elements and a Geordi-shaped presenter without a cast` | Implemented |
+
+## Canvas app factory and focus: `canvas-app-factory.test.ts`, `canvas-focus.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-139 | An app factory is called once with the run's context, whose runtime has the mounted grid. | `builds the app once from a factory that receives the run context at the mounted grid` | Implemented |
+| WEB-140 | A lowered mode builds the app from the factory too. | `builds the app from the factory in a lowered mode too` | Implemented |
+| WEB-141 | `css` reaches the run, which installs a BCSS resolver on the run context. | `passes css to the run, which installs a BCSS resolver on the run context` | Implemented |
+| WEB-142 | A press focuses the textarea again on `pointerup`, after the browser moved focus away. | `focuses the textarea again on release, after the browser moved focus away during the press` | Implemented |
+| WEB-143 | An `io.onData()` subscription made by the app factory is kept and receives the stop message. | `keeps an io.onData() subscription the factory makes, and sends it the stop message` | Implemented |
+| WEB-144 | A factory that throws leaves no canvas, presenter, observer, listener or timer. | `releases the canvas, presenter, observers, listeners and timers when the factory throws` | Implemented |

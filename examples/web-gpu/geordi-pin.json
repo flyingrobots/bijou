@@ -1,0 +1,28 @@
+{
+  "schema": "bijou.web-gpu.geordi-pin/1",
+  "repository": "flyingrobots/geordi",
+  "commit": "f53423ecf7c8dad15b12959e17ea4ccac4235459",
+  "packed": "pnpm install --frozen-lockfile; pnpm --filter @flyingrobots/geordi-core build; pnpm --filter @flyingrobots/geordi-bijou-gpu build; pnpm --filter <package> pack",
+  "packages": [
+    {
+      "name": "@flyingrobots/geordi-core",
+      "version": "0.1.0",
+      "tarball": "vendor/flyingrobots-geordi-core-0.1.0.tgz",
+      "sha256": "da16413fd602422912bb29aabb6beb6831b9c1a5053defee2162653a0b34654a"
+    },
+    {
+      "name": "@flyingrobots/geordi-bijou-gpu",
+      "version": "0.1.0",
+      "tarball": "vendor/flyingrobots-geordi-bijou-gpu-0.1.0.tgz",
+      "sha256": "a1be535e920fc167925245af9b8562edb65aae82ba756daaeeff00dd3b765de1"
+    }
+  ],
+  "files": [
+    {
+      "path": "vendor/procedural-glyphs.json",
+      "source": "fixtures/bijou-gpu/procedural-glyphs.json",
+      "sha256": "7ebc92f74a57ec7744fc7ada20c886d76b4ea96c09b5005efbf0883562d62e46",
+      "why": "The Canvas 2D presenter requires this table, and the package does not ship it."
+    }
+  ]
+}

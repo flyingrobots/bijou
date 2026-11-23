@@ -146,10 +146,15 @@ value changes.
 
 ## Limits
 
-- No browser engine runs in the sealed test runner. The tests use an
-  in-memory document that models the browser rules the host relies on. Real
-  focus, selection, IME composition, and native button activation are not
-  verified in a browser.
+- No browser engine runs in the sealed test runner. Those tests use an
+  in-memory document that models the browser rules the host relies on. One
+  case runs in Google Chrome, in the [web GPU showcase](../web-gpu-showcase/README.md)
+  browser suite: a real `document` and element are passed to
+  `mountBijouDom()`, a click and Enter and Space on a focused `<button>` each
+  dispatch once, and typing, a caret move and an IME commit (driven through
+  the DevTools protocol) keep the same `<input>` focused with its selection.
+  Other browsers, a person's IME, screen readers, and the focus fallback are
+  not verified in a browser.
 - The seam lowers `group` and `text` nodes only, so `box`, `image`, `list`,
   `table`, `custom`, and `markdown` nodes are refused.
 - A toggle has no checked state in `ui-scene-ir/1`, so it has no

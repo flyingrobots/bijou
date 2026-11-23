@@ -31,7 +31,7 @@ export type { WebUnsupportedCapability } from './errors.js';
 export { createWebInteractiveContext } from './context-interactive.js';
 export type { CreateWebInteractiveContextOptions, WebInteractiveContext } from './context-interactive.js';
 export { mountBijouCanvas } from './canvas-mount.js';
-export type { BijouCanvasAbortSignal, MountBijouCanvasOptions, MountedBijouCanvas } from './canvas-options.js';
+export type { BijouCanvasAbortSignal, BijouCanvasApp, MountBijouCanvasOptions, MountedBijouCanvas } from './canvas-options.js';
 export { BIJOU_CANVAS_LADDER } from './canvas-contract.js';
 export type {
   BijouCanvasAbortToken, BijouCanvasBackend, BijouCanvasBackendChoice, BijouCanvasBox, BijouCanvasContainer,

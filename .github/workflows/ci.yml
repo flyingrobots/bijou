@@ -123,6 +123,39 @@ jobs:
       - name: Smoke canary apps
         if: matrix.node-version == 22
         run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run smoke:canaries -- --skip-build'
+      - name: Build and typecheck the web-gpu showcase
+        if: matrix.node-version == 22
+        run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run web-gpu:build && npm run web-gpu:typecheck'
+
+  # The one suite that runs outside the sealed runner: the sealed workers have no
+  # browser and no GPU, so the web-gpu showcase runs in the runner's installed
+  # Google Chrome. Headless Chrome on a hosted Linux runner draws WebGL2 with
+  # SwiftShader (software-probed evidence) and exposes no WebGPU adapter.
+  browser_web_gpu:
+    name: Browser Suite (web-gpu, Chrome)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --fund=false
+      - name: Browser version
+        run: google-chrome --version
+      - name: Run the browser suite
+        env:
+          CI: "true"
+          BIJOU_WEB_GPU_PORT: "41797"
+        run: npm run test:browser:web-gpu
+      - name: Upload browser suite results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-gpu-browser-results
+          path: test-results/web-gpu
 
   unit_cross_platform:
     name: Focused Unit Tests (${{ matrix.label }}, Node 22)

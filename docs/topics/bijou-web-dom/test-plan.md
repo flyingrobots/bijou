@@ -87,8 +87,11 @@ differs moves the caret to the end, and Enter or Space on a `<button>` whose
 | DOM-31 | A plain element that replaces the focused one gets `tabindex="-1"` and focus. | `makes a replacement plain element focusable before focusing it` | Implemented |
 | DOM-32 | Replacing an input drops its composition state. | `clears the composition state of an input that a new element replaces` | Implemented |
 
-## Planned
+## Real browser: `examples/web-gpu/e2e/dom.e2e.ts`
 
-| ID | Requirement | Status |
-| --- | --- | --- |
-| DOM-27 | Real Chromium: focus, selection, IME, and single-fire button activation in Mode 2. The Bijou Playwright harness (T2.7) owns this case. | Planned |
+This case runs with `npm run test:browser:web-gpu` in Google Chrome, outside
+the sealed runner. Its page is `examples/web-gpu/dom.html`.
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| DOM-27 | Real Chromium: focus, selection, IME, and single-fire button activation in Mode 2. A click, Enter and Space on a focused `<button>` each dispatch once; typing, a caret move and an IME commit keep the same `<input>` element focused, with its selection; no diagnostic, console or page error. | `mountBijouDom() in Chromium: one dispatch per activation, and typing or composing keeps the input element, focus and selection` | Implemented |

@@ -14,6 +14,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- A click on a canvas mounted by `mountBijouCanvas()` now leaves keyboard focus
+  in its hidden textarea. Chrome's `mousedown` default action moved focus off
+  the canvas after the `pointerdown` handler had focused the textarea, so no
+  key reached the app; the mount now focuses the textarea again on
+  `pointerup`. The web GPU showcase's browser suite found it (#797).
 - `lowerUiSceneToSurface()` resolves a token color only from an own entry of
   `tokenColors`, as `lowerUiSceneToBrowser()` does. A token named
   `constructor`, or a `tokenColors` object that inherits entries, no longer
@@ -27,6 +32,22 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `examples/web-gpu`, a Vite page that mounts the counter and the component
+  showcase with `mountBijouCanvas()` on Geordi's WebGPU, WebGL2 and Canvas 2D
+  presenters, with a HUD of backend, fallback reasons, grid, cell size, device
+  pixel ratio, frame time and receipt evidence, and controls for backend
+  switching, WebGL2 context loss and atlas reset (#797). Geordi's packages are
+  vendored as tarballs pinned to one commit and installed offline. A
+  Playwright suite, `npm run test:browser:web-gpu`, drives the page in Google
+  Chrome; it is the one test lane outside the sealed runner. The build refuses
+  every Node.js built-in, so `examples/components` and `examples/hero`, which
+  read files at module load, are listed as refused rather than mounted.
+- `mountBijouCanvas()` takes an app factory, called once with the run's
+  context, and a `css` option passed to the run (#797).
+- The browser suite also checks `mountBijouDom()` in Google Chrome on
+  `examples/web-gpu/dom.html`: one dispatch per click, Enter and Space on a
+  `<button>`, and an `<input>` that keeps its element, focus and selection
+  through typing and an IME commit (#797).
 - `@flyingrobots/bijou-web` has `mountBijouDom()` (#796). It runs a
   `SemanticSceneApp` in a DOM container as native elements: a `button` or
   `switch` role becomes a `<button>`, and a `textbox` becomes an `<input>`.

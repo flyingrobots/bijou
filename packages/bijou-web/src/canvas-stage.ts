@@ -36,7 +36,9 @@ export interface CanvasStage<C extends BijouCanvasElement> {
 /**
  * Start the stage on the first negotiated presenter. The textarea joins the
  * container; pointer input moves with the canvas through `surface`, and a
- * press on the canvas focuses the textarea.
+ * press on the canvas focuses the textarea. It does so on pointerdown and
+ * again on pointerup: between them a browser's mousedown default action moves
+ * focus off the canvas, which cannot take focus itself.
  */
 export function createCanvasStage<C extends BijouCanvasElement>(
   input: CanvasStageInput<C>,
@@ -56,6 +58,7 @@ export function createCanvasStage<C extends BijouCanvasElement>(
 
   container.appendChild(textarea);
   surface.addEventListener('pointerdown', focusTextarea);
+  surface.addEventListener('pointerup', focusTextarea);
   surface.retarget(first.canvas);
   bridge.setPresenter(first.presenter);
 
@@ -102,6 +105,7 @@ export function createCanvasStage<C extends BijouCanvasElement>(
       released = true;
       bridge.dispose();
       surface.removeEventListener('pointerdown', focusTextarea);
+      surface.removeEventListener('pointerup', focusTextarea);
       surface.retarget(null);
       live.presenter.dispose();
       detachNode(container, live.canvas);
