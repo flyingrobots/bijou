@@ -1,7 +1,7 @@
 import { builtinModules } from 'node:module';
 import { relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { build, parseAst, type Plugin } from 'vite';
+import { build, parseSync, type Plugin } from 'vite';
 import showcaseConfig from '../../examples/web-gpu/vite.config.js';
 import { hostGlobalsIn } from './host-reach-ast.js';
 
@@ -35,7 +35,7 @@ function hostGlobals(findings: Set<string>): Plugin {
     transform(code, id) {
       const file = id.split('?')[0] ?? id;
       if (id.startsWith('\0') || !SCRIPT.test(file)) return null;
-      for (const name of hostGlobalsIn(parseAst(code, { lang: 'js' }))) findings.add(`${name} used by ${repoPath(file)}`);
+      for (const name of hostGlobalsIn(parseSync(file, code, { lang: 'js' }).program)) findings.add(`${name} used by ${repoPath(file)}`);
       return null;
     },
   };
