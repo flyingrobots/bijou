@@ -36,6 +36,17 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | WGPU-11 | The browser job runs only `npm ci` and the browser suite outside the seal. | `runs only npm ci and the browser suite outside the seal` | Implemented |
 | WGPU-12 | The sealed test job builds and typechecks the page. | `builds and typechecks the showcase inside the sealed runner` | Implemented |
 
+## Chrome sources: `tests/web-gpu/chrome-sources.test.ts` and `tests/web-gpu/chrome-registry.test.ts` (sealed)
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WGPU-24 | Every chrome `.tsx` outside the CLI-installed `src/vendor/` and `src/components/` has no intrinsic element but layout-only `div`s, the page `h1`, `a` links and the mount host; no inline style, raw colour, arbitrary Tailwind value, palette colour or primitive imported past the shadcn components. | `has chrome sources to scan`, `%s has no hand-authored markup, inline style or raw colour` | Implemented |
+| WGPU-25 | One component declares the Bijou mount host, and it has no children. | `declares the Bijou mount host in one component, with no children of its own` | Implemented |
+| WGPU-26 | Each HTML entry holds only a root element and its module script. | `keeps each HTML entry to a root element and its module script` | Implemented |
+| WGPU-27 | `components.json` installs from the `@flyingrobots` registry into `src/vendor/` and `src/components/`, and the README names every installed item. | `installs from the @flyingrobots registry into src/vendor and src/components`, `names every installed registry item in the README` | Implemented |
+| WGPU-28 | `src/index.css` declares only shadcn tokens, every light and dark token has a value, and the theme-book command is recorded; `src/showcase.css` is gone. | `declares only shadcn tokens in its one stylesheet`, `gives every light and dark token a value from theme-book, and records the command` | Implemented |
+| WGPU-29 | One boundary rule keeps chrome styles out of the Bijou mounts. | `keeps the chrome styles out of the Bijou mounts with one boundary rule` | Implemented |
+
 ## Golden lifecycle: `examples/web-gpu/e2e/golden.e2e.ts` (browser)
 
 | ID | Requirement | Test | Status |
@@ -70,3 +81,28 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
 | WGPU-21 | `dom.html` mounts a semantic scene app with `mountBijouDom()`; the case is DOM-27 of the [DOM host test plan](../bijou-web-dom/test-plan.md). | `mountBijouDom() in Chromium: one dispatch per activation, and typing or composing keeps the input element, focus and selection` | Implemented |
+
+## Chrome: `examples/web-gpu/e2e/chrome.e2e.ts` (browser)
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WGPU-30 | The theme follows the system by default; light and dark apply and persist across a reload; system follows the emulated scheme. | `the theme follows the system by default, switches to light or dark, and keeps the choice across a reload` | Implemented |
+| WGPU-31 | At 390 px the regions stack with no horizontal scroll and the grid fits the canvas. | `at phone width the regions stack in one column with no horizontal scroll, and the grid fits the canvas` | Implemented |
+| WGPU-32 | At 2560 px the Surface, the controls and the HUD sit side by side across the width. | `on an extra-wide screen the Surface, the controls and the HUD sit side by side across the width` | Implemented |
+| WGPU-33 | With WebGPU and WebGL2 unavailable, both fallback reasons are shown in an Alert. | `with no WebGPU adapter and no WebGL2 context the fallback reasons are shown in an alert` | Implemented |
+
+## Keys: `examples/web-gpu/e2e/keys.e2e.ts` (browser)
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WGPU-34 | With the Surface focused, `Esc`, `Space`, `h` `j` `k` `l`, the arrows and `t` all reach the textarea, the count follows the counter's own keys, and no palette or menu opens. | `with the Surface focused, every key reaches the Bijou app and none opens the page chrome` | Implemented |
+| WGPU-35 | In the chrome, `Esc` opens the palette, a typed command runs, and the Keys card shows `Kbd` hints. | `in the chrome, Esc opens the command palette, its commands run, and the hints name the keys` | Implemented |
+| WGPU-36 | In the chrome, `j` and `k` move focus, and `Space` then `t` opens the theme menu. | `in the chrome, j and k move focus through the controls and Space then t opens the theme menu` | Implemented |
+| WGPU-37 | On the DOM page, keys typed into a mounted input, and `Esc`, `j`, `k` and `Space` on a mounted Button, reach the element; Space presses it once and the page acts on none. | `on the DOM check page, keys typed into a mounted input stay in the input`, `on the DOM check page, a focused mounted Button gets Esc, j, k and Space, and the page acts on none of them` | Implemented |
+
+## Style isolation: `examples/web-gpu/e2e/isolation.e2e.ts` (browser)
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WGPU-38 | The canvas and textarea a mount creates have the computed non-inherited styles of the same elements in a document with no author CSS, and the canvas fills the host's content box. | `no chrome style reaches the canvas or the textarea mountBijouCanvas() creates` | Implemented |
+| WGPU-39 | Every element `mountBijouDom()` creates has the computed non-inherited styles of the same element in a document with no author CSS. | `no chrome style reaches the elements mountBijouDom() creates` | Implemented |
