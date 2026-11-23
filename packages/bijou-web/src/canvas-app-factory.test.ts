@@ -65,6 +65,7 @@ describe('mountBijouCanvas() app factory failures and early subscriptions', () =
     const env = createCanvasEnv();
     const payloads: unknown[] = [];
     const mounting = mountBijouCanvas((ctx: BijouContext) => {
+      if (ctx.io.onData === undefined) throw new Error('the run context has no onData');
       ctx.io.onData((payload) => { payloads.push(payload); });
       return counterApp;
     }, env.container, env.options());
