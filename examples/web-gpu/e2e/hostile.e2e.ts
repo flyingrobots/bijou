@@ -16,7 +16,7 @@ test('with no WebGPU adapter and no WebGL2 context, auto falls back to Canvas 2D
     });
   });
   const current = await open(page, 'app=counter&backend=auto');
-  witness(info, current);
+  witness(page, info, current);
   expect(current.problem).toBeNull();
   expect(current.backend).toBe('canvas2d');
   expect(current.fallbackReasons.map((reason) => [reason.backend, reason.code])).toEqual([
@@ -47,7 +47,7 @@ test('a WEBGL_lose_context loss and restore redraws the same frame without the a
   await page.getByRole('button', { name: 'Lose the WebGL2 context' }).click();
   await expect.poll(() => page.evaluate(() => window.__contextEvents)).toEqual(['webglcontextlost', 'webglcontextrestored']);
   const after = await waitFor(page, (current) => !current.contextLost);
-  witness(info, after);
+  witness(page, info, after);
   expect(after.problem).toBeNull();
   expect(after.backend).toBe('webgl2');
   // The presenter redrew from its retained staging buffer: no new frame came from the app.

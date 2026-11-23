@@ -16,7 +16,7 @@ test('counter on WebGPU draws the same frame as WebGL2 and takes a key', async (
   const webgl2Frame = await waitFor(page, (current) => current.frameRgbaSha256 !== null && current.presents === webgl2.presents);
   const webgpu = await open(page, 'app=counter&backend=webgpu');
   const probed = await waitFor(page, (current) => current.backend === 'webgpu' && current.evidenceLevel !== null);
-  witness(info, probed);
+  witness(page, info, probed);
   expect(webgpu.problem).toBeNull();
   expect(probed.evidenceLevel).toMatch(/^(gpu|software)-probed$/u);
   expect(probed.frameRgbaSha256).toBe(webgl2Frame.frameRgbaSha256);

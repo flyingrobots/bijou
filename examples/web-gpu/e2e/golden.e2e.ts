@@ -9,7 +9,7 @@ test('counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2
   const errors = collectErrors(page);
   const first = await open(page, 'app=counter&backend=webgl2');
   expect(first.problem).toBeNull();
-  witness(info, first);
+  witness(page, info, first);
 
   // The HUD reports what the mount and the receipt say.
   await expect(hud(page, 'backend')).toHaveText('WebGL2');
@@ -46,7 +46,7 @@ test('counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2
   await page.evaluate(() => { window.__previousCanvas = document.querySelector('#surface canvas'); });
   await page.evaluate(() => window.__bijouWebGpu?.switchBackend('canvas2d'));
   const canvas2d = await waitFor(page, (current) => current.backend === 'canvas2d' && current.presents > 0);
-  witness(info, canvas2d);
+  witness(page, info, canvas2d);
   await expect(hud(page, 'backend')).toHaveText('Canvas 2D');
   expect(await page.evaluate(() => window.__previousCanvas !== document.querySelector('#surface canvas'))).toBe(true);
   expect(await mounted(page)).toMatchObject({ canvases: 1, textareas: 1 });

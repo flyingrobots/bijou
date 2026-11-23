@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
 // Several worktrees may run this suite at once, so each picks its own port.
 const port = process.env['BIJOU_WEB_GPU_PORT'] ?? '41797';
@@ -30,7 +30,7 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 180_000,
   },
-  projects: [
-    { name: channel, use: { ...devices['Desktop Chrome'], channel } },
-  ],
+  // No device preset: its fixed user agent would replace the real browser's,
+  // and the Canvas 2D receipt records the user agent as its driver.
+  projects: [{ name: channel }],
 });

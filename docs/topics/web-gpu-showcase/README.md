@@ -90,12 +90,15 @@ browser suite.
 
 ## Evidence
 
-The browser suite runs in Google Chrome. Locally on an Apple M5 Mac, headless
-Chrome 156 draws WebGL2 through ANGLE on Metal and exposes a WebGPU adapter;
-both give `gpu-probed` receipts. On a hosted Ubuntu runner, WebGL2 draws with
-SwiftShader (`software-probed`) and Chrome exposes no WebGPU adapter, so the
-WebGPU case is skipped as capability-refused. For the counter, the WebGPU,
-WebGL2 and Canvas 2D frames have the same `frameRgbaSha256`.
+The browser suite runs in Google Chrome, headless.
+
+| Where | Chrome | WebGL2 | Canvas 2D | WebGPU |
+| --- | --- | --- | --- | --- |
+| Apple M5 Mac, locally | 158.0.8127.36 | ANGLE on Metal, `gpu-probed` | `software-probed` | Metal adapter, `gpu-probed` |
+| Hosted Ubuntu runner, `browser_web_gpu` job | 157.0.8103.78 | ANGLE on SwiftShader, `software-probed` | `software-probed` | No adapter: the case is skipped as capability-refused |
+
+For the counter, the WebGPU, WebGL2 and Canvas 2D frames have the same
+`frameRgbaSha256`; the golden and WebGPU cases assert it.
 
 Not verified: Firefox, Safari, a device pixel ratio other than 1, a DPR change
 during a run, IME composition and paste in a real browser, and any timing

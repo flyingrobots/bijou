@@ -92,11 +92,13 @@ export async function mounted(page: Page): Promise<{ canvases: number; textareas
   });
 }
 
-/** Record which backend, adapter and evidence level produced a result. */
-export function witness(info: TestInfo, current: HudState): void {
-  const description = `${current.backend ?? 'none'} on ${current.adapter ?? 'no adapter'}: ${current.evidenceLevel ?? 'no receipt'}`;
+/** Record which browser, backend, adapter and evidence level produced a result. */
+export function witness(page: Page, info: TestInfo, current: HudState): void {
+  const browser = page.context().browser()?.version() ?? 'unknown';
+  const description = `Chrome ${browser}, ${current.backend ?? 'none'} on ${current.adapter ?? 'no adapter'}: ${current.evidenceLevel ?? 'no receipt'}`;
   info.annotations.push({ type: 'evidence', description });
-  process.stdout.write(`${JSON.stringify({ kind: 'web-gpu-evidence', test: info.title, backend: current.backend, adapter: current.adapter, evidenceLevel: current.evidenceLevel })}\n`);
+  const line = { kind: 'web-gpu-evidence', test: info.title, browser, backend: current.backend, adapter: current.adapter, evidenceLevel: current.evidenceLevel };
+  process.stdout.write(`${JSON.stringify(line)}\n`);
 }
 
 /** The digit of `Count: N` in examples/counter: row 2, column 11 (box border, padding, two spaces, `Count: `). */
