@@ -37,7 +37,7 @@ describe('createWebInteractiveIO() keyboard', () => {
     ['Tab', 'tab', '\t'],
     ['Backspace', 'backspace', '\x7f'],
     ['F2', 'f2', '\x1b[12~'],
-    ['F12', 'f12', '\x1b[24~'],
+    ['F10', 'f10', '\x1b[21~'],
     ['PageDown', 'pagedown', '\x1b[6~'],
   ])('delivers the %s key as %s and its raw encoding', (key, name, encoded) => {
     const { keys, raw, press } = setup();

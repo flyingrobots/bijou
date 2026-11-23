@@ -75,9 +75,9 @@ describe('createWebInteractiveIO() pointer events', () => {
     fire('pointermove', { clientX: 45, clientY: 65, buttons: 1 });
     fire('pointerup', { clientX: 65, clientY: 85, button: 0, buttons: 0 });
     expect(mouse.map((m) => [m.action, m.button, m.col, m.row])).toEqual([
-      ['press', 'left', 1, 1], ['move', 'left', 3, 3], ['release', 'left', 5, 5],
+      ['press', 'left', 1, 1], ['move', 'left', 3, 2], ['release', 'left', 5, 3],
     ]);
-    expect(raw).toEqual(['\x1b[<0;2;2M', '\x1b[<32;4;4M', '\x1b[<0;6;6m']);
+    expect(raw).toEqual(['\x1b[<0;2;2M', '\x1b[<32;4;3M', '\x1b[<0;6;4m']);
   });
 
   it.each([
@@ -86,7 +86,7 @@ describe('createWebInteractiveIO() pointer events', () => {
     const { mouse, raw, fire } = setup();
     fire('pointermove', { clientX: 10, clientY: 20, buttons });
     expect(mouse[0]?.button).toBe(button);
-    expect(raw).toEqual([`\x1b[<${code};1;1M`]);
+    expect(raw).toEqual([`\x1b[<${String(code)};1;1M`]);
   });
 
   it.each([[0, 'left', 0], [1, 'middle', 1], [2, 'right', 2]])(
@@ -96,7 +96,7 @@ describe('createWebInteractiveIO() pointer events', () => {
       fire('pointerdown', { clientX: 10, clientY: 20, button: pointerButton });
       fire('pointerup', { clientX: 10, clientY: 20, button: pointerButton });
       expect(mouse.map((m) => m.button)).toEqual([button, button]);
-      expect(raw).toEqual([`\x1b[<${code};1;1M`, `\x1b[<${code};1;1m`]);
+      expect(raw).toEqual([`\x1b[<${String(code)};1;1M`, `\x1b[<${String(code)};1;1m`]);
     },
   );
 

@@ -20,6 +20,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `createWebInteractiveIO()` in `@flyingrobots/bijou-web` reads browser input
+  through a hidden `<textarea>` and a surface element (#793): keys, IME
+  composition (delivered once in either `compositionend` and `input` order),
+  single-line paste (multi-line paste is rejected), pointer and wheel with
+  0-based cells and SGR packets on `rawInput()`, a platform-aware shortcut
+  pass-through, and idempotent `dispose()`. It uses structural DOM interfaces
+  and has not run in a real browser.
 - `@flyingrobots/bijou-web` is a new workspace package for browser hosts
   (#792). `createWebContext()` composes `createWebClock()`,
   `createWebRuntime()`, `createWebStyle()`, and `createWebOutputIO()` into a

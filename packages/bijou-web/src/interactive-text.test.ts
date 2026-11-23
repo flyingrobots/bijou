@@ -139,4 +139,11 @@ describe('createWebInteractiveIO() paste', () => {
     expect(keys).toEqual([]);
     expect(rejected).toEqual([]);
   });
+
+  it('strips control characters so paste cannot forge escape sequences', () => {
+    const { keys, raw, fire } = setup();
+    fire('paste', { clipboardData: { getData: () => 'a\x1b[Ab\x9b\x7f\tc' } });
+    expect(keys).toEqual([text('a[Abc')]);
+    expect(raw).toEqual(['a[Abc']);
+  });
 });

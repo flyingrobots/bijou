@@ -59,7 +59,7 @@ describe('createWebInteractiveIO() lifecycle', () => {
     io.keyInput((key) => seen.push(key.key));
     io.rawInput((data) => seen.push(data));
     io.mouseInput((msg: WebMouseMsg) => seen.push(msg.action));
-    io.onResize((cols) => seen.push(`resize ${cols}`));
+    io.onResize((cols) => seen.push(`resize ${String(cols)}`));
     io.dispose();
     io.dispose();
     press('a');
@@ -82,7 +82,7 @@ describe('createWebInteractiveIO() lifecycle', () => {
 
   it('forwards resize columns and rows to onResize until disposed', () => {
     const { io, runtime } = setup();
-    const sizes: Array<[number, number]> = [];
+    const sizes: [number, number][] = [];
     const handle = io.onResize((cols, rows) => sizes.push([cols, rows]));
     runtime.resize(100, 30);
     handle.dispose();
@@ -93,14 +93,14 @@ describe('createWebInteractiveIO() lifecycle', () => {
 
   it('no longer refuses rawInput, and still writes output', () => {
     const { io } = setup();
-    expect(() => io.rawInput(() => undefined).dispose()).not.toThrow();
+    expect(() => { io.rawInput(() => undefined).dispose(); }).not.toThrow();
     io.write('hi');
     expect(io.output()).toBe('hi');
   });
 
   it('works with no textarea and no surface', () => {
     const io = createWebInteractiveIO();
-    expect(() => io.keyInput(() => undefined).dispose()).not.toThrow();
+    expect(() => { io.keyInput(() => undefined).dispose(); }).not.toThrow();
     expect(io.cellFromPoint(5, 5)).toEqual({ col: 0, row: 0 });
   });
 
