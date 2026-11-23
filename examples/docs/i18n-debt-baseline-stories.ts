@@ -21,7 +21,7 @@ export const DOGFOOD_STORY_I18N_DEBT_BASELINE = Object.freeze({
   'stories-helper-render-glyph-raytrace-preview': 1,
   'stories-helper-render-perf-overlay-story-preview': 1,
   'stories-helper-render-sparkline-story-preview': 7,
-  'stories-helper-render-spring-timeline-preview': 17,
+  'stories-helper-render-spring-timeline-preview': 16,
   'stories-helper-render-stats-panel-story-preview': 1,
   'stories-helper-staged-form-preview': 3,
   'stories-helper-summarize-data-viz-series': 7,

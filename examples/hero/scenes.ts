@@ -57,9 +57,9 @@ export function raytraceScene(
     },
   });
   surface.blit(body, 0, 1);
+  const { fps, frameTimeMs, history, ...memory } = perf;
   const hud = perfOverlaySurface({
-    fps: perf.fps, frameTimeMs: perf.frameTimeMs, frameTimeHistory: perf.history,
-    width, height, heapUsedMB: perf.heapUsedMB, rssMB: perf.rssMB,
+    fps, frameTimeMs, frameTimeHistory: history, width, height, ...memory,
   }, { title: 'Perf', width: 30, chartHeight: 3, borderToken: palette.accentToken, bgToken: palette.panelToken, ctx });
   surface.blit(hud, width - hud.width - 2, height - hud.height - 2);
   chrome(surface, palette, 'render lab');

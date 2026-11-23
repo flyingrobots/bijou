@@ -6,7 +6,7 @@ import type { FocusAreaOptions, FocusAreaState } from './focus-area.part01.js';
 
 import { resolveFocusAreaViewportWidth } from './focus-area.part06.js';
 export function createFocusAreaStateForSurface(
-  surface: Surface,
+  surface: Pick<Surface, 'width' | 'height'>,
   options: Omit<FocusAreaOptions, 'content'>,
 ): FocusAreaState {
   const { overflowX = 'hidden', scrollbarMode = 'gutter' } = options;

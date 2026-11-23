@@ -1,0 +1,1320 @@
+[
+  {
+    "id": "alert",
+    "variants": [
+      [
+        "alert('Deployment completed successfully.', { variant: 'success', ctx })"
+      ],
+      [
+        "alert('Migrations are queued behind a schema lock. Review the rollout window.', {",
+        "  variant: 'warning',",
+        "  ctx,",
+        "})"
+      ],
+      [
+        "alert('Release failed: 3 workers did not acknowledge the new image.', {",
+        "  variant: 'error',",
+        "  ctx,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "app-shell",
+    "variants": [
+      [
+        "appShellPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'framed shell',",
+        "  mode: 'shell',",
+        "})"
+      ],
+      [
+        "appShellPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'command palette',",
+        "  mode: 'palette',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "badge",
+    "variants": [
+      [
+        "column([",
+        "  row(['api    ', badgeSurface('LIVE', 'success', ctx), '  p95 84ms']),",
+        "  spacer(),",
+        "  row(['queue  ', badgeSurface('DEGRADED', 'warning', ctx), '  backlog 12']),",
+        "  spacer(),",
+        "  row(['cron   ', badgeSurface('PAUSED', 'muted', ctx), '  waiting for window']),",
+        "])"
+      ],
+      [
+        "column([",
+        "  row([",
+        "    badgeSurface('v4.0.0', 'accent', ctx),",
+        "    ' ',",
+        "    badgeSurface('MIT', 'muted', ctx),",
+        "    ' ',",
+        "    badgeSurface('TypeScript', 'info', ctx),",
+        "  ]),",
+        "  spacer(),",
+        "  row([",
+        "    'Server is ',",
+        "    badgeSurface('RUNNING', 'success', ctx),",
+        "    ' on port ',",
+        "    badgeSurface('3000', 'primary', ctx),",
+        "  ]),",
+        "])"
+      ]
+    ]
+  },
+  {
+    "id": "box",
+    "variants": [
+      [
+        "[",
+        "  headerBox('Deploy', { detail: 'v4.0.0 → production', ctx }),",
+        "  '',",
+        "  box('Window\\n\\n- freeze at 17:00\\n- canaries at 17:15\\n- promote after verification', {",
+        "    title: 'release window',",
+        "    width: 38,",
+        "    ctx,",
+        "  }),",
+        "].join('\\n')"
+      ],
+      [
+        "row([",
+        "  boxSurface('Signals\\n\\n- latency\\n- throughput\\n- queue depth', {",
+        "    title: 'ops',",
+        "    width: 20,",
+        "    ctx,",
+        "  }),",
+        "  spacer(2),",
+        "  boxSurface('Actions\\n\\n- confirm deploy\\n- watch canaries\\n- page owner', {",
+        "    title: 'release',",
+        "    width: 22,",
+        "    ctx,",
+        "  }),",
+        "])"
+      ]
+    ]
+  },
+  {
+    "id": "braille-chart",
+    "variants": [
+      [
+        "renderBrailleChartStoryPreview(",
+        "  [1, 4, 2, 8, 5, 7, 3, 9, 6, 4, 2, 5, 8, 7, 3, 6, 9, 5, 2, 4],",
+        "  { width: Math.max(10, width - 4), height: 6 },",
+        "  ctx,",
+        "  width,",
+        ")"
+      ],
+      [
+        "renderBrailleChartStoryPreview(",
+        "  [1, 4, 2, 8, 5, 7, 3, 9, 6, 4, 2, 5, 8, 7, 3, 6, 9, 5, 2, 4],",
+        "  { width: Math.max(10, width - 4), height: 6, min: 0, max: 10 },",
+        "  ctx,",
+        "  width,",
+        ")"
+      ]
+    ]
+  },
+  {
+    "id": "confirm",
+    "variants": [
+      [
+        "confirmPreview({",
+        "  width,",
+        "  ctx,",
+        "  question: 'Deploy to production?',",
+        "  defaultValue: false,",
+        "  yesMeaning: 'Promote the canary and begin the production rollout.',",
+        "  noMeaning: 'Keep the rollout paused for review.',",
+        "})"
+      ],
+      [
+        "confirmPreview({",
+        "  width,",
+        "  ctx,",
+        "  question: 'Discard unsaved release notes?',",
+        "  defaultValue: false,",
+        "  yesMeaning: 'Drop the local draft and close the editor.',",
+        "  noMeaning: 'Return to editing and keep the draft open.',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "dense-comparison",
+    "variants": [
+      [
+        "tableVisualVariantPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: `variant: ${spec.variant}`,",
+        "  variant: spec.variant,",
+        "})"
+      ],
+      [
+        "tablePipeFormatPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: `pipeFormat: ${spec.pipeFormat}`,",
+        "  pipeFormat: spec.pipeFormat,",
+        "})"
+      ],
+      [
+        "denseComparisonPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'focused table',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "drawer",
+    "variants": [
+      [
+        "if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {",
+        "  return [",
+        "    'drawer: Release context',",
+        "    'Supplemental context for release dashboard',",
+        "    'Canaries stable in eu-west',",
+        "    'Queue depth low',",
+        "    'Action: watch rollout',",
+        "  ].join('\\n');",
+        "}",
+        "const screenWidth = Math.max(40, width);",
+        "const screenHeight = 12;",
+        "const overlay = drawer({",
+        "  title: 'Release context',",
+        "  content: column([",
+        "    line('Canaries stable'),",
+        "    spacer(),",
+        "    line('Queue depth low'),",
+        "    line('Rollout window open'),",
+        "    spacer(),",
+        "    line('Action: watch rollout'),",
+        "  ]),",
+        "  anchor: 'right',",
+        "  width: Math.min(28, Math.max(16, screenWidth - 10)),",
+        "  screenWidth,",
+        "  screenHeight,",
+        "  borderToken: ctx.border('primary'),",
+        "  bgToken: ctx.surface('elevated'),",
+        "  ctx,",
+        "});",
+        "return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);"
+      ],
+      [
+        "if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {",
+        "  return [",
+        "    'drawer: Review queue',",
+        "    'Supplemental review panel',",
+        "    '2 migrations waiting',",
+        "    '1 config diff ready',",
+        "  ].join('\\n');",
+        "}",
+        "const screenWidth = Math.max(40, width);",
+        "const screenHeight = 12;",
+        "const overlay = drawer({",
+        "  title: 'Review queue',",
+        "  content: column([",
+        "    line('2 migrations waiting'),",
+        "    line('1 config diff ready'),",
+        "    line('Press Enter to inspect'),",
+        "  ]),",
+        "  anchor: 'bottom',",
+        "  height: 5,",
+        "  screenWidth,",
+        "  screenHeight,",
+        "  borderToken: ctx.border('primary'),",
+        "  bgToken: ctx.surface('elevated'),",
+        "  ctx,",
+        "});",
+        "return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);"
+      ]
+    ]
+  },
+  {
+    "id": "explainability",
+    "variants": [
+      [
+        "explainability({",
+        "  title: 'Promote the canary build',",
+        "  artifactKind: 'Recommendation',",
+        "  source: 'Release advisor',",
+        "  sourceMode: 'Advisory draft',",
+        "  rationale: 'Traffic and error budgets have stayed healthy long enough to make the canary promotion a reviewable next step.',",
+        "  evidence: [",
+        "    { label: 'Error rate', detail: '0.02% across the last 15 minutes' },",
+        "    { label: 'Latency', detail: 'p95 stayed below 110ms in both canary regions' },",
+        "    { label: 'Capacity', detail: 'queue depth remained under 12 during peak traffic' },",
+        "  ],",
+        "  nextAction: 'Promote the canary ring to the full production rollout after human review.',",
+        "  governance: 'A release owner must confirm the recommendation before production promotion.',",
+        "  confidence: 0.86,",
+        "  width: Math.max(54, Math.min(width, 72)),",
+        "  ctx,",
+        "})"
+      ],
+      [
+        "explainability({",
+        "  title: 'Hold the rollout for another review pass',",
+        "  artifactKind: 'Review brief',",
+        "  source: 'Incident assistant',",
+        "  sourceMode: 'Human-in-the-loop',",
+        "  rationale: 'The rollout is mostly healthy, but one region still shows elevated latency that could turn the recommendation premature.',",
+        "  evidence: [",
+        "    { label: 'eu-west latency', detail: 'p95 is 27ms above the baseline window' },",
+        "    { label: 'Error budget', detail: 'still healthy, but trending upward for two intervals' },",
+        "  ],",
+        "  nextAction: 'Keep the rollout paused and inspect the eu-west cache warmup path.',",
+        "  governance: 'Treat this as advisory guidance, not an automatic rollback trigger.',",
+        "  confidence: 71,",
+        "  width: Math.max(54, Math.min(width, 72)),",
+        "  ctx,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "expressive-branding",
+    "variants": [
+      [
+        "brandingPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'launch moment',",
+        "  mode: 'launch',",
+        "})"
+      ],
+      [
+        "brandingPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'celebratory heading',",
+        "  mode: 'heading',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "group-wizard",
+    "variants": [
+      [
+        "stagedFormPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'Prepare a production deploy:',",
+        "  mode: 'group',",
+        "  fields: [",
+        "    { label: 'Environment', value: 'production' },",
+        "    { label: 'Window', value: 'Tonight, 17:00-18:00 PDT' },",
+        "    { label: 'Approver', value: 'Release manager on call' },",
+        "  ],",
+        "  summaryText: 'Use grouped forms when the user is filling out one coherent packet of related fields.',",
+        "})"
+      ],
+      [
+        "stagedFormPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'Plan the rollout:',",
+        "  mode: 'wizard',",
+        "  stepLabel: 'Step 2 of 3 • Verification',",
+        "  fields: [",
+        "    { label: 'Health threshold', value: '0 failed probes for 10m' },",
+        "    { label: 'Fallback owner', value: 'platform-ops' },",
+        "  ],",
+        "  summaryText: 'Use staged forms when progress and step boundaries matter more than one giant grouped panel.',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "guided-flow",
+    "variants": [
+      [
+        "guidedFlow({",
+        "  title: t['preview.title'],",
+        "  label: t['preview.label'],",
+        "  summary: t['preview.summary'],",
+        "  metadata: [t['preview.meta.owner'], t['preview.meta.window']],",
+        "  steps: [",
+        "    { title: t['preview.step1.title'], detail: t['preview.step1.detail'], status: 'complete' satisfies GuidedFlowStepStatus },",
+        "    { title: t['preview.step2.title'], detail: t['preview.step2.detail'], status: 'current' satisfies GuidedFlowStepStatus },",
+        "    { title: t['preview.step3.title'], detail: t['preview.step3.detail'], status: 'pending' satisfies GuidedFlowStepStatus },",
+        "  ],",
+        "  sections: [",
+        "    { title: t['preview.section.why.title'], content: t['preview.section.why.content'] },",
+        "    { title: t['preview.section.note.title'], content: t['preview.section.note.content'], tone: 'muted' },",
+        "  ],",
+        "  nextAction: t['preview.nextAction'],",
+        "  width: Math.max(54, Math.min(width, 72)),",
+        "  ctx,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "help-view",
+    "variants": [
+      [
+        "helpPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'shell hint',",
+        "  mode: 'hint',",
+        "})"
+      ],
+      [
+        "helpPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'grouped help',",
+        "  mode: 'reference',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "hierarchy",
+    "variants": [
+      [
+        "hierarchyPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'project hierarchy',",
+        "  mode: 'tree',",
+        "})"
+      ],
+      [
+        "hierarchyPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'file picker',",
+        "  mode: 'picker',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "hyperlink",
+    "variants": [
+      [
+        "box([",
+        "  `Repository: ${hyperlink('flyingrobots/bijou', 'https://github.com/flyingrobots/bijou', { ctx })}`,",
+        "  '',",
+        "  `API docs: ${hyperlink('README reference', 'https://github.com/flyingrobots/bijou#readme', { ctx })}`,",
+        "].join('\\n'), {",
+        "  title: 'linked destinations',",
+        "  width: 58,",
+        "  ctx,",
+        "})"
+      ],
+      [
+        "box([",
+        "  `Both: ${hyperlink('Release notes', 'https://example.com/release-notes', { fallback: 'both', ctx })}`,",
+        "  '',",
+        "  `URL only: ${hyperlink('API reference', 'https://example.com/api', { fallback: 'url', ctx })}`,",
+        "  '',",
+        "  `Text only: ${hyperlink('Trusted local handbook', 'https://example.com/handbook', { fallback: 'text', ctx })}`,",
+        "].join('\\n'), {",
+        "  title: 'fallback policy',",
+        "  width: 62,",
+        "  ctx,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "inspector",
+    "variants": [
+      [
+        "inspector({",
+        "  title: 'package summary',",
+        "  currentValue: 'release-control',",
+        "  supportingText: 'Currently selected package in the registry overview.',",
+        "  sections: [",
+        "    { title: 'Owner', content: 'Platform' },",
+        "    { title: 'Profile', content: 'Rich' },",
+        "    {",
+        "      title: 'Description',",
+        "      content: 'Coordinates the release queue, rollout window, and production promotion handoff.',",
+        "      tone: 'muted',",
+        "    },",
+        "  ],",
+        "  width: 40,",
+        "  ctx,",
+        "})"
+      ],
+      [
+        "inspector({",
+        "  title: 'active rollout',",
+        "  currentValue: 'canary-eu-west',",
+        "  supportingText: 'Watching the currently selected rollout slice before promotion.',",
+        "  sections: [",
+        "    { title: 'Health', content: 'Stable • 0 failed checks' },",
+        "    { title: 'ETA', content: '8 minutes remaining' },",
+        "    {",
+        "      title: 'Description',",
+        "      content: 'Use the inspector for concise sidecar context, not a full operational dashboard.',",
+        "      tone: 'muted',",
+        "    },",
+        "  ],",
+        "  width: 42,",
+        "  ctx,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "kbd",
+    "variants": [
+      [
+        "column([",
+        "  line(`${kbd('Enter', { ctx })} Select item`),",
+        "  line(`${kbd('Esc', { ctx })} Dismiss panel`),",
+        "  line(`${kbd('?', { ctx })} Open help`),",
+        "])"
+      ],
+      [
+        "column([",
+        "  line(`${kbd('↑', { ctx })} ${kbd('↓', { ctx })} Browse rows`),",
+        "  line(`${kbd('←', { ctx })} ${kbd('→', { ctx })} Switch tabs`),",
+        "  line(`${kbd('Cmd', { ctx })} + ${kbd('Shift', { ctx })} + ${kbd('P', { ctx })} Command palette`),",
+        "])"
+      ]
+    ]
+  },
+  {
+    "id": "lists-for-exploration",
+    "variants": [
+      [
+        "explorationListPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'ordered outline',",
+        "  mode: 'enumerated',",
+        "})"
+      ],
+      [
+        "explorationListPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'browsable records',",
+        "  mode: 'browsable',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "log",
+    "variants": [
+      [
+        "box([",
+        "  log('debug', 'Connecting to release queue...', { ctx }),",
+        "  log('info', 'Canary started in eu-west', { ctx }),",
+        "  log('warn', '2 workers still draining old jobs', { ctx }),",
+        "  log('error', 'One verification probe timed out', { ctx }),",
+        "].join('\\n'), {",
+        "  title: 'activity stream',",
+        "  width: 54,",
+        "  ctx,",
+        "})"
+      ],
+      [
+        "box([",
+        "  log('info', 'Rollout window opened', { timestamp: true, ctx }),",
+        "  log('info', 'Canaries reached 25%', { timestamp: true, ctx }),",
+        "  log('warn', 'Waiting on staging approval', { timestamp: true, ctx }),",
+        "].join('\\n'), {",
+        "  title: 'release audit',",
+        "  width: 54,",
+        "  ctx,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "markdown",
+    "variants": [
+      [
+        "box(markdown(MARKDOWN_RELEASE_NOTES, { width: 42, ctx }), {",
+        "  title: 'release note',",
+        "  width: 50,",
+        "  ctx,",
+        "})"
+      ],
+      [
+        "box(markdown([",
+        "  '## Quick start',",
+        "  '',",
+        "  '1. Open the command palette.',",
+        "  '2. Search for a component family.',",
+        "  '3. Read the usage notes before choosing a surface.',",
+        "  '',",
+        "  'Use [`hyperlink()`](https://github.com/flyingrobots/bijou) when the destination itself matters.',",
+        "].join('\\n'), { width: 42, ctx }), {",
+        "  title: 'help excerpt',",
+        "  width: 50,",
+        "  ctx,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "modal",
+    "variants": [
+      [
+        "if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {",
+        "  return [",
+        "    'modal: Confirm deploy',",
+        "    'Deploy release-control to production?',",
+        "    'This will roll all workers and re-open the queue.',",
+        "    'Actions: y yes, n no, esc cancel',",
+        "  ].join('\\n');",
+        "}",
+        "const screenWidth = Math.max(32, width);",
+        "const screenHeight = 14;",
+        "const background = modalBackdrop(screenWidth, ctx);",
+        "const dialog = modal({",
+        "  title: 'Confirm deploy',",
+        "  body: column([",
+        "    line('Deploy release-control to production?'),",
+        "    spacer(),",
+        "    line('This will roll all workers and re-open the queue.'),",
+        "  ]),",
+        "  hint: line(`${kbd('y', { ctx })} yes • ${kbd('n', { ctx })} no • ${kbd('esc', { ctx })} cancel`),",
+        "  screenWidth,",
+        "  screenHeight,",
+        "  borderToken: ctx.border('primary'),",
+        "  bgToken: ctx.surface('elevated'),",
+        "  ctx,",
+        "});",
+        "return compositeSurface(background, [dialog], { dim: true });"
+      ],
+      [
+        "if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {",
+        "  return [",
+        "    'modal: Keyboard help',",
+        "    'j/k: Move between stories',",
+        "    '1-4: Switch profile',",
+        "    ',/.: Cycle variants',",
+        "    'esc: return to the page',",
+        "  ].join('\\n');",
+        "}",
+        "const screenWidth = Math.max(32, width);",
+        "const screenHeight = 14;",
+        "const background = modalBackdrop(screenWidth, ctx);",
+        "const dialog = modal({",
+        "  title: 'Keyboard help',",
+        "  body: column([",
+        "    line(`${kbd('j', { ctx })} ${kbd('k', { ctx })}  Move between stories`),",
+        "    line(`${kbd('1', { ctx })}…${kbd('4', { ctx })}  Switch profile`),",
+        "    line(`${kbd(',', { ctx })} ${kbd('.', { ctx })}  Cycle variants`),",
+        "  ]),",
+        "  hint: line(`Press ${kbd('esc', { ctx })} to return to the page`),",
+        "  screenWidth,",
+        "  screenHeight,",
+        "  borderToken: ctx.border('primary'),",
+        "  bgToken: ctx.surface('elevated'),",
+        "  ctx,",
+        "});",
+        "return compositeSurface(background, [dialog], { dim: true });"
+      ]
+    ]
+  },
+  {
+    "id": "mode-aware-custom-primitives",
+    "variants": [
+      [
+        "customPrimitivePreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'custom primitive',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "motion-and-shader-effects",
+    "variants": [
+      [
+        "motionPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'shader wave',",
+        "  mode: 'wave',",
+        "  timeMs,",
+        "})"
+      ],
+      [
+        "motionPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'braille field',",
+        "  mode: 'braille',",
+        "  timeMs,",
+        "})"
+      ],
+      [
+        "motionPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'glyph raytrace',",
+        "  mode: 'glyph-raytrace',",
+        "  timeMs,",
+        "})"
+      ],
+      [
+        "motionPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'spring timeline',",
+        "  mode: 'spring-timeline',",
+        "  timeMs,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "multiselect",
+    "variants": [
+      [
+        "multiselectPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'Enable release checks:',",
+        "  options: [",
+        "    { label: 'TypeScript', description: 'type-safe JavaScript' },",
+        "    { label: 'Vitest', description: 'unit testing' },",
+        "    { label: 'Playwright', description: 'end-to-end tests' },",
+        "    { label: 'Docker', description: 'container packaging' },",
+        "  ],",
+        "  selectedIndices: [0, 1],",
+        "  focusedIndex: 1,",
+        "})"
+      ],
+      [
+        "multiselectPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'Notify rollout channels:',",
+        "  options: [",
+        "    { label: 'Slack', description: 'release room' },",
+        "    { label: 'Status page', description: 'customer-facing notice' },",
+        "    { label: 'PagerDuty', description: 'incident escalation' },",
+        "    { label: 'Email', description: 'stakeholder summary' },",
+        "  ],",
+        "  selectedIndices: [0, 1, 3],",
+        "  focusedIndex: 2,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "notification-system",
+    "variants": [
+      [
+        "notificationPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'notification stack',",
+        "  mode: 'stack',",
+        "})"
+      ],
+      [
+        "notificationPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'notification history',",
+        "  mode: 'history',",
+        "})"
+      ],
+      [
+        "frameNotificationRoutingPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'framed notifications',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "path-and-progress",
+    "variants": [
+      [
+        "pathAndProgressPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'wayfinding',",
+        "  mode: 'wayfinding',",
+        "})"
+      ],
+      [
+        "pathAndProgressPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'rollout path',",
+        "  mode: 'rollout',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "perf-overlay",
+    "variants": [
+      [
+        "renderPerfOverlayStoryPreview({",
+        "  fps: 60,",
+        "  frameTimeMs: 16.7,",
+        "  frameTimeHistory: [18, 16, 17, 15, 18, 17, 16, 17, 15, 16, 18, 17, 16, 15, 17, 16],",
+        "  width: 120,",
+        "  height: 40,",
+        "  heapUsedMB: 42.1,",
+        "  rssMB: 128,",
+        "}, {}, ctx, width)"
+      ],
+      [
+        "renderPerfOverlayStoryPreview({",
+        "  fps: 30,",
+        "  frameTimeMs: 33.3,",
+        "  width: 80,",
+        "  height: 24,",
+        "  heapUsedMB: 64.2,",
+        "}, { showChart: false }, ctx, width)"
+      ]
+    ]
+  },
+  {
+    "id": "progress-bar",
+    "variants": [
+      [
+        "boxSurface(column([",
+        "  line(`Compile     ${progressBar(18, { width: 28, showPercent: true, ctx })}`),",
+        "  spacer(),",
+        "  line(`Canaries    ${progressBar(46, { width: 28, showPercent: true, ctx })}`),",
+        "  spacer(),",
+        "  line(`Artifacts   ${progressBar(73, { width: 28, showPercent: true, ctx })}`),",
+        "  spacer(),",
+        "  line(`Promote     ${progressBar(100, { width: 28, showPercent: true, ctx })}`),",
+        "]), {",
+        "  title: 'release pipeline',",
+        "  width: 48,",
+        "  ctx,",
+        "})"
+      ],
+      [
+        "const rollout = loopingProgressPercent(timeMs, 0);",
+        "const canaries = loopingProgressPercent(timeMs, 700);",
+        "const assets = loopingProgressPercent(timeMs, 1_300);",
+        "const spinnerTick = Math.floor(timeMs / 90);",
+        "return boxSurface(column([",
+        "  line(`Rollout    ${progressBar(rollout, { width: 28, showPercent: true, ctx })}`),",
+        "  spacer(),",
+        "  line(`Canaries   ${progressBar(canaries, { width: 28, showPercent: true, ctx })}`),",
+        "  spacer(),",
+        "  line(`Assets     ${progressBar(assets, { width: 28, showPercent: true, ctx })}`),",
+        "  spacer(),",
+        "  line(`Watch      ${spinnerFrame(spinnerTick, { label: 'waiting for verification window', ctx })}`),",
+        "]), {",
+        "  title: 'looping rollout monitor',",
+        "  width: 56,",
+        "  ctx,",
+        "});"
+      ]
+    ]
+  },
+  {
+    "id": "progressive-disclosure",
+    "variants": [
+      [
+        "progressiveDisclosurePreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'release accordion',",
+        "  interactive: false,",
+        "})"
+      ],
+      [
+        "progressiveDisclosurePreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'interactive disclosure',",
+        "  interactive: true,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "select",
+    "variants": [
+      [
+        "selectPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'Choose a release policy:',",
+        "  options: [",
+        "    { label: 'Canary only', description: 'ship to 10% and stop' },",
+        "    { label: 'Auto promote', description: 'promote once checks pass' },",
+        "    { label: 'Hold for review', description: 'require manual approval' },",
+        "    { label: 'Abort', description: 'cancel the rollout' },",
+        "  ],",
+        "  selectedIndex: 1,",
+        "  focusedIndex: 1,",
+        "})"
+      ],
+      [
+        "filterPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'Choose a programming language:',",
+        "  query: 'ty',",
+        "  options: [",
+        "    { label: 'TypeScript', description: 'typed JavaScript for apps', keywords: ['javascript', 'typed', 'web'] },",
+        "    { label: 'Python', description: 'scripting and data work', keywords: ['scripting', 'ml', 'data'] },",
+        "    { label: 'OCaml', description: 'typed ML family runtime', keywords: ['functional', 'ml', 'typed'] },",
+        "    { label: 'Rust', description: 'systems safety and speed', keywords: ['systems', 'memory', 'safe'] },",
+        "  ],",
+        "  matchedIndices: [0, 1, 2],",
+        "  selectedIndex: 0,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "separator",
+    "variants": [
+      [
+        "dividerPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'release review',",
+        "  sections: [",
+        "    {",
+        "      lines: [",
+        "        'Preflight checks are green.',",
+        "        mutedText(ctx, 'No blocking migrations or schema locks are active.'),",
+        "      ],",
+        "    },",
+        "    {",
+        "      label: 'Promote canaries',",
+        "      lines: [",
+        "        'Two regions are ready for promotion.',",
+        "        mutedText(ctx, 'Use labeled dividers when the boundary itself needs a name.'),",
+        "      ],",
+        "    },",
+        "    {",
+        "      label: 'Aftercare',",
+        "      lines: [",
+        "        'Watch latency for 15 minutes after promotion.',",
+        "      ],",
+        "    },",
+        "  ],",
+        "})"
+      ],
+      [
+        "dividerPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'ops checklist',",
+        "  sections: [",
+        "    {",
+        "      lines: ['Confirm deploy window'],",
+        "    },",
+        "    {",
+        "      lines: ['Page the fallback owner'],",
+        "    },",
+        "    {",
+        "      lines: ['Archive the rollout notes'],",
+        "    },",
+        "  ],",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "skeleton",
+    "variants": [
+      [
+        "boxSurface(column([",
+        "  line('Name'),",
+        "  contentSurface(skeleton({ width: 26, ctx })),",
+        "  spacer(),",
+        "  line('Description'),",
+        "  contentSurface(skeleton({ width: 34, lines: 3, ctx })),",
+        "  spacer(),",
+        "  line('Owner'),",
+        "  contentSurface(skeleton({ width: 18, ctx })),",
+        "]), {",
+        "  title: 'new package',",
+        "  width: 40,",
+        "  ctx,",
+        "})"
+      ],
+      [
+        "boxSurface(column([",
+        "  line('Package summary'),",
+        "  spacer(),",
+        "  contentSurface(skeleton({ width: 32, lines: 2, ctx })),",
+        "  spacer(),",
+        "  line('Recent activity'),",
+        "  contentSurface(skeleton({ width: 28, lines: 3, ctx })),",
+        "]), {",
+        "  title: 'registry overview',",
+        "  width: 38,",
+        "  ctx,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "sparkline",
+    "variants": [
+      [
+        "renderSparklineStoryPreview(",
+        "  [1, 5, 3, 8, 2, 7, 4, 6, 9, 3],",
+        "  {},",
+        "  ctx,",
+        "  width,",
+        ")"
+      ],
+      [
+        "renderSparklineStoryPreview(",
+        "  [10, 20, 15, 40, 35, 25, 30, 50, 45, 20, 10, 30, 60, 55, 40],",
+        "  { width: Math.max(8, width - 4) },",
+        "  ctx,",
+        "  width,",
+        ")"
+      ],
+      [
+        "renderSparklineStoryPreview(",
+        "  [3, 5, 4, 6, 5, 7],",
+        "  { min: 0, max: 10 },",
+        "  ctx,",
+        "  width,",
+        ")"
+      ]
+    ]
+  },
+  {
+    "id": "stats-panel",
+    "variants": [
+      [
+        "renderStatsPanelStoryPreview([",
+        "  { label: 'FPS', value: '60' },",
+        "  { label: 'frame time', value: '16.7 ms' },",
+        "  { label: 'heap', value: '42.1 MB' },",
+        "  { label: 'rss', value: '128 MB' },",
+        "], { title: 'Runtime', width: Math.min(36, Math.max(24, width - 4)) }, ctx, width)"
+      ],
+      [
+        "renderStatsPanelStoryPreview([",
+        "  { label: 'FPS', value: '58', sparkline: [55, 60, 58, 62, 57, 60, 58, 61] },",
+        "  { label: 'frame', value: '17.2 ms', sparkline: [18, 16, 17, 15, 18, 17, 16, 17] },",
+        "  { label: 'heap', value: '42 MB', sparkline: [38, 40, 42, 41, 43, 42, 40, 42] },",
+        "], { title: 'Perf', width: Math.min(44, Math.max(30, width - 4)) }, ctx, width)"
+      ]
+    ]
+  },
+  {
+    "id": "tabs",
+    "variants": [
+      [
+        "box([",
+        "  tabs([",
+        "    { label: 'Overview' },",
+        "    { label: 'Checks', badge: '3' },",
+        "    { label: 'Rollout', badge: '2' },",
+        "    { label: 'Logs' },",
+        "  ], { active: 2, ctx }),",
+        "  '',",
+        "  `Current pane: ${infoText(ctx, 'Rollout')}`,",
+        "  mutedText(ctx, 'Peer sections share one workspace; switching does not imply completion.'),",
+        "].join('\\n'), {",
+        "  title: 'peer navigation',",
+        "  width: 60,",
+        "  ctx,",
+        "})"
+      ],
+      [
+        "box([",
+        "  tabs([",
+        "    { label: 'General' },",
+        "    { label: 'Appearance' },",
+        "    { label: 'Notifications', badge: '2' },",
+        "  ], { active: 1, ctx }),",
+        "  '',",
+        "  `Current pane: ${infoText(ctx, 'Appearance')}`,",
+        "  mutedText(ctx, 'Use tabs when the user is switching sibling sections, not confirming steps.'),",
+        "].join('\\n'), {",
+        "  title: 'settings sections',",
+        "  width: 56,",
+        "  ctx,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "temporal-or-dependency-views",
+    "variants": [
+      [
+        "temporalPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'release timeline',",
+        "  mode: 'timeline',",
+        "})"
+      ],
+      [
+        "temporalPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'dependency graph',",
+        "  mode: 'dag',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "text-entry",
+    "variants": [
+      [
+        "textEntryPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'Choose a package slug:',",
+        "  label: 'Package name',",
+        "  value: 'release-control',",
+        "  helperText: 'Used in URLs, artifacts, and release announcements.',",
+        "  validationText: 'Use lowercase kebab-case.',",
+        "})"
+      ],
+      [
+        "textEntryPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'Write a rollout summary:',",
+        "  label: 'Summary',",
+        "  value: [",
+        "    'Canary passed in eu-west after one retry.',",
+        "    'Hold promotion until the background queue drains.',",
+        "  ].join('\\n'),",
+        "  helperText: 'Use multiline entry when the note itself matters, not just the final status.',",
+        "  multiline: true,",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "toast",
+    "variants": [
+      [
+        "if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {",
+        "  return [",
+        "    'toast: success',",
+        "    'Operation saved.',",
+        "  ].join('\\n');",
+        "}",
+        "const screenWidth = Math.max(36, width);",
+        "const screenHeight = 12;",
+        "const overlay = toast({",
+        "  message: 'Operation saved.',",
+        "  variant: 'success',",
+        "  anchor: 'top-right',",
+        "  screenWidth,",
+        "  screenHeight,",
+        "  ctx,",
+        "});",
+        "return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);"
+      ],
+      [
+        "if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {",
+        "  return [",
+        "    'toast: error',",
+        "    'Rollback required before promote.',",
+        "  ].join('\\n');",
+        "}",
+        "const screenWidth = Math.max(36, width);",
+        "const screenHeight = 12;",
+        "const overlay = toast({",
+        "  message: 'Rollback required before promote.',",
+        "  variant: 'error',",
+        "  anchor: 'bottom-left',",
+        "  screenWidth,",
+        "  screenHeight,",
+        "  ctx,",
+        "});",
+        "return compositeSurface(toastBackdrop(screenWidth, screenHeight, ctx), [overlay]);"
+      ]
+    ]
+  },
+  {
+    "id": "tooltip",
+    "variants": [
+      [
+        "if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {",
+        "  return [",
+        "    'tooltip: Command palette',",
+        "    'Explains: Search actions and docs without leaving the current page.',",
+        "  ].join('\\n');",
+        "}",
+        "const screenWidth = Math.max(36, width);",
+        "const screenHeight = 10;",
+        "const background = screenSurface(screenWidth, screenHeight, boxSurface(column([",
+        "  line('Docs toolbar'),",
+        "  spacer(),",
+        "  line(`${kbd('cmd+k', { ctx })} Command palette`),",
+        "]), {",
+        "  title: 'toolbar',",
+        "  width: Math.max(28, screenWidth - 6),",
+        "  ctx,",
+        "}), 2, 2);",
+        "const overlay = tooltip({",
+        "  content: 'Search actions and docs',",
+        "  row: 5,",
+        "  col: Math.min(screenWidth - 6, 18),",
+        "  direction: 'bottom',",
+        "  screenWidth,",
+        "  screenHeight,",
+        "  borderToken: ctx.border('primary'),",
+        "  bgToken: ctx.surface('elevated'),",
+        "  ctx,",
+        "});",
+        "return compositeSurface(background, [overlay]);"
+      ],
+      [
+        "if (ctx.mode === 'pipe' || ctx.mode === 'accessible') {",
+        "  return [",
+        "    'tooltip: Edge action',",
+        "    'Explains: Runs verification for the selected release.',",
+        "  ].join('\\n');",
+        "}",
+        "const screenWidth = Math.max(36, width);",
+        "const screenHeight = 10;",
+        "const background = screenSurface(screenWidth, screenHeight, boxSurface(column([",
+        "  line('Release actions'),",
+        "  spacer(),",
+        "  line('Verify release'),",
+        "]), {",
+        "  title: 'actions',",
+        "  width: Math.max(28, screenWidth - 6),",
+        "  ctx,",
+        "}), 2, 2);",
+        "const overlay = tooltip({",
+        "  content: 'Runs verification for the selected release',",
+        "  row: 1,",
+        "  col: screenWidth - 2,",
+        "  direction: 'right',",
+        "  screenWidth,",
+        "  screenHeight,",
+        "  borderToken: ctx.border('primary'),",
+        "  bgToken: ctx.surface('elevated'),",
+        "  ctx,",
+        "});",
+        "return compositeSurface(background, [overlay]);"
+      ]
+    ]
+  },
+  {
+    "id": "transient-app-notifications",
+    "variants": [
+      [
+        "transientAppNotificationPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'transient notifications',",
+        "  mode: 'actionable',",
+        "})"
+      ],
+      [
+        "transientAppNotificationPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'mixed live notices',",
+        "  mode: 'mixed',",
+        "})"
+      ]
+    ]
+  },
+  {
+    "id": "viewport-surface",
+    "variants": [
+      [
+        "viewportPreviewSurface(",
+        "  width,",
+        "  boxSurface(LONG_DOCUMENT, {",
+        "    title: 'release-notes.md',",
+        "    width: Math.max(28, width - 1),",
+        "    ctx,",
+        "  }),",
+        "  4,",
+        "  ctx,",
+        "  ['release-notes.md', 'Build plan', 'Run migrations', 'Promote release'],",
+        ")"
+      ],
+      [
+        "viewportPreviewSurface(",
+        "  width,",
+        "  column([",
+        "    boxSurface('Health checks\\n\\n- db\\n- cache\\n- queue', {",
+        "      title: 'Signals',",
+        "      width: Math.max(24, width - 1),",
+        "      ctx,",
+        "    }),",
+        "    spacer(),",
+        "    boxSurface('Warnings\\n\\n- slow migration\\n- stale cache', {",
+        "      title: 'Review',",
+        "      width: Math.max(24, width - 1),",
+        "      ctx,",
+        "    }),",
+        "    spacer(),",
+        "    boxSurface('Next steps\\n\\n- confirm deploy\\n- watch rollout', {",
+        "      title: 'Actions',",
+        "      width: Math.max(24, width - 1),",
+        "      ctx,",
+        "    }),",
+        "  ]),",
+        "  3,",
+        "  ctx,",
+        "  ['structured stack', 'Signals', 'Review', 'Actions'],",
+        ")"
+      ],
+      [
+        "pagerPreviewSurface(width, ctx)"
+      ],
+      [
+        "focusedPanePreviewSurface(width, ctx)"
+      ]
+    ]
+  },
+  {
+    "id": "workspace-layout",
+    "variants": [
+      [
+        "workspaceLayoutPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'split workspace',",
+        "  mode: 'split',",
+        "})"
+      ],
+      [
+        "workspaceLayoutPreview({",
+        "  width,",
+        "  ctx,",
+        "  title: 'grid workspace',",
+        "  mode: 'grid',",
+        "})"
+      ]
+    ]
+  }
+]

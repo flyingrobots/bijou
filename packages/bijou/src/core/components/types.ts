@@ -1,4 +1,5 @@
 import type { BijouContext } from '../../ports/context.js';
+import type { InlineDirection } from '../direction/direction.js';
 
 /** Shared overflow policy for text-bearing components. */
 export type OverflowBehavior = 'wrap' | 'truncate';
@@ -17,4 +18,9 @@ export interface BijouNodeOptions {
   readonly ctx?: BijouContext | undefined;
   /** Horizontal overflow behavior for constrained text content. Defaults to `'wrap'`. */
   readonly overflow?: OverflowBehavior | undefined;
+  /**
+   * Logical layout direction. Overrides `ctx.direction`; absent both, `'ltr'`.
+   * Direction-sensitive components read it through `resolveDirection()`.
+   */
+  readonly direction?: InlineDirection | undefined;
 }

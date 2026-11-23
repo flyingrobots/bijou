@@ -1,0 +1,20 @@
+{
+  "schema": "bijou.web-gpu.geordi-pin/1",
+  "repository": "flyingrobots/geordi",
+  "commit": "52ba6bbf96508aaf951fb7c70cff2c19bb2a6799",
+  "packed": "pnpm install --frozen-lockfile; pnpm --filter @flyingrobots/geordi-core build; pnpm --filter @flyingrobots/geordi-bijou-gpu build; pnpm --filter <package> pack",
+  "packages": [
+    {
+      "name": "@flyingrobots/geordi-core",
+      "version": "0.1.0",
+      "tarball": "vendor/flyingrobots-geordi-core-0.1.0.tgz",
+      "sha256": "da16413fd602422912bb29aabb6beb6831b9c1a5053defee2162653a0b34654a"
+    },
+    {
+      "name": "@flyingrobots/geordi-bijou-gpu",
+      "version": "0.1.0",
+      "tarball": "vendor/flyingrobots-geordi-bijou-gpu-0.1.0.tgz",
+      "sha256": "0b46c94b8fbbbb22a78bf5e51f564a983e4aaa97a8b57d2ac9e4c44b2ca42550"
+    }
+  ]
+}

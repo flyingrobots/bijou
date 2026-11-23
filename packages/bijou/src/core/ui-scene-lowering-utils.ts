@@ -60,6 +60,15 @@ export function nodeTextForMode(
   }
 }
 
+function ownTokenColor(
+  tokenColors: Readonly<Record<string, string>> | undefined,
+  token: string | undefined,
+): string | undefined {
+  if (token == null || tokenColors == null) return undefined;
+  if (!Object.hasOwn(tokenColors, token)) return undefined;
+  return tokenColors[token];
+}
+
 export function cellStyleForNode(
   node: UiNode,
   tokenColors: Readonly<Record<string, string>> | undefined,
@@ -67,12 +76,10 @@ export function cellStyleForNode(
   const style: Pick<Cell, 'fg' | 'bg' | 'modifiers'> = {};
   const fgToken = node.style?.fg?.token;
   const bgToken = node.style?.bg?.token;
-  if (fgToken != null && tokenColors?.[fgToken] != null) {
-    style.fg = tokenColors[fgToken];
-  }
-  if (bgToken != null && tokenColors?.[bgToken] != null) {
-    style.bg = tokenColors[bgToken];
-  }
+  const fg = ownTokenColor(tokenColors, fgToken);
+  if (fg != null) style.fg = fg;
+  const bg = ownTokenColor(tokenColors, bgToken);
+  if (bg != null) style.bg = bg;
   if (node.style?.modifiers != null) {
     style.modifiers = [...node.style.modifiers];
   }

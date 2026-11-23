@@ -67,6 +67,7 @@ export function applyFrameShellInteractionCommand<PageModel, Msg>(
         },
         pagesById,
         options,
+        dependencies.measureCache,
       );
     case 'switch-tab': {
       const [next, cmds] = switchTab(
@@ -84,6 +85,7 @@ export function applyFrameShellInteractionCommand<PageModel, Msg>(
         model,
         options,
         pagesById,
+        dependencies.measureCache,
       );
       teaCmds.push(...cmds);
       return next;

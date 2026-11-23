@@ -15,12 +15,14 @@ import { createFrameNotificationStateServices } from './app-frame-notification-s
 import { createFrameThemeModeServices } from './app-frame-theme-mode.js';
 import { createFrameShellCommandServices } from './app-frame-shell-command.js';
 import { createFrameKeyRouteServices } from './app-frame-key-route.js';
+import type { FocusedPaneMeasureCache } from './app-frame-scroll-measure-cache.js';
 import type { FrameThemeRuntime } from './app-frame-theme-runtime.js';
 
 export function createFrameControlsRuntime<PageModel, Msg>(
   options: CreateFramedAppOptions<PageModel, Msg>,
   registry: FramePageRegistry<PageModel, Msg>,
   themeRuntime: FrameThemeRuntime<PageModel, Msg>,
+  measureCache: FocusedPaneMeasureCache,
 ) {
   const { pagesById } = registry;
   const frameKeys = createFrameKeyMap({
@@ -73,6 +75,7 @@ export function createFrameControlsRuntime<PageModel, Msg>(
     paletteKeys,
   };
   const shellCommands = createFrameShellCommandServices({
+    measureCache,
     options,
     pagesById,
     frameKeys,

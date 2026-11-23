@@ -24,6 +24,7 @@ import {
 } from './app-docs-theme-tokens.js';
 import { dogfoodText } from './story-preview-style.js';
 import { renderEmptyStoryPane } from './app-empty-story-pane.js';
+import { renderStoryFacts } from './app-story-facts.js';
 import type { LandingThemeTokens } from './app-landing.js';
 import type { DocsExplorerModel } from './app-model.js';
 import {
@@ -59,6 +60,7 @@ export function renderStoryPane(
     story,
     selectedVariantIndex(model, story.id),
   );
+  const variantIndex = story.variants.indexOf(variant);
   const previewWidth = Math.max(
     20,
     Math.min(Math.max(20, paneWidth - 6), preset.width),
@@ -108,6 +110,15 @@ export function renderStoryPane(
         paneWidth,
         context,
         theme,
+      ),
+      spacer(1, 1),
+      renderStoryFacts(
+        story,
+        variantIndex,
+        variant.label,
+        preset,
+        paneWidth,
+        localization,
       ),
       spacer(1, 1),
       placeSurface(previewCard, {

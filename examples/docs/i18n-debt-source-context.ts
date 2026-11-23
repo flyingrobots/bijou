@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { isAlignmentOptionLiteral } from './i18n-debt-source-alignment.js';
 import { isThemeTokenFamilyIdentifier } from './i18n-debt-sources.js';
 
 export const NONLOCALIZABLE_PROPERTY_NAMES = new Set([
@@ -14,6 +15,7 @@ export function isStaticNonlocalizableContext(
   node: ts.Node,
   sourceFile: ts.SourceFile,
 ): boolean {
+  if (isAlignmentOptionLiteral(node)) return true;
   if (hasAncestor(node, isImportOrExportDeclaration)) return true;
   if (hasAncestor(node, ts.isLiteralTypeNode)) return true;
   if (
