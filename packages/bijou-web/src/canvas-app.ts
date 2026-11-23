@@ -11,6 +11,29 @@ const STOP: unique symbol = Symbol('bijou-web canvas stop');
  */
 const CRASH_DISMISS = { type: 'key', key: 'enter', ctrl: false, alt: false, shift: false } as const;
 
+/** The `IOPort.onData` stream a mount hands the runtime, which exists before the app does. */
+export interface ControlChannel {
+  onData(callback: (payload: unknown) => void): RawInputHandle;
+  send(payload: unknown): void;
+}
+
+/**
+ * Create the control stream first, so an app factory that subscribes to
+ * `ctx.io.onData()` while it builds the app keeps its subscription.
+ */
+export function createControlChannel(): ControlChannel {
+  const listeners = new Set<(payload: unknown) => void>();
+  return {
+    onData(callback) {
+      listeners.add(callback);
+      return { dispose() { listeners.delete(callback); } };
+    },
+    send(payload) {
+      for (const listener of [...listeners]) listener(payload);
+    },
+  };
+}
+
 /** An app wrapped so the mount can read its model and end its run. */
 export interface ControlledApp<Model, M> {
   readonly app: App<Model, M | typeof STOP>;
@@ -29,7 +52,7 @@ export interface ControlledApp<Model, M> {
  * app quit would. After the app threw, the runtime is in crash mode and the
  * stop is an Enter key instead.
  */
-export function controlApp<Model, M>(app: App<Model, M>): ControlledApp<Model, M> {
+export function controlApp<Model, M>(app: App<Model, M>, channel: ControlChannel = createControlChannel()): ControlledApp<Model, M> {
   let latest: { readonly model: Model } | undefined;
   let crashed = false;
   const guard = <T>(work: () => T): T => {
@@ -40,7 +63,6 @@ export function controlApp<Model, M>(app: App<Model, M>): ControlledApp<Model, M
       throw error;
     }
   };
-  const listeners = new Set<(payload: unknown) => void>();
   const wrapped: App<Model, M | typeof STOP> = {
     init() {
       const [model, commands] = app.init();
@@ -62,13 +84,9 @@ export function controlApp<Model, M>(app: App<Model, M>): ControlledApp<Model, M
       if (latest === undefined) throw new Error('the app has not been initialised yet');
       return latest.model;
     },
-    onData(callback) {
-      listeners.add(callback);
-      return { dispose() { listeners.delete(callback); } };
-    },
+    onData: (callback) => channel.onData(callback),
     requestStop() {
-      const message = crashed ? CRASH_DISMISS : STOP;
-      for (const listener of [...listeners]) listener(message);
+      channel.send(crashed ? CRASH_DISMISS : STOP);
     },
   };
 }

@@ -10,7 +10,8 @@ export function localTarballs(lock) {
     if (typeof resolved !== 'string' || !resolved.startsWith('file:')) continue;
     const path = resolved.slice('file:'.length);
     const normal = posix.normalize(path);
-    if (!path.endsWith('.tgz') || normal !== path || path.startsWith('/') || path.startsWith('../') || /^[a-zA-Z]:/u.test(path)) {
+    // A backslash is a separator to Windows join(), so it could step outside the source or target.
+    if (path.includes('\\') || !path.endsWith('.tgz') || normal !== path || path.startsWith('/') || path.startsWith('../') || /^[a-zA-Z]:/u.test(path)) {
       throw new Error(`Unsupported local dependency in package-lock.json: ${resolved}`);
     }
     paths.add(path);

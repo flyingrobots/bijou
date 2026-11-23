@@ -1,8 +1,8 @@
 import type { BijouContext } from '@flyingrobots/bijou';
 import { run, type App } from '@flyingrobots/bijou-tui';
-import { controlApp } from './canvas-app.js';
+import { controlApp, createControlChannel, type ControlledApp } from './canvas-app.js';
 import type { BijouCanvasContainer, BijouCanvasElement } from './canvas-contract.js';
-import { createTextarea } from './canvas-elements.js';
+import { createTextarea, detachNode } from './canvas-elements.js';
 import { abortedError, isGpuBackendUnavailable } from './canvas-errors.js';
 import { createFrameBridge } from './canvas-frames.js';
 import { globalCanvasHost } from './canvas-host.js';
@@ -88,8 +88,19 @@ export async function mountBijouCanvas<Model, C extends BijouCanvasElement>(
     runtime: { ...options.context?.runtime, columns: geometry.grid.columns, rows: geometry.grid.rows },
     input: { ...options.input, textarea, surface },
   });
-  const runCtx: BijouContext = { ...ctx, io: { ...ctx.io, onData: (callback: (payload: unknown) => void) => control.onData(callback) } };
-  const control = controlApp(resolveApp(app, runCtx));
+  const channel = createControlChannel();
+  const runCtx: BijouContext = { ...ctx, io: { ...ctx.io, onData: (callback: (payload: unknown) => void) => channel.onData(callback) } };
+  let control: ControlledApp<Model, unknown>;
+  try {
+    control = controlApp(resolveApp(app, runCtx), channel);
+  } catch (error: unknown) {
+    // No stage owns the first presenter yet: release everything made so far.
+    watch.dispose();
+    ctx.io.dispose();
+    first.presenter.dispose();
+    detachNode(container, first.canvas);
+    throw error;
+  }
   let fault: { readonly error: unknown } | undefined;
   const fail = (error: unknown): void => {
     fault ??= { error };
