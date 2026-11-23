@@ -140,6 +140,18 @@ Promise, Bijou reports a pipeline diagnostic, keeps the current frame moving,
 and ignores any late `next()` continuation so stage ordering stays
 deterministic.
 
+## Semantic Scene Apps
+
+A `SemanticSceneApp` is an `App` that also projects its model to a
+`ui-scene-ir/1` scene with `viewScene()` and maps a declared action to a
+message with `dispatchAction()`. `createSemanticSceneController()` runs such
+an app without a terminal or a DOM: it validates each scene, dispatches only
+action ids that the current scene declares, and sends each message through the
+EventBus to `update()`. `run()` does not use this contract.
+
+See the
+[semantic scene app contract](../../docs/topics/semantic-scene-app/README.md).
+
 ## Animation
 
 ### Spring Physics
