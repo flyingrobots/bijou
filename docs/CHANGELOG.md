@@ -82,6 +82,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Design record DL-036 decides which book edition to translate first: the
+  teaching book (about 13,600 lexical tokens). Planned translations will live
+  in `bijou-job-monitor` under `book/locales/<locale>/` and build to per-locale
+  PDFs after #618. The English
+  hash pins do not change. Each language's translation splits into two tasks
+  of about 4.5 hours (#616).
 - DL-038 decides the Wesley boundary (#663). Bijou pins `wesley-cli`
   exactly to `0.3.0-alpha.3` and spawns the CLI at build time over its
   `--json` output. Core gets a pure emitter over Wesley L1 IR. A missing or
