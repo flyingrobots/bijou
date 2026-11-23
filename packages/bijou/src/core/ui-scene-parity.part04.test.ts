@@ -133,18 +133,15 @@ describe('ui-scene-ir/1 parity witness refusals', () => {
     expect(refusals[1]?.message).toBe(refusals[0]?.message);
   });
 
-  it('resolves no color from a token name the token table only inherits', () => {
+  it('resolves no color from an entry the token table only inherits', () => {
+    const inherited = Object.create({ 'semantic.action.fg': '#111827' }) as Record<string, string>;
     const scene = withNode(debuggerScene, 'debugger.step', {
       style: { fg: { token: 'constructor' }, bg: { token: 'toString' } },
     });
-    const cell = lowerUiSceneToSurface(scene, { tokenColors: {} }).surface.get(
-      2,
-      2,
-    );
-    expect(cell.fg).toBeUndefined();
-    expect(cell.bg).toBeUndefined();
-    expect(mismatches(witnessUiSceneParity(scene, { tokenColors: {} }))).toEqual(
-      [],
-    );
+    for (const [source, tokenColors] of [[debuggerScene, inherited], [scene, {}]] as const) {
+      const cell = lowerUiSceneToSurface(source, { tokenColors }).surface.get(2, 2);
+      expect([cell.fg, cell.bg]).toEqual([undefined, undefined]);
+      expect(mismatches(witnessUiSceneParity(source, { tokenColors }))).toEqual([]);
+    }
   });
 });
