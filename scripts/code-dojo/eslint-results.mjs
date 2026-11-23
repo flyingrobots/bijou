@@ -7,6 +7,9 @@ import { spawnSync } from "node:child_process";
 export const lintTargets = [
   "bench/**/*.ts",
   "examples/**/*.ts",
+  "examples/web-gpu/src/main.tsx",
+  "examples/web-gpu/src/chrome/**/*.tsx",
+  "examples/web-gpu/src/dom/**/*.tsx",
   "packages/**/*.ts",
   "scripts/**/*.ts",
   "tests/**/*.ts",

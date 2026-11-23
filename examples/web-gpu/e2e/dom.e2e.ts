@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import type { ControlsModel } from '../src/dom/controls-app.js';
 import { collectErrors } from './support.js';
 // The probe's Window augmentation types the page.evaluate() calls below.
-export type { DomProbe } from '../src/dom/main.js';
+export type { DomProbe } from '../src/dom/probe.js';
 
 async function model(page: Page): Promise<ControlsModel> {
   return page.evaluate(() => {

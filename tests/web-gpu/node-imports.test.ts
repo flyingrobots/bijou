@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url';
 import { build } from 'vite';
 import { describe, expect, it } from 'vitest';
 import { REFUSED_APPS } from '../../examples/web-gpu/src/refused-apps.js';
+import { SHOWCASE_APPS } from '../../examples/web-gpu/src/apps.js';
 
 // The showcase build refuses every Node built-in instead of stubbing it. These
 // cases build modules with the showcase's own Vite configuration, offline.
@@ -30,13 +31,19 @@ describe('examples/web-gpu bundle has no Node.js built-in', () => {
     expect(message(await bundle('examples/web-gpu/index.html'))).toBe('null');
   });
 
-  it('builds each mounted app, through its unmodified entry, with no refusal', async () => {
-    expect(message(await bundle('examples/counter/main.ts'))).toBe('null');
-    expect(message(await bundle('examples/showcase/app.ts'))).toBe('null');
+  it.each([
+    ['counter', 'examples/counter/main.ts'],
+    ['components', 'examples/components/library.ts'],
+    ['hero', 'examples/hero/app.ts'],
+    ['hero', 'examples/hero/perf-browser.ts'],
+    ['showcase', 'examples/showcase/app.ts'],
+  ])('builds the %s app module %s with no refusal', async (_id, module) => {
+    expect(message(await bundle(module))).toBe('null');
   });
 
-  it.each(REFUSED_APPS.map((app) => [app.id, app] as const))('refuses %s with the reason the HUD shows', async (_id, app) => {
-    expect(message(await bundle(app.module))).toContain(`${app.code}: ${app.reason}`);
+  it('lists every example app it mounts and refuses none', () => {
+    expect(SHOWCASE_APPS.map((app) => app.id)).toEqual(['counter', 'components', 'hero', 'showcase']);
+    expect(REFUSED_APPS).toEqual([]);
   });
 
   it('refuses a direct import of a Node built-in and names the importer', async () => {

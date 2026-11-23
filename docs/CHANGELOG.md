@@ -15,6 +15,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   scene that declares no state keeps its canonical bytes and hash. The parity
   witness records the state as a `browser-only-fact` gap (#807).
 
+### Added
+
+- The web GPU showcase mounts the Components library and the hero app, and
+  its browser suite switches `counter -> components -> hero` and toggles the
+  three ten times. Both apps now import in a browser: their fonts, DOGFOOD
+  catalogs, example snippets and design-system families are imported instead
+  of read from disk at module load (the snippets and families as generated
+  JSON, kept current by `npm run components:data` and a drift test), and the
+  hero perf overlay reads memory through a port with a Node and a browser
+  adapter. Their terminal output is unchanged (#809).
+
 ### Changed
 
 - The `guidedFlow()` story's docs, variant label, and preview copy resolve
@@ -23,12 +34,29 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- DOGFOOD's "Language set to ..." notice now appears in the language just
+  chosen in settings, not the one being left: choosing Spanish from French
+  shows "Idioma establecido en español / Español." The notice is localized
+  with the target locale's catalogs, including any `extraI18nCatalogs`
+  (flyingrobots/bijou#582).
 - The DOGFOOD locale ratchet's language-cycle cases no longer time out on hosted
   runners. Each rendered 79 settings-toast ticks, each a full page render, and
   took 10 to 15 s hosted against a 15 s limit. They now use a scripted clock
   that lets the toast expire in two ticks (`tests/helpers/scripted-compressed-time.ts`),
   and take about 4 to 5 s per file hosted. No assertion changed; a new case pins
   that the compressed run ends on the same frame as real-time ticking (#778).
+- The DOGFOOD touched-file rule compares a touched split lineage, such as a
+  story helper of `examples/docs/stories.ts`, against the whole lineage at the
+  base. It had read only the changed files at the base, so every raw string of
+  their unchanged siblings was reported as added copy (#809).
+- The web GPU showcase's page chrome, on both its pages, is now a Vite + React
+  app built only from shadcn components installed from the `@flyingrobots`
+  registry, with a theme-book light, dark and system theme that persists, big
+  type, a layout from phone width to extra-wide, Skeleton and Spinner loading,
+  GSAP motion, and vim-style keys with `Kbd` hints (`Esc` opens a command
+  palette). While focus is in a Bijou mount every key goes to the app, and
+  chrome styles never reach the canvas or the `mountBijouDom()` elements; the
+  counter's frame digest is unchanged on all three backends (#815).
 - The web GPU showcase is pinned to Geordi `52ba6bb`, which ships its
   procedural glyph table (flyingrobots/geordi#205) and pins the canonical WGSL
   digest inside the WebGPU presenter (flyingrobots/geordi#189). The vendored
