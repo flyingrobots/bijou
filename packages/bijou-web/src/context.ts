@@ -35,6 +35,34 @@ export interface WebContext extends BijouContext {
   readonly clock: ClockPort;
 }
 
+/** Build the I/O port of a context from its runtime and clock. */
+export type WebIOFactory<IO extends WebOutputIO> = (runtime: WebRuntime, clock: ClockPort) => IO;
+
+/**
+ * Compose the browser runtime, clock, style, and an I/O port through
+ * `createBijou()`. Shared by {@link createWebContext} and
+ * `createWebInteractiveContext()`.
+ */
+export function composeWebContext<IO extends WebOutputIO>(
+  options: CreateWebContextOptions,
+  makeIO: WebIOFactory<IO>,
+): BijouContext & { readonly runtime: WebRuntime; readonly io: IO; readonly clock: ClockPort } {
+  const runtime = createWebRuntime(options.runtime);
+  const clock = options.clock ?? createWebClock();
+  const io = makeIO(runtime, clock);
+  const base = createBijou({
+    runtime,
+    io,
+    clock,
+    style: createWebStyle({ runtime }),
+    theme: options.theme,
+    presets: options.presets,
+    envVar: options.envVar,
+    ...(options.colorScheme === undefined ? {} : { colorScheme: options.colorScheme }),
+  });
+  return { ...base, mode: options.mode ?? base.mode, runtime, io, clock };
+}
+
 /**
  * Create a {@link BijouContext} for a browser host.
  *
@@ -47,22 +75,9 @@ export interface WebContext extends BijouContext {
  * @returns The context, with its runtime and I/O narrowed to the browser types.
  */
 export function createWebContext(options: CreateWebContextOptions = {}): WebContext {
-  const runtime = createWebRuntime(options.runtime);
-  const clock = options.clock ?? createWebClock();
-  const io = createWebOutputIO({
+  return composeWebContext(options, (runtime, clock) => createWebOutputIO({
     ...options.output,
     clock,
     resize: (callback) => runtime.onResize(callback),
-  });
-  const base = createBijou({
-    runtime,
-    io,
-    clock,
-    style: createWebStyle({ runtime }),
-    theme: options.theme,
-    presets: options.presets,
-    envVar: options.envVar,
-    ...(options.colorScheme === undefined ? {} : { colorScheme: options.colorScheme }),
-  });
-  return { ...base, mode: options.mode ?? base.mode, runtime, io, clock };
+  }));
 }

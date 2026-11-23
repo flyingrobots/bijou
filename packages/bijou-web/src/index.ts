@@ -2,8 +2,8 @@
  * Browser host adapter for Bijou.
  *
  * Implements the clock, runtime, style, output, and interactive input I/O
- * ports with no dependencies and no Node.js imports, and composes them into a
- * `BijouContext`.
+ * ports with no runtime dependencies and no Node.js imports, composes them
+ * into a `BijouContext`, and mounts a TEA app on an owned `<canvas>`.
  *
  * @module
  */
@@ -28,3 +28,16 @@ export { createWebContext } from './context.js';
 export type { CreateWebContextOptions, WebContext } from './context.js';
 export { WEB_UNSUPPORTED_CAPABILITY, WebUnsupportedCapabilityError } from './errors.js';
 export type { WebUnsupportedCapability } from './errors.js';
+export { createWebInteractiveContext } from './context-interactive.js';
+export type { CreateWebInteractiveContextOptions, WebInteractiveContext } from './context-interactive.js';
+export { mountBijouCanvas } from './canvas-mount.js';
+export type { BijouCanvasAbortSignal, MountBijouCanvasOptions, MountedBijouCanvas } from './canvas-options.js';
+export { BIJOU_CANVAS_LADDER } from './canvas-contract.js';
+export type {
+  BijouCanvasAbortToken, BijouCanvasBackend, BijouCanvasBackendChoice, BijouCanvasBox, BijouCanvasContainer,
+  BijouCanvasDocument, BijouCanvasElement, BijouCanvasFallbackReason, BijouCanvasFrame, BijouCanvasHost,
+  BijouCanvasNode, BijouCanvasPresentContext, BijouCanvasPresenter, BijouCanvasPresenterFactory,
+  BijouCanvasPresenterInit, BijouCanvasPresenters, BijouCanvasResize, BijouCanvasTextarea,
+} from './canvas-contract.js';
+export { BijouCanvasError, GPU_BACKEND_UNAVAILABLE_CODE, isGpuBackendUnavailable } from './canvas-errors.js';
+export type { BijouCanvasErrorCode } from './canvas-errors.js';
