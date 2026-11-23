@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ThemeProvider, useTheme } from '@/components/theme-provider';
 import { ThemeSwitch } from '@/components/theme-switch';
 import { Badge } from '@/vendor/components/ui/badge';
@@ -9,9 +9,11 @@ import { KeyHint } from './key-hint.js';
 import { usePageKeys, type LeaderKey } from './keys.js';
 import { useChromeMotion } from './motion.js';
 import { openPage, PAGES, type ShowcasePage } from './pages.js';
-import { Palette } from './palette.js';
 
 const THEME_STORAGE_KEY = 'bijou-web-gpu-theme';
+
+// The palette, its dialog and cmdk load on first use, so the first paint does not pay for them.
+const Palette = lazy(() => import('./palette.js').then((module) => ({ default: module.Palette })));
 
 interface ShellProps {
   readonly page: ShowcasePage['id'];
@@ -25,7 +27,12 @@ interface ShellProps {
 
 function Shell({ page, title, commands, leaders, children }: ShellProps) {
   const { setTheme } = useTheme();
-  const [palette, setPalette] = useState(false);
+  const [palette, setPaletteOpen] = useState(false);
+  const [paletteUsed, setPaletteUsed] = useState(false);
+  const setPalette = (open: boolean): void => {
+    if (open) setPaletteUsed(true);
+    setPaletteOpen(open);
+  };
   const [themeMenu, setThemeMenu] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   useChromeMotion(root);
@@ -53,7 +60,7 @@ function Shell({ page, title, commands, leaders, children }: ShellProps) {
         </div>
       </div>
       {children}
-      <Palette open={palette} onOpenChange={setPalette} commands={all} />
+      {paletteUsed && <Suspense fallback={null}><Palette open={palette} onOpenChange={setPalette} commands={all} /></Suspense>}
     </div>
   );
 }

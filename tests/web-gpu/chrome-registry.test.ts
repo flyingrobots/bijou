@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
@@ -23,6 +24,18 @@ function installed(directory: string): readonly string[] {
   return readdirSync(new URL(directory, example)).filter((name) => name.endsWith('.tsx')).map((name) => name.replace(/\.tsx$/u, ''));
 }
 
+interface LockedFile { readonly path: string; readonly item: string; readonly sha256: string }
+function lockedFiles(): readonly LockedFile[] {
+  const lock: unknown = JSON.parse(read('registry-files.json'));
+  if (typeof lock !== 'object' || lock === null || !('files' in lock) || !Array.isArray(lock.files)) throw new Error('registry-files.json has no files');
+  return lock.files.map((entry: unknown): LockedFile => {
+    if (typeof entry !== 'object' || entry === null || !('path' in entry) || !('item' in entry) || !('sha256' in entry)) throw new Error('a registry-files.json entry is malformed');
+    const { path, item, sha256 } = entry;
+    if (typeof path !== 'string' || typeof item !== 'string' || typeof sha256 !== 'string') throw new Error('a registry-files.json entry is malformed');
+    return { path, item, sha256 };
+  });
+}
+
 describe('examples/web-gpu chrome components and tokens', () => {
   it('installs from the @flyingrobots registry into src/vendor and src/components', () => {
     const config: unknown = JSON.parse(read('components.json'));
@@ -31,6 +44,18 @@ describe('examples/web-gpu chrome components and tokens', () => {
       aliases: { components: '@/vendor/components', ui: '@/vendor/components/ui', lib: '@/vendor/lib', hooks: '@/vendor/hooks' },
       registries: { '@flyingrobots': 'http://127.0.0.1:4173/r/{name}.json' },
     });
+  });
+
+  // The seal is offline, so it cannot ask the registry. registry-files.json records each file as
+  // the shadcn CLI wrote it; a hand edit changes the digest and fails here. Reinstalling with the
+  // CLI into a scratch project with the same components.json (README) refreshes the record.
+  it('keeps every CLI-installed file byte for byte as registry-files.json records it, and records nothing else', () => {
+    const locked = lockedFiles();
+    const onDisk = [...installed('src/vendor/components/ui/').map((name) => `src/vendor/components/ui/${name}.tsx`), ...installed('src/components/').map((name) => `src/components/${name}.tsx`)];
+    expect(locked.map((entry) => entry.path).sort()).toEqual(onDisk.sort());
+    for (const entry of locked) {
+      expect(createHash('sha256').update(readFileSync(new URL(entry.path, example))).digest('hex'), `${entry.path} differs from what the shadcn CLI installed`).toBe(entry.sha256);
+    }
   });
 
   it('names every installed registry item in the README', () => {

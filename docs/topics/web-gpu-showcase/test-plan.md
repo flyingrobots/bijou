@@ -45,6 +45,7 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | WGPU-26 | Each HTML entry holds only a root element and its module script. | `keeps each HTML entry to a root element and its module script` | Implemented |
 | WGPU-27 | `components.json` installs from the `@flyingrobots` registry into `src/vendor/` and `src/components/`, and the README names every installed item. | `installs from the @flyingrobots registry into src/vendor and src/components`, `names every installed registry item in the README` | Implemented |
 | WGPU-28 | `src/index.css` declares only shadcn tokens, every light and dark token has a value, and the theme-book command is recorded; `src/showcase.css` is gone. | `declares only shadcn tokens in its one stylesheet`, `gives every light and dark token a value from theme-book, and records the command` | Implemented |
+| WGPU-40 | Every file under `src/vendor/` and `src/components/` has the SHA-256 `registry-files.json` records for it as the shadcn CLI installed it, and the record lists no other file. The seal cannot reach the registry; reinstalling with the CLI (showcase README) is what ties the record to it. | `keeps every CLI-installed file byte for byte as registry-files.json records it, and records nothing else` | Implemented |
 | WGPU-29 | One boundary rule keeps chrome styles out of the Bijou mounts. | `keeps the chrome styles out of the Bijou mounts with one boundary rule` | Implemented |
 
 ## Golden lifecycle: `examples/web-gpu/e2e/golden.e2e.ts` (browser)
