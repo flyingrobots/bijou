@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { lowerUiSceneToBrowser, type UiSceneBrowserElement } from './ui-scene-browser.js';
 import { debuggerScene, withNode } from './ui-scene-browser.test-support.js';
-import { hashUiSceneValue, stableUiSceneStringify, validateUiSceneIr } from './ui-scene-ir.js';
+import { hashUiSceneValue, stableUiSceneStringify, validateUiSceneIr, type UiSceneIr } from './ui-scene-ir.js';
 import { witnessUiSceneParity } from './ui-scene-parity.js';
 
 const step = 'debugger.step';
+
+function isScene(value: unknown): value is UiSceneIr {
+  return typeof value === 'object' && value !== null;
+}
 
 function checkedOf(root: UiSceneBrowserElement, nodeId: string): string | undefined {
   const found = [root, ...root.children.flatMap(function walk(e): UiSceneBrowserElement[] {
@@ -45,7 +49,12 @@ describe('ui-scene-ir/1 node state.checked', () => {
 
   it('validates that checked is a boolean', () => {
     expect(validateUiSceneIr(toggle(true)).ok).toBe(true);
-    const bad = withNode(debuggerScene, step, { state: { checked: 'yes' as unknown as boolean } });
+    // Untrusted input: the text of a scene whose checked is a string, as a host would parse it.
+    const parsed: unknown = JSON.parse(
+      JSON.stringify(toggle(true)).replace('"checked":true', '"checked":"yes"'),
+    );
+    if (!isScene(parsed)) throw new Error('expected a scene object');
+    const bad = parsed;
     expect(validateUiSceneIr(bad)).toMatchObject({
       ok: false,
       issues: [{ code: 'invalid-node-state', id: step }],

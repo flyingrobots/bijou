@@ -89,7 +89,7 @@ test('mountBijouDom() in Chromium: one dispatch per activation, and typing or co
   expect(await model(page)).toMatchObject({ enabled: false, dispatches: 10 });
   await node(page, 'app.enabled').click();
   await expect(node(page, 'app.enabled')).toHaveAttribute('aria-checked', 'true');
-  expect(await switchElement?.evaluate((element) => element === document.querySelector('[data-bijou-node-id="app.enabled"]'))).toBe(true);
+  expect(await switchElement.evaluate((element) => element === document.querySelector('[data-bijou-node-id="app.enabled"]'))).toBe(true);
   expect(await model(page)).toMatchObject({ enabled: true, dispatches: 11 });
 
   expect(await page.evaluate(() => window.__bijouDom?.diagnostics)).toEqual([]);
