@@ -30,6 +30,8 @@ Use one term per concept, and define unfamiliar terms at first use (R45 §7.2).
 | Core and TUI | Ownership: `@flyingrobots/bijou` (core) or `@flyingrobots/bijou-tui` (TUI). |
 | Versioned artifact | An explicit contract such as `ui-scene-ir/1` or `bijou-block/1`. |
 | Semantic scene app | A TEA app that also projects its model to a `ui-scene-ir/1` scene and maps a declared action of that scene to a message. |
+| Replay stream | An ordered `bijou-replay-event/1` JSONL record of a run: inputs, commands, debug facts and frames (DL-033). |
+| Frame barrier | A replay `frame` event. Capture consumers emit output only at frame barriers (DL-033). |
 
 Say "output mode", not "profile", "lowering", or "TUI mode", when you mean `interactive`, `static`, `pipe`, or `accessible`. "Lowering" names the process of rendering for a less capable mode. Introduce it with care in first-use paths (R15).
 

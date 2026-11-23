@@ -332,6 +332,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- **Replay event envelope decision** — DL-033 fixes `bijou-replay-event/1`:
+  canonical JSONL, per-kind plain-data payloads, one `seq` order, logical
+  `tick`/`atMs` time, and full-Surface frame events as the capture barrier,
+  with contracts for the ReplayOutbox, `runScript()` emission, replay-driven
+  `recordDemoGif()` and the GIF fixture (#599).
+
 - DL-034 records the pre-push verification receipt decision (#648). The witness
   runs the policy that DL-030 selects (`fast` or `full`). The receipt binds that
   versioned policy identity, the verified Git tree, `classificationBase`, installed
