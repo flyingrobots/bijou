@@ -91,6 +91,7 @@ export function controlsScene(model: ControlsModel): UiSceneIr {
   const nodes = rows.map(([id, role], y): UiNode => ({
     id, kind: 'text', parentId: 'app', layout: { x: 0, y },
     ...(role === undefined ? {} : { role }),
+    ...(id === 'app.enabled' ? { state: { checked: model.enabled } } : {}),
     ...(id === 'app.count' ? { style: { fg: { token: 'semantic.primary' } } } : {}),
     text: { kind: 'literal', value: text(model, id) },
   }));
