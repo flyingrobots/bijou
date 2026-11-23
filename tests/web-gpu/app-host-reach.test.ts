@@ -9,6 +9,9 @@ describe('example app modules reach no Node host API', () => {
       'Buffer used by tests/fixtures/host-reach/global-read.ts',
       'node:fs imported by tests/fixtures/host-reach/reader.ts',
       'process used by tests/fixtures/host-reach/reader.ts',
+      // A shadowing parameter of one function does not hide a use in another,
+      // and a parameter named self is not the global object.
+      'process used by tests/fixtures/host-reach/scoped.ts',
     ]);
     expect(await hostReachOf('tests/fixtures/host-reach/clean.ts')).toEqual([]);
   });
