@@ -29,7 +29,8 @@ npx vite preview --config examples/web-gpu/vite.config.ts --port 41797
 
 `/dom.html` is the page the browser suite checks `mountBijouDom()` on.
 
-The first mount is chosen in the address: `?app=counter` or `?app=showcase`,
+The first mount is chosen in the address: `?app=counter`, `?app=components`,
+`?app=hero` or `?app=showcase`,
 and `&backend=auto` (the default), `webgpu`, `webgl2` or `canvas2d`.
 
 ## Run the browser suite
