@@ -75,6 +75,8 @@ describe('ComponentStory protocol', () => {
     expect(markdown).toContain('## Graceful lowering');
     expect(markdown).toContain('- **Profile:** Static (`static`, 60 cols)');
     expect(markdown).toContain('- Example: `examples/sample/main.ts`');
+    expect(markdown).not.toContain('## Content guidance');
+    expect(markdown).not.toContain('## Ownership');
   });
 
   it('finds matching profile modes and lowers string previews to surfaces', () => {

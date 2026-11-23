@@ -1,0 +1,27 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "e395442e-754e-4543-9b8a-8500bc3cea3b",
+  "agent": "codex",
+  "task": "Close inline fact index and alignment classification findings",
+  "bytesConsumed": 7495,
+  "byteAccounting": "Source bytes of three initial Graft reads at be3e01c6; excludes shell follow-up reads and shared standards",
+  "filesRead": [
+    "examples/docs/app-story-facts.ts",
+    "examples/docs/app-story-pane.ts",
+    "tests/dogfood-inline-variant-facts.test.ts"
+  ],
+  "filesModified": [
+    "examples/docs/app-story-pane.ts",
+    "examples/docs/i18n-debt-source-context.ts",
+    "tests/dogfood-inline-variant-facts.test.ts",
+    "scripts/dogfood-i18n-alignment-literals.test.ts",
+    "scripts/dogfood-i18n-debt.part02.test.ts",
+    "examples/docs/i18n-debt-source-alignment.ts",
+    "examples/docs/i18n-debt-source-exclusions.ts"
+  ],
+  "tripwires": [],
+  "validation": {
+    "red": "Public fractional selection displays Variant2.5 instead of2; valid layout enums counted as copy; broad property exclusion drops visible custom and wrong-axis text",
+    "green": "22 focused tests pass; restored narrow rule retains visible text; focused ESLint passes; baseline unchanged"
+  }
+}

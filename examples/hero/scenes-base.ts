@@ -5,8 +5,9 @@ export interface PerfSample {
   readonly fps: number;
   readonly frameTimeMs: number;
   readonly history: readonly number[];
-  readonly heapUsedMB: number;
-  readonly rssMB: number;
+  /** Absent when the host has no memory measure, as in a browser. */
+  readonly heapUsedMB?: number;
+  readonly rssMB?: number;
 }
 
 export function filled(width: number, height: number, bg: string): Surface {

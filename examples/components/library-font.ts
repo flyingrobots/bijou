@@ -1,8 +1,7 @@
-import { readFileSync } from 'node:fs';
 import { RasterFont, RasterFontGlyph } from '../../packages/bijou-tui/src/index.js';
+import DM_SANS_ATLAS from '../../assets/dm-sans-ascii.json' with { type: 'json' };
+import { decodeCanonicalBase64 } from '../_shared/base64.js';
 
-type FontMaskEncodingKind = 'base64';
-const MASK_ENCODING = 'base64' satisfies FontMaskEncodingKind;
 // The content digest is the atlas protocol's immutable source identifier.
 type FontSourceId = '8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d';
 const SOURCE_DIGEST = '8cd08d97e89c24d0aa92edd2f0f4c8ee6195eee9b7c9f154865a58b02f0c1c0d' satisfies FontSourceId;
@@ -28,15 +27,16 @@ function number(value: unknown): number {
 function entry(value: unknown): [string, RasterFontGlyph] {
   const g = record(value);
   if (typeof g['character'] !== 'string' || typeof g['mask'] !== 'string') throw new Error('Invalid title font glyph.');
-  const mask = Buffer.from(g['mask'], MASK_ENCODING);
-  if (mask.toString(MASK_ENCODING) !== g['mask']) throw new Error('Invalid title coverage encoding.');
+  // Coverage masks are stored in canonical base64.
+  const mask = decodeCanonicalBase64(g['mask']);
+  if (mask === undefined) throw new Error('Invalid title coverage encoding.');
   return [g['character'], new RasterFontGlyph({
     advance: number(g['advance']), left: number(g['left']), top: number(g['top']),
     width: number(g['width']), height: number(g['height']), columns: number(g['columns']), rows: number(g['rows']),
   }, mask)];
 }
 
-const raw: unknown = JSON.parse(readFileSync(new URL('../../assets/dm-sans-ascii.json', import.meta.url), 'utf8'));
+const raw: unknown = DM_SANS_ATLAS;
 const data = record(raw);
 if (data['version'] !== 1 || data['family'] !== EXPECTED_FONT.family || !Array.isArray(data['glyphs']) || data['glyphs'].length !== 95
   || data['fontSha256'] !== EXPECTED_FONT.sha256) {

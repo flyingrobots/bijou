@@ -25,9 +25,12 @@ import type { FrameThemeModeServices } from './app-frame-theme-mode.js';
 import type { FrameThemeRuntime } from './app-frame-theme-runtime.js';
 import type { createFrameShellCommandServices } from './app-frame-shell-command.js';
 import type { createFrameKeyRouteServices } from './app-frame-key-route.js';
+import type { FocusedPaneMeasureCache } from './app-frame-scroll-measure-cache.js';
+import { isScrollFrameAction } from './app-frame-scroll-handled.js';
 import { updateFrameScopedAction } from './app-frame-frame-action-update.js';
 
 export interface FrameAppUpdateDependencies<PageModel, Msg> {
+  readonly measureCache: FocusedPaneMeasureCache;
   readonly options: CreateFramedAppOptions<PageModel, Msg>;
   readonly pagesById: Map<string, FramePage<PageModel, Msg>>;
   readonly notificationOptions: ResolvedFrameNotificationOptions;
@@ -50,20 +53,26 @@ type FrameAppInput<Msg> =
   | PulseMsg
   | FramedAppMsg<Msg>;
 
-export function updateFrameApp<PageModel, Msg>(
+function routeFrameApp<PageModel, Msg>(
   msg: FrameAppInput<Msg>,
   model: InternalFrameModel<PageModel, Msg>,
   dependencies: FrameAppUpdateDependencies<PageModel, Msg>,
 ): [
   InternalFrameModel<PageModel, Msg>,
   Cmd<FramedAppMsg<Msg>>[],
+  boolean,
 ] {
   const { pagesById } = dependencies;
   if (isFrameScopedMsg(msg)) {
-    return updateFrameScopedAction(msg.action, model, dependencies);
+    const [next, cmds] = updateFrameScopedAction(
+      msg.action,
+      model,
+      dependencies,
+    );
+    return [next, cmds, isScrollFrameAction(msg.action)];
   }
   if (isResizeMsg(msg)) {
-    return [{ ...model, columns: msg.columns, rows: msg.rows }, []];
+    return [{ ...model, columns: msg.columns, rows: msg.rows }, [], false];
   }
   if (isKeyMsg(msg)) {
     return dependencies.shellCommands.drainShellCommandBuffer(
@@ -83,9 +92,29 @@ export function updateFrameApp<PageModel, Msg>(
         routed,
       );
     }
-    return updateTargetPage(model, model.activePageId, msg, pagesById);
+    return [...updateTargetPage(model, model.activePageId, msg, pagesById), false];
   }
-  return isPageScopedMsg<Msg>(msg)
-    ? updateTargetPage(model, msg.pageId, msg.msg, pagesById)
-    : updateTargetPage(model, model.activePageId, msg, pagesById);
+  return [
+    ...(isPageScopedMsg<Msg>(msg)
+      ? updateTargetPage(model, msg.pageId, msg.msg, pagesById)
+      : updateTargetPage(model, model.activePageId, msg, pagesById)),
+    false,
+  ];
+}
+
+export function updateFrameApp<PageModel, Msg>(
+  msg: FrameAppInput<Msg>,
+  model: InternalFrameModel<PageModel, Msg>,
+  dependencies: FrameAppUpdateDependencies<PageModel, Msg>,
+): [
+  InternalFrameModel<PageModel, Msg>,
+  Cmd<FramedAppMsg<Msg>>[],
+] {
+  const [next, cmds, scrollHandled] = routeFrameApp(
+    msg,
+    model,
+    dependencies,
+  );
+  if (!scrollHandled) dependencies.measureCache.invalidate();
+  return [next, cmds];
 }

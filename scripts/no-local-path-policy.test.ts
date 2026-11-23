@@ -37,10 +37,9 @@ describe('fixed container paths versus machine-local paths', () => {
     expect(localPathViolations(`scripts/docker-seal/${file}`, lock)).toEqual([lock]);
   });
 
-  it('admits the volume root only in the native quota program', () => {
+  it.each(['windows-measure.ps1', 'windows.mjs'])('rejects the volume root in %s, now that no native quota program addresses it', (file) => {
     const root = win32.join('C:', '/');
-    expect(localPathViolations('scripts/docker-seal/windows-measure.ps1', root)).toEqual([]);
-    expect(localPathViolations(worker, root)).toEqual([root]);
+    expect(localPathViolations(`scripts/docker-seal/${file}`, root)).toEqual([root]);
   });
 
   it('rejects file URLs even in Docker tooling', () => {

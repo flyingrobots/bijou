@@ -1,0 +1,125 @@
+{
+  "schema": "bijou.web-gpu.registry-files/1",
+  "cli": "shadcn@4.23.0",
+  "style": "radix-nova",
+  "registry": {
+    "@flyingrobots": "flyingrobots/shadcn-registry@ba6a844"
+  },
+  "files": [
+    {
+      "path": "src/components/theme-provider.tsx",
+      "item": "@flyingrobots/theme-provider",
+      "sha256": "7950c60bb1ef4b608790923dfb7ece95da6151fba619c85fd37573759018866f"
+    },
+    {
+      "path": "src/components/theme-switch.tsx",
+      "item": "@flyingrobots/theme-switch",
+      "sha256": "1c3c4ca8f88c633bf436e4af9c79a8126a3d46f024956d2e4a68173194da2a65"
+    },
+    {
+      "path": "src/vendor/components/ui/alert.tsx",
+      "item": "alert",
+      "sha256": "f253568242c1c69b343f12474002fdbe229f603158171c59e21c491ab79f2e6e"
+    },
+    {
+      "path": "src/vendor/components/ui/badge.tsx",
+      "item": "badge",
+      "sha256": "59953420d01d23d172b4e32583426db153ff09226e2d460d53526b9f25282801"
+    },
+    {
+      "path": "src/vendor/components/ui/button.tsx",
+      "item": "button",
+      "sha256": "08e5f87833c5db8436e89337ebde0f776bcdbf649d3de69fb89be6441ca2e366"
+    },
+    {
+      "path": "src/vendor/components/ui/card.tsx",
+      "item": "card",
+      "sha256": "7620e0f122bb5aa0a422254909bd11d5b088bb368eb60e6ba28010c332163cc0"
+    },
+    {
+      "path": "src/vendor/components/ui/command.tsx",
+      "item": "command",
+      "sha256": "3b69813382e1ee7e2cc4d2d812b01ceb425503685818ba8c55ba09ad45becb07"
+    },
+    {
+      "path": "src/vendor/components/ui/dialog.tsx",
+      "item": "dialog",
+      "sha256": "526022b1b81481b78495e9687354e228fde8fece728f900669b1934fe9c4e7e4"
+    },
+    {
+      "path": "src/vendor/components/ui/dropdown-menu.tsx",
+      "item": "dropdown-menu",
+      "sha256": "1b9c748a8ea8c2890124f316e3edf840153ef43f6df76b3ff1878d8fd37f9685"
+    },
+    {
+      "path": "src/vendor/components/ui/field.tsx",
+      "item": "field",
+      "sha256": "43a4c57d58e8126c7b33a479409306c6c3bd711b2a46d2bc1ef5e3bbfce7457c"
+    },
+    {
+      "path": "src/vendor/components/ui/input-group.tsx",
+      "item": "input-group",
+      "sha256": "58b5db6b30cba057dc24d58fc012e08459a72f56ec837c05865d4cde2cf99e83"
+    },
+    {
+      "path": "src/vendor/components/ui/input.tsx",
+      "item": "input",
+      "sha256": "75418e030b2a54dd017ac0f4588db4bbdbabca7525e88bbc9d84cb3e18bcb905"
+    },
+    {
+      "path": "src/vendor/components/ui/item.tsx",
+      "item": "item",
+      "sha256": "69b232af5b43e7ba917866b62969f79eff386820b715a26dbe579f4ceb11c5ff"
+    },
+    {
+      "path": "src/vendor/components/ui/kbd.tsx",
+      "item": "kbd",
+      "sha256": "d17724eb15923ea4f0432cd1cf22538addb14a386f4f9326661efcce7f97e33b"
+    },
+    {
+      "path": "src/vendor/components/ui/label.tsx",
+      "item": "label",
+      "sha256": "344bde38b8531615dbf8e14af3895517c24d8ef6ce56ddeda7e2e6fe4b5d0c00"
+    },
+    {
+      "path": "src/vendor/components/ui/separator.tsx",
+      "item": "separator",
+      "sha256": "42aa6209fe9bec178e4009cf042c16f7e8730bfc4edbc0c39972c1f0482e7d19"
+    },
+    {
+      "path": "src/vendor/components/ui/skeleton.tsx",
+      "item": "skeleton",
+      "sha256": "4c2af7fa9c645358a0fb188779deab6f0b981733b62befc25e18aaebea1350dc"
+    },
+    {
+      "path": "src/vendor/components/ui/spinner.tsx",
+      "item": "spinner",
+      "sha256": "6916679a40ad1c7624520de5eaa7b337635e81f9a76413201267f8619844646f"
+    },
+    {
+      "path": "src/vendor/components/ui/table.tsx",
+      "item": "table",
+      "sha256": "749b0501e97591f8d7c9ef81366d636e4b47857a15a28e6cf3b87841232e74bf"
+    },
+    {
+      "path": "src/vendor/components/ui/textarea.tsx",
+      "item": "textarea",
+      "sha256": "82601c91ffc6c727d924162c78d7cb853114bcced4e2eb922a68ca12d4239c0f"
+    },
+    {
+      "path": "src/vendor/components/ui/toggle-group.tsx",
+      "item": "toggle-group",
+      "sha256": "25064db129f4b80ae601dbb9cdaf949b5d511986e89f2edf15dd254061b454ac"
+    },
+    {
+      "path": "src/vendor/components/ui/toggle.tsx",
+      "item": "toggle",
+      "sha256": "aafa82253550574c833d0072c9f6f4a71e36efdbbeddb8ddf1b09db1fbc1f621"
+    },
+    {
+      "path": "src/vendor/components/ui/tooltip.tsx",
+      "item": "tooltip",
+      "sha256": "e94530dd6877132d5eda73f6fb0d217f345477232f140f2ca6e024d790177f6a"
+    }
+  ]
+}

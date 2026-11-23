@@ -3,6 +3,7 @@ import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from '
 import { networkInterfaces } from 'node:os';
 import { win32 } from 'node:path';
 import { ensureDocker } from '@git-stunts/docker-guard';
+import { requireSealMarker } from './windows-seal.mjs';
 
 /** Windows admission complements the host's inspected Docker isolation profile. */
 export function requireWindows() {
@@ -14,7 +15,7 @@ export function requireWindows() {
     encoding: 'utf8', timeout: 5000, maxBuffer: 16384,
   });
   if (!/STATE\s*:\s*4\s+RUNNING/u.test(service)) refuse('container execution service is not running');
-  if (readFileSync('C:\\bijou-test-seal', 'utf8') !== 'bijou-test-seal-v1\n') refuse('image seal missing');
+  requireSealMarker(readFileSync('C:\\bijou-test-seal', 'utf8'), 'Windows Docker test seal');
   if (readdirSync('\\\\.\\pipe\\').some((name) => /docker|containerd/iu.test(name))) refuse('container control pipe exposed');
   if (Object.values(networkInterfaces()).flat().some((entry) => entry && !entry.internal)) refuse('network beyond loopback');
   const allowedGit = new Set(['GIT_CONFIG_GLOBAL', 'GIT_CONFIG_NOSYSTEM', 'GIT_STUNTS_DOCKER']);

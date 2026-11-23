@@ -2237,6 +2237,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.story.facts.profile"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Profile: {profile}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.story.facts.variant"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "Variant {index} of {count}: {label}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.title"
       },
       "kind": "message",
@@ -4432,6 +4454,17 @@
       "sourceLocale": "en",
       "values": {
         "en": "single choice"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "stories.preview.springTimeline.camera"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "camera spring"
       }
     },
     {
