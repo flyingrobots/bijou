@@ -4,12 +4,14 @@ import { execute } from './process.mjs';
 import { startWorker, stopWorker, measureWorker } from './worker.mjs';
 import { LIMITS, WORKER } from './constants.mjs';
 import { templateConsumerManifest } from './consumer-manifest.mjs';
+import { copyLocalTarballs } from './local-tarballs.mjs';
 export async function prepareDependencies(snapshot, image, worker = WORKER, signal) {
   const run = (argv, options = {}) => execute(argv, { ...options, signal });
   const name = `${worker}-dependencies`;
   const directory = join(snapshot.directory, 'dependency-input');
   mkdirSync(join(directory, 'source', 'packages'), { recursive: true });
   for (const path of ['package.json', 'package-lock.json']) copyFileSync(join(snapshot.source, path), join(directory, 'source', path));
+  copyLocalTarballs(JSON.parse(readFileSync(join(snapshot.source, 'package-lock.json'), 'utf8')), snapshot.source, join(directory, 'source'));
   mkdirSync(join(directory, 'source', 'bench'));
   copyFileSync(join(snapshot.source, 'bench', 'package.json'), join(directory, 'source', 'bench', 'package.json'));
   mkdirSync(join(directory, 'source', 'canary'));
