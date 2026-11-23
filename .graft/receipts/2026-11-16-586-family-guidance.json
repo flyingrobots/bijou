@@ -1,0 +1,29 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "C17D38DE-A883-440F-A33C-7EAE5AC107B1",
+  "agent": "codex",
+  "task": "Render canonical family guidance in DOGFOOD (#586)",
+  "bytesConsumed": 2548,
+  "filesRead": ["docs/CHANGELOG.md"],
+  "filesModified": [
+    "examples/_stories/design-families.ts",
+    "examples/_stories/protocol-markdown.ts",
+    "examples/components/library-design.ts",
+    "examples/components/README.md",
+    "examples/components/README.fr.md",
+    "examples/components/README.es.md",
+    "examples/components/README.de.md",
+    "examples/docs/stories-story-guided-flow.ts",
+    "examples/docs/i18n-debt-baseline.ts",
+    "examples/docs/i18n-debt-baseline-stories.ts",
+    "scripts/component-family-guidance.test.ts",
+    "scripts/component-story-protocol.test.ts",
+    "scripts/dogfood-i18n-debt.part02.test.ts",
+    "docs/CHANGELOG.md",
+    ".graft/receipts/2026-11-16-586-family-guidance.json"
+  ],
+  "tripwires": [],
+  "metricsScope": "Graft changelog excerpt only; bounded shell source reads and live renderer probes are excluded from the byte count.",
+  "validation": "Both guidedFlow and badge actual DOGFOOD surfaces failed the new guidance assertion before repair. After repair, 11 focused tests passed, followed by ten successful repetitions of the two surface cases and protocol cases. Typed GuidedFlowStepStatus discriminants lowered measured debt from 2258 to 2255 without altering scanner policy or rendered output.",
+  "publication": "Current-main integration, normal push hooks, hosted CI and clean review remain required."
+}

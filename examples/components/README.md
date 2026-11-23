@@ -6,7 +6,7 @@ English · [Français](README.fr.md) · [Español](README.es.md) · [Deutsch](RE
 npm run components
 ```
 
-The Components Library is a deck of 58 slides: a title, a slide for each of 14 sections followed by its components, and an end slide. A section groups related component families for browsing; the 42 components cover 35 of the 36 families in `docs/design-system/component-families.md`. It shows one Bijou component at a time in the centre of the screen, with nothing else competing for attention. It uses the same 42-story catalog as DOGFOOD and Block Lab, and runs inside Bijou's standard app frame, so search, settings, and quit behave as they do in DOGFOOD.
+The Components Library is a deck of 59 slides: a title, a slide for each of 15 sections followed by its components, and an end slide. A section groups related component families for browsing; the 42 components cover 36 of the 37 families in `docs/design-system/component-families.md`. It shows one Bijou component at a time in the centre of the screen, with nothing else competing for attention. It uses the same 42-story catalog as DOGFOOD and Block Lab, and runs inside Bijou's standard app frame, so search, settings, and quit behave as they do in DOGFOOD.
 
 The library opens on a "Components Library" title screen, set in DM Sans. Press Enter to start.
 
@@ -24,7 +24,7 @@ The library opens on a "Components Library" title screen, set in DM Sans. Press 
 | `?` | Every key binding |
 | `q`, `Esc` | Quit, after a confirmation |
 
-A bar across the top row, in place of the frame header, shows how far you are through the whole deck, ending in a label such as "3 of 58". The Library draws this bar itself: it shows a place in a sequence, not a task's progress, so it does not use `progressBar()`. A breadcrumb above the component names its section and the component. Bijou's `tabs()` below the component list its variants, falling back to `paginator()` dots when the tabs are wider than the screen. The bottom row shows the output modes as tabs, then the info and right-to-left switches with their state (`i info off · r RTL off`). The frame's footer shows the navigation keys.
+A bar across the top row, in place of the frame header, shows how far you are through the whole deck, ending in a label such as "3 of 59". The Library draws this bar itself: it shows a place in a sequence, not a task's progress, so it does not use `progressBar()`. A breadcrumb above the component names its section and the component. Bijou's `tabs()` below the component list its variants, falling back to `paginator()` dots when the tabs are wider than the screen. The bottom row shows the output modes as tabs, then the info and right-to-left switches with their state (`i info off · r RTL off`). The frame's footer shows the navigation keys.
 
 ## Opening on a specific screen
 
@@ -57,7 +57,7 @@ slides never advance on their own. Press Enter, Space, `l`, the right arrow, or 
 
 ## Info and examples
 
-`i` shows the component's entry in the vocabulary of the design system's Component Families reference (book record R52). It opens with the family name and a summary, then a box titled **Tip for this variant** with the tip for the variant on screen. Below that, **When to use each variant** lists every variant with its tip; it stays the same as you change variant. Then come **Use when**, **Avoid when**, **Content guidance**, **Ownership**, **Graceful lowering**, and **Related families**, then an **Example**. The component's own story supplies a field where it has one; its family entry in `docs/design-system/component-families.md` supplies **Content guidance** and **Ownership**, and fills any field the story lacks. `guidedFlow()` has no family entry yet, so its panel shows only the story's fields.
+`i` shows the component's entry in the vocabulary of the design system's Component Families reference (book record R52). It opens with the family name and a summary, then a box titled **Tip for this variant** with the tip for the variant on screen. Below that, **When to use each variant** lists every variant with its tip; it stays the same as you change variant. Then come **Use when**, **Avoid when**, **Content guidance**, **Ownership**, **Graceful lowering**, and **Related families**, then an **Example**. The component's own story supplies a field where it has one; its family entry in `docs/design-system/component-families.md` supplies **Content guidance** and **Ownership**, and fills any field the story lacks. `guidedFlow()` belongs to Guided flows; its panel includes that family’s Content guidance and Ownership.
 
 The example is the variant's own `render()` call, read from its story file in `examples/docs/`. Long examples are abridged and labelled as such. Some stories call a shared preview helper, so their example shows that helper rather than a bare component call.
 

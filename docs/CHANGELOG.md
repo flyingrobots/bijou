@@ -28,6 +28,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- DOGFOOD story documentation shows canonical family Content guidance and
+  Ownership, matching the Components Library while preserving the story's own
+  summary and usage advice (#586).
 - The `guidedFlow()` story's docs, variant label, and preview copy resolve
   through the DOGFOOD catalogs in `en`, `fr`, `es`, and `de`. Stories can opt in
   through a `localize` hook, documented in `docs/development.md`.
@@ -352,6 +355,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Reject explicit null Sapphire hue seeds instead of silently selecting default hues.
 
 ### Added
+
+- **Guided flows component family** — the component-families guidance gains a
+  Guided flows entry for `guidedFlow()` with the R52 fields, distinguishing it
+  from Explainability walkthroughs and Path and progress. The `guidedFlow()`
+  story now maps to that family, so the Components Library covers 36 of 37 families
+  (#586).
 
 - **Replay event envelope decision** — DL-033 fixes `bijou-replay-event/1`:
   canonical JSONL, per-kind plain-data payloads, one `seq` order, logical

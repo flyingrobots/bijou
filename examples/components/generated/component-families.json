@@ -324,6 +324,42 @@
     ]
   },
   {
+    "title": "Guided flows",
+    "lines": [
+      "",
+      "- Family: `guidedFlow()`",
+      "- Variants:",
+      "  - summary with metadata and a staged step list (complete, current, pending)",
+      "  - titled sections with optional muted tone",
+      "  - one labeled next action",
+      "- Use when:",
+      "  - the surface needs one calm recommendation or setup path without becoming a full wizard",
+      "  - section rhythm and the next action should stay explicit instead of dissolving into prose",
+      "  - the guidance is general assistance rather than AI-mediated output that needs provenance",
+      "- Avoid when:",
+      "  - the content is AI-mediated and needs explicit provenance, evidence, or confidence; prefer `explainability()`",
+      "  - the user needs only location or progress through a process; prefer `stepper()` or `breadcrumb()` in Path and progress",
+      "  - the user needs editable state transitions or step routing owned by the shell",
+      "  - a single `note()` or `alert()` already says the whole thing",
+      "- Content guidance:",
+      "  - title the flow with the outcome the user is working toward",
+      "  - keep step titles short and give each step one detail line with an honest status",
+      "  - state the next action as one imperative sentence",
+      "  - use sections for reasons and operator notes, and mute supporting copy instead of adding more boxes",
+      "- Ownership:",
+      "  - core",
+      "- Graceful lowering:",
+      "  - rich/static: keep summary, steps, sections, and next action visibly distinct with deterministic rhythm",
+      "  - pipe: lower to indented sections and a labeled next action without decorative chrome",
+      "  - accessible: linearize steps and section labels in reading order with no dependence on borders, color, or layout",
+      "- Related families:",
+      "  - `explainability()`",
+      "  - `stepper()`",
+      "  - `note()`",
+      ""
+    ]
+  },
+  {
     "title": "Inspector panels",
     "lines": [
       "",
