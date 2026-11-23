@@ -1,9 +1,9 @@
-import { cpSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
-import { COMPONENTS_DATA_DIR, staleComponentsBrowserData } from '../scripts/components-browser-data.js';
+import { COMPONENTS_DATA_DIR, staleComponentsBrowserData, storySnippets } from '../scripts/components-browser-data.js';
 
 // The Components library imports generated copies of its snippets and design
 // families. This is their drift check: it regenerates them from the story
@@ -21,6 +21,13 @@ function copyOfGenerated(): URL {
 describe('generated Components library data', () => {
   it('matches what its sources give now', () => {
     expect(staleComponentsBrowserData()).toEqual([]);
+  });
+
+  it('reads the same snippets from a story checked out with CRLF line endings', () => {
+    const source = readFileSync(new URL('../examples/docs/stories-story-alert.ts', import.meta.url), 'utf8');
+    const lf = storySnippets(source.replace(/\r\n?/gu, '\n'));
+    expect(lf?.variants.length).toBeGreaterThan(1);
+    expect(storySnippets(source.replace(/\r?\n/gu, '\r\n'))).toEqual(lf);
   });
 
   it('names a copy that drifted, a missing one and a stray one', () => {

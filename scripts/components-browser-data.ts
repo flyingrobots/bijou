@@ -44,12 +44,21 @@ function tidy(source: string): string[] {
   return lines.map((l, i) => (i === 0 ? l : l.slice(cut))).filter((l) => l.trim() !== '');
 }
 
-/** story id → per-variant example code, read from the story's own TypeScript source, in directory order. */
+/**
+ * A story's id and per-variant example code, from its TypeScript source.
+ * Line endings are normalized first, so a CRLF checkout gives the same data.
+ */
+export function storySnippets(source: string): { id: string; variants: string[][] } | undefined {
+  const text = source.replace(/\r\n?/gu, '\n');
+  const id = /\bid:\s*'([^']+)'/.exec(text)?.[1];
+  return id === undefined ? undefined : { id, variants: renderSources(text).map(tidy) };
+}
+
+/** story id → per-variant example code, read from each story's own source, in directory order. */
 function snippets(): { id: string; variants: string[][] }[] {
   return readdirSync(STORY_DIR).filter((f) => f.startsWith('stories-story-') && f.endsWith('.ts')).flatMap((file) => {
-    const text = readFileSync(new URL(file, STORY_DIR), 'utf8');
-    const id = /\bid:\s*'([^']+)'/.exec(text)?.[1];
-    return id === undefined ? [] : [{ id, variants: renderSources(text).map(tidy) }];
+    const story = storySnippets(readFileSync(new URL(file, STORY_DIR), 'utf8'));
+    return story === undefined ? [] : [story];
   });
 }
 
