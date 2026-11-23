@@ -22,12 +22,14 @@ import {
 import { cyclePane } from './app-frame-actions-pane.js';
 import { scrollFocusedPane } from './app-frame-actions-scroll.js';
 import { switchTab } from './app-frame-actions-tabs.js';
+import type { FocusedPaneMeasureCache } from './app-frame-scroll-measure-cache.js';
 
 export function applyFrameAction<PageModel, Msg>(
   action: FrameAction,
   model: InternalFrameModel<PageModel, Msg>,
   options: CreateFramedAppOptions<PageModel, Msg>,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  measureCache?: FocusedPaneMeasureCache,
 ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] {
   switch (action.type) {
     case 'toggle-help':
@@ -75,7 +77,10 @@ export function applyFrameAction<PageModel, Msg>(
     case 'bottom':
     case 'scroll-left':
     case 'scroll-right':
-      return [scrollFocusedPane(model, action, pagesById, options), []];
+      return [
+        scrollFocusedPane(model, action, pagesById, options, measureCache),
+        [],
+      ];
     case 'runtime-issue':
     case 'notification-tick':
       return [model, []];

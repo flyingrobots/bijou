@@ -82,6 +82,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Framed apps reuse the focused-pane scroll measurement across consecutive
+  scroll actions (#589, DL-032). Each runtime owns one single-entry cache keyed
+  by a frame input revision, page, pane, columns and rows. Any message other
+  than a scroll action invalidates it, as does initializing the app again.
+  The measurement Surface is no longer module-global. Scroll behaviour is unchanged.
 - Components can resolve a layout direction (#612). `BijouNodeOptions` and
   `BijouContext` gain `direction?: 'ltr' | 'rtl'`, and `createBijou()` and
   `createTestContext()` accept it. `resolveDirection()` lets the explicit

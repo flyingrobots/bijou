@@ -17,6 +17,7 @@ import type {
 } from './app-frame-notification-runtime.js';
 import type { FrameThemeModeServices } from './app-frame-theme-mode.js';
 import type { FrameThemeRuntime } from './app-frame-theme-runtime.js';
+import type { FocusedPaneMeasureCache } from './app-frame-scroll-measure-cache.js';
 import { updateFrameTransition } from './app-frame-transition-update.js';
 
 export interface FrameActionUpdateDependencies<PageModel, Msg> {
@@ -26,6 +27,7 @@ export interface FrameActionUpdateDependencies<PageModel, Msg> {
   readonly notificationState: FrameNotificationStateServices<PageModel, Msg>;
   readonly themeMode: FrameThemeModeServices<PageModel, Msg>;
   readonly themeRuntime: FrameThemeRuntime<PageModel, Msg>;
+  readonly measureCache?: FocusedPaneMeasureCache;
 }
 
 export function updateFrameScopedAction<PageModel, Msg>(
@@ -107,5 +109,6 @@ export function updateFrameScopedAction<PageModel, Msg>(
     model,
     dependencies.options,
     dependencies.pagesById,
+    dependencies.measureCache,
   );
 }
