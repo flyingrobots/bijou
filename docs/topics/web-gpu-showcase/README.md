@@ -150,9 +150,11 @@ The browser suite runs in Google Chrome, headless.
 For the counter, the WebGPU, WebGL2 and Canvas 2D frames have the same
 `frameRgbaSha256`; the golden and WebGPU cases assert it.
 
-The components and hero apps mount with `auto`, so on the Mac they present on
-WebGPU with a `gpu-probed` receipt, and in the stress case on WebGL2 and
-Canvas 2D. Their frames are not compared across backends.
+The components and hero apps mount with `auto`: on the Mac they present on
+WebGPU with a `gpu-probed` receipt, and on the hosted runner, which has no
+WebGPU adapter, on WebGL2 with a `software-probed` one. The stress case also
+puts them on WebGL2 and Canvas 2D. Their frames are not compared across
+backends.
 
 Not verified: Firefox, Safari, a device pixel ratio other than 1, a DPR change
 during a run, IME composition and paste in a real browser, and any timing
