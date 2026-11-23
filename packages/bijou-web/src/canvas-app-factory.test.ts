@@ -22,9 +22,13 @@ describe('mountBijouCanvas() app factory and run options', () => {
     await env.drive();
     expect(received).toHaveLength(1);
     const [ctx] = received;
-    expect(ctx?.runtime).toBe(handle.ctx.runtime);
     expect(ctx?.mode).toBe('interactive');
+    expect(ctx?.theme).toBe(handle.ctx.theme);
     expect([ctx?.runtime.columns, ctx?.runtime.rows]).toEqual([80, 24]);
+    // It is the run's live context: a new container box reaches its runtime.
+    env.host.box(1000, 600);
+    await env.drive();
+    expect([ctx?.runtime.columns, ctx?.runtime.rows]).toEqual([100, 30]);
     env.press('a');
     await env.drive();
     expect(handle.model()).toEqual({ count: 1 });
