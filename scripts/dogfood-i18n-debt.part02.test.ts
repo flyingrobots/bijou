@@ -81,8 +81,9 @@ describe('DOGFOOD i18n debt inventory', () => {
       const surfaces = inventory.bySurface.map((surface) => surface.surface);
 
       // Keep #549's two removals, 24 localized release entries, and the typed
-      // root-route identifier removed while wiring actual landing lowering.
-      expect(inventory.total).toBe(2258);
+      // root-route identifier removed while wiring actual landing lowering,
+      // and the spring timeline preview's localized camera label (#809).
+      expect(inventory.total).toBe(2257);
       expect(surfaces).not.toContain('app-root-view');
       expect(surfaces).toContain('stories-story-guided-flow');
       expect(surfaces).not.toContain('docs-app');
