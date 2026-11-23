@@ -6,11 +6,73 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- `ui-scene-ir/1` nodes can declare an optional `state.checked` boolean,
+  validated by `validateUiSceneIr()` (`invalid-node-state`). The browser seam
+  lowers it as `data-bijou-checked`, and `mountBijouDom()` writes
+  `role="switch"` and `aria-checked` for a `switch` node, patched in place. A
+  scene that declares no state keeps its canonical bytes and hash. The parity
+  witness records the state as a `browser-only-fact` gap (#807).
+
+### Added
+
+- The web GPU showcase mounts the Components library and the hero app, and
+  its browser suite switches `counter -> components -> hero` and toggles the
+  three ten times. Both apps now import in a browser: their fonts, DOGFOOD
+  catalogs, example snippets and design-system families are imported instead
+  of read from disk at module load (the snippets and families as generated
+  JSON, kept current by `npm run components:data` and a drift test), and the
+  hero perf overlay reads memory through a port with a Node and a browser
+  adapter. Their terminal output is unchanged (#809).
+
 ### Changed
 
 - The `guidedFlow()` story's docs, variant label, and preview copy resolve
   through the DOGFOOD catalogs in `en`, `fr`, `es`, and `de`. Stories can opt in
   through a `localize` hook, documented in `docs/development.md`.
+
+### Fixed
+
+- DOGFOOD's "Language set to ..." notice now appears in the language just
+  chosen in settings, not the one being left: choosing Spanish from French
+  shows "Idioma establecido en español / Español." The notice is localized
+  with the target locale's catalogs, including any `extraI18nCatalogs`
+  (flyingrobots/bijou#582).
+- The DOGFOOD locale ratchet's language-cycle cases no longer time out on hosted
+  runners. Each rendered 79 settings-toast ticks, each a full page render, and
+  took 10 to 15 s hosted against a 15 s limit. They now use a scripted clock
+  that lets the toast expire in two ticks (`tests/helpers/scripted-compressed-time.ts`),
+  and take about 4 to 5 s per file hosted. No assertion changed; a new case pins
+  that the compressed run ends on the same frame as real-time ticking (#778).
+- The DOGFOOD touched-file rule compares a touched split lineage, such as a
+  story helper of `examples/docs/stories.ts`, against the whole lineage at the
+  base. It had read only the changed files at the base, so every raw string of
+  their unchanged siblings was reported as added copy (#809).
+- The web GPU showcase's page chrome, on both its pages, is now a Vite + React
+  app built only from shadcn components installed from the `@flyingrobots`
+  registry, with a theme-book light, dark and system theme that persists, big
+  type, a layout from phone width to extra-wide, Skeleton and Spinner loading,
+  GSAP motion, and vim-style keys with `Kbd` hints (`Esc` opens a command
+  palette). While focus is in a Bijou mount every key goes to the app, and
+  chrome styles never reach the canvas or the `mountBijouDom()` elements; the
+  counter's frame digest is unchanged on all three backends (#815).
+- The web GPU showcase is pinned to Geordi `52ba6bb`, which ships its
+  procedural glyph table (flyingrobots/geordi#205) and pins the canonical WGSL
+  digest inside the WebGPU presenter (flyingrobots/geordi#189). The vendored
+  `procedural-glyphs.json`, its digest check and its `proceduralTable` argument
+  are gone. The counter's frame digest is unchanged on all three backends; the
+  Canvas 2D receipt's `executedArtifactSha256` changes, because the package now
+  hashes `createCanvas2DSurfacePresenterCore` (#810).
+- A click on a canvas mounted by `mountBijouCanvas()` now leaves keyboard focus
+  in its hidden textarea. Chrome's `mousedown` default action moved focus off
+  the canvas after the `pointerdown` handler had focused the textarea, so no
+  key reached the app; the mount now focuses the textarea again on
+  `pointerup`. The web GPU showcase's browser suite found it (#797).
+- `lowerUiSceneToSurface()` resolves a token color only from an own entry of
+  `tokenColors`, as `lowerUiSceneToBrowser()` does. A token named
+  `constructor`, or a `tokenColors` object that inherits entries, no longer
+  colors a cell. The parity witness found the difference (#443).
 
 ### Removed
 
@@ -25,6 +87,123 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   (#624), at every layout width and in all four locales. The facts no longer
   depend on the wide-only variants pane, so the contextual drawer migration can
   remove that pane without removing a required fact.
+- Framed apps reuse the focused-pane scroll measurement across consecutive
+  scroll actions (#589, DL-032). Each runtime owns one single-entry cache keyed
+  by a frame input revision, page, pane, columns and rows. Any message other
+  than a scroll action invalidates it, as does initializing the app again.
+  The measurement Surface is no longer module-global. Scroll behaviour is unchanged.
+- Components can resolve a layout direction (#612). `BijouNodeOptions` and
+  `BijouContext` gain `direction?: 'ltr' | 'rtl'`, and `createBijou()` and
+  `createTestContext()` accept it. `resolveDirection()` lets the explicit
+  option override the context and defaults to `'ltr'`; `mirrorsLayout()`
+  keeps `pipe` and `accessible` output in logical order. `directionalSide()`,
+  `orderForDirection()`, `mirrorGlyph()` and `mirrorGlyphs()` map logical
+  edges, sequences and directional glyphs (‹ ›, ▸ ◂, → ←) for right-to-left
+  layout. No Component mirrors yet; the family tasks under #573 adopt it.
+- Design record DL-029 decides the DOGFOOD Code Dojo debt dashboard: a
+  `release` page guide that renders a committed `code-dojo.debt-report.v1`
+  snapshot and an append-only `code-dojo.debt-history.v1` ledger, with no live
+  computation at render time (#601). The proposed contracts keep report checks
+  optional, distinguish unavailable live data, and preserve cited history with
+  idempotent recording and explicit unknown or zero-debt goalpost states.
+
+- Design record DL-036 decides which book edition to translate first: the
+  teaching book (about 13,600 lexical tokens). Planned translations will live
+  in `bijou-job-monitor` under `book/locales/<locale>/` and build to per-locale
+  PDFs after #618. The English
+  hash pins do not change. Each language's translation splits into two tasks
+  of about 4.5 hours (#616).
+- DL-038 decides the Wesley boundary (#663). Bijou pins `wesley-cli`
+  exactly to `0.3.0-alpha.3` and spawns the CLI at build time over its
+  `--json` output. Core gets a pure emitter over Wesley L1 IR. A missing or
+  mismatched Wesley is a hard error with no fallback parser.
+- `examples/web-gpu`, a Vite page that mounts the counter and the component
+  showcase with `mountBijouCanvas()` on Geordi's WebGPU, WebGL2 and Canvas 2D
+  presenters, with a HUD of backend, fallback reasons, grid, cell size, device
+  pixel ratio, frame time and receipt evidence, and controls for backend
+  switching, WebGL2 context loss and atlas reset (#797). Geordi's packages are
+  vendored as tarballs pinned to one commit and installed offline. A
+  Playwright suite, `npm run test:browser:web-gpu`, drives the page in Google
+  Chrome; it is the one test lane outside the sealed runner. The build refuses
+  every Node.js built-in, so `examples/components` and `examples/hero`, which
+  read files at module load, are listed as refused rather than mounted.
+- `mountBijouCanvas()` takes an app factory, called once with the run's
+  context, and a `css` option passed to the run (#797).
+- The browser suite also checks `mountBijouDom()` in Google Chrome on
+  `examples/web-gpu/dom.html`: one dispatch per click, Enter and Space on a
+  `<button>`, and an `<input>` that keeps its element, focus and selection
+  through typing and an IME commit (#797).
+- `@flyingrobots/bijou-web` has `mountBijouDom()` (#796). It runs a
+  `SemanticSceneApp` in a DOM container as native elements: a `button` or
+  `switch` role becomes a `<button>`, and a `textbox` becomes an `<input>`.
+  Each scene is lowered with `lowerUiSceneToBrowser()` and patched in place,
+  keyed by `data-bijou-node-id`, so an input keeps its element, value, and
+  selection across re-renders. Delegated `click`, `keydown`, `input`, and
+  composition events become action requests; a native button activates once.
+  Focus that loses its node moves to a declared node, an ancestor, or the
+  root. Theme tokens are `--bijou-semantic-*`, `--bijou-surface-*`, and
+  `--bijou-border-*` custom properties that update live, and `dir` follows
+  the model. `stop()` removes every listener and stops the app. The tests use
+  an in-memory document; no browser runs them. Reference:
+  `docs/topics/bijou-web-dom/README.md`.
+- `mountBijouCanvas()` in `@flyingrobots/bijou-web` runs a TEA app on a
+  `<canvas>` it owns inside a container (#795). Presenters are injected per
+  backend through a structural `BijouCanvasPresenter` interface that Geordi's
+  presenters satisfy, so the package does not depend on Geordi. `'auto'` tries
+  `webgpu`, `webgl2`, then `canvas2d`, each on a fresh canvas, records
+  `fallbackReasons`, and falls back only on unavailability; a renderer fault
+  or a forced backend's unavailability rejects. Frames coalesce onto
+  `requestAnimationFrame`; the container's device-pixel box and DPR set the
+  grid; a zero-size container defers the mount. `switchBackend()` swaps canvas
+  and presenter while the run, model, focus and input stay; `stop()` is
+  idempotent and leaves nothing attached. `createWebInteractiveContext()`
+  composes a context around `createWebInteractiveIO()`. The package now has
+  `@flyingrobots/bijou-tui` as a peer dependency. Tested with in-memory fakes
+  only, not in a real browser.
+- `createWebInteractiveIO()` in `@flyingrobots/bijou-web` reads browser input
+  through a hidden `<textarea>` and a surface element (#793): keys, IME
+  composition (delivered once in either `compositionend` and `input` order),
+  single-line paste (multi-line paste is rejected), pointer and wheel with
+  0-based cells and SGR packets on `rawInput()`, a platform-aware shortcut
+  pass-through, and idempotent `dispose()`. It uses structural DOM interfaces
+  and has not run in a real browser.
+- `@flyingrobots/bijou-tui` has a semantic scene app contract (#794).
+  `SemanticSceneApp` is an `App` that also projects its model to a
+  `ui-scene-ir/1` scene and maps a declared action to a message.
+  `createSemanticSceneController()` validates each scene, dispatches only
+  action ids that the current scene declares, and sends each message through
+  the `EventBus` to `update()`. An undeclared or removed action id gives a
+  typed diagnostic and no state change. Listeners get each frame once, in
+  commit order, also when a listener invokes an action. The terminal runtime
+  is unchanged. Reference: `docs/topics/semantic-scene-app/README.md`.
+- `@flyingrobots/bijou-web` is a new workspace package for browser hosts
+  (#792). `createWebContext()` composes `createWebClock()`,
+  `createWebRuntime()`, `createWebStyle()`, and `createWebOutputIO()` into a
+  `BijouContext` for all four output modes, with no runtime dependencies and
+  no Node.js imports. Output goes to caller-supplied sinks or in-memory
+  buffers. `readFile`, `readDir`, `question`, and `rawInput` refuse with a
+  typed `WebUnsupportedCapabilityError`. The package is not published to npm.
+- `SurfacePresenter` is a synchronous host seam in `@flyingrobots/bijou-tui`
+  for hosts that are not terminals (#791). Pass one to `run()` as
+  `RunOptions.presenter`. In `interactive` mode the runtime then calls
+  `enter?()`, `present(current, target, ctx)`, `onResize?(cols, rows)`, and
+  `exit?()`, and writes no frame, screen, cursor, or mouse bytes to `ctx.io`.
+  A run without a presenter is unchanged. The `static`, `pipe`, and
+  `accessible` output modes ignore the presenter. The contract does not cover a
+  hardware cursor overlay, OSC 8 hyperlinks, or a window title.
+- `@flyingrobots/bijou` has a browser renderer seam for `ui-scene-ir/1`
+  (#442). `lowerUiSceneToBrowser()` lowers a scene with a `geordi-browser`
+  target profile to a deterministic element tree and HTML markup that hold only
+  scene facts. `createUiSceneBrowserDom()` builds the tree through a host
+  document, and `createUiSceneBrowserReceipt()` fills `outputs.browser` in a
+  `ui-scene-receipt/1`. The terminal renderer is unchanged. Reference:
+  `docs/topics/ui-scene-browser/README.md`.
+- `@flyingrobots/bijou` has a terminal and browser parity witness for
+  `ui-scene-ir/1` (#443). `witnessUiSceneParity()` lowers one scene on both
+  targets and reports each fact as `equal`, a named `gap`, or a `mismatch`.
+  `compareUiSceneLowerings()` compares two lowerings that already exist. The
+  witness compares the element tree with the terminal cells; no test loads the
+  markup in a browser. Reference: `docs/topics/ui-scene-parity/README.md`.
 - Translation glossaries for French, Spanish, and German
   (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
   Block, Surface, Stories, core, and TUI stay English; graceful lowering is
@@ -96,6 +275,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   opening and closing each hold for 3 seconds.
 
 ### Fixed
+
+- A regression test pins component family entries to exactly the eight R52
+  fields, so no comparison or analogue field can return.
 
 - The Markdown CLI resize test drains PTY output during shutdown, preventing
   macOS terminal restoration from blocking behind unread output. Its five-second
@@ -170,6 +352,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - Reject explicit null Sapphire hue seeds instead of silently selecting default hues.
 
 ### Added
+
+- **Replay event envelope decision** — DL-033 fixes `bijou-replay-event/1`:
+  canonical JSONL, per-kind plain-data payloads, one `seq` order, logical
+  `tick`/`atMs` time, and full-Surface frame events as the capture barrier,
+  with contracts for the ReplayOutbox, `runScript()` emission, replay-driven
+  `recordDemoGif()` and the GIF fixture (#599).
 
 - DL-034 records the pre-push verification receipt decision (#648). The witness
   runs the policy that DL-030 selects (`fast` or `full`). The receipt binds that

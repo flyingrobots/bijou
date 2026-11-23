@@ -34,6 +34,15 @@ export interface UiLayoutIntent {
   readonly height?: number;
 }
 
+/**
+ * State a node declares about itself. Optional and absent by default, so a
+ * scene that declares none keeps its canonical bytes and hash.
+ */
+export interface UiNodeState {
+  /** Whether a toggle is on. A boolean only; no mixed value. */
+  readonly checked?: boolean;
+}
+
 export interface UiNode {
   readonly id: string;
   readonly kind: UiNodeKind;
@@ -45,6 +54,7 @@ export interface UiNode {
   readonly text?: UiTextRef;
   readonly style?: UiStyleRef | undefined;
   readonly actions?: readonly string[] | undefined;
+  readonly state?: UiNodeState;
   readonly metadata?: Record<string, unknown>;
 }
 
@@ -114,7 +124,8 @@ export type UiSceneIssueCode =
   | 'i18n-node-missing'
   | 'i18n-action-missing'
   | 'source-map-node-missing'
-  | 'invalid-target-profile';
+  | 'invalid-target-profile'
+  | 'invalid-node-state';
 
 export interface UiSceneValidationIssue {
   readonly code: UiSceneIssueCode;

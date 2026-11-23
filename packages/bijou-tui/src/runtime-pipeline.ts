@@ -1,11 +1,13 @@
 import {
   createPipeline,
   RENDER_LAYOUT_ROOT_KEY,
+  type RenderMiddleware,
 } from './pipeline/pipeline.js';
 import { bcssMiddleware } from './pipeline/middleware/css.js';
 import { motionMiddleware } from './pipeline/middleware/motion.js';
 import { paintMiddleware } from './pipeline/middleware/paint.js';
 import { renderSurfaceFrame } from './screen.js';
+import type { SurfacePresenter } from './surface-presenter.js';
 import type {
   App,
   RunOptions,
@@ -42,20 +44,39 @@ export function createRuntimePipeline<Model, M>(
     pipeline.use('Layout', bcssMiddleware(options.css));
   }
   pipeline.use('Paint', paintMiddleware());
-  pipeline.use('Diff', (state, next) => {
-    renderSurfaceFrame(
-      state.ctx.io,
-      state.currentSurface,
-      state.targetSurface,
-      state.ctx.style,
-      state.outBuf,
-    );
-    next();
-  });
+  pipeline.use('Diff', options?.presenter == null
+    ? (state, next) => {
+      renderSurfaceFrame(
+        state.ctx.io,
+        state.currentSurface,
+        state.targetSurface,
+        state.ctx.style,
+        state.outBuf,
+      );
+      next();
+    }
+    : presentFrames(options.presenter));
   pipeline.use('Output', (state, next) => {
     buffers.adoptTarget(state.targetSurface);
     next();
   });
   options?.configurePipeline?.(pipeline);
   return pipeline;
+}
+
+/**
+ * Hand each frame to the presenter in place of the ANSI differ. A thrown
+ * error is fatal: the target is not adopted, because the host never showed it.
+ */
+function presentFrames(presenter: SurfacePresenter): RenderMiddleware {
+  return (state, next) => {
+    try {
+      presenter.present(state.currentSurface, state.targetSurface, state.ctx);
+    } catch (error) {
+      state.data[FATAL_RENDER_ERROR_KEY] = error
+        ?? new Error('SurfacePresenter.present() threw an empty value');
+      return;
+    }
+    next();
+  };
 }

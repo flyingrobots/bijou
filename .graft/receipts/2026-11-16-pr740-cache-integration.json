@@ -1,0 +1,25 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "e395442e-754e-4543-9b8a-8500bc3cea3b",
+  "agent": "codex",
+  "task": "Integrate maximized geometry into cached measurement and calibrate public scroll semantics",
+  "bytesConsumed": 6427,
+  "byteAccounting": "Source byte sizes of three Graft bounded test reads for this follow-up; excludes earlier review reads, shell output and shared standards",
+  "filesRead": [
+    "packages/bijou-tui/src/app-frame-scroll-measure-cache.test-support.ts",
+    "packages/bijou-tui/src/app-frame-scroll-measure-cache-invalidation.test.ts",
+    "packages/bijou-tui/src/app-frame-scroll-measure-cache.test.ts"
+  ],
+  "filesModified": [
+    "packages/bijou-tui/src/app-frame-actions-scroll-measure.ts",
+    "packages/bijou-tui/src/app-frame-actions-scroll.ts",
+    "packages/bijou-tui/src/app-frame-scroll-measure-cache-semantics.test.ts",
+    "docs/CHANGELOG.md"
+  ],
+  "tripwires": [],
+  "validation": {
+    "node": "22.23.3",
+    "red": "Split geometry mutation fails maximized y48 (actual8); disabled invalidation fails shrink y0 (actual90) and hidden overflow x0 (actual2); ignored resize rows fails y80 (actual90)",
+    "green": "Focused scroll suite and calibrated semantic repetitions; broader integration gates pending"
+  }
+}

@@ -1,9 +1,8 @@
-import { readFileSync } from 'node:fs';
 import { RasterFont, RasterFontGlyph, layoutRasterText } from '../../packages/bijou-tui/src/index.js';
+import JACQUARD_ATLAS from '../../assets/jacquard12-bijou.json' with { type: 'json' };
+import { decodeCanonicalBase64 } from '../_shared/base64.js';
 
 // This atlas protocol stores bit-packed coverage in canonical base64.
-type FontMaskEncodingKind = 'base64';
-const MASK_ENCODING = 'base64' satisfies FontMaskEncodingKind;
 
 function object(value: unknown): Record<string, unknown> {
   if (!isRecord(value)) throw new Error('Invalid title font record.');
@@ -40,8 +39,8 @@ interface FontFields {
 function glyph(value: unknown): RasterFontGlyph {
   const g: GlyphFields = object(value);
   if (typeof g.mask !== 'string') throw new Error('Missing title glyph mask.');
-  const mask = Buffer.from(g.mask, MASK_ENCODING);
-  if (mask.toString(MASK_ENCODING) !== g.mask) throw new Error('Invalid title glyph mask.');
+  const mask = decodeCanonicalBase64(g.mask);
+  if (mask === undefined) throw new Error('Invalid title glyph mask.');
   return new RasterFontGlyph({
     advance: number(g.advance),
     left: number(g.left) + number(g.advance) / 2, top: number(g.top),
@@ -50,7 +49,7 @@ function glyph(value: unknown): RasterFontGlyph {
   }, mask);
 }
 
-const raw = JSON.parse(readFileSync(new URL('../../assets/jacquard12-bijou.json', import.meta.url), 'utf8')) as unknown;
+const raw: unknown = JACQUARD_ATLAS;
 const data: FontFields = object(raw);
 const EXPECTED_FONT = { family: 'Jacquard 12', version: 1 };
 if (data.family !== EXPECTED_FONT.family || data.version !== EXPECTED_FONT.version

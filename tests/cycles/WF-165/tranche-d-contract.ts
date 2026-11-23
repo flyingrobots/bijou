@@ -90,6 +90,7 @@ export const TRANCHE_D_PUBLIC_EXPORTS = {
     'UiLayoutIntent',
     'UiNode',
     'UiNodeKind',
+    'UiNodeState',
     'UiPortabilityClaim',
     'UiPortabilityLevel',
     'UiSceneIr',

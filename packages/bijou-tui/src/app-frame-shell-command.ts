@@ -11,6 +11,7 @@ import {
   type RuntimeInputRouteResult,
 } from './runtime-engine.js';
 import type { FrameShellCommandDependencies } from './app-frame-shell-command-contract.js';
+import { handledOnlyByScroll } from './app-frame-scroll-handled.js';
 import { applyFrameShellUiCommand } from './app-frame-shell-command-ui.js';
 import { applyFrameShellInteractionCommand } from './app-frame-shell-command-interaction.js';
 
@@ -71,7 +72,11 @@ export function createFrameShellCommandServices<PageModel, Msg>(
   const drainShellCommandBuffer = (
     model: InternalFrameModel<PageModel, Msg>,
     routeResult: RuntimeInputRouteResult<FrameShellCommand<Msg>>,
-  ): [InternalFrameModel<PageModel, Msg>, Cmd<FramedAppMsg<Msg>>[]] => {
+  ): [
+    InternalFrameModel<PageModel, Msg>,
+    Cmd<FramedAppMsg<Msg>>[],
+    boolean,
+  ] => {
     const buffers = bufferRuntimeRouteResult(
       createRuntimeBuffers<FrameShellCommand<Msg>>(),
       routeResult,
@@ -83,7 +88,11 @@ export function createFrameShellCommandServices<PageModel, Msg>(
       (current, command) =>
         applyShellCommand(current, command, teaCmds),
     );
-    return [state, teaCmds];
+    return [
+      state,
+      teaCmds,
+      teaCmds.length === 0 && handledOnlyByScroll(buffers.commands.items),
+    ];
   };
   return { drainShellCommandBuffer };
 }

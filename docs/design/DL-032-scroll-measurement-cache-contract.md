@@ -93,6 +93,8 @@ this contract must be reopened.
 - A scroll action that returns without measuring (no focused pane, empty
   rectangle) still does not increment the revision.
 - A new runtime, including a restored session, starts empty.
+- Each `init()` on an existing framed app invalidates its prior measurement
+  before creating fresh page models, even when page, pane and size are unchanged.
 
 Between two scroll actions with no other message in between, nothing in the
 model can have changed except scroll offsets. That is the key-repeat path, so

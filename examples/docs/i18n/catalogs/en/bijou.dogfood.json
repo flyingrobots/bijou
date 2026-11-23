@@ -4459,6 +4459,17 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "stories.preview.springTimeline.camera"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "en": "camera spring"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "stories.preview.textEntry.currentValue"
       },
       "kind": "message",
