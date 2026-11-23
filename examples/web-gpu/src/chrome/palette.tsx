@@ -9,7 +9,7 @@ export function Palette({ open, onOpenChange, commands }: { open: boolean; onOpe
     <CommandDialog open={open} onOpenChange={onOpenChange} title="Commands" description="Search for a control, a page or a theme.">
       <Command>
         <CommandInput placeholder="Type a command…" />
-        <CommandList>
+        <CommandList className="max-h-[min(18rem,calc(66dvh-6rem))]">
           <CommandEmpty>No matching command.</CommandEmpty>
           {groups.map((group) => (
             <CommandGroup key={group} heading={group}>

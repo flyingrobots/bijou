@@ -69,6 +69,13 @@ export function usePageKeys(openPalette: () => void, leaders: readonly LeaderKey
       disarm();
       return;
     }
+    // A held key repeats: a repeat is not a second press, so it neither arms the leader nor completes it.
+    if (event.repeat) {
+      if (armed.current === null || event.key !== ' ') return;
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     if (armed.current === null) {
       if (event.key !== ' ' || event.shiftKey) return;
       armed.current = window.setTimeout(disarm, LEADER_TIMEOUT_MS);

@@ -32,13 +32,13 @@ async function start(container: HTMLElement, store: ShowcaseStore): Promise<void
   const refresh = async (): Promise<void> => {
     store.update({ hud: await session.state() });
   };
-  await refresh();
-  // A failed refresh is shown, not left as an unhandled rejection; the next one clears it.
-  window.setInterval(() => {
-    refresh().then(() => {
-      if (store.snapshot().error !== null) store.update({ error: null });
-    }, (error: unknown) => { store.update({ error: `HUD refresh: ${describeProblem(error)}` }); });
-  }, 200);
+  // A failed refresh is shown, not left as an unhandled rejection; the next one clears it. The
+  // first refresh goes through the same handler, so a failure there does not stop the polling.
+  const tick = (): Promise<void> => refresh().then(() => {
+    if (store.snapshot().error !== null) store.update({ error: null });
+  }, (error: unknown) => { store.update({ error: `HUD refresh: ${describeProblem(error)}` }); });
+  await tick();
+  window.setInterval(() => { void tick(); }, 200);
 }
 
 /** Start the showcase on the Surface container the chrome rendered. */

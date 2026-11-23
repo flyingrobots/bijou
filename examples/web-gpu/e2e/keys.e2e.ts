@@ -107,3 +107,40 @@ test('on the DOM check page, a focused mounted Button gets Esc, j, k and Space, 
   expect(await page.evaluate(() => document.activeElement?.getAttribute('data-bijou-node-id'))).toBe('app.increment');
   expect(errors).toEqual([]);
 });
+
+test('in the chrome, holding Space until it repeats arms the leader once and does not open the palette', async ({ page }) => {
+  const errors = collectErrors(page);
+  await open(page, 'app=counter&backend=canvas2d');
+  await page.locator('[data-nav]').first().focus();
+  // A second down without an up is the browser's auto-repeat: the event has repeat set.
+  await page.keyboard.down(' ');
+  await page.keyboard.down(' ');
+  await page.keyboard.down(' ');
+  await page.keyboard.up(' ');
+  // A palette opened by a repeat renders a frame later, so give it time to appear before saying it did not.
+  await page.waitForTimeout(300);
+  await expect(palette(page)).toHaveCount(0);
+  // The leader is still armed by the one real press, so the next key runs its command.
+  await page.keyboard.press('t');
+  await expect(page.getByRole('menu')).toBeVisible();
+  // Two distinct presses still open the palette.
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('menu')).toHaveCount(0);
+  await page.locator('[data-nav]').first().focus();
+  await page.keyboard.press(' ');
+  await page.keyboard.press(' ');
+  await expect(palette(page)).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('in a short landscape viewport, the command list stays inside the viewport', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.setViewportSize({ width: 667, height: 375 });
+  await open(page, 'app=counter&backend=canvas2d');
+  await page.locator('[data-nav]').first().focus();
+  await page.keyboard.press('Escape');
+  await expect(palette(page)).toBeVisible();
+  const bottom = await page.locator('[data-slot="command-list"]').evaluate((list) => list.getBoundingClientRect().bottom);
+  expect(bottom).toBeLessThanOrEqual(375);
+  expect(errors).toEqual([]);
+});
