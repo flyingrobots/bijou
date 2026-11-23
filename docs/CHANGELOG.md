@@ -82,6 +82,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- DL-038 decides the Wesley boundary (#663). Bijou pins `wesley-cli`
+  exactly to `0.3.0-alpha.3` and spawns the CLI at build time over its
+  `--json` output. Core gets a pure emitter over Wesley L1 IR. A missing or
+  mismatched Wesley is a hard error with no fallback parser.
 - `examples/web-gpu`, a Vite page that mounts the counter and the component
   showcase with `mountBijouCanvas()` on Geordi's WebGPU, WebGL2 and Canvas 2D
   presenters, with a HUD of backend, fallback reasons, grid, cell size, device
