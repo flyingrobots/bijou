@@ -12,6 +12,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   through the DOGFOOD catalogs in `en`, `fr`, `es`, and `de`. Stories can opt in
   through a `localize` hook, documented in `docs/development.md`.
 
+### Fixed
+
+- `lowerUiSceneToSurface()` resolves a token color only from an own entry of
+  `tokenColors`, as `lowerUiSceneToBrowser()` does. A token named
+  `constructor`, or a `tokenColors` object that inherits entries, no longer
+  colors a cell. The parity witness found the difference (#443).
+
 ### Removed
 
 - DOGFOOD no longer ships the unrendered `release-story-current*.md` sources that
@@ -51,6 +58,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   document, and `createUiSceneBrowserReceipt()` fills `outputs.browser` in a
   `ui-scene-receipt/1`. The terminal renderer is unchanged. Reference:
   `docs/topics/ui-scene-browser/README.md`.
+- `@flyingrobots/bijou` has a terminal and browser parity witness for
+  `ui-scene-ir/1` (#443). `witnessUiSceneParity()` lowers one scene on both
+  targets and reports each fact as `equal`, a named `gap`, or a `mismatch`.
+  `compareUiSceneLowerings()` compares two lowerings that already exist. The
+  witness compares the element tree with the terminal cells; no test loads the
+  markup in a browser. Reference: `docs/topics/ui-scene-parity/README.md`.
 - Translation glossaries for French, Spanish, and German
   (`docs/topics/glossary.<locale>.md`) fix one rendering per Bijou term:
   Block, Surface, Stories, core, and TUI stay English; graceful lowering is

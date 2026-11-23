@@ -265,6 +265,16 @@ status keys fall back to `semantic.muted`.
 - **[Browser renderer seam reference](../../docs/topics/ui-scene-browser/README.md)**:
   Review the element mapping, options, refusals, and limits.
 
+### Terminal and Browser Parity Witness
+
+- **`witnessUiSceneParity()`**: Lower one `ui-scene-ir/1` scene on the
+  terminal target and on the browser target, then report each fact as equal, a
+  named gap, or a mismatch.
+- **`compareUiSceneLowerings()`**: Compare a terminal lowering and a browser
+  lowering that already exist.
+- **[Parity witness reference](../../docs/topics/ui-scene-parity/README.md)**:
+  Review the facts that must be equal, the named gaps, and the limits.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.
