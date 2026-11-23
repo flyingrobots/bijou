@@ -116,23 +116,39 @@ the page always reads back, so the HUD never shows it.
 
 | Control | Effect |
 | --- | --- |
-| App buttons | Stop the mounted app and mount another. Operations run one at a time. |
-| Backend buttons | `switchBackend()` to that backend on a fresh canvas. |
+| App toggle group | Stop the mounted app and mount another. Operations run one at a time. |
+| Backend toggle group | `switchBackend()` to that backend on a fresh canvas. |
 | Lose the WebGL2 context | `WEBGL_lose_context.loseContext()`, then `restoreContext()` once the presenter reports the loss. |
 | Reset the glyph atlas | `atlas.invalidate(undefined, 'manual')`, a new atlas generation. |
 
 `window.__bijouWebGpu` exposes the HUD state and these operations to the
 browser suite, with `cellRect()`, which reads cells at the mount's cell size,
 and `failures()`, every operation that failed, which a later mount does not
-clear. A HUD refresh that fails is shown below the HUD. A WebGPU readback that
-rejects because a switch disposed its presenter shows no receipt.
+clear. A boot failure or a HUD refresh that fails is shown in an alert under
+the Surface. A WebGPU readback that rejects because a switch disposed its
+presenter shows no receipt. The command palette runs the same operations.
+
+## Page chrome
+
+Both pages' chrome is a React app of shadcn components from the
+`@flyingrobots` registry, with a theme-book light, dark and system theme; the
+[showcase README](../../../examples/web-gpu/README.md#the-page-chrome) lists the
+items, the theme command, the layout and the keys. The chrome never restyles
+what Bijou renders: the Surface container and the DOM host are empty
+`data-bijou-mount` elements, and `[data-bijou-mount] * { all: revert; }` keeps
+every chrome rule off the elements a mount creates.
+
+The focus rule: while focus is inside a Bijou mount, every key goes to the
+mounted app and the page acts on none; the page's keys (`Esc` for the command
+palette, `h` `j` `k` `l` and the arrows to move, `Space` then a key for a
+feature) work only while focus is in the chrome.
 
 ## DOM host check page
 
-`examples/web-gpu/dom.html` is not part of the showcase. It mounts a small
-semantic scene app (`src/dom/controls-app.ts`: a status, a Button, a text
+`examples/web-gpu/dom.html` is not part of the showcase. Inside the same
+chrome, it mounts a small semantic scene app (`src/dom/controls-app.ts`: a status, a Button, a text
 input with a greeting that follows it, and a switch) with `mountBijouDom()`,
-passing the real `document`. `window.__bijouDom` exposes the model, the
+passing the real `document` (`src/dom/probe.ts`). `window.__bijouDom` exposes the model, the
 controller's diagnostics and `stop()` to the browser suite. The model counts
 every action message it receives in `dispatches`.
 

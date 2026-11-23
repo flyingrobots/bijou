@@ -1,6 +1,8 @@
 import { builtinModules } from 'node:module';
 import { relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 
 // The showcase bundles the Bijou packages from source so that every module,
@@ -29,7 +31,8 @@ export function refuseNodeBuiltins(): Plugin {
 export default defineConfig({
   root: fileURLToPath(new URL('.', import.meta.url)),
   base: './',
-  plugins: [refuseNodeBuiltins()],
+  // React and Tailwind build the page chrome; neither adds a Node built-in to the bundle.
+  plugins: [refuseNodeBuiltins(), react(), tailwindcss()],
   resolve: {
     alias: [
       { find: /^@flyingrobots\/bijou\/perf$/u, replacement: source('bijou/src/core/render/packed-cell.ts') },
@@ -40,6 +43,8 @@ export default defineConfig({
       { find: /^@flyingrobots\/bijou-web$/u, replacement: source('bijou-web/src/index.ts') },
       // Only startApp() exists in the browser; see src/browser-start-app.ts.
       { find: /^@flyingrobots\/bijou-node$/u, replacement: fileURLToPath(new URL('src/browser-start-app.ts', import.meta.url)) },
+      // The shadcn components' own imports, as components.json names them.
+      { find: /^@\//u, replacement: fileURLToPath(new URL('src/', import.meta.url)) },
     ],
   },
   build: {

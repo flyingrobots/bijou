@@ -35,6 +35,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   story helper of `examples/docs/stories.ts`, against the whole lineage at the
   base. It had read only the changed files at the base, so every raw string of
   their unchanged siblings was reported as added copy (#809).
+- The web GPU showcase's page chrome, on both its pages, is now a Vite + React
+  app built only from shadcn components installed from the `@flyingrobots`
+  registry, with a theme-book light, dark and system theme that persists, big
+  type, a layout from phone width to extra-wide, Skeleton and Spinner loading,
+  GSAP motion, and vim-style keys with `Kbd` hints (`Esc` opens a command
+  palette). While focus is in a Bijou mount every key goes to the app, and
+  chrome styles never reach the canvas or the `mountBijouDom()` elements; the
+  counter's frame digest is unchanged on all three backends (#815).
 - The web GPU showcase is pinned to Geordi `52ba6bb`, which ships its
   procedural glyph table (flyingrobots/geordi#205) and pins the canonical WGSL
   digest inside the WebGPU presenter (flyingrobots/geordi#189). The vendored

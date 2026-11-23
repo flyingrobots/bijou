@@ -17,6 +17,7 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "jsx": "react-jsx",
     "allowImportingTsExtensions": false,
     "paths": {
       "@flyingrobots/bijou": ["../../packages/bijou/src/index.ts"],
@@ -25,8 +26,9 @@
       "@flyingrobots/bijou-i18n": ["../../packages/bijou-i18n/src/index.ts"],
       "@flyingrobots/bijou-tui": ["../../packages/bijou-tui/src/index.ts"],
       "@flyingrobots/bijou-web": ["../../packages/bijou-web/src/index.ts"],
-      "@flyingrobots/bijou-node": ["./src/browser-start-app.ts"]
+      "@flyingrobots/bijou-node": ["./src/browser-start-app.ts"],
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }
