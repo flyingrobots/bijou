@@ -20,7 +20,6 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
-<<<<<<< HEAD
 - `@flyingrobots/bijou-web` is a new workspace package for browser hosts
   (#792). `createWebContext()` composes `createWebClock()`,
   `createWebRuntime()`, `createWebStyle()`, and `createWebOutputIO()` into a
@@ -28,8 +27,6 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   no Node.js imports. Output goes to caller-supplied sinks or in-memory
   buffers. `readFile`, `readDir`, `question`, and `rawInput` refuse with a
   typed `WebUnsupportedCapabilityError`. The package is not published to npm.
-||||||| 2d131ce3
-=======
 - `SurfacePresenter` is a synchronous host seam in `@flyingrobots/bijou-tui`
   for hosts that are not terminals (#791). Pass one to `run()` as
   `RunOptions.presenter`. In `interactive` mode the runtime then calls
@@ -38,7 +35,6 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   A run without a presenter is unchanged. The `static`, `pipe`, and
   `accessible` output modes ignore the presenter. The contract does not cover a
   hardware cursor overlay, OSC 8 hyperlinks, or a window title.
->>>>>>> origin/main
 - `@flyingrobots/bijou` has a browser renderer seam for `ui-scene-ir/1`
   (#442). `lowerUiSceneToBrowser()` lowers a scene with a `geordi-browser`
   target profile to a deterministic element tree and HTML markup that hold only
