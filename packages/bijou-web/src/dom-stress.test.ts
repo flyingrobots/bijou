@@ -21,7 +21,9 @@ describe('mountBijouDom() stress', () => {
     }
 
     expect(handle.controller.frame().model.count).toBe(101);
-    expect(Math.max(...writes)).toBe(1);
+    // An increment writes the count text once. A toggle writes its text, data-bijou-checked and aria-checked, once each.
+    expect(writes.filter((_, step) => step % 2 === 0).every((count) => count === 1)).toBe(true);
+    expect(writes.filter((_, step) => step % 2 === 1).every((count) => count === 3)).toBe(true);
     expect(doc.counts.created).toBe(created);
     expect(doc.liveListeners()).toBe(listeners);
     expect(IDS.map((id) => node(id)).every((element, index) => element === elements[index])).toBe(true);

@@ -70,6 +70,7 @@ export function browserNodeAttributes(
     ['data-bijou-fg-token', node.style?.fg?.token],
     ['data-bijou-bg-token', node.style?.bg?.token],
     ['data-bijou-border-token', node.style?.border?.token],
+    ['data-bijou-checked', node.state?.checked === undefined ? undefined : String(node.state.checked)],
     ['data-bijou-modifiers', list(node, 'modifiers', node.style?.modifiers)],
     ['style', browserNodeStyle(node, facts.tokenColors)],
   ];

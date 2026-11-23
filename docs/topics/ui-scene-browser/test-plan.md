@@ -56,6 +56,16 @@ also hold USB-04. This change does not edit them.
 | USB-25 | A receipt for a lowering of another scene is refused. | `refuses a receipt for a lowering of another scene` | Implemented |
 | USB-26 | The endpoint hash follows the target profile. | `changes the endpoint hash when the target profile changes` | Implemented |
 
+## Node state: `ui-scene-checked.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| USB-27 | A checked and an unchecked switch lower to `data-bijou-checked`. | `lowers a checked and an unchecked switch to data-bijou-checked` | Implemented |
+| USB-28 | A node without the state lowers no attribute and keeps its markup. | `lowers nothing for a switch without the state, and keeps its exact markup` | Implemented |
+| USB-29 | The state on a non-switch node is lowered as a fact only. | `lowers the declared state of a node that is not a switch as a fact only` | Implemented |
+| USB-30 | A scene without state keeps its canonical bytes and hash; declaring it changes the hash. | `keeps the canonical bytes and hash of a scene that declares no state`; `hashes a scene that declares the state differently from one that does not` | Implemented |
+| USB-31 | A non-boolean `state.checked` is an `invalid-node-state` issue and the seam refuses the scene. | `validates that checked is a boolean` | Implemented |
+
 ## Not covered
 
 - No test loads the markup in a browser engine. The sealed runner has none.

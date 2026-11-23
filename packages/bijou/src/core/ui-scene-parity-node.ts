@@ -96,6 +96,7 @@ function browserOnlyFindings(
     ['action', attributes.get('data-bijou-action')],
     ['binding', attributes.get('data-bijou-binding')],
     ['border-token', attributes.get('data-bijou-border-token')],
+    ['checked', attributes.get('data-bijou-checked')],
     ['width', style.get('--bijou-width')],
     ['height', style.get('--bijou-height')],
   ];

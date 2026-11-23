@@ -51,6 +51,10 @@ export function hostSpec(element: UiSceneBrowserElement): DomHostSpec {
   const kind = hostKind(role, element);
   const added: UiSceneBrowserAttribute[] = [];
   if (kind === 'button') added.push({ name: 'type', value: 'button' });
+  const checked = attribute(element, 'data-bijou-checked');
+  if (role === 'switch' && checked !== undefined) {
+    added.push({ name: 'role', value: 'switch' }, { name: 'aria-checked', value: checked });
+  }
   if (kind === 'input') added.push({ name: 'type', value: 'text' });
   if (kind === 'plain' && actionIds.length > 0) added.push({ name: 'tabindex', value: '0' });
   if (kind === 'plain' && role !== undefined && ARIA_ROLES.has(role)) added.push({ name: 'role', value: role });

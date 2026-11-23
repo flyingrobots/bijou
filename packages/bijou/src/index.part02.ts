@@ -124,6 +124,7 @@ export {
   type UiLayoutIntent,
   type UiNode,
   type UiNodeKind,
+  type UiNodeState,
   type UiPortabilityClaim,
   type UiPortabilityLevel,
   type UiSceneIr,

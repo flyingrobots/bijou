@@ -6,6 +6,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- `ui-scene-ir/1` nodes can declare an optional `state.checked` boolean,
+  validated by `validateUiSceneIr()` (`invalid-node-state`). The browser seam
+  lowers it as `data-bijou-checked`, and `mountBijouDom()` writes
+  `role="switch"` and `aria-checked` for a `switch` node, patched in place. A
+  scene that declares no state keeps its canonical bytes and hash. The parity
+  witness records the state as a `browser-only-fact` gap (#807).
+
 ### Changed
 
 - The `guidedFlow()` story's docs, variant label, and preview copy resolve

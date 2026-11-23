@@ -34,7 +34,7 @@ describe('ui-scene-ir/1 node state.checked', () => {
   });
 
   it('keeps the canonical bytes and hash of a scene that declares no state', () => {
-    expect(stableUiSceneStringify(debuggerScene)).not.toContain('state');
+    expect(stableUiSceneStringify(debuggerScene)).not.toContain('"state":{');
     expect(hashUiSceneValue(debuggerScene)).toBe(lowerUiSceneToBrowser(debuggerScene).sceneHash);
   });
 

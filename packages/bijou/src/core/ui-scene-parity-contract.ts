@@ -20,6 +20,7 @@ export type UiSceneParityFact =
   | 'action'
   | 'binding'
   | 'border-token'
+  | 'checked'
   | 'width'
   | 'height';
 

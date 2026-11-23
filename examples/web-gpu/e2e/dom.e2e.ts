@@ -79,10 +79,18 @@ test('mountBijouDom() in Chromium: one dispatch per activation, and typing or co
   expect(composed).toEqual({ same: true, active: true, selection: [5, 5] });
   expect(await model(page)).toMatchObject({ name: 'abX日本cd', dispatches: 9 });
 
-  // The switch toggles once per click.
+  // The switch is a switch for assistive technology, and toggles once per click.
+  await expect(node(page, 'app.enabled')).toHaveAttribute('role', 'switch');
+  await expect(node(page, 'app.enabled')).toHaveAttribute('aria-checked', 'true');
+  const switchElement = await node(page, 'app.enabled').elementHandle();
   await node(page, 'app.enabled').click();
   await expect(node(page, 'app.enabled')).toHaveText('Off');
+  await expect(node(page, 'app.enabled')).toHaveAttribute('aria-checked', 'false');
   expect(await model(page)).toMatchObject({ enabled: false, dispatches: 10 });
+  await node(page, 'app.enabled').click();
+  await expect(node(page, 'app.enabled')).toHaveAttribute('aria-checked', 'true');
+  expect(await switchElement?.evaluate((element) => element === document.querySelector('[data-bijou-node-id="app.enabled"]'))).toBe(true);
+  expect(await model(page)).toMatchObject({ enabled: true, dispatches: 11 });
 
   expect(await page.evaluate(() => window.__bijouDom?.diagnostics)).toEqual([]);
   await page.evaluate(() => { window.__bijouDom?.stop(); });

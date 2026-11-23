@@ -43,6 +43,7 @@ Each case changes one output after lowering and expects one `mismatch`.
 | USP-18 | Text under a later node is a `text-overdrawn` gap. | `names text that a later node draws over in the terminal` | Implemented |
 | USP-19 | Text with control sequences or tabs is a `text-sanitized` gap. | `names text that the terminal sanitizes` | Implemented |
 | USP-20 | A border token is a `browser-only-fact` gap. | `names a border token that only the browser output carries` | Implemented |
+| USP-21 | A declared checked state is a `browser-only-fact` gap. | `records the state as a browser-only parity gap` | Implemented |
 
 USP-01 holds the `group-not-drawn` gap and the `browser-only-fact` gaps for
 `role`, `component`, `action`, `binding`, `width`, and `height`.
