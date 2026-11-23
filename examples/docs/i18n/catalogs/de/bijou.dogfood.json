@@ -2237,6 +2237,28 @@
     {
       "key": {
         "namespace": "bijou.dogfood",
+        "id": "docs.story.facts.profile"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Profil: {profile}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
+        "id": "docs.story.facts.variant"
+      },
+      "kind": "message",
+      "sourceLocale": "en",
+      "values": {
+        "de": "Variante {index} von {count}: {label}"
+      }
+    },
+    {
+      "key": {
+        "namespace": "bijou.dogfood",
         "id": "docs.title"
       },
       "kind": "message",

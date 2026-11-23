@@ -82,6 +82,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The DOGFOOD Components reading path shows the active variant, its position
+  and the variant count, and the active profile inline in the story pane
+  (#624), at every layout width and in all four locales. The facts no longer
+  depend on the wide-only variants pane, so the contextual drawer migration can
+  remove that pane without removing a required fact.
 - Framed apps reuse the focused-pane scroll measurement across consecutive
   scroll actions (#589, DL-032). Each runtime owns one single-entry cache keyed
   by a frame input revision, page, pane, columns and rows. Any message other
