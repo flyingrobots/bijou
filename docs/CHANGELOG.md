@@ -25,6 +25,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The DOGFOOD locale ratchet's language-cycle cases no longer time out on hosted
+  runners. Each rendered 79 settings-toast ticks, each a full page render, and
+  took 10 to 15 s hosted against a 15 s limit. They now use a scripted clock
+  that lets the toast expire in two ticks (`tests/helpers/scripted-compressed-time.ts`),
+  and take about 4 to 5 s per file hosted. No assertion changed; a new case pins
+  that the compressed run ends on the same frame as real-time ticking (#778).
 - The DOGFOOD touched-file rule compares a touched split lineage, such as a
   story helper of `examples/docs/stories.ts`, against the whole lineage at the
   base. It had read only the changed files at the base, so every raw string of
