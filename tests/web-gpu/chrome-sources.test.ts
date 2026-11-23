@@ -32,7 +32,7 @@ function problems(path: string): string[] {
     if (tag === 'div' && /\bdata-bijou-mount\b/u.test(attributes)) continue;
     if (tag === 'a' && /^\s*href=\{[^}]+\}\s*$/u.test(attributes)) continue;
     if (tag !== 'div' && tag !== 'h1') { found.push(`<${tag}>`); continue; }
-    const rest = attributes.replace(/className="([^"]*)"/u, '').trim();
+    const rest = attributes.replace(/className="([^"]*)"/u, '').replace(/\b(?:ref|key)=\{[\w.]+\}|\bdata-(?:nav-region|region)="[a-z-]+"/gu, '').trim();
     if (rest !== '') found.push(`<${tag} ${rest}>`);
     const classes = /className="([^"]*)"/u.exec(attributes)?.[1]?.split(/\s+/u).filter(Boolean) ?? [];
     for (const name of classes) if (!LAYOUT.test(name)) found.push(`<${tag}> class ${name}`);

@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { collectErrors, countModel, open } from './support.js';
 // The DOM probe's Window augmentation types window.__bijouDom below.
-export type { DomProbe } from '../src/dom/main.js';
+export type { DomProbe } from '../src/dom/probe.js';
 
 declare global {
   interface Window {
@@ -30,9 +30,9 @@ test('with the Surface focused, every key reaches the Bijou app and none opens t
   const errors = collectErrors(page);
   await open(page, 'app=counter&backend=canvas2d');
   await page.locator('#surface canvas').click();
-  await recordKeysAt(page, '#surface textarea');
   await page.keyboard.press('+');
   await expect.poll(() => countModel(page)).toBe(1);
+  await recordKeysAt(page, '#surface textarea');
   // The counter's own keys: k and ArrowUp increment, j and ArrowDown decrement.
   for (const key of PROBE_KEYS) await page.keyboard.press(key);
   await expect.poll(() => page.evaluate(() => window.__reached)).toEqual(PROBE_KEYS);
@@ -89,5 +89,21 @@ test('on the DOM check page, keys typed into a mounted input stay in the input',
   await expect.poll(() => page.evaluate(() => window.__reached)).toEqual(['h', 'j', 'k', 'l', ' ', 't', 'Escape']);
   await expect(palette(page)).toHaveCount(0);
   await expect(page.getByRole('menu')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test('on the DOM check page, a focused mounted Button gets Esc, j, k and Space, and the page acts on none of them', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto('/dom.html');
+  await page.waitForFunction(() => window.__bijouDom?.ready === true);
+  await page.locator('[data-bijou-node-id="app.increment"]').focus();
+  await recordKeysAt(page, '[data-bijou-node-id="app.increment"]');
+  for (const key of ['Escape', 'j', 'k', 'h', 'l', ' ', 't']) await page.keyboard.press(key);
+  await expect.poll(() => page.evaluate(() => window.__reached)).toEqual(['Escape', 'j', 'k', 'h', 'l', ' ', 't']);
+  // Space pressed the Button once; no key moved focus or opened the palette or the theme menu.
+  await expect(page.locator('[data-bijou-node-id="app.count"]')).toHaveText('Count 1');
+  await expect(palette(page)).toHaveCount(0);
+  await expect(page.getByRole('menu')).toHaveCount(0);
+  expect(await page.evaluate(() => document.activeElement?.getAttribute('data-bijou-node-id'))).toBe('app.increment');
   expect(errors).toEqual([]);
 });

@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { collectErrors, open } from './support.js';
 // The DOM probe's Window augmentation types window.__bijouDom below.
-export type { DomProbe } from '../src/dom/main.js';
+export type { DomProbe } from '../src/dom/probe.js';
 
 // The chrome's styles stop at a Bijou mount: every element a mount creates has
 // the computed style the same element has in a document with no author CSS.

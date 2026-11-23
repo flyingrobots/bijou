@@ -41,8 +41,13 @@ test('the theme follows the system by default, switches to light or dark, and ke
   expect(errors).toEqual([]);
 });
 
-type Box = { x: number; y: number; width: number; height: number };
+interface Box { x: number; y: number; width: number; height: number }
+/** The chrome's GSAP entrance has finished: no card still carries the timeline's transform. */
+async function settled(page: Page): Promise<void> {
+  await page.waitForFunction(() => [...document.querySelectorAll('[data-motion]')].every((card) => getComputedStyle(card).transform === 'none'));
+}
 async function region(page: Page, name: string): Promise<Box> {
+  await settled(page);
   const box = await page.locator(`[data-region="${name}"]`).boundingBox();
   if (box === null) throw new Error(`the ${name} region has no box`);
   return box;

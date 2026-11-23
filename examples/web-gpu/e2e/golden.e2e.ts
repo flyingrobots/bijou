@@ -58,8 +58,8 @@ test('counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2
   await page.keyboard.press('+');
   await expect.poll(() => countModel(page)).toBe(2);
 
-  // The other app mounts in place of the counter.
-  await page.getByRole('button', { name: 'Component showcase' }).click();
+  // The other app mounts in place of the counter; the app choice is a toggle group, one radio per app.
+  await page.getByRole('radio', { name: 'Component showcase' }).click();
   const showcase = await waitFor(page, (current) => current.app === 'showcase' && current.presents > 0);
   expect(showcase.problem).toBeNull();
   await expect(hud(page, 'app')).toHaveText('showcase');

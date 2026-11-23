@@ -56,21 +56,3 @@ export function hudRows(state: HudState): readonly (readonly [string, string, st
     ['problem', 'Refusal or fault', state.problem ?? 'none'],
   ];
 }
-
-/** Write the HUD rows into `list`, one `<dt>`/`<dd>` pair each. */
-export function renderHud(list: HTMLElement, state: HudState): void {
-  const rows = hudRows(state);
-  if (list.children.length !== rows.length * 2) {
-    list.replaceChildren(...rows.flatMap(([key, label]) => {
-      const term = document.createElement('dt');
-      term.textContent = label;
-      const value = document.createElement('dd');
-      value.dataset['hud'] = key;
-      return [term, value];
-    }));
-  }
-  for (const [key, , text] of rows) {
-    const value = list.querySelector<HTMLElement>(`[data-hud="${key}"]`);
-    if (value !== null && value.textContent !== text) value.textContent = text;
-  }
-}
