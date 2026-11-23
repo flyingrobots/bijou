@@ -24,6 +24,16 @@ teaching book and its LaTeX sources now belong to the job-monitor repository.
 Individual source Markdown files remain removed;
 their exact text and hashes survive in the frozen corpus for DOGFOOD and checks.
 
+Translations: the teaching book (about 13,600 lexical tokens, 106 pages) is
+the first edition to be translated. The planned translated sources will live
+in the job-monitor repository
+under `book/locales/<locale>/`, at the same relative paths as the English files,
+and will build to `bijou-book.<locale>.pdf` after locale build support
+([#618](https://github.com/flyingrobots/bijou/issues/618)) lands.
+The complete edition and the archive
+stay English only, and the English hash pins do not change. See
+[DL-036](./design/DL-036-book-translation-edition.md).
+
 For a bounded source excerpt, run from the repository root:
 
 ```bash
@@ -55,6 +65,12 @@ The glossary and topic finder support practical lookup.
 - [Project front door](../README.md)
 - [Agent agreements](../AGENTS.md)
 - [Design vocabulary](./topics/design-vocabulary.md): canonical terms, component family fields, and writing style
+- [Browser renderer seam for `ui-scene-ir/1`](./topics/ui-scene-browser/README.md): element mapping, refusals, receipt, and [test plan](./topics/ui-scene-browser/test-plan.md)
+- [Terminal and browser parity witness for `ui-scene-ir/1`](./topics/ui-scene-parity/README.md): equal facts, named gaps, refusals, limits, and [test plan](./topics/ui-scene-parity/test-plan.md)
+- [Semantic scene app contract](./topics/semantic-scene-app/README.md): `ui-scene-ir/1` projection, action dispatch, diagnostics, and [test plan](./topics/semantic-scene-app/test-plan.md)
+- [Browser host adapter](./topics/bijou-web/README.md): the `@flyingrobots/bijou-web` port contracts, refusals, and [test plan](./topics/bijou-web/test-plan.md)
+- [Web GPU showcase](./topics/web-gpu-showcase/README.md): example apps on Geordi's WebGPU, WebGL2 and Canvas 2D presenters in a browser, the HUD, the pinned Geordi packages, and [test plan](./topics/web-gpu-showcase/test-plan.md)
+- [DOM host](./topics/bijou-web-dom/README.md): `mountBijouDom()` element mapping, keyed patching, events, focus fallback, theme sync, and [test plan](./topics/bijou-web-dom/test-plan.md)
 - Translation glossaries ([French](./topics/glossary.fr.md), [Spanish](./topics/glossary.es.md), [German](./topics/glossary.de.md)): one rendering per Bijou term, address form, and typography; decision in [DL-035](./design/DL-035-translation-glossary.md)
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)

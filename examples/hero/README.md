@@ -49,4 +49,5 @@ Half-block cells hold two colour pixels. Braille cells hold eight dots but only 
 - `clip.ts`: records any Bijou app with scripted keys on a mock clock, one frame per pulse.
 - `record.ts`: records each app, cuts the reel together, streams the GIF and optional PNG stills.
 - `modes.ts`: the mode-lowering shots; `png.ts`: a small PNG encoder for stills.
+- `perf.ts`: the perf tracker behind the overlay, which reads memory through a port; `perf-node.ts` is its Node adapter (`process.memoryUsage()`) and `perf-browser.ts` its browser adapter, which reports no memory.
 - `main.ts`: the live hero app.

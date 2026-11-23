@@ -81,3 +81,27 @@ export {
   dagPaneSetSource,
   dagPaneKeyMap,
 } from './dag-pane.js';
+
+// Semantic scene app — ui-scene-ir/1 projection and action dispatch
+export {
+  type SceneProjection,
+  type SemanticSceneApp,
+  type SemanticSceneCheckpoint,
+  type SemanticSceneController,
+  type SemanticSceneControllerOptions,
+  type SemanticSceneCrash,
+  type SemanticSceneCrashPhase,
+  type SemanticSceneDiagnostic,
+  type SemanticSceneDiagnosticCode,
+  type SemanticSceneFrame,
+  type SemanticSceneInvocationResult,
+  type SemanticSceneStatus,
+  type UiActionInvocation,
+  type UiActionRequest,
+  type UiActionValue,
+  createSemanticSceneController,
+  parseUiSceneActionAttribute,
+  replaySemanticSceneActions,
+  UI_SCENE_ACTION_ATTRIBUTE,
+  UI_SCENE_NODE_ID_ATTRIBUTE,
+} from './semantic-scene.js';

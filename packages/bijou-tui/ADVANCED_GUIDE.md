@@ -37,7 +37,8 @@ The render path is composed of five stages:
 1. **Layout**: Resolve node dimensions and positions.
 2. **Paint**: Rasterize components into surface buffers.
 3. **Post-Process**: Apply global effects (e.g., shaders, grayscale).
-4. **Diff**: Compute the minimal ANSI delta between front and back buffers.
+4. **Diff**: Compute the minimal ANSI delta between front and back buffers, or
+   hand both buffers to a [Surface presenter](#surface-presenters).
 5. **Output**: Write the diff buffer to the terminal.
 
 For the specific `LayoutNode` handoff between localization and paint, use the
@@ -70,6 +71,71 @@ run(app, {
 
 For the exact stage order, default runtime wiring, and `RenderState` contract,
 use the dedicated [render pipeline guide](../../docs/book/bijou-designs.pdf#page=332).
+
+### Surface Presenters
+
+A Surface presenter is a host that shows `interactive` frames from Surfaces
+instead of from terminal bytes. Use one when the host is not a terminal, such
+as a canvas or a native window. Pass it to `run()` as `presenter`.
+
+This example is illustrative: `app` and `ctx` come from your application.
+
+```typescript
+import { run, type SurfacePresenter } from '@flyingrobots/bijou-tui';
+
+const sizes: string[] = [];
+const presenter: SurfacePresenter = {
+  present(_current, target) {
+    // Copy what you need before you return.
+    sizes.push(`${target.width}x${target.height}`);
+  },
+  onResize(cols, rows) {
+    sizes.push(`resize ${cols}x${rows}`);
+  },
+};
+
+await run(app, { ctx, presenter });
+```
+
+While a presenter is set, the runtime calls it in place of each terminal write:
+
+| Runtime event | Presenter call | Terminal bytes it replaces |
+| --- | --- | --- |
+| Startup | `enter?()` | Alternate screen, cursor, and mouse mode |
+| Each frame | `present(current, target, ctx)` | The ANSI diff from the **Diff** stage |
+| Viewport resize | `onResize?(cols, rows)` | Clear screen and cursor home |
+| Shutdown | `exit?()` | Mouse mode off and screen restore |
+
+The runtime writes zero bytes to `ctx.io.write()` and `ctx.io.writeBytes()`.
+Runtime diagnostics still go to the context error port. The runtime still reads
+key, mouse, and resize input from `ctx.io`.
+
+`present()` is synchronous:
+
+- `current` is the frame that the host shows now. `target` is the next frame.
+- Both are live framebuffers. The **Output** stage swaps and reuses them when
+  `present()` returns, so copy or upload every cell that you need first. Do not
+  keep either Surface and do not mutate them.
+- For packed Surfaces, the union of `current.renderDirtyWords` and
+  `target.renderDirtyWords` marks every cell that can differ. This includes a
+  cell that `current` painted and `target` leaves empty.
+- After a resize, `current` is an invalidated frame at the new size, so every
+  cell is marked.
+
+Errors:
+
+- If `present()` throws, the runtime enters crash mode and presents the crash
+  Surface through `present()`. If that call also throws, `run()` rejects with
+  the first error.
+- If `onResize()` throws, the runtime reports a runtime issue, does not send
+  that resize message to the app, and continues at the new size.
+- If `enter()` or `exit()` throws, `run()` rejects with that error.
+
+The `static`, `pipe`, and `accessible` output modes ignore the presenter. They
+write lowered text through `ctx.io.write()`.
+
+The contract does not cover a hardware cursor overlay, OSC 8 hyperlinks, or a
+window title. The runtime sends none of these to a presenter.
 
 ## Transition Shaders
 
@@ -357,6 +423,9 @@ The runtime crash surface shows:
 
 This is a developer-facing post-mortem path, not a recovery system. The runtime
 still rethrows the original failure after the user dismisses the surface.
+
+With a [Surface presenter](#surface-presenters), the runtime passes the crash
+Surface to `present()` instead of writing it to the terminal.
 
 ## Framed Shell Layer Projection
 

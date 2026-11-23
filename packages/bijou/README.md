@@ -283,6 +283,27 @@ const items = orderForDirection(crumbs, visual);
   Review the exact input versions, supported blocks, inspection modes, output
   contracts, diagnostics, and verification commands.
 
+### Browser Renderer Seam
+
+- **`lowerUiSceneToBrowser()`**: Lower a `ui-scene-ir/1` scene with a
+  `geordi-browser` target profile to a deterministic element tree and HTML
+  markup. The output holds only facts the scene declares.
+- **`createUiSceneBrowserDom()`**: Build that tree through a host document.
+- **`createUiSceneBrowserReceipt()`**: Record the browser output in a
+  `ui-scene-receipt/1`.
+- **[Browser renderer seam reference](../../docs/topics/ui-scene-browser/README.md)**:
+  Review the element mapping, options, refusals, and limits.
+
+### Terminal and Browser Parity Witness
+
+- **`witnessUiSceneParity()`**: Lower one `ui-scene-ir/1` scene on the
+  terminal target and on the browser target, then report each fact as equal, a
+  named gap, or a mismatch.
+- **`compareUiSceneLowerings()`**: Compare a terminal lowering and a browser
+  lowering that already exist.
+- **[Parity witness reference](../../docs/topics/ui-scene-parity/README.md)**:
+  Review the facts that must be equal, the named gaps, and the limits.
+
 ## Documentation
 
 - **[GUIDE.md](./GUIDE.md)**: Productive-fast path.
