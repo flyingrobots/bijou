@@ -5,7 +5,7 @@ import type { DomMounted } from './dom-patch.js';
 export interface FocusRestore {
   /** The owned element that had focus before the patch, if any. */
   readonly focused: DomMounted | undefined;
-  /** The document's active element before the patch. */
+  /** The document's active element after the patch. */
   readonly active: unknown;
   /** Node ids that the new scene has. */
   readonly seen: ReadonlySet<string>;
@@ -29,15 +29,15 @@ function focusEntry(entry: DomMounted): void {
  * The fallback, in order: the first of `focusableNodeIds` that the new scene
  * has; then the nearest ancestor of the removed node that the new scene has;
  * then the mount root. When the focused node stays but its element was
- * replaced, the new element gets focus. Nothing happens when focus was not on
- * an owned element.
+ * replaced, or moving it lost focus, its element gets focus again. Nothing
+ * happens when focus was not on an owned element.
  */
 export function restoreFocus(state: FocusRestore): void {
   const { focused, seen, byId } = state;
   if (focused === undefined) return;
   const current = byId.get(focused.spec.nodeId);
   if (seen.has(focused.spec.nodeId) && current !== undefined) {
-    if (current.element !== state.active) current.element.focus();
+    if (current.element !== state.active) focusEntry(current);
     return;
   }
   for (const nodeId of state.focusableNodeIds) {

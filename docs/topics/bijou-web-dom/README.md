@@ -89,11 +89,12 @@ scene and its element tag does not change, its element is kept:
   last patch, the input differs from it, and no composition is in progress.
   A re-render for any other change leaves the value, and so the selection,
   untouched.
-- Children are put in scene order by moving only the nodes that are out of
-  place. A node that left the scene is removed.
+- Children that left the scene are removed first. Then the kept children are
+  put in scene order by moving only the ones that are out of place, so a
+  sibling leaving does not move the nodes after it.
 
 A node whose element tag changes, for example from `span` to `button`, gets
-a new element.
+a new element. A composition in progress on the old element is dropped.
 
 ## Events
 
@@ -107,7 +108,7 @@ its `data-bijou-action`; the bridge sends the first one with
 | `click` | The nearest element at or above the target that has an action. A click on an `<input>` sends nothing. |
 | `keydown` Enter or Space | Only on a plain element that has an action; the default is prevented. A `<button>` gets no key handling, because the browser turns Enter and Space into one `click`. |
 | `input` | The input's value, unless `isComposing` is true or a composition is in progress. |
-| `compositionend` | The committed value, once. An `input` event right after it with the same value is skipped. |
+| `compositionend` | The committed value, once. A later `input` event on the same element is skipped when it repeats that value and the scene has not changed the value since. |
 
 An action that the current scene no longer declares is ignored by the
 controller and reported to `onDiagnostic` as `action-not-declared`.
@@ -122,8 +123,8 @@ moves to, in order:
 3. the root.
 
 A plain element without a `tabindex` gets `tabindex="-1"` before it takes
-focus. When the focused node stays but gets a new element, the new element
-takes focus.
+focus. When the focused node stays but gets a new element, or a reorder moved
+its element and the browser dropped focus, its element takes focus again.
 
 ## Theme and direction
 

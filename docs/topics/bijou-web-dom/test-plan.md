@@ -9,10 +9,12 @@ with `%j` or `%s` is one parameterized test.
 The tests run in the sealed Docker runner against the in-memory document in
 `dom-document.test-support.ts`. It models these browser rules: a moved node
 leaves its old parent, removing the focused node moves focus to `body`,
-setting an `<input>` value that differs moves the caret to the end, and Enter
-or Space on a `<button>` whose `keydown` is not prevented fires one `click`.
-The fixture app is `createControlsApp()` in `dom-app.test-support.ts`. No real
-browser runs these cases.
+moving the focused node also drops focus, only a `<button>`, an `<input>`, or
+an element with `tabindex` takes focus, setting an `<input>` value that
+differs moves the caret to the end, and Enter or Space on a `<button>` whose
+`keydown` is not prevented fires one `click`. The fixture apps are
+`createControlsApp()` in `dom-app.test-support.ts` and `createShapesApp()` in
+`dom-shapes.test-support.ts`. No real browser runs these cases.
 
 ## Golden: `dom-mount.test.ts`
 
@@ -43,6 +45,7 @@ browser runs these cases.
 | DOM-13 | Committed composition text dispatches once, whichever of `compositionend` and the last `input` comes first. | `dispatches committed composition text once (compositionend first: %s)` | Implemented |
 | DOM-14 | Nothing dispatches during a composition, and a scene value does not overwrite it. | `dispatches nothing while a composition is in progress, and keeps its text` | Implemented |
 | DOM-15 | An action for a removed node is ignored with a diagnostic. | `ignores an action for a node that left the scene` | Implemented |
+| DOM-28 | After the scene changes the value, typing that repeats a committed composition still dispatches. | `dispatches typed text that repeats a committed composition after the scene changed the value` | Implemented |
 
 ## Focus: `dom-focus.test.ts`
 
@@ -67,13 +70,22 @@ browser runs these cases.
 | --- | --- | --- | --- |
 | DOM-23 | `stop()` removes listeners, command timers, and the root, and is idempotent. | `stop() removes every listener, TEA timer, and the root, and is idempotent` | Implemented |
 | DOM-24 | After `stop()`, a theme change, an event, or an action writes nothing. | `writes nothing for a theme change, event, or action after stop()` | Implemented |
-| DOM-25 | A first scene that cannot be lowered stops the controller and attaches nothing. | `stops the controller and attaches nothing when the first scene cannot be lowered` | Implemented |
+| DOM-25 | A first scene that cannot be lowered stops the controller, which releases a command interval, and attaches nothing. | `stops the controller and attaches nothing when the first scene cannot be lowered` | Implemented |
 
 ## Stress: `dom-stress.test.ts`
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
 | DOM-26 | 200 sequential updates write at most once each, create nothing, keep every element, and leave no listener after `stop()`. | `patches 200 sequential updates in place with bounded writes and no orphaned listeners` | Implemented |
+
+## Reshaped scenes: `dom-reshape.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| DOM-29 | A reorder that moves the focused element gives it focus again. | `restores focus to a kept element that a reorder moved` | Implemented |
+| DOM-30 | A sibling leaving does not move the focused element after it. | `does not move a focused element when an earlier sibling leaves` | Implemented |
+| DOM-31 | A plain element that replaces the focused one gets `tabindex="-1"` and focus. | `makes a replacement plain element focusable before focusing it` | Implemented |
+| DOM-32 | Replacing an input drops its composition state. | `clears the composition state of an input that a new element replaces` | Implemented |
 
 ## Planned
 

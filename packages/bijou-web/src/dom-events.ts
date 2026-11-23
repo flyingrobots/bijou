@@ -24,12 +24,13 @@ type DomEventType = (typeof DOM_EVENT_TYPES)[number];
  * - `keydown` Enter or Space on a plain element with an action sends that
  *   action and prevents the default.
  * - `input` on an `<input>` sends its value, except while a composition is in
- *   progress. `compositionend` sends the committed value once; an `input`
- *   event that repeats the committed value right after it is skipped.
+ *   progress. `compositionend` sends the committed value once. A later
+ *   `input` event on the same element is skipped when it repeats that value
+ *   and the scene has not changed the value since.
  */
 export function bridgeDomEvents(root: BijouDomElement, options: DomEventBridgeOptions): () => void {
   const { patcher, session, invoke } = options;
-  const committed = new Map<string, string>();
+  const committed = new Map<string, { readonly element: unknown; readonly value: string; readonly sceneValue: string | undefined }>();
 
   const actionable = (entry: DomMounted | undefined): DomMounted | undefined => {
     let at = entry;
@@ -67,7 +68,8 @@ export function bridgeDomEvents(root: BijouDomElement, options: DomEventBridgeOp
       const { nodeId } = entry.spec;
       if (session.composing.has(nodeId)) return;
       const value = entry.element.value ?? '';
-      const repeat = committed.get(nodeId) === value;
+      const mark = committed.get(nodeId);
+      const repeat = mark?.element === entry.element && mark.value === value && mark.sceneValue === entry.sceneValue;
       committed.delete(nodeId);
       if (!repeat) send(entry, value);
     },
@@ -80,8 +82,8 @@ export function bridgeDomEvents(root: BijouDomElement, options: DomEventBridgeOp
       if (entry === undefined) return;
       const value = entry.element.value ?? '';
       session.composing.delete(entry.spec.nodeId);
-      committed.set(entry.spec.nodeId, value);
       send(entry, value);
+      committed.set(entry.spec.nodeId, { element: entry.element, value, sceneValue: entry.sceneValue });
     },
   };
 

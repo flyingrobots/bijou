@@ -43,15 +43,20 @@ function diffAttributes(
   return wanted;
 }
 
-/** Make `parent` hold exactly `desired`, in order, moving only what is out of place. */
+/**
+ * Make `parent` hold exactly `desired`, in order. Children that left are
+ * removed first, so a kept child moves only when it is out of place.
+ */
 function reconcileChildren(parent: BijouDomElement, desired: readonly BijouDomNode[]): void {
+  const kept = new Set(desired);
+  for (let index = parent.childNodes.length - 1; index >= 0; index -= 1) {
+    const child = parent.childNodes[index];
+    if (child !== undefined && !kept.has(child)) parent.removeChild(child);
+  }
   desired.forEach((node, index) => {
     const current = parent.childNodes[index];
     if (current !== node) parent.insertBefore(node, current ?? null);
   });
-  for (let extra = parent.childNodes[desired.length]; extra !== undefined; extra = parent.childNodes[desired.length]) {
-    parent.removeChild(extra);
-  }
 }
 
 /**
@@ -83,7 +88,10 @@ export function createDomPatcher(
   const claim = (spec: DomHostSpec, parentId: string | undefined): DomMounted => {
     const existing = byId.get(spec.nodeId);
     if (existing?.spec.tag === spec.tag) return Object.assign(existing, { spec, parentId });
-    if (existing !== undefined) byElement.delete(existing.element);
+    if (existing !== undefined) {
+      byElement.delete(existing.element);
+      session.composing.delete(spec.nodeId);
+    }
     const element = document.createElement(spec.tag);
     const entry: DomMounted = { spec, element, attributes: new Map(), text: undefined, sceneValue: undefined, parentId };
     byId.set(spec.nodeId, entry);
@@ -103,12 +111,11 @@ export function createDomPatcher(
 
   return {
     patch(tree) {
-      const active = document.activeElement;
-      const focused = byElement.get(active);
+      const focused = byElement.get(document.activeElement);
       const seen = new Set<string>();
       rootAttributes = diffAttributes(root, rootAttributes, tree.attributes);
       reconcileChildren(root, tree.children.map((child) => patchNode(child, undefined, seen)));
-      restoreFocus({ focused, active, seen, byId, root, focusableNodeIds });
+      restoreFocus({ focused, active: document.activeElement, seen, byId, root, focusableNodeIds });
       for (const [nodeId, entry] of byId) {
         if (seen.has(nodeId)) continue;
         byId.delete(nodeId);
