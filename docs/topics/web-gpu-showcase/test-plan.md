@@ -25,9 +25,21 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
 | WGPU-07 | The page builds with no Node built-in. | `builds the showcase page with no refusal` | Implemented |
-| WGPU-08 | The counter's unmodified entry and the component showcase build with no Node built-in. | `builds each mounted app, through its unmodified entry, with no refusal` | Implemented |
-| WGPU-09 | `examples/components` and `examples/hero` are refused with the reason the HUD shows. | `refuses %s with the reason the HUD shows` | Implemented |
+| WGPU-08 | Each app module the showcase mounts (counter's unmodified entry, the Components library, hero and its browser memory adapter, the component showcase) builds with no Node built-in. | `builds the %s app module %s with no refusal` | Implemented |
+| WGPU-09 | The showcase lists counter, components, hero and showcase, and refuses none. | `lists every example app it mounts and refuses none` | Implemented |
 | WGPU-10 | A direct Node built-in import is refused and the importer named. | `refuses a direct import of a Node built-in and names the importer` | Implemented |
+
+## Host-free example apps: `tests/web-gpu/app-host-reach.test.ts`, `tests/web-gpu/app-cell-widths.test.ts` and others (sealed)
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WGPU-24 | The import-graph walk finds a Node built-in behind two re-exports and a dynamic import, and free `process` and `Buffer` uses, and nothing for a shadowing parameter or a property name. | `finds a built-in behind two re-exports and host globals, and nothing in a shadow or a property name` | Implemented |
+| WGPU-25 | The counter, showcase, components and hero app modules, and hero's perf tracker, reach no Node built-in and no `process` or `Buffer`. | `%s (%s) reaches none` | Implemented |
+| WGPU-26 | The Components library and the hero app paint the same styled terminal frames as before their data moved to imports. | `the library title, a component with its docs and snippet, and the end slide`, `the hero reel from the melt-in title through the render lab, with a fixed perf sample` in `tests/examples-terminal-frames.test.ts` | Implemented |
+| WGPU-27 | The generated Components library data matches its sources, and the check names a drifted, a missing and a stray copy. | `matches what its sources give now`, `names a copy that drifted, a missing one and a stray one` in `tests/components-browser-data.test.ts` | Implemented |
+| WGPU-28 | The DOGFOOD catalog import table lists every catalog file of every locale; each call returns its own copy; an unknown locale is refused. | `import every catalog file of every locale, and nothing else`, `give each call its own copy, and refuse a locale with no catalogs` in `tests/dogfood-catalog-imports.test.ts` | Implemented |
+| WGPU-29 | The host-free base64 decoder accepts and refuses exactly the texts that `Buffer` round-trips. | `decodes what Buffer encodes, for every length from 0 to 64 bytes`, `refuses %j as Buffer does`, `agrees with Buffer on random texts over the alphabet and padding` in `tests/examples-base64.test.ts` | Implemented |
+| WGPU-30 | No Components library slide, in any output mode, and no frame of the hero reel holds a width-2 grapheme or is an unpacked Surface. | `every Components library slide, with its info, in each output mode`, `the whole hero reel, with the palette open and a theme switch` | Implemented |
 
 ## CI lanes: `tests/web-gpu/ci-browser-job.test.ts` (sealed)
 
@@ -40,8 +52,8 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| WGPU-13 | The counter loads on forced WebGL2; the HUD reports backend, no fallback, grid, cell, a probed evidence level and frame time; the grid matches the canvas box. An empty cell is exactly `#0D1117`; the digit and the label have ink. A key press makes the count 1 and changes the digit's pixels only. A switch to Canvas 2D replaces the canvas, keeps one canvas and one textarea, keeps the count, keeps focus, shows the same digit pixels and the same `frameRgbaSha256`, and takes the next key. The showcase app mounts in place of the counter; unmount leaves nothing; no console or page error. | `counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2D, then the app changes and unmounts` | Implemented |
-| WGPU-14 | The HUD lists `components` and `hero` with their typed refusal. | `the HUD names the example apps that cannot be mounted unmodified, with their typed refusal` | Implemented |
+| WGPU-13 | The counter loads on forced WebGL2; the HUD reports backend, no fallback, grid, cell, a probed evidence level and frame time; the grid matches the canvas box. An empty cell is exactly `#0D1117`; the digit and the label have ink. A key press makes the count 1 and changes the digit's pixels only. A switch to Canvas 2D replaces the canvas, keeps one canvas and one textarea, keeps the count, keeps focus, shows the same digit pixels and the same `frameRgbaSha256`, and takes the next key. Then components and hero mount in turn (counter -> components -> hero), each presenting with no problem, one canvas and one textarea; unmount leaves nothing; no console or page error. | `counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2D, then components and hero mount and it unmounts` | Implemented |
+| WGPU-14 | The HUD lists the four apps and no refused app. | `the HUD lists no example app as refused: every one bundles for the browser` | Implemented |
 
 ## Hostile events and edges: `examples/web-gpu/e2e/hostile.e2e.ts` (browser)
 
@@ -57,7 +69,7 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| WGPU-19 | Ten rounds of app and backend toggles, fired without waiting, leave one canvas and one textarea, at most three nodes at any sample, a healthy HUD, no failed operation in the retained history, and no error. | `ten rapid app and backend toggles leave one canvas, one textarea and no error` | Implemented |
+| WGPU-19 | Ten rounds of toggles across counter, components and hero and two backends, fired without waiting, leave one canvas and one textarea, at most three nodes at any sample, a healthy HUD on hero, no failed operation in the retained history, and no error. | `ten rapid toggles of three apps and two backends leave one canvas, one textarea and no error` | Implemented |
 
 ## WebGPU: `examples/web-gpu/e2e/webgpu.e2e.ts` (browser)
 

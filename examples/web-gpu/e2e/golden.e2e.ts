@@ -5,7 +5,7 @@ import {
 
 // The golden lifecycle of the issue's test plan, in one page: load, WebGL2
 // pixels, a key press, a live switch to Canvas 2D, the other app, unmount.
-test('counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2D, then the app changes and unmounts', async ({ page }, info) => {
+test('counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2D, then components and hero mount and it unmounts', async ({ page }, info) => {
   const errors = collectErrors(page);
   const first = await open(page, 'app=counter&backend=webgl2');
   expect(first.problem).toBeNull();
@@ -58,12 +58,15 @@ test('counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2
   await page.keyboard.press('+');
   await expect.poll(() => countModel(page)).toBe(2);
 
-  // The other app mounts in place of the counter.
-  await page.getByRole('button', { name: 'Component showcase' }).click();
-  const showcase = await waitFor(page, (current) => current.app === 'showcase' && current.presents > 0);
-  expect(showcase.problem).toBeNull();
-  await expect(hud(page, 'app')).toHaveText('showcase');
-  expect(await mounted(page)).toMatchObject({ canvases: 1, textareas: 1 });
+  // The other example apps mount in place of the counter, one at a time: counter -> components -> hero.
+  for (const [title, id] of [['Components library', 'components'], ['Hero', 'hero']] as const) {
+    await page.getByRole('button', { name: title, exact: true }).click();
+    const next = await waitFor(page, (current) => current.app === id && current.presents > 0);
+    witness(page, info, next);
+    expect(next.problem).toBeNull();
+    await expect(hud(page, 'app')).toHaveText(id);
+    expect(await mounted(page)).toMatchObject({ canvases: 1, textareas: 1 });
+  }
 
   // Unmount removes the canvas and the textarea.
   await page.evaluate(() => window.__bijouWebGpu?.unmount());
@@ -72,14 +75,10 @@ test('counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2
   expect(errors).toEqual([]);
 });
 
-test('the HUD names the example apps that cannot be mounted unmodified, with their typed refusal', async ({ page }) => {
+test('the HUD lists no example app as refused: every one bundles for the browser', async ({ page }) => {
   const errors = collectErrors(page);
   await open(page, 'app=counter&backend=canvas2d');
-  await expect(page.locator('[data-refused="components"]')).toHaveText(
-    'Components library: BIJOU_WEB_GPU_NODE_IMPORT: node:fs imported by examples/components/library-font.ts',
-  );
-  await expect(page.locator('[data-refused="hero"]')).toHaveText(
-    'Hero: BIJOU_WEB_GPU_NODE_IMPORT: node:fs imported by examples/docs/app-cylinder-font.ts',
-  );
+  await expect(page.locator('#apps button')).toHaveText(['Counter', 'Components library', 'Hero', 'Component showcase']);
+  await expect(page.locator('#refused li')).toHaveCount(0);
   expect(errors).toEqual([]);
 });

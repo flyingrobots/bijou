@@ -1,5 +1,6 @@
 import { boxSurface, column, contentSurface, createSpringState, line, motionTimeline, processTimeline, resolveSpringConfig, spacer, springStep } from './stories-runtime.js';
 import type { BijouContext, Surface } from './stories-runtime.js';
+import { dogfoodText } from './story-preview-style.js';
 
 export function renderSpringTimelinePreview(input: {
   readonly width: number;
@@ -26,7 +27,7 @@ export function renderSpringTimelinePreview(input: {
     state = timeline.step(state, 1 / 60);
   }
 
-  const values = timeline.values(state);
+  const { camera = 0, glow = 0, caption = 0 } = timeline.values(state);
   const springConfig = resolveSpringConfig('stiff');
   let springState = createSpringState(0);
   for (let frame = 0; frame < frames; frame++) {
@@ -34,16 +35,16 @@ export function renderSpringTimelinePreview(input: {
   }
 
   const barWidth = Math.max(10, width - 18);
-  const filled = Math.max(0, Math.min(barWidth, Math.round((values.camera ?? 0) * barWidth)));
+  const filled = Math.max(0, Math.min(barWidth, Math.round(camera * barWidth)));
   const empty = Math.max(0, barWidth - filled);
   const process = processTimeline([
-    { label: 'camera spring', description: `settled ${String(Math.round(springState.value * 100))}%`, status: 'info' },
-    { label: 'shader glow', description: `opacity ${String(Math.round((values.glow ?? 0) * 100))}%`, status: 'success' },
-    { label: 'caption reveal', description: `timeline ${String(Math.round((values.caption ?? 0) * 100))}%`, status: 'warning' },
+    { label: dogfoodText(undefined, 'stories.preview.springTimeline.camera', 'camera spring'), description: `settled ${String(Math.round(springState.value * 100))}%`, status: 'info' },
+    { label: 'shader glow', description: `opacity ${String(Math.round(glow * 100))}%`, status: 'success' },
+    { label: 'caption reveal', description: `timeline ${String(Math.round(caption * 100))}%`, status: 'warning' },
   ], { ctx });
 
   return boxSurface(column([
-    line(`spring ${'█'.repeat(filled)}${' '.repeat(empty)} ${String(Math.round((values.camera ?? 0) * 100))}%`, width - 2),
+    line(`spring ${'█'.repeat(filled)}${' '.repeat(empty)} ${String(Math.round(camera * 100))}%`, width - 2),
     spacer(),
     contentSurface(process),
   ]), {

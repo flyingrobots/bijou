@@ -69,7 +69,7 @@ export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtl
     problem = null;
     const entry = SHOWCASE_APPS.find((app) => app.id === id);
     if (entry === undefined) throw new Error(`BIJOU_WEB_GPU_UNKNOWN_APP: ${id}`);
-    const build = await entry.load();
+    const { build, css } = await entry.load();
     const made = { cellPx: atlas.cellPx(), dpr: atlas.dpr() };
     const mounted = await mountBijouCanvas((ctx) => {
       // The browser counterpart of what startApp() does on Node.
@@ -80,6 +80,7 @@ export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtl
       createCanvas: () => document.createElement('canvas'),
       cellPx: made.cellPx,
       backend,
+      ...(css === undefined ? {} : { css }),
     });
     handle = mounted;
     metrics = made;
