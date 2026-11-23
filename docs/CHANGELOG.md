@@ -20,6 +20,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `@flyingrobots/bijou-web` is a new workspace package for browser hosts
+  (#792). `createWebContext()` composes `createWebClock()`,
+  `createWebRuntime()`, `createWebStyle()`, and `createWebOutputIO()` into a
+  `BijouContext` for all four output modes, with no runtime dependencies and
+  no Node.js imports. Output goes to caller-supplied sinks or in-memory
+  buffers. `readFile`, `readDir`, `question`, and `rawInput` refuse with a
+  typed `WebUnsupportedCapabilityError`. The package is not published to npm.
 - `SurfacePresenter` is a synchronous host seam in `@flyingrobots/bijou-tui`
   for hosts that are not terminals (#791). Pass one to `run()` as
   `RunOptions.presenter`. In `interactive` mode the runtime then calls
