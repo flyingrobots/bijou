@@ -311,8 +311,8 @@ factory may read it, and the mount disposes a presenter that arrives after it.
 ### Wiring Geordi's factories (illustrative)
 
 This example is illustrative and not run by any test here. It assumes the
-`@flyingrobots/geordi-bijou-gpu` exports as they stand today; `atlas`,
-`proceduralTable` and `app` are values your page builds.
+`@flyingrobots/geordi-bijou-gpu` exports as they stand today; `atlas`
+and `app` are values your page builds.
 
 ```ts
 import {
@@ -326,7 +326,7 @@ const handle = await mountBijouCanvas(app, document.getElementById('terminal')!,
   presenters: {
     webgpu: (canvas) => createWebGPUSurfacePresenter(canvas, { atlas }),
     webgl2: (canvas) => createWebGL2SurfacePresenter({ canvas, atlas }),
-    canvas2d: (canvas) => createCanvas2DSurfacePresenter({ canvas, atlas, proceduralTable }),
+    canvas2d: (canvas) => createCanvas2DSurfacePresenter({ canvas, atlas }),
   },
 });
 console.log(handle.backend, handle.fallbackReasons);
