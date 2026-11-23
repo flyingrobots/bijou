@@ -59,3 +59,37 @@ describe('mountBijouCanvas() app factory and run options', () => {
     await env.stop(handle);
   });
 });
+
+describe('mountBijouCanvas() app factory failures and early subscriptions', () => {
+  it('keeps an io.onData() subscription the factory makes, and sends it the stop message', async () => {
+    const env = createCanvasEnv();
+    const payloads: unknown[] = [];
+    const mounting = mountBijouCanvas((ctx: BijouContext) => {
+      ctx.io.onData((payload) => { payloads.push(payload); });
+      return counterApp;
+    }, env.container, env.options());
+    env.host.box(800, 480);
+    const handle = await mounting;
+    await env.drive();
+    expect(payloads).toEqual([]);
+    await env.stop(handle);
+    expect(payloads).toHaveLength(1);
+  });
+
+  it('releases the canvas, presenter, observers, listeners and timers when the factory throws', async () => {
+    const env = createCanvasEnv();
+    const failure = new Error('the app could not be built');
+    const mounting = mountBijouCanvas(() => { throw failure; }, env.container, env.options());
+    env.host.box(800, 480);
+    await expect(mounting).rejects.toBe(failure);
+    await env.drive();
+    expect(env.container.children).toEqual([]);
+    expect(env.backends.live()).toBe(0);
+    expect(env.listeners()).toBe(0);
+    expect(env.host.liveObservers()).toBe(0);
+    expect(env.host.liveDprWatchers()).toBe(0);
+    expect(env.clockHost.liveTimers()).toBe(0);
+    expect(env.clockHost.liveFrames()).toBe(0);
+    expect(env.clock.pendingHandles()).toBe(0);
+  });
+});

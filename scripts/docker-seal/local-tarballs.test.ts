@@ -17,7 +17,7 @@ describe('dependency worker local tarballs', () => {
     expect(localTarballs({ packages: { a: { resolved: 'https://registry.npmjs.org/a/-/a-1.0.0.tgz' }, b: {} } })).toEqual([]);
   });
 
-  it.each(['file:../outside.tgz', 'file:/abs/x.tgz', 'file:a/../../x.tgz', 'file:D:x.tgz', 'file:packages/dir'])(
+  it.each(['file:../outside.tgz', 'file:/abs/x.tgz', 'file:a/../../x.tgz', 'file:D:x.tgz', 'file:packages/dir', 'file:..\\outside.tgz', 'file:vendor\\x.tgz'])(
     'refuses %s', (resolved) => {
       expect(() => localTarballs(entry(resolved))).toThrow('Unsupported local dependency');
     },

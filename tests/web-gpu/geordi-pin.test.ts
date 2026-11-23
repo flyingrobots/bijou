@@ -1,5 +1,7 @@
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 // The showcase consumes Geordi only through tarballs vendored at one pinned commit.
@@ -55,16 +57,25 @@ describe('examples/web-gpu Geordi pin', () => {
   });
 
   it.each(packages.map((entry) => [entry.name, entry] as const))('%s tarball matches its recorded SHA-256', (_name, entry) => {
-    expect(digest(entry.tarball, 'sha256', 'hex')).toBe(entry.sha256);
+    expect(digest(entry.tarball, 'sha256', 'hex'), `${entry.tarball} is not the tarball geordi-pin.json records`).toBe(entry.sha256);
   });
 
   it.each(files.map((entry) => [entry.path, entry] as const))('%s matches its recorded SHA-256', (_path, entry) => {
-    expect(digest(entry.path, 'sha256', 'hex')).toBe(entry.sha256);
+    expect(
+      digest(entry.path, 'sha256', 'hex'),
+      `${entry.path} bytes differ from geordi-pin.json; a checkout that converts line endings (core.autocrlf) changes them unless .gitattributes marks the file -text`,
+    ).toBe(entry.sha256);
+  });
+
+  it('keeps every pinned file byte-exact on checkout through .gitattributes', () => {
+    const paths = [...packages.map((entry) => entry.tarball), ...files.map((entry) => entry.path)].map((path) => `examples/web-gpu/${path}`);
+    const output = execFileSync('git', ['check-attr', 'text', '--', ...paths], { cwd: fileURLToPath(root), encoding: 'utf8' });
+    expect(output.trim().split('\n')).toEqual(paths.map((path) => `${path}: text: unset`));
   });
 
   it.each(packages.map((entry) => [entry.name, entry] as const))('%s resolves from the vendored tarball with npm integrity', (name, entry) => {
     const spec = `file:examples/web-gpu/${entry.tarball}`;
-    expect(devDependencies[name]).toBe(spec);
+    expect(devDependencies[name], `package.json must install ${name} from ${spec}; after a re-pin, update its file: specifier and run npm install --package-lock-only --ignore-scripts`).toBe(spec);
     const lock = fields(locked[`node_modules/${name}`], name);
     expect(lock['version']).toBe(entry.version);
     expect(lock['resolved']).toBe(spec);
