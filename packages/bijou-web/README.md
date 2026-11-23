@@ -17,10 +17,43 @@ This package is a workspace package. It is not published to npm yet.
 | `createWebRuntime()` | `RuntimePort` | An in-memory environment and a mutable output size. |
 | `createWebStyle()` | `StylePort` | 24-bit ANSI SGR styling that honors `NO_COLOR`. |
 | `createWebOutputIO()` | `IOPort` | Output to your sinks or to in-memory buffers. |
-| `createWebContext()` | `BijouContext` | The four ports composed through `createBijou()`. |
+| `createWebInteractiveIO()` | `IOPort` | Output plus keyboard, IME, paste, pointer, wheel, and resize input. |
+| `createWebContext()` | `BijouContext` | The four output-side ports composed through `createBijou()`. |
 
-The package only writes output. It attaches no keyboard, IME, or pointer
-input, mounts no canvas, and renders nothing into the DOM.
+`createWebContext()` only writes output. The package mounts no canvas and
+renders nothing into the DOM.
+
+## Read input
+
+`createWebInteractiveIO()` reads input from a hidden `<textarea>` and a
+surface element that you pass in. The example is illustrative; `textarea` and
+`canvasHost` are elements your page owns, and `handle` stands for your code.
+
+```ts
+import { createWebInteractiveIO, createWebRuntime } from '@flyingrobots/bijou-web';
+
+const runtime = createWebRuntime({ columns: 100, rows: 30 });
+const io = createWebInteractiveIO({
+  textarea,
+  surface: canvasHost,
+  runtime,
+  platform: navigator.userAgent.includes('Mac') ? 'mac' : 'other',
+});
+
+const keys = io.keyInput((key) => handle(key));
+const mouse = io.mouseInput((msg) => handle(msg)); // 0-based col and row
+keys.dispose();
+mouse.dispose();
+io.dispose(); // idempotent
+```
+
+IME composition arrives once as committed text. Single-line paste arrives as
+text; multi-line paste is rejected rather than turned into Enter keys. Browser
+shortcuts such as reload and DevTools pass through. `cellFromPoint()` and
+`mouseInput()` use 0-based cells; only the SGR packets on `rawInput()` are
+1-based. The adapter has been tested against in-memory event targets, not in a
+real browser. The [reference](../../docs/topics/bijou-web/README.md) has the
+full contract.
 
 ## Create a context
 
