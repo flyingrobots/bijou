@@ -25,6 +25,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The DOGFOOD touched-file rule compares a touched split lineage, such as a
+  story helper of `examples/docs/stories.ts`, against the whole lineage at the
+  base. It had read only the changed files at the base, so every raw string of
+  their unchanged siblings was reported as added copy (#809).
 - The web GPU showcase is pinned to Geordi `52ba6bb`, which ships its
   procedural glyph table (flyingrobots/geordi#205) and pins the canonical WGSL
   digest inside the WebGPU presenter (flyingrobots/geordi#189). The vendored
