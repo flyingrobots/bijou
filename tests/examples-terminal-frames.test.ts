@@ -10,6 +10,9 @@ import { createClipContext, KEY, recordClip, type ClipContext } from '../example
 // What the Components library and the hero app paint in a styled terminal,
 // frame by frame, pinned by digest. The digests were recorded before their
 // data loading moved from file reads to imports (flyingrobots/bijou#809).
+// The library digests were recorded again for the Guided flows family
+// (flyingrobots/bijou#586): guidedFlow() has its own section, so the deck has
+// 59 slides in 15 sections and covers 36 families.
 const COLS = 120;
 const ROWS = 36;
 
@@ -33,10 +36,10 @@ describe('the Components library and the hero app paint what they did before #80
       family: await library({ component: 'guidedFlow', slide: 'family' }),
       end: await library({ slide: 'end' }),
     }).toEqual({
-      title: '6:a3a44d710435e8463bc3ff90423a74c5442363b3b833357ba9ff766bd7273ac6',
-      docs: '6:3d31c38e8f46ed68f30cad9583ce2a5853976b6893fc628f0a1150b29f749471',
-      family: '6:1b0c67222fc04373be1f8599292a97bd664d7cda9025ca393cccf10e427da7df',
-      end: '6:7085e49e8535ce91d3b49f9c71369c43cee645ab3e678c994e11ee93da136164',
+      title: '6:e5de299124e4836d1767c862679727aa7e2acccfd65593648376c22746fbdd8c',
+      docs: '6:62a0ef38b482bc24663f7f4c072771806c5f65bd0b9bebfd63ea03ff41526c74',
+      family: '6:6f515456a714eb0fcd7bea9bc4c1b555b465044b3df4c549255ebc44c6318ff8',
+      end: '6:2d6d4690c7b75b2947513f2abe5d6de3f8e5831d1f4026ed40b2e5249de9a4d9',
     });
   });
 

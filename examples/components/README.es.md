@@ -6,7 +6,7 @@
 npm run components
 ```
 
-La Biblioteca de componentes es un mazo de 58 diapositivas: un título, una diapositiva por cada una de las 14 secciones seguida de sus componentes, y una diapositiva final. Una sección agrupa familias de componentes relacionadas para explorarlas; los 42 componentes cubren 36 de las 37 familias de `docs/design-system/component-families.md`. Muestra un componente de Bijou a la vez en el centro de la pantalla, sin nada más que compita por la atención. Usa el mismo catálogo de 42 historias que DOGFOOD y Block Lab, y se ejecuta dentro del marco de aplicación estándar de Bijou, de modo que la búsqueda, los ajustes y la salida se comportan como en DOGFOOD.
+La Biblioteca de componentes es un mazo de 59 diapositivas: un título, una diapositiva por cada una de las 15 secciones seguida de sus componentes, y una diapositiva final. Una sección agrupa familias de componentes relacionadas para explorarlas; los 42 componentes cubren 36 de las 37 familias de `docs/design-system/component-families.md`. Muestra un componente de Bijou a la vez en el centro de la pantalla, sin nada más que compita por la atención. Usa el mismo catálogo de 42 historias que DOGFOOD y Block Lab, y se ejecuta dentro del marco de aplicación estándar de Bijou, de modo que la búsqueda, los ajustes y la salida se comportan como en DOGFOOD.
 
 La biblioteca se abre con una pantalla de título "Components Library", compuesta en DM Sans. Pulsa Enter para empezar.
 
@@ -24,7 +24,7 @@ La biblioteca se abre con una pantalla de título "Components Library", compuest
 | `?` | Todos los atajos de teclado |
 | `q`, `Esc` | Salir, tras una confirmación |
 
-Una barra en la fila superior, en lugar del encabezado del marco, muestra cuánto has avanzado por todo el mazo y termina en una etiqueta como "3 of 58". La Biblioteca dibuja esta barra por sí misma: muestra una posición en una secuencia, no el progreso de una tarea, por lo que no usa `progressBar()`. Una ruta de navegación sobre el componente indica su sección y el componente. El `tabs()` de Bijou bajo el componente enumera sus variantes, y recurre a los puntos de `paginator()` cuando las pestañas son más anchas que la pantalla. La fila inferior muestra los modos de salida como pestañas, y luego los interruptores de información y de derecha a izquierda con su estado (`i info off · r RTL off`). El pie del marco muestra las teclas de navegación.
+Una barra en la fila superior, en lugar del encabezado del marco, muestra cuánto has avanzado por todo el mazo y termina en una etiqueta como "3 of 59". La Biblioteca dibuja esta barra por sí misma: muestra una posición en una secuencia, no el progreso de una tarea, por lo que no usa `progressBar()`. Una ruta de navegación sobre el componente indica su sección y el componente. El `tabs()` de Bijou bajo el componente enumera sus variantes, y recurre a los puntos de `paginator()` cuando las pestañas son más anchas que la pantalla. La fila inferior muestra los modos de salida como pestañas, y luego los interruptores de información y de derecha a izquierda con su estado (`i info off · r RTL off`). El pie del marco muestra las teclas de navegación.
 
 ## Abrir en una pantalla concreta
 
