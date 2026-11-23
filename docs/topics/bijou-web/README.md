@@ -226,7 +226,11 @@ browser, so cross-browser event ordering, Safari's `keydown` after
 ## `mountBijouCanvas(app, container, options)`
 
 Mounts a TEA app on a `<canvas>` that the mount owns inside `container`, and
-resolves to a `MountedBijouCanvas` handle. The app runs once, on
+resolves to a `MountedBijouCanvas` handle. `app` is the app, or a function
+that builds it from the context the run uses (`BijouCanvasApp`): an app such as
+`createShowcaseApp(ctx)` that takes a `BijouContext` is mounted that way. The
+function is called once, before `init()`; in `interactive` mode the context's
+runtime already has the mounted grid. The app runs once, on
 `run()` from `@flyingrobots/bijou-tui` with `RunOptions.presenter`, for the
 whole life of the mount; switching backends never restarts it.
 
@@ -246,6 +250,7 @@ whole life of the mount; switching backends never restarts it.
 | `context` | `createWebContext()` options other than `clock` and `mode`: theme, environment, output sinks. |
 | `input` | `platform`, `passThrough` and `onPasteRejected` of the input adapter. |
 | `signal` | An `AbortSignal` that cancels a mount that has not resolved yet. |
+| `css` | A BCSS stylesheet, passed to `run()` as `RunOptions.css` in every output mode. |
 
 `createCanvas` is required, not defaulted, so that the canvas type reaches the
 factories unchanged: with `() => document.createElement('canvas')` they
@@ -369,7 +374,8 @@ hidden container waits, with nothing added, until the first box with area.
 `ctx` comes from `createWebInteractiveContext()`. Keys, IME and paste come
 from the hidden textarea, and pointer and wheel events from the current
 canvas, hit-tested over the cells the grid covers. A press on the canvas
-focuses the textarea. The canvas gets `display:block;width:100%;height:100%`
+focuses the textarea on `pointerdown` and again on `pointerup`, because a
+browser's `mousedown` default action moves focus off the canvas in between. The canvas gets `display:block;width:100%;height:100%`
 and the default textarea is visually hidden when they have an inline style.
 
 ### Handle
@@ -402,13 +408,13 @@ In `static`, `pipe` and `accessible` mode the mount adds nothing to
 `switchBackend()` rejects with `BIJOU_WEB_CANVAS_NOT_INTERACTIVE`. Interactive
 web accessibility belongs to the DOM host, not to a canvas.
 
-### Not verified here
+### Verified in a browser
 
-Every test uses in-memory containers, canvases, resize hosts and presenter
-factories. No real browser, GPU or Geordi presenter has run against the mount,
-so the default `ResizeObserver`, `devicePixelRatio` and `matchMedia` host, real
-context binding, and the type compatibility of Geordi's factories with these
-interfaces under a real build are unverified. The type tests check that
-`HTMLDivElement`, `HTMLCanvasElement` and `HTMLTextAreaElement` satisfy the
-structural element interfaces and that a restated Geordi presenter shape
-satisfies `BijouCanvasPresenter`.
+The [web-gpu showcase](../web-gpu-showcase/README.md) mounts example apps
+with this function on Geordi's presenters in Chrome. Its browser suite holds
+the default `ResizeObserver`, `devicePixelRatio` and `matchMedia` host, real
+context binding on fresh canvases, `switchBackend()` across real canvases,
+focus on a press, and the type compatibility of Geordi's factories under a
+real build. Every other case above uses in-memory containers, canvases,
+resize hosts and presenter factories. A change of device pixel ratio has not
+been driven in a browser.

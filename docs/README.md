@@ -59,6 +59,7 @@ The glossary and topic finder support practical lookup.
 - [Terminal and browser parity witness for `ui-scene-ir/1`](./topics/ui-scene-parity/README.md): equal facts, named gaps, refusals, limits, and [test plan](./topics/ui-scene-parity/test-plan.md)
 - [Semantic scene app contract](./topics/semantic-scene-app/README.md): `ui-scene-ir/1` projection, action dispatch, diagnostics, and [test plan](./topics/semantic-scene-app/test-plan.md)
 - [Browser host adapter](./topics/bijou-web/README.md): the `@flyingrobots/bijou-web` port contracts, refusals, and [test plan](./topics/bijou-web/test-plan.md)
+- [Web GPU showcase](./topics/web-gpu-showcase/README.md): example apps on Geordi's WebGPU, WebGL2 and Canvas 2D presenters in a browser, the HUD, the pinned Geordi packages, and [test plan](./topics/web-gpu-showcase/test-plan.md)
 - Translation glossaries ([French](./topics/glossary.fr.md), [Spanish](./topics/glossary.es.md), [German](./topics/glossary.de.md)): one rendering per Bijou term, address form, and typography; decision in [DL-035](./design/DL-035-translation-glossary.md)
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)
