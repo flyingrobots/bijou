@@ -1,3 +1,3 @@
-export interface LockfileShape { readonly packages?: Readonly<Record<string, { readonly resolved?: unknown } | undefined>> }
-export function localTarballs(lock: LockfileShape): string[];
-export function copyLocalTarballs(lock: LockfileShape, source: string, target: string): string[];
+/** Repository paths of every tarball `lock` (a parsed package-lock.json) resolves with `file:`. */
+export function localTarballs(lock: unknown): string[];
+export function copyLocalTarballs(lock: unknown, source: string, target: string): string[];

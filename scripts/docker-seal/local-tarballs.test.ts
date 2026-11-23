@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { localTarballs, type LockfileShape } from './local-tarballs.mjs';
+import { localTarballs } from './local-tarballs.mjs';
 
-const lock = JSON.parse(readFileSync(new URL('../../package-lock.json', import.meta.url), 'utf8')) as LockfileShape;
-const entry = (resolved: string): LockfileShape => ({ packages: { 'node_modules/x': { resolved } } });
+const lock: unknown = JSON.parse(readFileSync(new URL('../../package-lock.json', import.meta.url), 'utf8'));
+const entry = (resolved: string): unknown => ({ packages: { 'node_modules/x': { resolved } } });
 
 describe('dependency worker local tarballs', () => {
   it('lists the vendored Geordi tarballs the lockfile resolves', () => {

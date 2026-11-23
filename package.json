@@ -27,7 +27,7 @@
     "components": "node --import tsx examples/components/main.ts",
     "web-gpu": "vite --config examples/web-gpu/vite.config.ts",
     "web-gpu:build": "vite build --config examples/web-gpu/vite.config.ts",
-    "web-gpu:typecheck": "tsc -p examples/web-gpu/tsconfig.json",
+    "web-gpu:typecheck": "tsc -p examples/web-gpu/tsconfig.json && tsc -p examples/web-gpu/tsconfig.e2e.json",
     "test:browser:web-gpu": "playwright test --config examples/web-gpu/playwright.config.ts",
     "record:hero": "node --import tsx examples/hero/record.ts",
     "record:modes": "node --import tsx examples/hero/modes.ts",

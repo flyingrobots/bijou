@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bijou GPU Showcase</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./src/showcase.css">
+  </head>
+  <body>
+    <header>
+      <h1>Bijou GPU Showcase</h1>
+      <p>Example apps mounted with <code>mountBijouCanvas()</code> on Geordi's presenters. Click the Surface, then type.</p>
+    </header>
+    <main>
+      <section id="surface" aria-label="Bijou Surface"></section>
+      <aside aria-label="Diagnostics">
+        <h2>App</h2>
+        <div id="apps" class="controls"></div>
+        <h2>Backend</h2>
+        <div id="backends" class="controls"></div>
+        <h2>Hostile events</h2>
+        <div id="hostile" class="controls"></div>
+        <h2>HUD</h2>
+        <dl id="hud"></dl>
+        <h2>Not mounted</h2>
+        <ul id="refused"></ul>
+        <p id="boot-error" role="alert"></p>
+      </aside>
+    </main>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
