@@ -56,11 +56,23 @@ toggle action.
 | SSA-21 | The package root exports the contract. | `exports the contract from the package root` | Implemented |
 | SSA-22 | The controller runs with no `document` and no `window`. | `runs where no document or window exists` | Implemented |
 
+## Import graph: `semantic-scene.part06.test.ts`
+
+The test follows the relative imports of `semantic-scene.ts` through the source
+files they reach.
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| SSA-24 | The reached files import no package except `@flyingrobots/bijou`. | `reaches the controller and imports only the bijou core package` | Implemented |
+| SSA-25 | No reached file, and no name imported from a package, is a DOM or browser module. | `imports no DOM or browser module or name` | Implemented |
+| SSA-26 | No reached file names the `document` or `window` global. | `names no document or window global in any reached file` | Implemented |
+
 ## Not covered
 
 - No test runs the controller under a DOM host. SSA-16 uses two
   `BijouContext` values and two bus owners in the sealed Node runner.
 - No test connects the controller to `run()`. The contract is not part of the
   terminal runtime.
-- SSA-22 checks the globals of the test process. It does not inspect the
-  import graph of the package.
+- SSA-24 to SSA-26 read import statements with a pattern. They do not run
+  the TypeScript resolver, and they do not follow the modules of
+  `@flyingrobots/bijou` itself.
