@@ -7,11 +7,11 @@ import { execute, readInput, requireFree } from './process.mjs';
 import { snapshot } from './snapshot.mjs';
 import { validateWindowsWorker as validate } from './windows-policy.mjs';
 import { templateConsumerManifest } from './consumer-manifest.mjs';
+import { copyLocalTarballs } from './local-tarballs.mjs';
 import { requireWindowsBootstrapClear } from './windows-quarantine.mjs';
 import { validateWindowsUsage } from './windows-usage.mjs';
-import { windowsCommand } from './windows-stage.mjs';
-import { prepareWorkerProgram } from './windows-worker.mjs';
-import { hostVolumeInventory, parseHostVolumes } from './windows-volumes.mjs';
+import { parseWorkerStorage, storageContract, storageMeasureProgram } from './windows-storage.mjs';
+import { assignSourceOwnerProgram, prepareWorkerProgram } from './windows-worker.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const command = process.argv.slice(2);
@@ -27,7 +27,6 @@ const destination = join(process.env.RUNNER_TEMP, 'bijou-sealed-evidence', rando
 const GiB = 1024 ** 3;
 const label = 'org.bijou.sealed-tests';
 const ps = ['powershell', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command'];
-const measureProgram = readFileSync(new URL('./windows-measure.ps1', import.meta.url), 'utf8');
 const generatedBudget = 40 * 1024 ** 2;
 const npm = ['node', 'C:\\node\\node_modules\\npm\\bin\\npm-cli.js'];
 requireFree(root);
@@ -35,7 +34,6 @@ requireWindowsBootstrapClear();
 mkdirSync(destination, { recursive: true });
 let snap; let created = false; let sealed = false; let cleanupComplete = false;
 let backing; let lastBackingFree; let backingGrowth = 0;
-let hostVolumes; let quotaVolume;
 let dataBaseline; let dataBackingStart = 0; let logBaseline; let logBackingStart = 0;
 const controller = new AbortController();
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => controller.abort());
@@ -52,19 +50,19 @@ async function measure(baseline = false) {
   if (lastBackingFree !== undefined) backingGrowth += Math.max(0, lastBackingFree - backingFree);
   lastBackingFree = backingFree;
   const worker = await inspect(); validate(worker, sealed);
-  const result = await docker(['exec', name, ...ps, `& { ${measureProgram} } -ExpectedVolume '${quotaVolume}'`],
-  { timeout: 15000 });
-  const usage = { ...JSON.parse(result.output.toString()), backingFree };
-  if (!Number.isSafeInteger(usage.processes) || usage.processes < 1 || usage.processes > 256) throw new Error('Windows process budget exceeded');
-  const data = validateWindowsUsage(usage, dataBaseline ?? usage, backingGrowth - dataBackingStart, 4 * GiB);
+  const result = await docker(['exec', name, ...ps, storageMeasureProgram], { timeout: 15000 });
+  const usage = { ...parseWorkerStorage(result.output.toString()), backingFree };
+  if (usage.processes < 1 || usage.processes > 256) throw new Error('Windows process budget exceeded');
+  const data = validateWindowsUsage(usage, dataBaseline ?? usage, backingGrowth - dataBackingStart, 4 * GiB, 'data');
   if (baseline) { logBaseline = usage; logBackingStart = backingGrowth; }
-  const generated = logBaseline ? validateWindowsUsage(usage, logBaseline, backingGrowth - logBackingStart, generatedBudget) : 0;
+  const generated = logBaseline ? validateWindowsUsage(usage, logBaseline, backingGrowth - logBackingStart, generatedBudget, 'generated data') : 0;
   Object.assign(usage, { data, generated, backingGrowth });
   return usage;
 }
 function manifests(snapshot) {
   const target = join(snapshot.directory, 'manifests'); mkdirSync(target);
   for (const file of ['package.json', 'package-lock.json']) copyFileSync(join(snapshot.source, file), join(target, file));
+  copyLocalTarballs(JSON.parse(readFileSync(join(snapshot.source, 'package-lock.json'), 'utf8')), snapshot.source, target);
   mkdirSync(join(target, 'bench'));
   copyFileSync(join(snapshot.source, 'bench', 'package.json'), join(target, 'bench', 'package.json'));
   mkdirSync(join(target, 'canary'));
@@ -95,36 +93,23 @@ async function createWorker(network) {
   dataBaseline = undefined; logBaseline = undefined; dataBackingStart = backingGrowth;
   created = true;
   await docker(['create', '--name', name, '--label', `${label}=windows-v1`, '--isolation', 'process',
-    '--network', network, '--cpu-count', '2', '--memory', '6g', '--storage-opt', 'size=8G',
+    '--network', network, '--cpu-count', '2', '--memory', '6g', '--storage-opt', `size=${storageContract.requestedSize}`,
     '--log-driver', 'json-file', '--log-opt', 'max-size=1m', '--log-opt', 'max-file=1', image]);
   validate(await inspect(), network === 'none');
   await docker(['start', name]);
   await docker(['exec', name, ...ps, prepareWorkerProgram]);
-  const volumeResult = await docker(['exec', name, ...ps,
-    "$ErrorActionPreference='Stop'; ConvertTo-Json -InputObject @((Get-CimInstance -ClassName Win32_Volume -Filter \"DriveLetter='C:'\").DeviceID) -Compress"],
-  { timeout: 15000 });
-  const volumes = JSON.parse(volumeResult.output.toString());
-  if (!Array.isArray(volumes) || volumes.length !== 1 || typeof volumes[0] !== 'string'
-      || !/^\\\\\?\\Volume\{[0-9a-f-]{36}\}\\$/iu.test(volumes[0])
-      || hostVolumes.includes(volumes[0].toLowerCase())) throw new Error('Independent container quota volume cannot be established');
-  quotaVolume = volumes[0];
-  await docker(['exec', name, ...ps, `& { ${measureProgram} } -Initialize -ExpectedVolume '${quotaVolume}'`], { timeout: 15000 });
+  // The first measurement also admits the worker volume as the storage boundary.
   dataBaseline = await measure();
   dataBackingStart = backingGrowth;
 }
 async function assignSourceOwner() {
   // Git checks ownership of the worktree root as well as .git. The latter is
   // created by ContainerUser; Docker copy leaves the former administrator-owned.
-  await docker(['exec', name, ...ps,
-    "$ErrorActionPreference='Stop'; icacls C:\\work\\source /setowner ContainerUser; if($LASTEXITCODE -ne 0) { throw 'Source ownership assignment failed' }; $expected=([System.Security.Principal.NTAccount]'ContainerUser').Translate([System.Security.Principal.SecurityIdentifier]).Value; $actual=(Get-Acl C:\\work\\source).GetOwner([System.Security.Principal.SecurityIdentifier]).Value; if($actual -ne $expected) { throw 'Source ownership verification failed' }"],
-  { timeout: 15000 });
+  await docker(['exec', name, ...ps, assignSourceOwnerProgram], { timeout: 15000 });
 }
 try {
   backing = JSON.parse((await docker(['info', '--format', '{{json .DockerRootDir}}'])).output.toString());
   lastBackingFree = requireFree(backing);
-  const hostVolumeResult = await windowsCommand(hostVolumeInventory.label, hostVolumeInventory.argv,
-    { timeout: hostVolumeInventory.timeout, signal: controller.signal, hostPath: backing });
-  hostVolumes = parseHostVolumes(hostVolumeResult.output.toString());
   const toolchain = JSON.parse((await docker(['image', 'inspect', image])).output.toString())[0];
   if (toolchain.Os !== 'windows' || toolchain.Size > 20 * GiB) throw new Error('Windows toolchain image invalid');
   const sourceIndex = process.env.GIT_INDEX_FILE ? resolve(process.cwd(), process.env.GIT_INDEX_FILE) : undefined;
@@ -157,7 +142,8 @@ try {
   await measure(true);
   writeFileSync(join(destination, 'admission.json'), JSON.stringify({
     sourceSha256: snap.digest, image: toolchain.Id, hostConfig: config.HostConfig,
-    limits: { cpu: 2, memory: 6 * GiB, storage: 8 * GiB, data: 4 * GiB, temporary: 4 * GiB, generated: generatedBudget, processes: 256 },
+    limits: { cpu: 2, memory: 6 * GiB, storage: storageContract.maximumCapacityBytes, data: 4 * GiB, temporary: 4 * GiB, generated: generatedBudget, processes: 256 },
+    storage: storageContract,
     usage: await measure(), command,
   }, null, 2));
   await docker(['exec', '--user', 'ContainerUser', '--workdir', 'C:\\work\\source', name,
@@ -167,7 +153,9 @@ try {
     allowFailure: true, monitor: measure, onData: (chunk) => process.stdout.write(chunk),
   });
   writeFileSync(join(destination, 'stdout.log'), result.output);
-  writeFileSync(join(destination, 'receipt.json'), JSON.stringify({ code: result.code, sourceSha256: snap.digest, usage: await measure() }));
+  writeFileSync(join(destination, 'receipt.json'), JSON.stringify({
+    code: result.code, sourceSha256: snap.digest, storage: storageContract, usage: await measure(),
+  }));
   process.exitCode = result.code;
 } finally {
   if (created) {

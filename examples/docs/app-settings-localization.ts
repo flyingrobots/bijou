@@ -15,12 +15,16 @@ import type {
   DocsExplorerModel,
   DocsMsg,
 } from './app-model.js';
+import type { DocsLocaleLocalization } from './app-locale-localization.js';
 
 export function localizationSettingsSection(
   model: DocsExplorerModel,
   localization: LocalizationPort,
+  localeLocalization: DocsLocaleLocalization,
 ): FrameSettingSection<DocsMsg> {
   const nextLocale = nextDogfoodLocale(model.locale);
+  // The notice reports the switch, so it speaks the language being chosen.
+  const nextLocalization = localeLocalization(nextLocale.id);
   return {
     id: 'localization',
     title: dogfoodText(
@@ -44,15 +48,15 @@ export function localizationSettingsSection(
         kind: 'choice',
         action: { type: 'cycle-locale' },
         feedback: {
-          title: shellText(localization, 'settings.title', 'Settings'),
+          title: shellText(nextLocalization, 'settings.title', 'Settings'),
           message: dogfoodText(
-            localization,
+            nextLocalization,
             'settings.language.feedback',
             'Language set to {language}.',
             {
               language: dogfoodLocaleLabel(
                 nextLocale.id,
-                localization,
+                nextLocalization,
               ),
             },
           ),

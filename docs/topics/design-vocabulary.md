@@ -20,6 +20,7 @@ Use one term per concept, and define unfamiliar terms at first use (R45 §7.2).
 | Component | Leaf rendering vocabulary, such as `alert()` or `table()`. |
 | Block | A unit that owns product semantics, data contracts, and lowering facts. |
 | Surface | Structured terminal-cell output. |
+| Surface presenter | A host that shows `interactive` frames from Surfaces instead of from terminal bytes (`SurfacePresenter`). |
 | Family | One semantic job that one or more components perform, such as "Inline status" (R52). |
 | Section | A Components Library grouping of related families for browsing, such as "Status and in-flow feedback". A section is not a family. |
 | Variant | A semantic, interaction-layer, or render-path form of a family (R52). |
@@ -28,6 +29,7 @@ Use one term per concept, and define unfamiliar terms at first use (R45 §7.2).
 | Command and effect | A command requests change; an effect interacts with the outside world. |
 | Core and TUI | Ownership: `@flyingrobots/bijou` (core) or `@flyingrobots/bijou-tui` (TUI). |
 | Versioned artifact | An explicit contract such as `ui-scene-ir/1` or `bijou-block/1`. |
+| Semantic scene app | A TEA app that also projects its model to a `ui-scene-ir/1` scene and maps a declared action of that scene to a message. |
 
 Say "output mode", not "profile", "lowering", or "TUI mode", when you mean `interactive`, `static`, `pipe`, or `accessible`. "Lowering" names the process of rendering for a less capable mode. Introduce it with care in first-use paths (R15).
 

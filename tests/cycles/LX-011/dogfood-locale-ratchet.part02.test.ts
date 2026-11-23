@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createScriptTestContext as createTestContext, runScriptDeterministic as runScript } from '../../helpers/scripted.js';
+import { createToastCompressedScriptContext } from '../../helpers/scripted-compressed-time.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 
 type DocsModel = ReturnType<ReturnType<typeof createDocsApp>['init']>[0];
@@ -79,7 +80,7 @@ describe('LX-011 DOGFOOD locale ratchet', () => {
     });
 
   it('preserves extra DOGFOOD catalog overrides after language cycling', async () => {
-      const ctx = createTestContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
+      const ctx = createToastCompressedScriptContext({ mode: 'interactive', runtime: { columns: 120, rows: 40 } });
       const app = createDocsApp(ctx, {
         initialRoute: 'docs',
         locale: 'en',

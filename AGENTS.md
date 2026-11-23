@@ -21,6 +21,16 @@ This guide is for AI agents and human operators recovering context in the Bijou 
   mounts, Docker-socket exposure and environment-only guard bypasses are forbidden.
   Report a refused run as blocked; preserve its evidence and fix the boundary.
 
+- **One suite runs outside the seal, on purpose: the browser suite of
+  `examples/web-gpu`** (`npm run test:browser:web-gpu`, CI job "Browser Suite
+  (web-gpu, Chrome)"). The sealed workers have no browser and no GPU, and a
+  build-only check is not evidence that a page renders. This is the only
+  exception. It drives the built showcase in a real Chrome and nothing else: it
+  is not a place for unit tests, and `tests/web-gpu/ci-browser-job.test.ts`
+  holds its CI job to `npm ci` plus the suite. Everything that does not need a
+  browser, including the showcase's build and typecheck, stays in the seal.
+  Record which browser, adapter and evidence level produced a result.
+
 - The canonical standards artifact is
   **`docs/typescript-code-standards.editors-edition.md`**, copied verbatim from
   the TypeScript Code Standards Editor's Edition source package. Humans and
