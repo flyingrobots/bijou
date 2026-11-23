@@ -14,8 +14,11 @@ The package has no runtime dependencies. Its sources import nothing from
 Node.js and do not name `process` or `Buffer`; it compiles with
 `"types": []`, so those names do not typecheck.
 
-The package only writes output. It attaches no keyboard, IME, or pointer
-input, mounts no canvas, and renders nothing into the DOM.
+The ports only write output. They attach no keyboard, IME, or pointer
+input, and mount no canvas.
+
+`mountBijouDom()` runs a semantic scene app as native DOM elements. Its
+reference is [DOM host](../bijou-web-dom/README.md).
 
 ## `createWebClock(options?)`
 
