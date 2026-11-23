@@ -1,51 +1,22 @@
 import { readFileSync } from 'node:fs';
-import { dirname, join, normalize } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import {
+  collectImports,
+  importGraph,
+} from './semantic-scene-imports.test-support.js';
 
 const sourceDirectory = dirname(fileURLToPath(import.meta.url));
-const specifierPattern =
-  /(?:import|export)([^;]*?)from\s+['"]([^'"]+)['"]/gsu;
 const browserName = /dom|browser/iu;
+const domGlobal = /\b(?:document|window)\b/u;
 
-interface ImportGraph {
-  readonly files: readonly string[];
-  readonly packages: readonly string[];
-  readonly packageNames: readonly string[];
-}
-
-/** Follow the relative imports of `entry` and collect what they reach. */
-function importGraph(entry: string): ImportGraph {
-  const files = new Set<string>();
-  const packages = new Set<string>();
-  const packageNames = new Set<string>();
-  const pending = [entry];
-  while (pending.length > 0) {
-    const file = pending.pop();
-    if (file === undefined || files.has(file)) continue;
-    files.add(file);
-    const source = readFileSync(join(sourceDirectory, file), 'utf8');
-    for (const [, clause = '', specifier = ''] of source.matchAll(specifierPattern)) {
-      if (specifier.startsWith('.')) {
-        const target = specifier.replace(/\.js$/u, '.ts');
-        pending.push(normalize(join(dirname(file), target)));
-        continue;
-      }
-      packages.add(specifier);
-      for (const name of clause.match(/[A-Za-z_]\w*/gu) ?? []) {
-        packageNames.add(name);
-      }
-    }
-  }
-  return {
-    files: [...files].sort(),
-    packages: [...packages].sort(),
-    packageNames: [...packageNames].sort(),
-  };
+function readSource(file: string): string {
+  return readFileSync(join(sourceDirectory, file), 'utf8');
 }
 
 describe('semantic scene contract: import graph', () => {
-  const graph = importGraph('semantic-scene.ts');
+  const graph = importGraph('semantic-scene.ts', readSource);
 
   it('reaches the controller and imports only the bijou core package', () => {
     expect(graph.files).toContain('semantic-scene-controller.ts');
@@ -60,9 +31,42 @@ describe('semantic scene contract: import graph', () => {
 
   it('names no document or window global in any reached file', () => {
     const mentions = graph.files.filter((file) =>
-      /\b(?:document|window)\b/u.test(
-        readFileSync(join(sourceDirectory, file), 'utf8'),
-      ));
+      domGlobal.test(readSource(file)));
     expect(mentions).toEqual([]);
+  });
+});
+
+describe('semantic scene contract: import scanner', () => {
+  it('reads side-effect, multi-line and re-export statements', () => {
+    const source = [
+      "import './browser-side-effect.js';",
+      'import {',
+      '  a,',
+      "} from '@scope/pkg';",
+      "export * from './more.js';",
+      "export const empty = '';",
+    ].join('\n');
+
+    expect(collectImports(source)).toEqual([
+      { specifier: './browser-side-effect.js', names: [] },
+      { specifier: '@scope/pkg', names: ['a'] },
+      { specifier: './more.js', names: [] },
+    ]);
+  });
+
+  it('follows a side-effect import to a file that the checks then read', () => {
+    const sources = new Map([
+      ['entry.ts', "import './browser-side-effect.js';"],
+      ['browser-side-effect.ts', "document.title = 'x';"],
+    ]);
+    const graph = importGraph('entry.ts', (file) => sources.get(file) ?? '');
+
+    expect(graph.files).toEqual(['browser-side-effect.ts', 'entry.ts']);
+    expect(graph.files.filter((file) => browserName.test(file)))
+      .toEqual(['browser-side-effect.ts']);
+    expect(graph.files.filter((file) =>
+      domGlobal.test(sources.get(file) ?? ''))).toEqual([
+      'browser-side-effect.ts',
+    ]);
   });
 });
