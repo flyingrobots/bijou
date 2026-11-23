@@ -44,6 +44,13 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    // The showcase, and the page the browser suite checks mountBijouDom() on.
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('index.html', import.meta.url)),
+        dom: fileURLToPath(new URL('dom.html', import.meta.url)),
+      },
+    },
     emptyOutDir: true,
     target: 'es2022',
     reportCompressedSize: false,

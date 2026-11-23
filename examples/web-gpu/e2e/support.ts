@@ -7,6 +7,8 @@ declare global {
   interface Window {
     /** A canvas a test remembers, to tell a replaced canvas from the same one. */
     __previousCanvas?: Element | null;
+    /** The DOM check's input element before typing, to tell it from a replacement. */
+    __previousInput?: Element | null;
     /** WebGL context events a test saw on the presenting canvas. */
     __contextEvents?: string[];
   }

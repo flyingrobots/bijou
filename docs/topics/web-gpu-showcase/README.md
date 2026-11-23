@@ -88,6 +88,15 @@ the page always reads back, so the HUD never shows it.
 `window.__bijouWebGpu` exposes the HUD state and these operations to the
 browser suite.
 
+## DOM host check page
+
+`examples/web-gpu/dom.html` is not part of the showcase. It mounts a small
+semantic scene app (`src/dom/controls-app.ts`: a status, a Button, a text
+input with a greeting that follows it, and a switch) with `mountBijouDom()`,
+passing the real `document`. `window.__bijouDom` exposes the model, the
+controller's diagnostics and `stop()` to the browser suite. The model counts
+every action message it receives in `dispatches`.
+
 ## Evidence
 
 The browser suite runs in Google Chrome, headless.

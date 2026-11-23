@@ -44,6 +44,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   read files at module load, are listed as refused rather than mounted.
 - `mountBijouCanvas()` takes an app factory, called once with the run's
   context, and a `css` option passed to the run (#797).
+- The browser suite also checks `mountBijouDom()` in Google Chrome on
+  `examples/web-gpu/dom.html`: one dispatch per click, Enter and Space on a
+  `<button>`, and an `<input>` that keeps its element, focus and selection
+  through typing and an IME commit (#797).
 - `@flyingrobots/bijou-web` has `mountBijouDom()` (#796). It runs a
   `SemanticSceneApp` in a DOM container as native elements: a `button` or
   `switch` role becomes a `<button>`, and a `textbox` becomes an `<input>`.

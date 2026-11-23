@@ -63,8 +63,8 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | --- | --- | --- | --- |
 | WGPU-20 | Where Chrome exposes a WebGPU adapter, the counter on WebGPU gives a probed receipt with the same `frameRgbaSha256` as WebGL2 and takes a key. Without an adapter the case is skipped as capability-refused. | `counter on WebGPU draws the same frame as WebGL2 and takes a key` | Implemented |
 
-## Planned
+## DOM host check: `examples/web-gpu/e2e/dom.e2e.ts` (browser)
 
-| ID | Requirement | Status |
-| --- | --- | --- |
-| WGPU-21 | A live Chromium check of `mountBijouDom()` on this harness: mount one app, click an action, type into an input, and assert the input element's identity and selection survive a patch. Owed by flyingrobots/bijou#796, which merges after this page. | Planned |
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WGPU-21 | `dom.html` mounts a semantic scene app with `mountBijouDom()`; the case is DOM-27 of the [DOM host test plan](../bijou-web-dom/test-plan.md). | `mountBijouDom() in Chromium: one dispatch per activation, and typing or composing keeps the input element, focus and selection` | Implemented |
