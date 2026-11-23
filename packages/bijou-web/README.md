@@ -3,9 +3,10 @@
 The browser host adapter for Bijou.
 
 `@flyingrobots/bijou-web` implements Bijou's clock, runtime, style, and output
-I/O ports for a browser window or worker, and composes them into a
-`BijouContext`. It has no runtime dependencies and imports nothing from
-Node.js.
+I/O ports for a browser window or worker, composes them into a
+`BijouContext`, and mounts a TEA app on a `<canvas>` it owns. It has no
+runtime dependencies, imports nothing from Node.js, and depends on
+`@flyingrobots/bijou-tui` only as a peer.
 
 This package is a workspace package. It is not published to npm yet.
 
@@ -19,10 +20,38 @@ This package is a workspace package. It is not published to npm yet.
 | `createWebOutputIO()` | `IOPort` | Output to your sinks or to in-memory buffers. |
 | `createWebInteractiveIO()` | `IOPort` | Output plus keyboard, IME, paste, pointer, wheel, and resize input. |
 | `createWebContext()` | `BijouContext` | The four output-side ports composed through `createBijou()`. |
+| `createWebInteractiveContext()` | `BijouContext` | The same, with `createWebInteractiveIO()` as the I/O port. |
+| `mountBijouCanvas()` | — | Runs a TEA app on an owned `<canvas>` through injected presenters. |
 | `mountBijouDom()` | DOM host | Runs a semantic scene app as native DOM elements. |
 
-`createWebContext()` only writes output. The package mounts no canvas;
-`mountBijouDom()` renders a semantic scene app into the DOM.
+`createWebContext()` only writes output.
+
+## Mount on a canvas
+
+`mountBijouCanvas()` adds a canvas and a hidden textarea to a container,
+picks a presenter (`'auto'` tries `webgpu`, `webgl2`, then `canvas2d`, each
+on a fresh canvas), and runs the app with frames drawn once per animation
+frame. You inject the presenter factories, so the package depends on no GPU
+library. The example is illustrative; `app`, `container`, the three factory
+functions and `cellPxW`/`cellPxH` stand for your own values.
+
+```ts
+import { mountBijouCanvas } from '@flyingrobots/bijou-web';
+
+const handle = await mountBijouCanvas(app, container, {
+  createCanvas: () => document.createElement('canvas'),
+  cellPx: { width: cellPxW, height: cellPxH },
+  presenters: { webgpu: makeWebGpu, webgl2: makeWebGl2, canvas2d: makeCanvas2d },
+});
+console.log(handle.backend, handle.fallbackReasons);
+await handle.switchBackend('canvas2d'); // keeps the model and input
+await handle.stop(); // idempotent; removes everything it added
+```
+
+Only an unavailable backend falls back; a renderer fault rejects. The
+[reference](../../docs/topics/bijou-web/README.md#mountbijoucanvasapp-container-options)
+has the presenter interface and an example that wires Geordi's factories. The
+mount has been tested with in-memory fakes, not in a real browser.
 
 ## Read input
 

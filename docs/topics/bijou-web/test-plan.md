@@ -163,3 +163,63 @@ named test. A name with `%s` is one parameterized test.
 | WEB-101 | `rawInput()` no longer refuses, and output still works. | `no longer refuses rawInput, and still writes output` | Implemented |
 | WEB-102 | The adapter works without a textarea or a surface. | `works with no textarea and no surface` | Implemented |
 | WEB-103 | 1,000 mixed events leave zero listeners after dispose. | `leaves zero listeners after 1,000 mixed resize, key, and pointer events` | Implemented |
+
+## Interactive context: `context-interactive.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-104 | `createWebInteractiveContext()` reads the textarea through `io.rawInput()`, in `interactive` mode. | `composes a context whose io reads the textarea through rawInput` | Implemented |
+| WEB-105 | Pointer input is hit-tested and SGR-encoded against the context runtime size. | `hit-tests and encodes pointer input against the context runtime size` | Implemented |
+| WEB-106 | Runtime resizes reach `io.onResize()`. | `forwards runtime resizes to io.onResize` | Implemented |
+| WEB-107 | `io.dispose()` removes every input listener. | `removes every input listener on io.dispose()` | Implemented |
+
+## Canvas ladder: `canvas-ladder.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-108 | `'auto'` presents on WebGPU first and records no fallback. | `uses WebGPU first in auto mode and records no fallback` | Implemented |
+| WEB-109 | `'auto'` tries `webgpu`, `webgl2`, `canvas2d` in strict order, each on its own canvas, with each exact reason. | `tries webgpu, then webgl2, then canvas2d in strict order and records each exact reason` | Implemented |
+| WEB-110 | A backend that fails after binding a context is removed with its canvas; the next one gets a fresh canvas. | `mounts a fresh canvas after a backend fails once it has bound a context` | Implemented |
+| WEB-111 | A backend without a factory is passed over with a recorded reason. | `skips a backend that has no factory in auto mode and says so` | Implemented |
+| WEB-112 | A renderer fault stops `'auto'` loudly with no fallback and leaves nothing mounted. | `stops loudly on a renderer fault in auto mode and never falls back` | Implemented |
+| WEB-113 | A forced backend's unavailability rejects with the typed error and no fallback. | `fails a forced backend loudly when it is unavailable, with no fallback` | Implemented |
+| WEB-114 | A forced backend without a factory rejects. | `fails a forced backend that has no factory` | Implemented |
+| WEB-115 | An exhausted ladder rejects with every reason and leaves nothing mounted. | `reports every reason when no backend in the ladder is available` | Implemented |
+| WEB-116 | The unavailability predicate is injectable. | `accepts an injected predicate for unavailability` | Implemented |
+
+## Canvas frames: `canvas-frames.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-117 | The first frame is a full refresh at the container's grid size. | `presents the first frame with a full refresh at the grid size of the container` | Implemented |
+| WEB-118 | Runtime frames between two animation frames coalesce into one present. | `coalesces every runtime frame between two animation frames into one present` | Implemented |
+| WEB-119 | A new container box resizes the presenter and the grid, then refreshes fully. | `resizes the presenter and the grid when the container box changes` | Implemented |
+| WEB-120 | The device-pixel content box and DPR changes set the grid. | `uses the device-pixel content box and follows DPR changes` | Implemented |
+| WEB-121 | A Surface without packed storage is refused with a typed error. | `refuses a Surface without packed storage instead of dropping its dirty bits` | Implemented |
+
+## Canvas switching: `canvas-switch.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-122 | `switchBackend()` swaps canvas and presenter, keeping the model, focus and input wiring; the old canvas keeps no listener. | `swaps the canvas and presenter while keeping the TEA model, focus and input wiring` | Implemented |
+| WEB-123 | The new presenter re-presents the last frame with a full refresh at once. | `re-presents the last frame on the new presenter at once` | Implemented |
+| WEB-124 | An unavailable switch target rejects and keeps the current backend working. | `keeps the current backend when the switch target is unavailable` | Implemented |
+| WEB-125 | Overlapping switches run one after another. | `runs overlapping switches one after another` | Implemented |
+| WEB-126 | A switch after `stop()` is refused. | `refuses a switch after stop()` | Implemented |
+
+## Canvas lifecycle: `canvas-lifecycle.test.ts`, `canvas-crash.test.ts`, `canvas-stress.test.ts`, `canvas-types.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WEB-127 | `stop()` is idempotent and retains no listener, observer, timer, frame or presenter. | `stop() is idempotent and leaves no listener, observer, timer, frame or presenter` | Implemented |
+| WEB-128 | A zero-width or zero-height container defers the mount until the first box with area. | `defers the mount while the container has zero width, until the first non-zero box` | Implemented |
+| WEB-129 | Aborting during async WebGPU init rejects and disposes the late presenter. | `aborts a mount whose async WebGPU init is still pending, and disposes the late presenter` | Implemented |
+| WEB-130 | Aborting while waiting for a box rejects and retains nothing. | `aborts a mount that is still waiting for a non-zero box` | Implemented |
+| WEB-131 | An already aborted signal refuses before observing. | `refuses at once when the signal is already aborted` | Implemented |
+| WEB-132 | `stop()` during an async WebGPU switch aborts it without leaking. | `stop() during an async WebGPU switch aborts it without leaking a canvas or presenter` | Implemented |
+| WEB-133 | A presenter fault while drawing ends the run and rejects `done`. | `ends the run loudly when a presenter faults while presenting` | Implemented |
+| WEB-134 | `stop()` after the app crashed ends the run and rejects `done` with the crash error. | `stop() after an app crash ends the run with the crash error` | Implemented |
+| WEB-135 | `accessible` mode writes to the output sink and mounts no canvas. | `writes accessible output through the output sink and mounts no canvas` | Implemented |
+| WEB-136 | A host without `ResizeObserver` refuses loudly. | `refuses loudly when the host has no ResizeObserver` | Implemented |
+| WEB-137 | 50 mount, switch and stop cycles retain nothing. | `leaves zero listeners, observers, timers or presenters after 50 mount, switch and stop cycles` | Implemented |
+| WEB-138 | Real DOM elements and a Geordi-shaped presenter satisfy the structural interfaces at compile time. | `accepts the real DOM elements and a Geordi-shaped presenter without a cast` | Implemented |

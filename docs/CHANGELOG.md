@@ -38,9 +38,22 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   root. Theme tokens are `--bijou-semantic-*`, `--bijou-surface-*`, and
   `--bijou-border-*` custom properties that update live, and `dir` follows
   the model. `stop()` removes every listener and stops the app. The tests use
-  an in-memory document; no browser runs them. The package now has a peer
-  dependency on `@flyingrobots/bijou-tui`. Reference:
+  an in-memory document; no browser runs them. Reference:
   `docs/topics/bijou-web-dom/README.md`.
+- `mountBijouCanvas()` in `@flyingrobots/bijou-web` runs a TEA app on a
+  `<canvas>` it owns inside a container (#795). Presenters are injected per
+  backend through a structural `BijouCanvasPresenter` interface that Geordi's
+  presenters satisfy, so the package does not depend on Geordi. `'auto'` tries
+  `webgpu`, `webgl2`, then `canvas2d`, each on a fresh canvas, records
+  `fallbackReasons`, and falls back only on unavailability; a renderer fault
+  or a forced backend's unavailability rejects. Frames coalesce onto
+  `requestAnimationFrame`; the container's device-pixel box and DPR set the
+  grid; a zero-size container defers the mount. `switchBackend()` swaps canvas
+  and presenter while the run, model, focus and input stay; `stop()` is
+  idempotent and leaves nothing attached. `createWebInteractiveContext()`
+  composes a context around `createWebInteractiveIO()`. The package now has
+  `@flyingrobots/bijou-tui` as a peer dependency. Tested with in-memory fakes
+  only, not in a real browser.
 - `createWebInteractiveIO()` in `@flyingrobots/bijou-web` reads browser input
   through a hidden `<textarea>` and a surface element (#793): keys, IME
   composition (delivered once in either `compositionend` and `input` order),
