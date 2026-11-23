@@ -1,5 +1,5 @@
 // Windows counterpart of dependencies.mjs: keep consumer graph selection aligned.
-// Only manifests, lockfile and this audited preparation program are present.
+// Only manifests, lockfile, the lockfile's repository tarballs and this audited preparation program are present.
 import { readFileSync, readdirSync, mkdirSync, writeFileSync, rmSync, openSync, closeSync, fstatSync, readSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';

@@ -52,7 +52,10 @@ node scripts/docker-seal/run.mjs -- sh -c 'npm run build && npm run lint && npm 
 ```
 
 Package downloads happen in a separate bounded setup worker that receives only
-package manifests and the lockfile. Package lifecycle scripts are disabled
+package manifests, the lockfile, and the repository tarballs the lockfile
+resolves with `file:` (the vendored Geordi packages of `examples/web-gpu`,
+listed by `scripts/docker-seal/local-tarballs.mjs`). npm checks each tarball
+against its lockfile `integrity`. Package lifecycle scripts are disabled
 there. Tests and lifecycle execution run afterward with networking disabled.
 Missing offline dependencies fail the run; the launcher does not restore
 network access as a fallback.

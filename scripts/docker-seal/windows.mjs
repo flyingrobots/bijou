@@ -7,6 +7,7 @@ import { execute, readInput, requireFree } from './process.mjs';
 import { snapshot } from './snapshot.mjs';
 import { validateWindowsWorker as validate } from './windows-policy.mjs';
 import { templateConsumerManifest } from './consumer-manifest.mjs';
+import { copyLocalTarballs } from './local-tarballs.mjs';
 import { requireWindowsBootstrapClear } from './windows-quarantine.mjs';
 import { validateWindowsUsage } from './windows-usage.mjs';
 import { parseWorkerStorage, storageContract, storageMeasureProgram } from './windows-storage.mjs';
@@ -61,6 +62,7 @@ async function measure(baseline = false) {
 function manifests(snapshot) {
   const target = join(snapshot.directory, 'manifests'); mkdirSync(target);
   for (const file of ['package.json', 'package-lock.json']) copyFileSync(join(snapshot.source, file), join(target, file));
+  copyLocalTarballs(JSON.parse(readFileSync(join(snapshot.source, 'package-lock.json'), 'utf8')), snapshot.source, target);
   mkdirSync(join(target, 'bench'));
   copyFileSync(join(snapshot.source, 'bench', 'package.json'), join(target, 'bench', 'package.json'));
   mkdirSync(join(target, 'canary'));
