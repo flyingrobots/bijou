@@ -24,5 +24,16 @@ test('counter on WebGPU draws the same frame as WebGL2 and takes a key', async (
   await page.keyboard.press('+');
   await expect.poll(() => countModel(page)).toBe(1);
   expect(ink(await cellPixels(page, COUNTER_DIGIT.col, COUNTER_DIGIT.row))).toBeGreaterThan(0);
+
+  // Switches dispose WebGPU presenters while the HUD may be reading one back.
+  for (let round = 0; round < 10; round++) {
+    await page.evaluate(async () => {
+      const probe = window.__bijouWebGpu;
+      await Promise.all([probe?.state(), probe?.switchBackend('webgl2'), probe?.state(), probe?.switchBackend('webgpu'), probe?.state()]);
+    });
+  }
+  await waitFor(page, (current) => current.backend === 'webgpu' && current.evidenceLevel !== null);
+  expect(await page.evaluate(() => window.__bijouWebGpu?.failures())).toEqual([]);
+  await expect(page.locator('#boot-error')).toHaveText('');
   expect(errors).toEqual([]);
 });

@@ -17,7 +17,8 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | WGPU-03 | Each tarball has the SHA-256 the pin records. | `%s tarball matches its recorded SHA-256` | Implemented |
 | WGPU-04 | The vendored procedural glyph table has the SHA-256 the pin records. | `%s matches its recorded SHA-256` | Implemented |
 | WGPU-05 | The manifest and lockfile resolve each package from its tarball, with matching npm integrity. | `%s resolves from the vendored tarball with npm integrity` | Implemented |
-| WGPU-06 | The sealed dependency worker receives the lockfile's repository tarballs, and refuses a path outside the repository. | `lists the vendored Geordi tarballs the lockfile resolves`, `refuses %s` in `scripts/docker-seal/local-tarballs.test.ts` | Implemented |
+| WGPU-23 | Every pinned file is `-text` in `.gitattributes`, so a CRLF checkout keeps its bytes. | `keeps every pinned file byte-exact on checkout through .gitattributes` | Implemented |
+| WGPU-06 | The sealed dependency worker receives the lockfile's repository tarballs, and refuses a path outside the repository or with a backslash. | `lists the vendored Geordi tarballs the lockfile resolves`, `refuses %s` in `scripts/docker-seal/local-tarballs.test.ts` | Implemented |
 
 ## No Node built-in: `tests/web-gpu/node-imports.test.ts` (sealed)
 
@@ -50,18 +51,19 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | WGPU-16 | `WEBGL_lose_context` loses and restores the context; the presenter redraws the same pixels without an app frame, and later frames read back as before. | `a WEBGL_lose_context loss and restore redraws the same frame without the app` | Implemented |
 | WGPU-17 | A viewport resize changes the grid the HUD reports, to the canvas box divided by the cell. | `resizing the viewport changes the grid the HUD reports` | Implemented |
 | WGPU-18 | An atlas reset starts a new generation and the frame reads back as before. | `a forced glyph atlas reset starts a new generation and redraws the same pixels` | Implemented |
+| WGPU-22 | With spare pixels past the last whole cell, the probe reads each cell at the mount's cell size. | `the cell probe reads at the mount cell size when the canvas has spare pixels` | Implemented |
 
 ## Stress: `examples/web-gpu/e2e/stress.e2e.ts` (browser)
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| WGPU-19 | Ten rounds of app and backend toggles, fired without waiting, leave one canvas and one textarea, at most three nodes at any sample, a healthy HUD and no error. | `ten rapid app and backend toggles leave one canvas, one textarea and no error` | Implemented |
+| WGPU-19 | Ten rounds of app and backend toggles, fired without waiting, leave one canvas and one textarea, at most three nodes at any sample, a healthy HUD, no failed operation in the retained history, and no error. | `ten rapid app and backend toggles leave one canvas, one textarea and no error` | Implemented |
 
 ## WebGPU: `examples/web-gpu/e2e/webgpu.e2e.ts` (browser)
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| WGPU-20 | Where Chrome exposes a WebGPU adapter, the counter on WebGPU gives a probed receipt with the same `frameRgbaSha256` as WebGL2 and takes a key. Without an adapter the case is skipped as capability-refused. | `counter on WebGPU draws the same frame as WebGL2 and takes a key` | Implemented |
+| WGPU-20 | Where Chrome exposes a WebGPU adapter, the counter on WebGPU gives a probed receipt with the same `frameRgbaSha256` as WebGL2 and takes a key. Ten rounds of switches during HUD readbacks leave no failed operation, no HUD refresh error and no page error. Without an adapter the case is skipped as capability-refused. | `counter on WebGPU draws the same frame as WebGL2 and takes a key` | Implemented |
 
 ## DOM host check: `examples/web-gpu/e2e/dom.e2e.ts` (browser)
 

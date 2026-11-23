@@ -4,7 +4,8 @@ import { createShowcaseAtlas } from './atlas.js';
 import { renderHud } from './hud.js';
 import { createShowcasePresenters } from './presenters.js';
 import { installProbe } from './probe.js';
-import { createShowcaseSession, describeProblem, type ShowcaseSession } from './session.js';
+import { describeProblem } from './problems.js';
+import { createShowcaseSession, type ShowcaseSession } from './session.js';
 
 const BACKENDS: readonly BijouCanvasBackend[] = ['webgpu', 'webgl2', 'canvas2d'];
 const LABELS: Record<BijouCanvasBackend, string> = { webgpu: 'WebGPU', webgl2: 'WebGL2', canvas2d: 'Canvas 2D' };
@@ -69,7 +70,11 @@ async function boot(): Promise<void> {
     renderHud(hud, await session.state());
   };
   await refresh();
-  window.setInterval(() => { void refresh(); }, 200);
+  // A failed refresh is shown, not left as an unhandled rejection; the next one clears it.
+  const bootError = element('#boot-error');
+  window.setInterval(() => {
+    refresh().then(() => { bootError.textContent = ''; }, (error: unknown) => { bootError.textContent = `HUD refresh: ${describeProblem(error)}`; });
+  }, 200);
 }
 
 boot().catch((error: unknown) => {

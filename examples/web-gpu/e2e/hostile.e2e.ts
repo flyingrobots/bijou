@@ -93,3 +93,18 @@ test('a forced glyph atlas reset starts a new generation and redraws the same pi
   expect((await state(page)).problem).toBeNull();
   expect(errors).toEqual([]);
 });
+
+test('the cell probe reads at the mount cell size when the canvas has spare pixels', async ({ page }) => {
+  const errors = collectErrors(page);
+  await open(page, 'app=counter&backend=canvas2d');
+  // 50 px holds five 9 px cells and 5 spare pixels: 50 / 5 would give a 10 px cell.
+  await page.addStyleTag({ content: '#surface { box-sizing: content-box; width: 50px; }' });
+  const narrow = await waitFor(page, (current) => current.grid?.cols === 5);
+  const width = narrow.cellPx.width;
+  expect(await page.evaluate(() => document.querySelector('#surface canvas')?.getBoundingClientRect().width)).toBe(50);
+  expect(await page.evaluate(() => window.__bijouWebGpu?.cellRect(1, 1))).toEqual({ x: width, y: narrow.cellPx.height, width, height: narrow.cellPx.height });
+  const corner = await cellPixels(page, 0, 1);
+  expect(corner).toHaveLength(width * narrow.cellPx.height * 4);
+  expect(ink(corner)).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});

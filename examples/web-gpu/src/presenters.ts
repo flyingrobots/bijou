@@ -82,7 +82,8 @@ export interface ShowcasePresenters {
 export function createShowcasePresenters(atlas: GlyphAtlas): ShowcasePresenters {
   const live = new Map<HTMLCanvasElement, TrackedPresenter>();
   const colours = { defaultFg: SHOWCASE_DEFAULT_FG, defaultBg: SHOWCASE_DEFAULT_BG };
-  const webgl2 = new Map<HTMLCanvasElement, WebGL2SurfacePresenter>();
+  // Weak: a removed canvas and its disposed presenter are not kept alive by the lookup.
+  const webgl2 = new WeakMap<HTMLCanvasElement, WebGL2SurfacePresenter>();
   return {
     factories: {
       webgpu: async (canvas) => track('webgpu', canvas, await createWebGPUSurfacePresenter(canvas, { atlas, ...colours }), live),

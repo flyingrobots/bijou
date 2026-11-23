@@ -12,8 +12,16 @@ cases that hold this behavior are listed in the [test plan](./test-plan.md).
 | `counter` | `examples/counter/main.ts`, unmodified | The build resolves `@flyingrobots/bijou-node` to `src/browser-start-app.ts`, whose `startApp(app)` hands the app to the page instead of starting a terminal run. |
 | `showcase` | `examples/showcase/app.ts`, unmodified | `createShowcaseApp(ctx)`, built from the run's context. |
 
-Each mount builds its app from the run's context and sets that context as the
-default context first, as `startApp()` does on Node.
+Each mount passes `mountBijouCanvas()` a factory that sets the run's context
+as the default context, as `startApp()` does on Node, and then returns the
+app. The two apps are made at different times:
+
+- The counter's `App` is created when `load()` imports
+  `examples/counter/main.ts`, once per page, before any mount. Module-level
+  code there never sees a mount's context; the factory returns the existing
+  `App`, whose `view()` reads the default context when it renders.
+- The showcase's `App` is created inside the factory by
+  `createShowcaseApp(ctx)`, once per mount, with that mount's context.
 
 These example apps are not mounted, and the HUD lists them with their refusal:
 
@@ -38,7 +46,8 @@ commit that `geordi-pin.json` records, and installed through `file:`
 development dependencies whose `integrity` the lockfile records. The sealed
 dependency worker receives those tarballs with the manifests, so the sealed
 build is offline. The pin also records Geordi's procedural glyph table, which
-the Canvas 2D presenter needs and the package does not ship; the page refuses
+the Canvas 2D presenter needs and the package does not ship, a workaround for
+flyingrobots/geordi#205; the page refuses
 to start Canvas 2D unless the table hashes to the package's own
 `PROCEDURAL_GLYPH_TABLE_SHA256`.
 
@@ -65,7 +74,7 @@ ratio, the atlas has a new cell size and the page mounts the app again.
 | --- | --- |
 | App, Backend, Fallback reasons | The mount handle: `backend` and `fallbackReasons`, each as `backend: code (reason)`. |
 | Grid | `ctx.runtime.columns` by `ctx.runtime.rows`. |
-| Cell, Device pixel ratio | The atlas's physical cell size and the ratio it was resolved at. |
+| Cell, Device pixel ratio | The physical cell size and ratio the current mount was made with, so they always match its grid. |
 | Frame time | Milliseconds the last `present()` call took, measured around the call, and the number of frames presented. |
 | Evidence, Adapter, Atlas generation, Shader, Frame | The newest receipt: `evidenceLevel`, `adapter`, `atlasGeneration`, `shaderSha256` and `frameRgbaSha256`. |
 | WebGL2 context | `lost` while the WebGL2 presenter reports a lost context. |
@@ -86,7 +95,10 @@ the page always reads back, so the HUD never shows it.
 | Reset the glyph atlas | `atlas.invalidate(undefined, 'manual')`, a new atlas generation. |
 
 `window.__bijouWebGpu` exposes the HUD state and these operations to the
-browser suite.
+browser suite, with `cellRect()`, which reads cells at the mount's cell size,
+and `failures()`, every operation that failed, which a later mount does not
+clear. A HUD refresh that fails is shown below the HUD. A WebGPU readback that
+rejects because a switch disposed its presenter shows no receipt.
 
 ## DOM host check page
 

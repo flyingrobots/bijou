@@ -233,7 +233,10 @@ resolves to a `MountedBijouCanvas` handle. `app` is the app, or a function
 that builds it from the context the run uses (`BijouCanvasApp`): an app such as
 `createShowcaseApp(ctx)` that takes a `BijouContext` is mounted that way. The
 function is called once, before `init()`; in `interactive` mode the context's
-runtime already has the mounted grid. The app runs once, on
+runtime already has the mounted grid. A subscription it makes to
+`ctx.io.onData()` is kept and receives the stop message. If it throws, the
+mount releases the canvas, presenter, observers and input it had made, and
+rejects with that error. The app runs once, on
 `run()` from `@flyingrobots/bijou-tui` with `RunOptions.presenter`, for the
 whole life of the mount; switching backends never restarts it.
 

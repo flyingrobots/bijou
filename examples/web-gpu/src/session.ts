@@ -3,15 +3,9 @@ import { mountBijouCanvas, type BijouCanvasBackend, type BijouCanvasBackendChoic
 import { SHOWCASE_APPS } from './apps.js';
 import type { ShowcaseAtlas } from './atlas.js';
 import { receiptFields, type HudState } from './hud.js';
-import type { ShowcasePresenters } from './presenters.js';
-
-/** `CODE: message` for a typed error, the message otherwise. */
-export function describeProblem(error: unknown): string {
-  if (typeof error === 'object' && error !== null && 'code' in error && typeof error.code === 'string') {
-    return `${error.code}: ${error instanceof Error ? error.message : 'no message'}`;
-  }
-  return error instanceof Error ? error.message : String(error);
-}
+import { describeProblem, until } from './problems.js';
+import type { ShowcasePresenters, TrackedPresenter } from './presenters.js';
+import type { EndpointReceipt } from '@flyingrobots/geordi-bijou-gpu';
 
 /** One mounted app at a time, and every operation the HUD controls run on it. */
 export interface ShowcaseSession {
@@ -27,25 +21,42 @@ export interface ShowcaseSession {
   unmount(): Promise<void>;
   /** The latest model of the mounted app. */
   model(): unknown;
+  /** Every operation that failed, oldest first; a later mount does not clear it. */
+  failures(): readonly string[];
+  /** The physical cell size the current mount was created with. */
+  cellPx(): { readonly width: number; readonly height: number };
   readonly handle: () => MountedBijouCanvas<unknown, HTMLCanvasElement> | undefined;
 }
 
-const nextFrame = (): Promise<void> => new Promise((resolve) => { requestAnimationFrame(() => { resolve(); }); });
-
-/** Wait, a frame at a time, until `ready()` holds; give up after `frames`. */
-export async function until(ready: () => boolean, frames = 120): Promise<void> {
-  for (let frame = 0; frame < frames && !ready(); frame++) await nextFrame();
-  if (!ready()) throw new Error('BIJOU_WEB_GPU_TIMEOUT: the condition did not hold');
+/**
+ * The tracked presenter's newest receipt. A WebGPU readback rejects when a
+ * switch disposes the presenter during it: that presenter is gone, so it has
+ * no receipt to show. A failure of the presenter still presenting is thrown.
+ */
+async function readReceipt(tracked: TrackedPresenter | undefined, presenters: ShowcasePresenters): Promise<EndpointReceipt | null> {
+  if (tracked === undefined) return null;
+  try {
+    return await tracked.receipt();
+  } catch (error: unknown) {
+    if (presenters.presenterFor(tracked.canvas) !== tracked) return null;
+    throw error;
+  }
 }
 
 export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtlas, presenters: ShowcasePresenters): ShowcaseSession {
   let handle: MountedBijouCanvas<unknown, HTMLCanvasElement> | undefined;
+  // The cell size and ratio the mount was made with: the atlas may already have newer ones.
+  let metrics = { cellPx: atlas.cellPx(), dpr: atlas.dpr() };
   let appId: string | null = null;
   let problem: string | null = null;
+  const failures: string[] = [];
   // Operations run one at a time, in the order the controls were used.
   let queue: Promise<void> = Promise.resolve();
   const enqueue = (work: () => Promise<void>): Promise<void> => {
-    const step = queue.then(work).catch((error: unknown) => { problem = describeProblem(error); });
+    const step = queue.then(work).catch((error: unknown) => {
+      problem = describeProblem(error);
+      failures.push(problem);
+    });
     queue = step;
     return step;
   };
@@ -59,6 +70,7 @@ export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtl
     const entry = SHOWCASE_APPS.find((app) => app.id === id);
     if (entry === undefined) throw new Error(`BIJOU_WEB_GPU_UNKNOWN_APP: ${id}`);
     const build = await entry.load();
+    const made = { cellPx: atlas.cellPx(), dpr: atlas.dpr() };
     const mounted = await mountBijouCanvas((ctx) => {
       // The browser counterpart of what startApp() does on Node.
       setDefaultContext(ctx);
@@ -66,16 +78,19 @@ export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtl
     }, container, {
       presenters: presenters.factories,
       createCanvas: () => document.createElement('canvas'),
-      cellPx: atlas.cellPx(),
+      cellPx: made.cellPx,
       backend,
     });
     handle = mounted;
+    metrics = made;
     mounted.done.catch((error: unknown) => { if (handle === mounted) problem = describeProblem(error); });
   }
 
   return {
     handle: () => handle,
     model: () => handle?.model(),
+    failures: () => [...failures],
+    cellPx: () => metrics.cellPx,
     mountApp: (id, backend = 'auto') => enqueue(() => mount(id, backend)),
     switchBackend: (next) => enqueue(async () => {
       if (handle === undefined) throw new Error('BIJOU_WEB_GPU_NOT_MOUNTED: no app is mounted');
@@ -100,16 +115,18 @@ export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtl
     async state() {
       const tracked = presenters.presenterFor(handle?.canvas ?? null);
       const runtime = handle?.ctx.runtime;
+      const { cellPx, dpr } = metrics;
+      const receipt = await readReceipt(tracked, presenters);
       return {
         app: appId,
         backend: handle?.backend ?? null,
         fallbackReasons: handle?.fallbackReasons ?? [],
         grid: runtime === undefined ? null : { cols: runtime.columns, rows: runtime.rows },
-        cellPx: atlas.cellPx(),
-        dpr: atlas.dpr(),
+        cellPx,
+        dpr,
         frameMs: tracked?.lastPresentMs ?? null,
         presents: tracked?.presents ?? 0,
-        ...receiptFields(tracked === undefined ? null : await tracked.receipt()),
+        ...receiptFields(receipt),
         contextLost: webgl2()?.getDiagnostics().contextLost ?? false,
         problem,
         canvases: container.querySelectorAll('canvas').length,

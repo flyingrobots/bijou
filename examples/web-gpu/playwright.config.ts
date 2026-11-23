@@ -21,6 +21,8 @@ export default defineConfig({
     baseURL: origin,
     channel,
     viewport: { width: 1280, height: 900 },
+    // Kept in outputDir, which the CI job uploads when the suite fails.
+    trace: 'retain-on-failure',
   },
   webServer: {
     // Serve the production bundle, the artifact the sealed gate builds.

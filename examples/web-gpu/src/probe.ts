@@ -8,6 +8,9 @@ export interface ShowcaseProbe {
   model(): unknown;
   /** RGBA of every displayed pixel of one cell, read back from the canvas the page shows. */
   cellPixels(col: number, row: number): number[] | null;
+  cellRect(col: number, row: number): { x: number; y: number; width: number; height: number };
+  /** Every queued operation that failed, oldest first. */
+  failures(): readonly string[];
   mountApp: ShowcaseSession['mountApp'];
   switchBackend: ShowcaseSession['switchBackend'];
   loseContext: ShowcaseSession['loseContext'];
@@ -36,11 +39,15 @@ function readCell(session: ShowcaseSession, col: number, row: number): number[] 
   const context = scratch.getContext('2d', { willReadFrequently: true });
   if (context === null) return null;
   context.drawImage(canvas, 0, 0);
-  const cell = session.handle()?.ctx.runtime;
-  if (cell === undefined) return null;
-  const width = Math.floor(canvas.width / cell.columns);
-  const height = Math.floor(canvas.height / cell.rows);
+  // The mount's fixed cell size: the canvas is not rounded to whole cells.
+  const { width, height } = session.cellPx();
   return [...context.getImageData(col * width, row * height, width, height).data];
+}
+
+/** The canvas rectangle `cellPixels()` reads for one cell, in physical pixels. */
+function cellRect(session: ShowcaseSession, col: number, row: number): { x: number; y: number; width: number; height: number } {
+  const { width, height } = session.cellPx();
+  return { x: col * width, y: row * height, width, height };
 }
 
 export function installProbe(session: ShowcaseSession): void {
@@ -49,6 +56,8 @@ export function installProbe(session: ShowcaseSession): void {
     state: () => session.state(),
     model: () => session.model(),
     cellPixels: (col, row) => readCell(session, col, row),
+    cellRect: (col, row) => cellRect(session, col, row),
+    failures: () => session.failures(),
     mountApp: (id, backend) => session.mountApp(id, backend),
     switchBackend: (next) => session.switchBackend(next),
     loseContext: () => session.loseContext(),

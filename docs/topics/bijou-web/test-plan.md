@@ -232,4 +232,5 @@ named test. A name with `%s` is one parameterized test.
 | WEB-140 | A lowered mode builds the app from the factory too. | `builds the app from the factory in a lowered mode too` | Implemented |
 | WEB-141 | `css` reaches the run, which installs a BCSS resolver on the run context. | `passes css to the run, which installs a BCSS resolver on the run context` | Implemented |
 | WEB-142 | A press focuses the textarea again on `pointerup`, after the browser moved focus away. | `focuses the textarea again on release, after the browser moved focus away during the press` | Implemented |
-
+| WEB-143 | An `io.onData()` subscription made by the app factory is kept and receives the stop message. | `keeps an io.onData() subscription the factory makes, and sends it the stop message` | Implemented |
+| WEB-144 | A factory that throws leaves no canvas, presenter, observer, listener or timer. | `releases the canvas, presenter, observers, listeners and timers when the factory throws` | Implemented |
