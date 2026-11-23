@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createEventBus } from './eventbus.js';
 import { RuntimeFramebuffers } from './runtime-buffers.js';
 import { enterRuntimeCrashMode } from './runtime-crash.js';
+import { createRuntimeHost } from './runtime-host.js';
 import { createRuntimeSession } from './runtime-startup.js';
 
 describe('runtime crash mode', () => {
@@ -12,6 +13,7 @@ describe('runtime crash mode', () => {
     const buffers = new RuntimeFramebuffers(40, 12);
     const bus = createEventBus({ clock: ctx.clock });
     const first = new Error('first crash');
+    const host = createRuntimeHost(ctx, undefined);
 
     enterRuntimeCrashMode(
       'render',
@@ -23,6 +25,7 @@ describe('runtime crash mode', () => {
       bus,
       () => ({ columns: 40, rows: 12 }),
       () => undefined,
+      host,
     );
     enterRuntimeCrashMode(
       'update',
@@ -34,6 +37,7 @@ describe('runtime crash mode', () => {
       bus,
       () => ({ columns: 40, rows: 12 }),
       () => undefined,
+      host,
     );
 
     expect(ctx.io.writtenErr).toHaveLength(1);

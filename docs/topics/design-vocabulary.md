@@ -20,6 +20,7 @@ Use one term per concept, and define unfamiliar terms at first use (R45 §7.2).
 | Component | Leaf rendering vocabulary, such as `alert()` or `table()`. |
 | Block | A unit that owns product semantics, data contracts, and lowering facts. |
 | Surface | Structured terminal-cell output. |
+| Surface presenter | A host that shows `interactive` frames from Surfaces instead of from terminal bytes (`SurfacePresenter`). |
 | Family | One semantic job that one or more components perform, such as "Inline status" (R52). |
 | Section | A Components Library grouping of related families for browsing, such as "Status and in-flow feedback". A section is not a family. |
 | Variant | A semantic, interaction-layer, or render-path form of a family (R52). |

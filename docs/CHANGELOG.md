@@ -28,6 +28,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   the `EventBus` to `update()`. An undeclared or removed action id gives a
   typed diagnostic and no state change. The terminal runtime is unchanged.
   Reference: `docs/topics/semantic-scene-app/README.md`.
+- `SurfacePresenter` is a synchronous host seam in `@flyingrobots/bijou-tui`
+  for hosts that are not terminals (#791). Pass one to `run()` as
+  `RunOptions.presenter`. In `interactive` mode the runtime then calls
+  `enter?()`, `present(current, target, ctx)`, `onResize?(cols, rows)`, and
+  `exit?()`, and writes no frame, screen, cursor, or mouse bytes to `ctx.io`.
+  A run without a presenter is unchanged. The `static`, `pipe`, and
+  `accessible` output modes ignore the presenter. The contract does not cover a
+  hardware cursor overlay, OSC 8 hyperlinks, or a window title.
 - `@flyingrobots/bijou` has a browser renderer seam for `ui-scene-ir/1`
   (#442). `lowerUiSceneToBrowser()` lowers a scene with a `geordi-browser`
   target profile to a deterministic element tree and HTML markup that hold only
