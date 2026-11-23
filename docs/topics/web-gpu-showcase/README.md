@@ -10,28 +10,57 @@ cases that hold this behavior are listed in the [test plan](./test-plan.md).
 | App | Source | How it loads |
 | --- | --- | --- |
 | `counter` | `examples/counter/main.ts`, unmodified | The build resolves `@flyingrobots/bijou-node` to `src/browser-start-app.ts`, whose `startApp(app)` hands the app to the page instead of starting a terminal run. |
+| `components` | `examples/components/library.ts` | `createLibraryApp(ctx)` with the `LIBRARY_CSS` stylesheet, which is what `examples/components/main.ts` runs with no arguments. |
+| `hero` | `examples/hero/app.ts` | `createHeroApp()` with the run's context and grid, and a perf tracker from `examples/hero/perf.ts` on the browser adapter of its memory port, as `examples/hero/main.ts` does with the Node adapter. |
 | `showcase` | `examples/showcase/app.ts`, unmodified | `createShowcaseApp(ctx)`, built from the run's context. |
 
 Each mount passes `mountBijouCanvas()` a factory that sets the run's context
 as the default context, as `startApp()` does on Node, and then returns the
-app. The two apps are made at different times:
+app, and the app's stylesheet as `css` when it has one. The apps are made at
+different times:
 
 - The counter's `App` is created when `load()` imports
   `examples/counter/main.ts`, once per page, before any mount. Module-level
   code there never sees a mount's context; the factory returns the existing
   `App`, whose `view()` reads the default context when it renders.
-- The showcase's `App` is created inside the factory by
-  `createShowcaseApp(ctx)`, once per mount, with that mount's context.
+- The other apps are created inside the factory, once per mount, with that
+  mount's context.
 
-These example apps are not mounted, and the HUD lists them with their refusal:
+No example app is refused. The HUD's refused list (`src/refused-apps.ts`) is
+empty, and an app that came to import a Node built-in would be listed there
+with its `BIJOU_WEB_GPU_NODE_IMPORT` refusal.
 
-| App | Refusal |
-| --- | --- |
-| `examples/components` | `BIJOU_WEB_GPU_NODE_IMPORT: node:fs imported by examples/components/library-font.ts`. It also reads files in `library-snippets.ts`, `examples/docs/app-cylinder-font.ts` and `examples/docs/i18n/dogfood-catalog.ts`. |
-| `examples/hero` | `BIJOU_WEB_GPU_NODE_IMPORT: node:fs imported by examples/docs/app-cylinder-font.ts`, through `scenes.ts` and `examples/docs/app-cylinder-title.ts`. Its `perf.ts` also reads `process.memoryUsage()`. |
+### Host-free example apps
 
-Both read files at module load, so they cannot be bundled for a browser
-without changing them.
+The `components` and `hero` app modules import no Node built-in and use no
+`process` or `Buffer`, through any import or re-export.
+`tests/web-gpu/app-host-reach.test.ts` bundles each one with the showcase's
+resolution and lists every one it finds. Data they used to read from disk at
+module load is imported instead, so the bundler inlines it:
+
+| Data | Source | How it is imported |
+| --- | --- | --- |
+| DM Sans and Jacquard 12 raster fonts | `assets/dm-sans-ascii.json`, `assets/jacquard12-bijou.json` | JSON import attributes. Coverage masks are decoded by `examples/_shared/base64.ts`, which accepts exactly the canonical base64 that `Buffer` round-trips. |
+| DOGFOOD runtime catalogs | `examples/docs/i18n/catalogs/<locale>/*.json` | JSON import attributes, one table entry per file. `tests/dogfood-catalog-imports.test.ts` holds the table to the directory. |
+| Example code snippets and design-system families | The story sources in `examples/docs/` and `docs/design-system/component-families.md` (in the archived book corpus) | Generated copies in `examples/components/generated/`, written by `npm run components:data`. `tests/components-browser-data.test.ts` regenerates them and fails on drift; `npm run components:data:check` does the same. |
+
+The hero perf overlay reads memory through a port (`MemorySampler` in
+`examples/hero/perf.ts`). `perf-node.ts` reads `process.memoryUsage()`;
+`perf-browser.ts` reports nothing, because a page has no standard measure of
+its heap or resident set, so in the browser the overlay shows no heap or RSS
+row.
+
+`tests/examples-terminal-frames.test.ts` pins, by digest, the styled frames
+both apps paint in a 120 by 36 terminal, recorded before the data moved to
+imports. `tests/web-gpu/app-cell-widths.test.ts` paints every Components
+library slide in each output mode and the hero reel, and finds no width-2
+grapheme and no unpacked Surface, either of which the canvas contract
+refuses.
+
+The showcase bundle loads each app on demand, so the page's entry chunk does
+not carry them. The Components library's chunk carries its inlined fonts,
+snippets, families and catalogs and is the largest, about 620 KB before
+compression.
 
 ## Build
 
@@ -120,6 +149,10 @@ The browser suite runs in Google Chrome, headless.
 
 For the counter, the WebGPU, WebGL2 and Canvas 2D frames have the same
 `frameRgbaSha256`; the golden and WebGPU cases assert it.
+
+The components and hero apps mount with `auto`, so on the Mac they present on
+WebGPU with a `gpu-probed` receipt, and in the stress case on WebGL2 and
+Canvas 2D. Their frames are not compared across backends.
 
 Not verified: Firefox, Safari, a device pixel ratio other than 1, a DPR change
 during a run, IME composition and paste in a real browser, and any timing

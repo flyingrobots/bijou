@@ -6,6 +6,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- The web GPU showcase mounts the Components library and the hero app, and
+  its browser suite switches `counter -> components -> hero` and toggles the
+  three ten times. Both apps now import in a browser: their fonts, DOGFOOD
+  catalogs, example snippets and design-system families are imported instead
+  of read from disk at module load (the snippets and families as generated
+  JSON, kept current by `npm run components:data` and a drift test), and the
+  hero perf overlay reads memory through a port with a Node and a browser
+  adapter. Their terminal output is unchanged (#809).
+
 ### Changed
 
 - The `guidedFlow()` story's docs, variant label, and preview copy resolve
