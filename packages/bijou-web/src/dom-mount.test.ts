@@ -18,7 +18,7 @@ describe('mountBijouDom()', () => {
     expect(node('app.enabled').tagName).toBe('button');
     expect(node('app.chip').tagName).toBe('span');
     expect(node('app.chip').getAttribute('tabindex')).toBe('0');
-    expect(root().textContent).toBe('Count 0incrementOnthemedirectionchip');
+    expect(root().textContent).toBe('Count 0incrementOnthemedirchip');
     expect(root().textContent).not.toContain('\u001b');
     expect(ctx.io.output()).toBe('');
     handle.stop();

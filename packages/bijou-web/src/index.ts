@@ -19,3 +19,8 @@ export { createWebContext } from './context.js';
 export type { CreateWebContextOptions, WebContext } from './context.js';
 export { WEB_UNSUPPORTED_CAPABILITY, WebUnsupportedCapabilityError } from './errors.js';
 export type { WebUnsupportedCapability } from './errors.js';
+export { mountBijouDom } from './dom-mount.js';
+export type {
+  BijouDomDirection, BijouDomDocument, BijouDomElement, BijouDomEvent, BijouDomHandle,
+  BijouDomNode, BijouDomStyle, BijouDomText, MountBijouDomOptions,
+} from './dom-contract.js';

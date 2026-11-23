@@ -16,11 +16,11 @@ describe('mountBijouDom() theme and direction sync', () => {
   });
 
   it('updates a changed token live without recreating any node', () => {
-    let context: BijouContext | undefined;
+    const holder: { ctx?: BijouContext } = {};
     const mounted = mountControls({}, {
-      onTheme: () => { context?.tokenGraph.set('semantic.primary', { hex: '#ff0000' }); },
+      onTheme: () => { holder.ctx?.tokenGraph.set('semantic.primary', { hex: '#ff0000' }); },
     });
-    context = mounted.ctx;
+    holder.ctx = mounted.ctx;
     const count = mounted.node('app.count');
     const before = { ...mounted.doc.counts };
 

@@ -48,6 +48,7 @@ export function createControlsApp(options: ControlsOptions = {}): SemanticSceneA
       options.clock === undefined ? [] : [intervalCmd(options.clock)],
     ],
     update(msg, model) {
+      if (msg.type === 'key' || msg.type === 'resize' || msg.type === 'mouse' || msg.type === 'pulse') return [model, []];
       switch (msg.type) {
         case 'increment': return [{ ...model, count: model.count + 1 }, []];
         case 'reset': return [{ ...model, count: 0 }, []];
@@ -57,7 +58,6 @@ export function createControlsApp(options: ControlsOptions = {}): SemanticSceneA
         case 'direction': return [{ ...model, dir: model.dir === 'ltr' ? 'rtl' : 'ltr' }, []];
         case 'tick': return [{ ...model, ticks: model.ticks + 1 }, []];
         case 'chip': return [{ ...model, showChip: false }, []];
-        default: return [model, []];
       }
     },
     view: () => createSurface(1, 1),

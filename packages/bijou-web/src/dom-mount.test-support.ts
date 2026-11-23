@@ -14,9 +14,9 @@ export interface MountedControls {
   readonly ctx: WebContext;
   readonly handle: BijouDomHandle<ControlsModel, ControlsMsg>;
   /** The element of a scene node. */
-  node(nodeId: string): FakeElement;
+  readonly node: (nodeId: string) => FakeElement;
   /** The mount root, as the fake element it is. */
-  root(): FakeElement;
+  readonly root: () => FakeElement;
 }
 
 /** Mount the controls app in a container attached to the document body. */
