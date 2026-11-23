@@ -41,8 +41,16 @@ async function cycleLanguageFrames(options: DocsAppOptions): Promise<string> {
     runtime: { columns: 120, rows: 40 },
   });
   const app = createDocsApp(ctx, { initialRoute: 'docs', ...options });
-  const result = await runScript(app, LANGUAGE_CYCLE_STEPS, { ctx });
-  return result.frames.map(frameText).join('\n');
+  // Read each frame as it is drawn: DOGFOOD reuses one surface, so every entry
+  // of the returned `frames` shows the last frame, after the notice has gone.
+  const texts: string[] = [];
+  await runScript(app, LANGUAGE_CYCLE_STEPS, {
+    ctx,
+    onFrame: (frame) => {
+      texts.push(frameText(frame));
+    },
+  });
+  return texts.join('\n');
 }
 
 const SPANISH_FEEDBACK_OVERRIDE: I18nCatalog = {
@@ -55,6 +63,12 @@ const SPANISH_FEEDBACK_OVERRIDE: I18nCatalog = {
       en: 'Language set to {language}.',
       es: 'Idioma centinela: {language}.',
     },
+  }, {
+    // An extra catalog replaces the namespace, so it carries the label it uses.
+    key: { namespace: 'bijou.dogfood', id: 'settings.language.es' },
+    kind: 'message',
+    sourceLocale: 'en',
+    values: { en: 'Spanish', es: 'español' },
   }],
 };
 
