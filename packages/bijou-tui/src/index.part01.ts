@@ -29,6 +29,7 @@ export type {
 } from './types.js';
 
 export { QUIT, isKeyMsg, isResizeMsg, isMouseMsg, isPulseMsg } from './types.js';
+export type { SurfacePresenter } from './surface-presenter.js';
 
 // Runtime engine
 export type {

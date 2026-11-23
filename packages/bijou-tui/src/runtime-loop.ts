@@ -6,13 +6,12 @@ import {
   surfaceToString,
 } from '@flyingrobots/bijou';
 import { installBCSSResolver } from './css/install.js';
-import { DISABLE_MOUSE, mouseModeSequence, resolveMouseMode } from './mouse-mode.js';
-import { enterScreen } from './screen.js';
 import { normalizeViewOutput } from './view-output.js';
 import { RuntimeFramebuffers } from './runtime-buffers.js';
 import { createRuntimeBus } from './runtime-bus.js';
 import type { RuntimeLifecycleHooks } from './runtime-contract.js';
 import { enterRuntimeCrashMode } from './runtime-crash.js';
+import { createRuntimeHost } from './runtime-host.js';
 import { installRuntimeInput } from './runtime-input.js';
 import { createRuntimeRenderer } from './runtime-render.js';
 import { finalizeRuntime } from './runtime-shutdown.js';
@@ -68,6 +67,7 @@ export async function runWithLifecycleHooks<Model, M>(
     if (routed !== undefined) bus.emit(routed);
   };
   const bus = createRuntimeBus(options, clock, ctx, routeIssue);
+  const host = createRuntimeHost(ctx, options);
   const crash = (
     phase: 'update' | 'render' | 'resize',
     error: unknown,
@@ -83,6 +83,7 @@ export async function runWithLifecycleHooks<Model, M>(
       bus,
       viewport,
       shutdown,
+      host,
     );
   };
   const renderer = createRuntimeRenderer({
@@ -98,13 +99,8 @@ export async function runWithLifecycleHooks<Model, M>(
     crash,
   }, buffers);
   options?.middlewares?.forEach((middleware) => bus.use(middleware));
-  const mouseMode = resolveMouseMode(options);
-  const useMouse = mouseMode !== undefined;
-  const restoreScreen = (options?.altScreen ?? true)
-    || (options?.hideCursor ?? true);
-  if (restoreScreen) enterScreen(ctx.io);
-  ctx.io.write(useMouse ? mouseModeSequence(mouseMode) : DISABLE_MOUSE);
-  bus.connectIO(ctx.io, { mouse: useMouse });
+  host.enter();
+  bus.connectIO(ctx.io, { mouse: host.useMouse });
   bus.onQuit(shutdown);
   bus.startPulse(ctx.runtime.refreshRate);
   const execute = installRuntimeInput(
@@ -117,6 +113,7 @@ export async function runWithLifecycleHooks<Model, M>(
     renderer,
     crash,
     shutdown,
+    host,
   );
   const resizeCommands = synchronizeInitialViewport(
     app,
@@ -134,13 +131,5 @@ export async function runWithLifecycleHooks<Model, M>(
     session.resolveQuit = resolve;
     if (!session.running) resolve();
   });
-  await finalizeRuntime(
-    session,
-    renderer,
-    bus,
-    clock,
-    ctx,
-    useMouse,
-    restoreScreen,
-  );
+  await finalizeRuntime(session, renderer, bus, clock, ctx, host);
 }
