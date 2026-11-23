@@ -6,10 +6,10 @@ import { KeyHint } from './key-hint.js';
 export function Palette({ open, onOpenChange, commands }: { open: boolean; onOpenChange: (open: boolean) => void; commands: readonly ChromeCommand[] }) {
   const groups = [...new Set(commands.map((command) => command.group))];
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange} title="Commands" description="Search for a control, a page or a theme.">
-      <Command>
+    <CommandDialog open={open} onOpenChange={onOpenChange} title="Commands" description="Search for a control, a page or a theme." className="flex max-h-3/5 flex-col">
+      <Command className="min-h-0">
         <CommandInput placeholder="Type a command…" />
-        <CommandList className="max-h-[min(18rem,calc(66dvh-6rem))]">
+        <CommandList>
           <CommandEmpty>No matching command.</CommandEmpty>
           {groups.map((group) => (
             <CommandGroup key={group} heading={group}>
