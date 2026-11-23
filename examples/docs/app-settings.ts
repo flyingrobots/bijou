@@ -10,6 +10,7 @@ import {
 import { landingSettingsSection } from './app-settings-landing.js';
 import { localizationSettingsSection } from './app-settings-localization.js';
 import { shellSettingsSection } from './app-settings-shell.js';
+import type { DocsLocaleLocalization } from './app-locale-localization.js';
 import type {
   DocsExplorerModel,
   DocsMsg,
@@ -24,6 +25,7 @@ type SettingsBuilder = NonNullable<
 
 export function createDocsSettingsBuilder(
   localization: LocalizationPort,
+  localeLocalization: DocsLocaleLocalization,
 ): SettingsBuilder {
   return ({ model, pageModel }) => {
     const theme = resolveDocsVisualThemeByShellThemeId(
@@ -35,7 +37,11 @@ export function createDocsSettingsBuilder(
       listTheme: docsThemePreferenceListTheme(theme),
       sections: [
         shellSettingsSection(pageModel, localization),
-        localizationSettingsSection(pageModel, localization),
+        localizationSettingsSection(
+          pageModel,
+          localization,
+          localeLocalization,
+        ),
         landingSettingsSection(
           model.columns,
           model.rows,

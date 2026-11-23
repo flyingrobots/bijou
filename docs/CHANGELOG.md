@@ -25,6 +25,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- DOGFOOD's "Language set to ..." notice now appears in the language just
+  chosen in settings, not the one being left: choosing Spanish from French
+  shows "Idioma establecido en español / Español." The notice is localized
+  with the target locale's catalogs, including any `extraI18nCatalogs`
+  (flyingrobots/bijou#582).
 - The DOGFOOD locale ratchet's language-cycle cases no longer time out on hosted
   runners. Each rendered 79 settings-toast ticks, each a full page render, and
   took 10 to 15 s hosted against a 15 s limit. They now use a scripted clock
