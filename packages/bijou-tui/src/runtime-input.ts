@@ -4,7 +4,6 @@ import {
   type ClockPort,
 } from '@flyingrobots/bijou';
 import type { EventBus } from './eventbus.js';
-import { clearAndHome } from './screen.js';
 import { isKeyMsg, isPulseMsg, isResizeMsg } from './types.js';
 import type {
   App,
@@ -15,6 +14,7 @@ import type {
   RuntimeRenderer,
   RuntimeSession,
 } from './runtime-contract.js';
+import type { RuntimeHost } from './runtime-host.js';
 
 /** Connect the single TEA update subscription to runtime state. */
 export function installRuntimeInput<Model, M>(
@@ -31,6 +31,7 @@ export function installRuntimeInput<Model, M>(
     snapshot: Model,
   ) => void,
   shutdown: (error?: unknown) => void,
+  host: RuntimeHost,
 ): (commands: Cmd<M>[]) => void {
   const execute = (commands: Cmd<M>[]): void => {
     for (const command of commands) bus.runCmd(command);
@@ -53,7 +54,7 @@ export function installRuntimeInput<Model, M>(
         message.rows,
       );
       buffers.reset(viewport.columns, viewport.rows, true);
-      clearAndHome(ctx.io);
+      host.resize(viewport.columns, viewport.rows);
     }
     if (isKeyMsg(message) && message.key === 'c' && message.ctrl) {
       const now = clock.now();

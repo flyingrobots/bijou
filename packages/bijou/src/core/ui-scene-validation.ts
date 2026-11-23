@@ -36,6 +36,10 @@ export function validateUiSceneIr(scene: UiSceneIr): UiSceneValidationResult {
         add(issues, 'child-node-missing', `Node ${node.id} references missing child ${childId}`, node.id);
       }
     }
+    const checked: unknown = node.state?.checked;
+    if (checked !== undefined && typeof checked !== 'boolean') {
+      add(issues, 'invalid-node-state', `Node ${node.id} declares a state.checked that is not a boolean`, node.id);
+    }
     for (const actionId of node.actions ?? []) {
       if (!actionIds.all.has(actionId)) {
         add(issues, 'node-action-missing', `Node ${node.id} references missing action ${actionId}`, node.id);
