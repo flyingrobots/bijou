@@ -22,6 +22,7 @@ This package is a workspace package. It is not published to npm yet.
 | `createWebContext()` | `BijouContext` | The four output-side ports composed through `createBijou()`. |
 | `createWebInteractiveContext()` | `BijouContext` | The same, with `createWebInteractiveIO()` as the I/O port. |
 | `mountBijouCanvas()` | — | Runs a TEA app on an owned `<canvas>` through injected presenters. |
+| `mountBijouDom()` | DOM host | Runs a semantic scene app as native DOM elements. |
 
 `createWebContext()` only writes output.
 
@@ -147,6 +148,35 @@ still scheduled.
 `bgRgb`, `bgHex`, and `bold`. An invalid hex color leaves the text unstyled.
 Pass `runtime` to read `NO_COLOR` on every call, or `noColor` to decide
 explicitly.
+
+## Mount an app in the DOM
+
+`mountBijouDom(app, container, options?)` runs a `SemanticSceneApp` from
+`@flyingrobots/bijou-tui` in a container element. It lowers each scene with
+`lowerUiSceneToBrowser()` and patches it in place, keyed by
+`data-bijou-node-id`, so an `<input>` keeps its element, value, and selection
+across re-renders. Clicks, keys, text input, and IME composition become action
+requests. Theme tokens are custom properties on the mount root, such as
+`--bijou-semantic-primary`.
+
+The example is illustrative. `app` stands for any `SemanticSceneApp`.
+
+```ts
+import { mountBijouDom } from '@flyingrobots/bijou-web';
+
+const handle = mountBijouDom(app, document.getElementById('app')!, {
+  direction: (model) => model.direction,
+});
+
+// Later:
+handle.stop();
+```
+
+The package needs `@flyingrobots/bijou-tui` as a peer for this function. The
+seam lowers `group` and `text` nodes only. The tests run against an in-memory
+document, not a browser; real focus, selection, and IME behavior is not
+verified yet. Read the [DOM host reference](../../docs/topics/bijou-web-dom/README.md)
+for the element mapping, events, focus fallback, and limits.
 
 ## Unsupported capabilities
 

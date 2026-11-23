@@ -20,6 +20,9 @@ in, and `createWebInteractiveContext()` composes a context around it.
 `mountBijouCanvas()` runs a TEA app on a `<canvas>` it owns inside a container
 element; presenters are injected, and the package depends on no GPU library.
 
+`mountBijouDom()` runs a semantic scene app as native DOM elements. Its
+reference is [DOM host](../bijou-web-dom/README.md).
+
 ## `createWebClock(options?)`
 
 | Member | Contract |

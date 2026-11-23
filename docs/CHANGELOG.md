@@ -27,6 +27,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `@flyingrobots/bijou-web` has `mountBijouDom()` (#796). It runs a
+  `SemanticSceneApp` in a DOM container as native elements: a `button` or
+  `switch` role becomes a `<button>`, and a `textbox` becomes an `<input>`.
+  Each scene is lowered with `lowerUiSceneToBrowser()` and patched in place,
+  keyed by `data-bijou-node-id`, so an input keeps its element, value, and
+  selection across re-renders. Delegated `click`, `keydown`, `input`, and
+  composition events become action requests; a native button activates once.
+  Focus that loses its node moves to a declared node, an ancestor, or the
+  root. Theme tokens are `--bijou-semantic-*`, `--bijou-surface-*`, and
+  `--bijou-border-*` custom properties that update live, and `dir` follows
+  the model. `stop()` removes every listener and stops the app. The tests use
+  an in-memory document; no browser runs them. Reference:
+  `docs/topics/bijou-web-dom/README.md`.
 - `mountBijouCanvas()` in `@flyingrobots/bijou-web` runs a TEA app on a
   `<canvas>` it owns inside a container (#795). Presenters are injected per
   backend through a structural `BijouCanvasPresenter` interface that Geordi's
