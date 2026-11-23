@@ -1,0 +1,25 @@
+{
+  "schema": "graft.receipt.v1",
+  "sessionId": "e395442e-754e-4543-9b8a-8500bc3cea3b",
+  "agent": "codex",
+  "task": "Assert R52 requirements through validator diagnostics instead of a test-only export",
+  "bytesConsumed": 10763,
+  "byteAccounting": "Source bytes of the five bounded Graft file reads at parent bfa46628; excludes shell diff output and shared standards read for the enclosing scroll review",
+  "filesRead": [
+    "scripts/design-system-docs-preflight.test.ts",
+    "scripts/design-system-docs-rules.ts",
+    "scripts/design-system-docs-parser.ts",
+    "scripts/design-system-docs-preflight.ts",
+    "scripts/code-dojo/check-graft-receipts.mjs"
+  ],
+  "filesModified": [
+    "scripts/design-system-docs-preflight.test.ts",
+    "scripts/design-system-docs-rules.ts"
+  ],
+  "tripwires": [],
+  "validation": {
+    "node": "22.23.3",
+    "red": "Renaming the required Family field to Family metadata fails the exact reported-fields assertion",
+    "green": "Seven tests pass; ten shuffled repetitions with seeds 1 through 10 pass; documentation preflight passes"
+  }
+}
