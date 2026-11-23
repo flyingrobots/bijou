@@ -134,7 +134,8 @@ describe('ui-scene-ir/1 parity witness refusals', () => {
   });
 
   it('resolves no color from an entry the token table only inherits', () => {
-    const inherited = Object.create({ 'semantic.action.fg': '#111827' }) as Record<string, string>;
+    const inherited: Record<string, string> = {};
+    Object.setPrototypeOf(inherited, { 'semantic.action.fg': '#111827' });
     const scene = withNode(debuggerScene, 'debugger.step', {
       style: { fg: { token: 'constructor' }, bg: { token: 'toString' } },
     });
