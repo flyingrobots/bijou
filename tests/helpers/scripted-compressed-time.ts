@@ -42,7 +42,9 @@ export function createToastCompressedScriptContext(
       }, ms);
     },
     setInterval: (callback, ms) => base.setInterval(callback, ms),
-    queueMicrotask: (callback) => base.queueMicrotask(callback),
+    queueMicrotask(callback: () => void): void {
+      base.queueMicrotask(callback);
+    },
   };
   return { ...createTestContext({ ...options, clock }), clock };
 }
