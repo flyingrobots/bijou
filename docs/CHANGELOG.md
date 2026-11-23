@@ -82,6 +82,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Design record DL-029 decides the DOGFOOD Code Dojo debt dashboard: a
+  `release` page guide that renders a committed `code-dojo.debt-report.v1`
+  snapshot and an append-only `code-dojo.debt-history.v1` ledger, with no live
+  computation at render time (#601). The proposed contracts keep report checks
+  optional, distinguish unavailable live data, and preserve cited history with
+  idempotent recording and explicit unknown or zero-debt goalpost states.
+
 - Design record DL-036 decides which book edition to translate first: the
   teaching book (about 13,600 lexical tokens). Planned translations will live
   in `bijou-job-monitor` under `book/locales/<locale>/` and build to per-locale
