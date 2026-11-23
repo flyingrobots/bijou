@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { createScriptTestContext as createTestContext, runScriptDeterministic as runScript } from '../../helpers/scripted.js';
+import { runScriptDeterministic as runScript } from '../../helpers/scripted.js';
+import { createToastCompressedScriptContext as createTestContext } from '../../helpers/scripted-compressed-time.js';
 import { createDocsApp } from '../../../examples/docs/app.js';
 
 type DocsModel = ReturnType<ReturnType<typeof createDocsApp>['init']>[0];

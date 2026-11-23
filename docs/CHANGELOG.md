@@ -23,6 +23,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The DOGFOOD locale ratchet's language-cycle cases no longer time out on hosted
+  runners. Each rendered 79 settings-toast ticks, each a full page render, and
+  took 10 to 15 s hosted against a 15 s limit. They now use a scripted clock
+  that lets the toast expire in two ticks (`tests/helpers/scripted-compressed-time.ts`),
+  and take about 4 to 5 s per file hosted. No assertion changed; a new case pins
+  that the compressed run ends on the same frame as real-time ticking (#778).
+- The web GPU showcase is pinned to Geordi `52ba6bb`, which ships its
+  procedural glyph table (flyingrobots/geordi#205) and pins the canonical WGSL
+  digest inside the WebGPU presenter (flyingrobots/geordi#189). The vendored
+  `procedural-glyphs.json`, its digest check and its `proceduralTable` argument
+  are gone. The counter's frame digest is unchanged on all three backends; the
+  Canvas 2D receipt's `executedArtifactSha256` changes, because the package now
+  hashes `createCanvas2DSurfacePresenterCore` (#810).
 - A click on a canvas mounted by `mountBijouCanvas()` now leaves keyboard focus
   in its hidden textarea. Chrome's `mousedown` default action moved focus off
   the canvas after the `pointerdown` handler had focused the textarea, so no
