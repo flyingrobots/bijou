@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
@@ -41,7 +41,6 @@ const packages = list(pin['packages'], 'packages').map((entry) => ({
   tarball: text(entry['tarball'], 'tarball'),
   sha256: text(entry['sha256'], 'sha256'),
 }));
-const files = list(pin['files'], 'files').map((entry) => ({ path: text(entry['path'], 'path'), sha256: text(entry['sha256'], 'sha256') }));
 const devDependencies = fields(json(new URL('package.json', root))['devDependencies'], 'devDependencies');
 const locked = fields(json(new URL('package-lock.json', root))['packages'], 'packages');
 
@@ -60,15 +59,14 @@ describe('examples/web-gpu Geordi pin', () => {
     expect(digest(entry.tarball, 'sha256', 'hex'), `${entry.tarball} is not the tarball geordi-pin.json records`).toBe(entry.sha256);
   });
 
-  it.each(files.map((entry) => [entry.path, entry] as const))('%s matches its recorded SHA-256', (_path, entry) => {
-    expect(
-      digest(entry.path, 'sha256', 'hex'),
-      `${entry.path} bytes differ from geordi-pin.json; a checkout that converts line endings (core.autocrlf) changes them unless .gitattributes marks the file -text`,
-    ).toBe(entry.sha256);
+  it('pins no file besides the two tarballs, and vendors nothing else', () => {
+    expect(pin['files']).toBeUndefined();
+    const vendored = readdirSync(new URL('vendor/', example)).sort();
+    expect(vendored).toEqual(packages.map((entry) => entry.tarball.replace('vendor/', '')).sort());
   });
 
   it('keeps every pinned file byte-exact on checkout through .gitattributes', () => {
-    const paths = [...packages.map((entry) => entry.tarball), ...files.map((entry) => entry.path)].map((path) => `examples/web-gpu/${path}`);
+    const paths = packages.map((entry) => entry.tarball).map((path) => `examples/web-gpu/${path}`);
     const output = execFileSync('git', ['check-attr', 'text', '--', ...paths], { cwd: fileURLToPath(root), encoding: 'utf8' });
     expect(output.trim().split('\n')).toEqual(paths.map((path) => `${path}: text: unset`));
   });

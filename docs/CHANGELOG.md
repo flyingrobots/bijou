@@ -14,6 +14,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The web GPU showcase is pinned to Geordi `52ba6bb`, which ships its
+  procedural glyph table (flyingrobots/geordi#205) and pins the canonical WGSL
+  digest inside the WebGPU presenter (flyingrobots/geordi#189). The vendored
+  `procedural-glyphs.json`, its digest check and its `proceduralTable` argument
+  are gone. The counter's frame digest is unchanged on all three backends; the
+  Canvas 2D receipt's `executedArtifactSha256` changes, because the package now
+  hashes `createCanvas2DSurfacePresenterCore` (#810).
 - A click on a canvas mounted by `mountBijouCanvas()` now leaves keyboard focus
   in its hidden textarea. Chrome's `mousedown` default action moved focus off
   the canvas after the `pointerdown` handler had focused the textarea, so no
