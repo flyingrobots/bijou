@@ -18,6 +18,11 @@ export const DOGFOOD_CATALOG_FILES: Readonly<Record<string, Readonly<Record<stri
   fr: { 'bijou.dogfood.json': FR },
 };
 
+// Each call returns its own copy, as each read of the file did before, parsed
+// from the catalog's JSON text: as fast as that read, and faster than a
+// structured clone of the imported object.
+const CATALOG_TEXT = new Map<string, string>();
+
 export function dogfoodI18nCatalogsForLocale(locale: string): readonly I18nCatalog[] {
   const files = Object.hasOwn(DOGFOOD_CATALOG_FILES, locale) ? DOGFOOD_CATALOG_FILES[locale] : undefined;
   if (files === undefined) throw new Error(`DOGFOOD has no i18n catalogs for locale ${locale}`);
@@ -35,9 +40,10 @@ function firstDogfoodI18nCatalog(): I18nCatalog {
   return catalog;
 }
 
-// Each call returns its own copy, as each read of the file did before.
 function readRuntimeCatalog(file: string, imported: unknown): I18nCatalog {
-  const parsed: unknown = structuredClone(imported);
+  const text = CATALOG_TEXT.get(file) ?? JSON.stringify(imported);
+  CATALOG_TEXT.set(file, text);
+  const parsed: unknown = JSON.parse(text);
   if (!isRuntimeCatalog(parsed)) {
     throw new Error(`Invalid DOGFOOD i18n catalog: missing namespace or entries at ${file}`);
   }
