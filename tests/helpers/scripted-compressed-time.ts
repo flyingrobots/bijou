@@ -26,6 +26,10 @@ const TOAST_TIME_SCALE = 60;
  * Use it for cases that assert the state after a transient toast. Cases that
  * assert what the toast shows while it is visible must use
  * `createScriptTestContext`.
+ *
+ * `tests/cycles/LX-011/dogfood-locale-ratchet.part04.test.ts` keeps this helper
+ * honest: it runs the same language cycle at real speed and requires the
+ * compressed run to end on the identical frame and page models.
  */
 export function createToastCompressedScriptContext(
   options: ScriptContextOptions = {},
