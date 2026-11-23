@@ -4,9 +4,18 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const tsconfigRootDir = path.dirname(fileURLToPath(import.meta.url));
+// The web-gpu showcase's own chrome is React. The components the shadcn CLI
+// installed (examples/web-gpu/src/vendor/ and src/components/) are registry
+// code, kept as the CLI wrote them, and are not linted here.
+const showcaseChromeFiles = [
+  "examples/web-gpu/src/main.tsx",
+  "examples/web-gpu/src/chrome/**/*.tsx",
+  "examples/web-gpu/src/dom/**/*.tsx",
+];
 const typeCheckedFiles = [
   "bench/**/*.ts",
   "examples/**/*.ts",
+  ...showcaseChromeFiles,
   "packages/**/*.ts",
   "scripts/**/*.ts",
   "tests/**/*.ts",
@@ -72,6 +81,16 @@ export default tseslint.config(
           "message": "Prefer literal unions or domain classes. Enums create runtime/type ambiguity unless explicitly approved."
         }
       ]
+    },
+  },
+  {
+    // The browser showcase needs DOM types, which the shared project leaves out.
+    files: ["examples/web-gpu/**/*.ts", ...showcaseChromeFiles],
+    languageOptions: {
+      parserOptions: {
+        project: ["./examples/web-gpu/tsconfig.json", "./examples/web-gpu/tsconfig.e2e.json"],
+        tsconfigRootDir,
+      },
     },
   },
   {

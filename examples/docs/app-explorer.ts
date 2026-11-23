@@ -22,6 +22,7 @@ import type {
   DocsMsg,
 } from './app-model.js';
 import { createDocsSettingsBuilder } from './app-settings.js';
+import { createDocsLocaleLocalization } from './app-locale-localization.js';
 import { DOCS_SHELL_THEME_STATE } from './app-shell-theme-state.js';
 import { localizeDogfoodShellThemes } from './dogfood-theme-localization.js';
 import { DEFAULT_LOCALE } from './locale.js';
@@ -81,6 +82,9 @@ export function createDocsExplorerApp(
     onShellThemeChange: ({ ctx: nextContext }) => {
       onShellThemeChange(nextContext);
     },
-    settings: createDocsSettingsBuilder(localization),
+    settings: createDocsSettingsBuilder(
+      localization,
+      createDocsLocaleLocalization(options),
+    ),
   });
 }

@@ -1,9 +1,9 @@
 import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { requireSealMarker } from './windows-seal.mjs';
 const root = 'C:\\work\\source';
-if (process.platform !== 'win32' || readFileSync('C:\\bijou-test-seal', 'utf8') !== 'bijou-test-seal-v1\n') {
-  throw new Error('Windows initialization requires the sealed image');
-}
+if (process.platform !== 'win32') throw new Error('Windows initialization requires a Windows container');
+requireSealMarker(readFileSync('C:\\bijou-test-seal', 'utf8'), 'Windows initialization');
 if (existsSync(`${root}\\.git`)) throw new Error('Copied input contains Git metadata');
 const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.toUpperCase().startsWith('GIT_')));
 Object.assign(env, { HOME: 'C:\\home', GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: 'NUL' });

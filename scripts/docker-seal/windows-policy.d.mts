@@ -11,7 +11,7 @@ export interface WindowsWorkerInspection {
     readonly NetworkMode: string;
     readonly CpuCount: number;
     readonly Memory: number;
-    readonly StorageOpt?: { readonly size?: string };
+    readonly StorageOpt?: Readonly<Record<string, string>> | null;
     readonly Isolation: string;
   };
   readonly NetworkSettings: { readonly Networks: Readonly<Record<string, unknown>> };

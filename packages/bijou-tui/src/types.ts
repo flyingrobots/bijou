@@ -2,6 +2,7 @@ import type { BijouContext } from '@flyingrobots/bijou';
 import type { Middleware } from './eventbus.js';
 import type { RenderPipeline } from './pipeline/pipeline.js';
 import type { SurfaceBudgetThresholds } from './surface-budget.js';
+import type { SurfacePresenter } from './surface-presenter.js';
 import type { ViewOutput } from './view-output.js';
 import type {
   KeyMsg,
@@ -87,6 +88,11 @@ export interface RunOptions<M = unknown> {
   commandBackpressureThreshold?: number;
   /** Optional BCSS stylesheet string. */
   css?: string | undefined;
+  /**
+   * Host that receives `interactive` frames as Surfaces. While it is set, the
+   * runtime writes no frame or terminal-control bytes to `ctx.io`.
+   */
+  presenter?: SurfacePresenter | undefined;
 }
 
 export * from './runtime-commands.js';

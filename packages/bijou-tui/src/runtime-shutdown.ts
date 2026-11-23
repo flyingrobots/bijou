@@ -4,8 +4,6 @@ import type {
   TimerHandle,
 } from '@flyingrobots/bijou';
 import type { EventBus } from './eventbus.js';
-import { DISABLE_MOUSE } from './mouse-mode.js';
-import { exitScreen } from './screen.js';
 import type {
   RuntimeRenderer,
   RuntimeSession,
@@ -14,18 +12,18 @@ import {
   formatRuntimeDetail,
   writeErrorLine,
 } from './runtime-format.js';
+import type { RuntimeHost } from './runtime-host.js';
 
 const DRAIN_TIMEOUT_MS = 1000;
 
-/** Flush scheduled work, drain commands with a deadline, and restore the TTY. */
+/** Flush scheduled work, drain commands with a deadline, and exit the host. */
 export async function finalizeRuntime<Model, M>(
   session: RuntimeSession<Model>,
   renderer: RuntimeRenderer,
   bus: EventBus<M>,
   clock: ClockPort,
   ctx: BijouContext,
-  useMouse: boolean,
-  restoreScreen: boolean,
+  host: RuntimeHost,
 ): Promise<void> {
   if (renderer.hasPendingRender()) {
     await new Promise<void>((resolve) => {
@@ -46,8 +44,7 @@ export async function finalizeRuntime<Model, M>(
   renderer.dispose();
   bus.stopPulse();
   bus.dispose();
-  if (useMouse) ctx.io.write(DISABLE_MOUSE);
-  if (restoreScreen) exitScreen(ctx.io);
+  host.exit();
   if (session.fatalError != null) {
     throw session.fatalError instanceof Error
       ? session.fatalError

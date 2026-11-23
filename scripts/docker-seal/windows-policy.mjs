@@ -7,7 +7,7 @@ export function validateWindowsWorker(worker, offline) {
       || config.Binds?.length || config.VolumesFrom?.length || config.Privileged
       || config.Devices?.length || config.DeviceRequests?.length || config.SecurityOpt?.length
       || config.NetworkMode !== (offline ? 'none' : 'nat') || config.CpuCount !== 2 || config.Memory !== 6 * 1024 ** 3
-      || config.StorageOpt?.size !== '8G' || config.Isolation !== 'process'
+      || Object.keys(config.StorageOpt ?? {}).join() !== 'size' || config.StorageOpt.size !== '20G' || config.Isolation !== 'process'
       || networks.some((network) => !allowedNetworks.includes(network))) {
     throw new Error('Windows worker fails its required isolation profile');
   }
