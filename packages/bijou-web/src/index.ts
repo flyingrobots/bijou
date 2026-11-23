@@ -41,3 +41,8 @@ export type {
 } from './canvas-contract.js';
 export { BijouCanvasError, GPU_BACKEND_UNAVAILABLE_CODE, isGpuBackendUnavailable } from './canvas-errors.js';
 export type { BijouCanvasErrorCode } from './canvas-errors.js';
+export { mountBijouDom } from './dom-mount.js';
+export type {
+  BijouDomDirection, BijouDomDocument, BijouDomElement, BijouDomEvent, BijouDomHandle,
+  BijouDomNode, BijouDomStyle, BijouDomText, MountBijouDomOptions,
+} from './dom-contract.js';
