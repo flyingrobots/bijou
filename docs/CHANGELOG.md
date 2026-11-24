@@ -22,6 +22,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `docs/topics/text-width/`. The tests found five defects, filed as #851,
   #852, #853, #854 and #855 (#678).
 
+- `npm run code-dojo:cycles` holds the repository's runtime import cycles to a
+  checked-in inventory, `scripts/code-dojo/baselines/runtime-scc.json`: the
+  strongly connected components of the runtime import graph, built from
+  TypeScript's syntax tree with type-only imports and re-exports left out. A
+  new, grown or merged component, or a new edge inside one, fails; a component
+  that shrinks or disappears fails as stale until `npm run
+  code-dojo:cycles:write` records it. The check is a step of `code-dojo:verify`
+  and `code-dojo:ci`. Today's inventory holds 16 components and 49 modules.
+  Output is JSON Lines with schemas in `schemas/` (#638).
+
 - `npm run code-dojo:report` writes the Code Dojo debt aggregate, next goalpost
   target, per-source counts, top ESLint rules and optional live ESLint data to
   `docs/code-dojo/debt-report.json` as a `code-dojo.debt-report.v1` document,

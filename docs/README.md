@@ -75,6 +75,7 @@ The glossary and topic finder support practical lookup.
 - Translation glossaries ([French](./topics/glossary.fr.md), [Spanish](./topics/glossary.es.md), [German](./topics/glossary.de.md)): one rendering per Bijou term, address form, and typography; decision in [DL-035](./design/DL-035-translation-glossary.md)
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)
+- [Runtime import cycle ratchet](./topics/runtime-import-cycles/README.md): the runtime import graph, the SCC inventory, the hold-or-shrink rule, and [test plan](./topics/runtime-import-cycles/test-plan.md)
 - [Changelog](./CHANGELOG.md)
 - [Components Library](../examples/components/README.md): every component, one slide at a time, in every output mode
 - [DOGFOOD](../examples/docs/README.md): the documentation app, in English, French, Spanish, and German
