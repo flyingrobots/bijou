@@ -147,3 +147,18 @@ Use the same lane locally when you want to reproduce the CI benchmark surface:
 ```bash
 npm run -s bench:ci:gradient -- --out /tmp/bijou-gradient-ci.json
 ```
+
+## Soak bench host ports
+
+`npm run soak` (`src/soak-runner.ts`) is a Bijou app whose module
+(`src/soak-app.ts`) reaches no Node API. `createSoakApp(ctx, host)` takes a
+`SoakHost` (`src/soak-ports.ts`): already-parsed `options` (`cycles`, `fps`,
+`dwell`), a `memory` reading that returns `heapUsedMB` and `rssMB` or
+`undefined` for a figure the host cannot measure, and a `log` sink that gets
+one JSON line per scenario. Where a figure is `undefined` the perf panel shows
+no row for it and the log line has no such field.
+
+`src/soak-node.ts` is the Node adapter: it parses `--cycles=`, `--fps=`,
+`--dwell=` and `--out=`, reads `process.memoryUsage()` and appends to the log
+file. A sink that throws loses that line; the soak carries on. The tests are
+`src/soak-host.test.ts` and `tests/web-gpu/soak-host-reach.test.ts`.

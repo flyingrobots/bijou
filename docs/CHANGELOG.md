@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- The soak bench (`npm run soak`) takes its options, memory readings and log
+  through three host ports (`bench/src/soak-ports.ts`) instead of reading
+  `process.argv`, `process.memoryUsage()` and `node:fs`, so its app module
+  reaches no Node API. `bench/src/soak-node.ts` is the Node adapter and keeps
+  the arguments, log lines and frames of `npm run soak`. A host that cannot
+  measure memory gets no heap or resident row and no such field in the log,
+  never a zero. A log sink that throws loses that line but no longer stops
+  the run.
 - Four DOGFOOD modules no longer read Node files: `app-ids.ts` and
   `app-prompt-font.ts` import their JSON, and the landing logo and the
   translated guides are generated JSON copies (`examples/docs/generated/`,

@@ -1,12 +1,14 @@
 import { createSurface, perfOverlaySurface, type BijouContext } from '@flyingrobots/bijou';
 import { createFramedApp, createKeyMap, type Cmd } from '@flyingrobots/bijou-tui';
 import { displayScenarios } from './soak-config.js';
+import type { SoakHost } from './soak-ports.js';
 import { latestPaneSize, type SoakModel, type SoakMsg } from './soak-model.js';
 import { initScenario, renderScenarioSurface, scenarioShortLabel } from './soak-scenarios.js';
 import { formatNs } from './stats.js';
 import { updateSoak } from './soak-update.js';
 
-export function createSoakApp(appCtx: BijouContext) {
+export function createSoakApp(appCtx: BijouContext, host: SoakHost) {
+  const update = updateSoak(host);
   return createFramedApp<SoakModel, SoakMsg>({
     title: 'Soak Runner',
     pages: [{
@@ -20,7 +22,7 @@ export function createSoakApp(appCtx: BijouContext) {
         return [initScenario(0, 0, w, h), []];
       },
       keyMap: createKeyMap<SoakMsg>().bind('`', 'Toggle perf overlay', { type: 'toggle-perf' }),
-      update: updateSoak,
+      update,
       layout(model: SoakModel) {
         return {
           kind: 'pane' as const,
@@ -42,7 +44,7 @@ export function createSoakApp(appCtx: BijouContext) {
               for (const ns of recent.slice(recent.length - windowSize)) sum += ns;
               avgNs = sum / windowSize;
             }
-            const mem = process.memoryUsage();
+            const mem = host.memory();
             const historyMs = recent.length > 1 ? recent.map((ns) => ns / 1_000_000) : [];
             const measuredFps = avgNs > 0 ? 1_000_000_000 / avgNs : 0;
             const perfPanel = perfOverlaySurface({
@@ -51,8 +53,9 @@ export function createSoakApp(appCtx: BijouContext) {
               frameTimeHistory: historyMs,
               width,
               height,
-              heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024 * 10) / 10,
-              rssMB: Math.round(mem.rss / 1024 / 1024 * 10) / 10,
+              // A figure the host cannot measure is left out, never shown as zero.
+              ...(mem.heapUsedMB === undefined ? {} : { heapUsedMB: mem.heapUsedMB }),
+              ...(mem.rssMB === undefined ? {} : { rssMB: mem.rssMB }),
               extras: [
                 { label: 'scenario', value: scenarioShortLabel(model) },
                 { label: 'frame', value: String(model.frameIndex) },

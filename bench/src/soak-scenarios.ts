@@ -1,9 +1,9 @@
-import { appendFileSync } from 'node:fs';
 import { createSurface, type Surface } from '@flyingrobots/bijou';
 import type { Cmd } from '@flyingrobots/bijou-tui';
 import type { AnyScenario } from './scenarios/types.js';
 import { computeStats } from './stats.js';
-import { displayScenarios, LOG_PATH } from './soak-config.js';
+import { displayScenarios } from './soak-config.js';
+import type { SoakHost } from './soak-ports.js';
 import type { SoakModel, SoakMsg } from './soak-model.js';
 
 // Matches both ASCII 'x' and Unicode '×' (U+00D7) in dimension suffixes like "(220×58)".
@@ -29,10 +29,10 @@ function runWarmup(scenario: AnyScenario, state: unknown): void {
   }
 }
 
-function logScenarioStats(model: SoakModel): void {
+function logScenarioStats(model: SoakModel, host: SoakHost): void {
   const scenario = currentScenario(model);
   const stats = computeStats(model.frameTimes);
-  const mem = process.memoryUsage();
+  const mem = host.memory();
   const entry = {
     ts: new Date().toISOString(),
     cycle: model.cycle,
@@ -43,10 +43,10 @@ function logScenarioStats(model: SoakModel): void {
     p90: Math.round(stats.p90),
     p99: Math.round(stats.p99),
     covPct: Math.round(stats.cov * 1000) / 10,
-    heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024 * 10) / 10,
-    rssMB: Math.round(mem.rss / 1024 / 1024 * 10) / 10,
+    heapUsedMB: mem.heapUsedMB,
+    rssMB: mem.rssMB,
   };
-  appendFileSync(LOG_PATH, JSON.stringify(entry) + '\n');
+  host.log(JSON.stringify(entry));
 }
 
 export function renderScenarioSurface(model: SoakModel, width: number, height: number): Surface {
@@ -98,9 +98,14 @@ export function reinitAtSize(model: SoakModel, width: number, height: number): S
   };
 }
 
-export function logAndAdvanceCmd(model: SoakModel): Cmd<SoakMsg> {
+/** A log sink that throws loses that line but never stops the soak. */
+export function logAndAdvanceCmd(model: SoakModel, host: SoakHost): Cmd<SoakMsg> {
   return () => {
-    logScenarioStats(model);
+    try {
+      logScenarioStats(model, host);
+    } catch {
+      // The run is the product; its log is best effort.
+    }
     currentScenario(model).teardown?.(model.scenarioState);
     return { type: 'advance-scenario' } satisfies SoakMsg;
   };

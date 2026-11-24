@@ -1,9 +1,16 @@
 import { quit, type Cmd, type FramePageMsg } from '@flyingrobots/bijou-tui';
 import { latestPaneSize, type SoakModel, type SoakMsg } from './soak-model.js';
-import { displayScenarios, MAX_CYCLES, DWELL_SECS, FRAME_INTERVAL_MS } from './soak-config.js';
+import { displayScenarios } from './soak-config.js';
+import type { SoakHost } from './soak-ports.js';
 import { currentScenario, initScenario, reinitAtSize, logAndAdvanceCmd } from './soak-scenarios.js';
 
-export function updateSoak(msg: FramePageMsg<SoakMsg>, model: SoakModel): [SoakModel, Cmd<SoakMsg>[]] {
+export function updateSoak(host: SoakHost): (msg: FramePageMsg<SoakMsg>, model: SoakModel) => [SoakModel, Cmd<SoakMsg>[]] {
+  return (msg, model) => updateModel(host, msg, model);
+}
+
+function updateModel(host: SoakHost, msg: FramePageMsg<SoakMsg>, model: SoakModel): [SoakModel, Cmd<SoakMsg>[]] {
+  const { cycles: MAX_CYCLES, dwell: DWELL_SECS, fps } = host.options;
+  const FRAME_INTERVAL_MS = 1000 / fps;
   if (msg.type === 'toggle-perf') {
     return [{ ...model, showPerf: !model.showPerf }, []];
   }
@@ -37,7 +44,7 @@ export function updateSoak(msg: FramePageMsg<SoakMsg>, model: SoakModel): [SoakM
     // Check if dwell time expired.
     if (newElapsed >= dwellMs) {
       const updated: SoakModel = { ...model, elapsedMs: newElapsed };
-      return [updated, [logAndAdvanceCmd(updated)]];
+      return [updated, [logAndAdvanceCmd(updated, host)]];
     }
 
     // Throttle: only advance a scenario frame at the target FPS rate.
