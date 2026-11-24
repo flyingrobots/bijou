@@ -21,6 +21,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- CI publishes a per-job wall-time summary to the run's job summary, slowest
+  finished job first, with skipped, in-progress and cancelled jobs labelled.
+  The new `Wall time summary` job is read-only, non-blocking and required by
+  no other job (flyingrobots/bijou#609).
+
 - A regression test builds a temporary repository with several unpublished
   commits and runs the pre-push hook's own `changed_paths_for_push` and
   `is_dogfood_relevant_path` against a first publication (all-zero remote
