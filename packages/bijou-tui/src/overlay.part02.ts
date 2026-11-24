@@ -9,6 +9,8 @@ import { sliceAnsi, visibleLength } from './viewport.js';
 import type { CompositeOptions, Overlay } from './overlay.part01.js';
 
 import { surfaceFromContent } from './overlay.part09.js';
+
+import { recordDimmedBackdrop, type OverlayRect } from './overlay-backdrop.js';
 export function spliceLine(bgLine: string, overlayLine: string, col: number): string {
   const overlayVis = visibleLength(overlayLine);
   const bgVis = visibleLength(bgLine);
@@ -96,9 +98,13 @@ export function compositeSurfaceInto(
     }
   }
 
+  const rects: OverlayRect[] = [];
   for (const overlay of overlays) {
-    target.blit(overlay.surface ?? surfaceFromContent(overlay.content), overlay.col, overlay.row);
+    const source = overlay.surface ?? surfaceFromContent(overlay.content);
+    target.blit(source, overlay.col, overlay.row);
+    rects.push({ col: overlay.col, row: overlay.row, width: source.width, height: source.height });
   }
+  recordDimmedBackdrop(target, options?.dim ? rects : undefined);
 
   return target;
 }

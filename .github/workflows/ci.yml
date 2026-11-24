@@ -296,3 +296,22 @@ jobs:
           path: |
             ${{ runner.temp }}/bijou-bench/gradient-ci.json
             ${{ runner.temp }}/bijou-bench/gradient-ci-summary.md
+
+  wall_time_summary:
+    name: Wall time summary
+    if: always()
+    continue-on-error: true
+    needs: [changes, test, browser_web_gpu, unit_cross_platform, smoke_dogfood, bench_gradient]
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - name: Publish per-job wall-time summary
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/ci-wall-time/publish.mjs
