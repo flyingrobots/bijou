@@ -1,6 +1,6 @@
 import { execute } from './process.mjs';
 import { OWNER } from './constants.mjs';
-import { mkdirSync, writeFileSync, existsSync, unlinkSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, unlinkSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 function quarantine(name) {
@@ -9,6 +9,18 @@ function quarantine(name) {
     ? join(process.env.RUNNER_TEMP, 'bijou-sealed-custody') : join(homedir(), '.cache', 'bijou-sealed-tests');
   mkdirSync(base, { recursive: true, mode: 0o700 });
   return join(base, `${name}.json`);
+}
+const BUSY = 'Another sealed run is using it; wait for it to finish and run again. To queue runs, wrap the command in a lock of your choosing.';
+// A marker whose recorded process is alive is a run in progress, not a wreck.
+export function markerRefusal(name, marker) {
+  let pid;
+  try { pid = JSON.parse(readFileSync(marker, 'utf8')).pid; } catch { pid = undefined; }
+  let alive = false;
+  if (Number.isSafeInteger(pid) && pid > 0) {
+    try { process.kill(pid, 0); alive = true; } catch (error) { alive = error.code === 'EPERM'; }
+  }
+  return alive ? `Worker already active: ${name} (process ${String(pid)}). ${BUSY}`
+    : `Worker requires explicit recovery: ${marker}`;
 }
 export function workerArgs(name, image, network = 'none') {
   return ['create', '--name', name, '--label', `${OWNER}=v1`, '--init',
@@ -30,13 +42,23 @@ export async function inspectWorker(name, cleanup = false) {
   if (/No such (object|container):/i.test(result.output.toString())) return null;
   throw new Error(`Cannot establish Docker worker state: ${result.output.toString()}`);
 }
+/**
+ * Refuse early when a worker is already in use, before any snapshot or
+ * dependency work. startWorker() repeats these checks and stays the atomic
+ * admission for simultaneous launches.
+ */
+export async function assertWorkerFree(name) {
+  const marker = quarantine(name);
+  if (existsSync(marker)) throw new Error(markerRefusal(name, marker));
+  if ((await inspectWorker(name))?.State.Running) throw new Error(`Worker already active: ${name}. ${BUSY}`);
+}
 export async function startWorker(name, image, network) {
   const marker = quarantine(name);
-  if (existsSync(marker)) throw new Error(`Worker requires explicit recovery: ${marker}`);
+  if (existsSync(marker)) throw new Error(markerRefusal(name, marker));
   let worker = await inspectWorker(name);
   if (worker) {
     if (worker.Config.Labels?.[OWNER] !== 'v1') throw new Error(`Refusing unowned worker ${name}`);
-    if (worker.State.Running) throw new Error(`Worker already active: ${name}`);
+    if (worker.State.Running) throw new Error(`Worker already active: ${name}. ${BUSY}`);
     const imageId = JSON.parse((await execute(['docker', 'image', 'inspect', image])).output)[0].Id;
     if (worker.Image !== imageId) throw new Error('Existing worker image changed; explicit owned-worker migration required');
   } else {

@@ -10,7 +10,7 @@ import { usePageKeys, type LeaderKey } from './keys.js';
 import { useChromeMotion } from './motion.js';
 import { openPage, PAGES, type ShowcasePage } from './pages.js';
 
-const THEME_STORAGE_KEY = 'bijou-web-gpu-theme';
+export const THEME_STORAGE_KEY = 'bijou-web-gpu-theme';
 
 // The palette, its dialog and cmdk load on first use, so the first paint does not pay for them.
 const Palette = lazy(() => import('./palette.js').then((module) => ({ default: module.Palette })));

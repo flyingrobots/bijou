@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { stripMarkdownFrontmatter } from './app-markdown.js';
+import ARTICLES from './generated/guide-translations.json' with { type: 'json' };
+import { stripMarkdownFrontmatter } from './app-markdown-text.js';
 
 /**
  * Translated DOGFOOD articles: `content/i18n/<locale>/<guide id>.md`. A file may start with frontmatter carrying
@@ -11,6 +11,7 @@ export interface GuideTranslation {
   readonly body: string;
 }
 
+const articles: ReadonlyMap<string, string> = new Map(Object.entries(ARTICLES).map(([key, lines]) => [key, lines.join('\n')]));
 const cache = new Map<string, GuideTranslation | null>();
 
 function parse(raw: string): GuideTranslation {
@@ -34,8 +35,8 @@ export function guideTranslation(guideId: string, locale: string | undefined): G
   const key = `${locale}/${guideId}`;
   const cached = cache.get(key);
   if (cached !== undefined) return cached ?? undefined;
-  const url = new URL(`./content/i18n/${locale}/${guideId}.md`, import.meta.url);
-  const translation = existsSync(url) ? parse(readFileSync(url, 'utf8')) : null;
+  const article = articles.get(key);
+  const translation = article === undefined ? null : parse(article);
   cache.set(key, translation);
   return translation ?? undefined;
 }

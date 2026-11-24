@@ -1,6 +1,6 @@
-import { readFileSync } from 'node:fs';
+import BIJOU_PACKAGE from '../../packages/bijou/package.json' with { type: 'json' };
 
-export const BIJOU_VERSION = readBijouPackageVersion();
+export const BIJOU_VERSION: string = BIJOU_PACKAGE.version;
 export const VERSION_TEXT = `v${BIJOU_VERSION}`;
 export const GUIDES_PAGE_ID = 'guides';
 export const COMPONENTS_PAGE_ID = 'components';
@@ -62,19 +62,4 @@ export function resolveDocsLayoutVariant(
 
 export function isDocsPageId(value: string): value is DocsPageId {
   return DOCS_SITE_PAGES.some((page) => page.id === value);
-}
-
-function readBijouPackageVersion(): string {
-  const packageJson: unknown = JSON.parse(
-    readFileSync(
-      new URL('../../packages/bijou/package.json', import.meta.url),
-      'utf8',
-    ),
-  );
-  const version: unknown =
-    typeof packageJson === 'object' && packageJson !== null
-      ? Object.getOwnPropertyDescriptor(packageJson, 'version')?.value
-      : undefined;
-  if (typeof version === 'string') return version;
-  throw new Error('Bijou package version is missing');
 }

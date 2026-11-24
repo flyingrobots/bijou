@@ -6,7 +6,51 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Changed
+
+- The soak bench (`npm run soak`) takes its options, memory readings and log
+  through host ports (`bench/src/soak-ports.ts`) instead of reading
+  `process.argv`, `process.memoryUsage()` and `node:fs`, so its app module
+  reaches no Node API. `bench/src/soak-node.ts` is the Node adapter and keeps
+  the arguments, log lines and frames of `npm run soak`. A host that cannot
+  measure memory gets no heap or resident row and no such field in the log,
+  never a zero. The context the scenarios render with is a further host
+  port, `scenarioContext`: the Node adapter supplies the interactive test
+  context each scenario's `setup` used to build for itself, one per `setup`
+  call, so the scenarios render as before. `Scenario.setup(ctx)` now requires
+  its context and `component-app` builds none; the wall-time harness child
+  creates the same context. A log sink that throws still ends the run with its error,
+  as a failed append always did.
+- Four DOGFOOD modules no longer read Node files: `app-ids.ts` and
+  `app-prompt-font.ts` import their JSON, and the landing logo and the
+  translated guides are generated JSON copies (`examples/docs/generated/`,
+  written by `npm run components:data`, held to their files by
+  `tests/dogfood-browser-data.test.ts`). Terminal output is unchanged.
+- DOGFOOD reads its Markdown documents through one seam,
+  `examples/_shared/documents.ts` (the live file, then the verified corpus,
+  as before). The web GPU showcase's build resolves it to a browser adapter
+  that serves a table of exactly the documents the app reads, made from the
+  files at build time and never committed, so `examples/docs/app.ts` reaches
+  no Node API.
+
 ### Added
+
+- The web GPU showcase has a demo gallery: `/gallery.html` lists a registry of
+  demos (`examples/web-gpu/src/gallery/demos.ts`, DOGFOOD first), each loaded
+  on demand into its own chunk and opened full-window at `?app=<id>`. A Back
+  button and `Esc` return; an unknown id shows the gallery with a message; a
+  demo that fails to load shows its error and leaves the gallery usable.
+
+- The web GPU showcase mounts DOGFOOD, the documentation app: `?app=dogfood`
+  on the showcase page, and `/dogfood.html`, a page with no chrome whose
+  Surface fills the window and resizes with it. The app and its document table
+  load on demand, so the page's entry chunk does not carry them. The browser's
+  language picks DOGFOOD's locale, and the choice stays in the page.
+- The web GPU showcase can present one app on either host and keep its state.
+  A Host switch beside the backend switch (`Space` then `m`) stops the canvas
+  mount and starts `mountBijouDom()` with the same model, and back again. The
+  new dual-host counter example has both projections; apps with no scene
+  projection keep the DOM choice disabled and say why (flyingrobots/bijou#869).
 
 - The `bijou-tui` raytrace vector helpers (`raytraceAdd`, `raytraceSub`,
   `raytraceScale`, `raytraceCross`, `raytraceNormalize`, `raytraceReflect`)
@@ -14,6 +58,24 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   result is written into it and returned, so CPU-bound loops allocate nothing
   per call; the target may alias any input, and results equal the allocating
   form bit for bit. Calls without a target are unchanged (#348).
+- Regression tests prove East Asian wide-character layout in `wrapToWidth()`,
+  `constrain()` truncation and `table()` in `interactive` and `static` modes,
+  for Han, kana, halfwidth katakana, precomposed Hangul, fullwidth forms and
+  emoji between ideographs, with a property test over widths 2..120. The
+  narrow East Asian Ambiguous policy is now stated and pinned. The reference is
+  `docs/topics/text-width/`. The tests found five defects, filed as #851,
+  #852, #853, #854 and #855 (#678).
+
+- `npm run code-dojo:cycles` holds the repository's runtime import cycles to a
+  checked-in inventory, `scripts/code-dojo/baselines/runtime-scc.json`: the
+  strongly connected components of the runtime import graph, built from
+  TypeScript's syntax tree with type-only imports and re-exports left out. A
+  new, grown or merged component, or a new edge inside one, fails; a component
+  that shrinks or disappears fails as stale until `npm run
+  code-dojo:cycles:write` records it. The check is a step of `code-dojo:verify`
+  and `code-dojo:ci`. Today's inventory holds 16 components and 49 modules.
+  Output is JSON Lines with schemas in `schemas/` (#638).
+
 - `npm run code-dojo:report` writes the Code Dojo debt aggregate, next goalpost
   target, per-source counts, top ESLint rules and optional live ESLint data to
   `docs/code-dojo/debt-report.json` as a `code-dojo.debt-report.v1` document,
@@ -30,6 +92,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   (#369).
 
 ### Fixed
+
+- The sealed runner's local launchers (`scripts/docker-seal/run.mjs` and
+  `bootstrap.mjs`) no longer wrap each run in `git locks with`, so `npm test`,
+  `npm run soak` and every other local command run on a machine without
+  `git-locks`. A second concurrent local run is refused at once with a message
+  saying another run holds the worker; callers that want queueing wrap their
+  own command (flyingrobots/bijou#865).
+
+- `mountBijouCanvas()` paints the last frame again after a container resize
+  that leaves the grid unchanged. Resizing the presenter clears the canvas, and
+  with no change of columns or rows the app rendered nothing, so the canvas
+  stayed blank until the next key (flyingrobots/bijou#867).
 
 - `npm run dogfood:i18n:debt` prints each logical surface once. The inventory's
   per-surface rows are now aggregated from the entries by surface through

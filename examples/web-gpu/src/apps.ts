@@ -1,6 +1,7 @@
 import type { BijouContext } from '@flyingrobots/bijou';
-import type { App } from '@flyingrobots/bijou-tui';
+import type { App, SemanticSceneApp } from '@flyingrobots/bijou-tui';
 import { startedApp } from './browser-start-app.js';
+import { GALLERY_DEMOS } from './gallery/demos.js';
 
 export { REFUSED_APPS, type RefusedApp } from './refused-apps.js';
 
@@ -9,6 +10,8 @@ export interface ShowcaseBuild {
   readonly build: (ctx: BijouContext) => App<unknown, unknown>;
   /** A BCSS stylesheet, as the app's own entry passes to `run()`. */
   readonly css?: string;
+  /** The app as a semantic scene app, when it has a scene projection: what the DOM host mounts. */
+  readonly scene?: (ctx: BijouContext) => SemanticSceneApp<unknown, unknown>;
 }
 
 /** An example app the showcase mounts as it is. */
@@ -61,6 +64,17 @@ export const SHOWCASE_APPS: readonly ShowcaseApp[] = [
     async load() {
       const { createShowcaseApp } = await import('../../showcase/app.js');
       return { build: (ctx) => createShowcaseApp(ctx) };
+    },
+  },
+  // Every gallery demo (DOGFOOD first), so the showcase page and the gallery load them one way.
+  ...GALLERY_DEMOS,
+  {
+    id: 'dual',
+    title: 'Dual-host counter',
+    // One app with both projections: cells for the canvas host, a scene for the DOM host.
+    async load() {
+      const { createDualApp } = await import('./dual/dual-app.js');
+      return { build: (ctx) => createDualApp(ctx), scene: (ctx) => createDualApp(ctx) };
     },
   },
 ];

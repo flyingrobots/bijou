@@ -13,6 +13,8 @@ cases that hold this behavior are listed in the [test plan](./test-plan.md).
 | `components` | `examples/components/library.ts` | `createLibraryApp(ctx)` with the `LIBRARY_CSS` stylesheet, which is what `examples/components/main.ts` runs with no arguments. |
 | `hero` | `examples/hero/app.ts` | `createHeroApp()` with the run's context and grid, and a perf tracker from `examples/hero/perf.ts` on the browser adapter of its memory port, as `examples/hero/main.ts` does with the Node adapter. |
 | `showcase` | `examples/showcase/app.ts`, unmodified | `createShowcaseApp(ctx)`, built from the run's context. |
+| `dogfood` | `examples/docs/app.ts` | `createDocsApp(ctx, { localePort })`, imported by the name `@bijou-examples/docs`, which `vite.config.ts` resolves to the app and `src/dogfood/docs-app.d.ts` describes to the showcase's stricter `tsconfig.json`. The locale port (`src/dogfood/browser-locale.ts`) offers the browser's first language until the reader picks one in the app, and keeps the choice in the port, so in the page. |
+| `dual` | `examples/web-gpu/src/dual/dual-app.ts` | `createDualApp(ctx)`, a semantic scene app: `view()` paints cells and `viewScene()` describes the same model, so it mounts on either host. |
 
 Each mount passes `mountBijouCanvas()` a factory that sets the run's context
 as the default context, as `startApp()` does on Node, and then returns the
@@ -42,7 +44,20 @@ module load is imported instead, so the bundler inlines it:
 | --- | --- | --- |
 | DM Sans and Jacquard 12 raster fonts | `assets/dm-sans-ascii.json`, `assets/jacquard12-bijou.json` | JSON import attributes. Coverage masks are decoded by `examples/_shared/base64.ts`, which accepts exactly the canonical base64 that `Buffer` round-trips. |
 | DOGFOOD runtime catalogs | `examples/docs/i18n/catalogs/<locale>/*.json` | JSON import attributes, one table entry per file. `tests/dogfood-catalog-imports.test.ts` holds the table to the directory. |
+| DOGFOOD package version, prompt font | `packages/bijou/package.json`, `assets/space-grotesk-ascii.json` | JSON import attributes; the font's masks go through `examples/_shared/base64.ts`. |
+| DOGFOOD landing logo, translated guides | `assets/flyingrobotslogo.txt`, `examples/docs/content/i18n/<locale>/<guide>.md` | Generated JSON in `examples/docs/generated/`, written by `npm run components:data`. `tests/dogfood-browser-data.test.ts` regenerates it and fails on drift. |
+| DOGFOOD documents | The Markdown files its guides read, and `docs/design-system/component-families.md` | One seam, `examples/_shared/documents.ts`: in Node, the live file and then the SHA-256-verified book corpus. The showcase's build swaps it, with the plugin in `examples/web-gpu/documents-plugin.ts`, for a reader over a table of exactly the documents the app reads, made from the files at build time. Nothing is committed, so editing a document never needs a generator run. The reader imports nothing from Node. |
 | Example code snippets and design-system families | The story sources in `examples/docs/` and `docs/design-system/component-families.md` (in the archived book corpus) | Generated copies in `examples/components/generated/`, written by `npm run components:data`. `tests/components-browser-data.test.ts` regenerates them and fails on drift; `npm run components:data:check` does the same. |
+
+The document table is made in memory at build time by
+`scripts/dogfood-documents.ts`, from the localization inventory's own discovery
+of `readMarkdownDoc('<literal>')` call sites, the translations of each that
+exist, and each `./content/<name>.md` literal. The page does not hash.
+`tests/dogfood-documents.test.ts` makes the same table and checks that it holds
+exactly the documents the app reads in every locale, that the browser reader
+answers each key as the Node adapter does, and that each text equals its live
+file or, for a file that exists only in the book corpus, the corpus record with
+its recorded SHA-256.
 
 The hero perf overlay reads memory through a port (`MemorySampler` in
 `examples/hero/perf.ts`). `perf-node.ts` reads `process.memoryUsage()`;
@@ -58,9 +73,14 @@ grapheme and no unpacked Surface, either of which the canvas contract
 refuses.
 
 The showcase bundle loads each app on demand, so the page's entry chunk does
-not carry them. The Components library's chunk carries its inlined fonts,
-snippets, families and catalogs and is the largest, about 620 KB before
-compression.
+not carry them. In the production build, the entry chunk of the showcase page
+is `main-*.js` at 16.5 kB, with its preloaded chunks `mount-host-*.js` at
+481 kB and `keys-card-*.js` at 155 kB; neither holds an app. The DOGFOOD chunk
+(`app-*.js`, 1,326 kB before compression) carries the document table, the
+translated guides, the catalogs and the app, and is the largest; `runtime-create-*.js`
+(525 kB) and `library-*.js` (98 kB) are loaded on demand by the Components
+library and DOGFOOD. A document's text appears in the build once, in the DOGFOOD
+chunk, and the 2.5 MB book corpus is not in it.
 
 ## Build
 
@@ -100,6 +120,8 @@ ratio, the atlas has a new cell size and the page mounts the app again.
 | Row | Source |
 | --- | --- |
 | App, Backend, Fallback reasons | The mount handle: `backend` and `fallbackReasons`, each as `backend: code (reason)`. |
+| Host | `Canvas` or `DOM`: which host presents the app. For an app with no scene projection it reads `Canvas (no DOM: <title> has no scene projection)`. |
+| Model | The live model's own string, number and boolean fields as `name value` pairs, cut at 96 characters. |
 | Grid | `ctx.runtime.columns` by `ctx.runtime.rows`. |
 | Cell, Device pixel ratio | The physical cell size and ratio the current mount was made with, so they always match its grid. |
 | Frame time | Milliseconds the last `present()` call took, measured around the call, and the number of frames presented. |
@@ -117,7 +139,8 @@ the page always reads back, so the HUD never shows it.
 | Control | Effect |
 | --- | --- |
 | App toggle group | Stop the mounted app and mount another. Operations run one at a time. |
-| Backend toggle group | `switchBackend()` to that backend on a fresh canvas. |
+| Host toggle group | Stop the mount and present the same app, with its model, on the other host. The DOM item is disabled for an app with no scene projection, and a line under the group says why. `Space` then `m` does the same. |
+| Backend toggle group | `switchBackend()` to that backend on a fresh canvas. Disabled while the DOM host presents. |
 | Lose the WebGL2 context | `WEBGL_lose_context.loseContext()`, then `restoreContext()` once the presenter reports the loss. |
 | Reset the glyph atlas | `atlas.invalidate(undefined, 'manual')`, a new atlas generation. |
 
@@ -151,6 +174,68 @@ input with a greeting that follows it, and a switch) with `mountBijouDom()`,
 passing the real `document` (`src/dom/probe.ts`). `window.__bijouDom` exposes the model, the
 controller's diagnostics and `stop()` to the browser suite. The model counts
 every action message it receives in `dispatches`.
+
+## DOGFOOD page
+
+`examples/web-gpu/dogfood.html` is a third Rollup input beside `index.html` and
+`dom.html`, and has no page chrome. Its React root renders one component,
+`MountHost` with the `window` size (`h-dvh w-screen`), and `src/dogfood/boot.ts`
+mounts DOGFOOD on it through the same session, atlas and presenters as the
+showcase page, so the grid fills the window and follows a resize. `?backend=`
+chooses the backend as on the showcase page, and `window.__bijouWebGpu` is the
+same probe. `examples/web-gpu/e2e/dogfood.e2e.ts` opens the landing screen,
+enters the guides, opens a guide, changes page and theme, resizes the window,
+and opens every page, asserting no fault, no failure and no console error.
+
+## Demo gallery
+
+`examples/web-gpu/gallery.html` is a fourth Rollup input. The registry,
+`src/gallery/demos.ts`, lists each demo with an id, a title, a one-line
+description and a `load()` that imports the app on demand, so no demo's code is
+in the entry chunk. DOGFOOD is the first entry, and the showcase page's app list
+(`src/apps.ts`) spreads the registry, so a new entry is one object there.
+
+The address chooses the page (`src/gallery/route.ts`):
+
+| Address | Page |
+| --- | --- |
+| `gallery.html` | The gallery: one shadcn `Item` link per demo, with `Enter` and `l` hints. |
+| `gallery.html?app=<id>` | That demo, full-window, with a Back button hinted `Esc`. Reloading opens the same demo. |
+| `gallery.html?app=<unknown>` | The gallery with an Alert that names the unknown id, shown as text. |
+
+Visits use `pushState`, so back and forward walk them. Only `?backend=` carries
+from one address to the next. Leaving a demo stops its mount, disposes its atlas
+and removes `window.__bijouWebGpu`, so no canvas, probe or listener stays behind.
+A demo whose code fails to load shows its error in an Alert and leaves the Back
+button working. `Esc` returns only while focus is in the chrome: while the
+Surface has focus every key goes to the demo. The gallery also joins the header
+and the palette as `Space` then `a`. The build writes a manifest
+(`build.manifest`), which `tests/web-gpu/gallery-chunks.test.ts` reads.
+
+## Host switch
+
+An app with a scene projection (a `SemanticSceneApp`: an ordinary app plus
+`viewScene()` and `dispatchAction()`) can be presented two ways. The canvas
+host is `mountBijouCanvas()`, which paints `view()` and sends key messages.
+The DOM host is `mountBijouDom()`, which lowers `viewScene()` to native
+elements and sends the scene's actions.
+
+Switching reads the model from the live mount, stops that mount and waits for
+it, then starts the other host with the app wrapped by `withCarriedModel()`
+(`src/handoff.ts`), whose `init()` returns the carried model and no commands.
+The app's own init commands are not run again. Exactly one mount is alive at a
+time, and the switch runs on the same queue as every other operation.
+
+Coming back to the canvas uses the backend the canvas last presented on. If
+the new host cannot start, the previous host is started again with the same
+model and the HUD's refusal row shows the reason. A request for the DOM host
+on an app with no scene projection is refused with `BIJOU_WEB_GPU_NO_SCENE`
+and changes nothing.
+
+Of the five apps only `dual` has a scene projection. The DOM host lowers
+`group` and `text` nodes only, so its scene stays within those. A name the
+canvas cannot hold (a character two cells wide) is painted as `?` per
+character on the canvas and kept whole in the scene.
 
 ## Evidence
 
