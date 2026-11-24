@@ -123,7 +123,7 @@ describe('Code Dojo live ESLint measurement', () => {
     const done = lines(real.stdout).pop();
     const ratchet = summarizeEslintResults(runEslintJson(REAL_ROOT)).total;
 
-    expect(real.code).toBe(0);
+    expect(real.code, `stderr: ${real.stderr.join(' | ')}\nlast stdout: ${real.stdout.at(-1) ?? ''}`).toBe(0);
     expect(field(done, 'live')).toBe(ratchet);
     expect(field(done, 'stored')).toBe(0);
     expect(validateEvent(done), JSON.stringify(validateEvent.errors)).toBe(true);
