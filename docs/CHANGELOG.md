@@ -8,6 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- A regression test builds a temporary repository with several unpublished
+  commits and runs the pre-push hook's own `changed_paths_for_push` and
+  `is_dogfood_relevant_path` against a first publication (all-zero remote
+  object id), asserting paths from every commit are detected, a branch with
+  unrelated files stays non-relevant, and an existing remote branch diffs
+  against the remote object (#552).
+
+### Added
+
 - `ui-scene-ir/1` nodes can declare an optional `state.checked` boolean,
   validated by `validateUiSceneIr()` (`invalid-node-state`). The browser seam
   lowers it as `data-bijou-checked`, and `mountBijouDom()` writes
