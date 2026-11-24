@@ -132,3 +132,18 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | WGPU-46 | The dual-host counter's scene has `group` and `text` nodes only with an action per control, its Surface is packed with width-1 cells only, and it takes both the counter keys and the scene actions. | `lowers to group and text nodes only, and declares an action for each control`, `paints a name the canvas cannot hold with one cell per grapheme, and the scene keeps it whole`, `takes the counter keys and t as key messages`, `takes the scene actions through the controller: increment, decrement, rename and toggle` | Implemented |
 | WGPU-47 | When the new host cannot start, the previous host is started again with the same model. | Not yet tested: no host failure can be provoked from the page without a test seam. | Planned |
 
+
+## Gallery: `tests/web-gpu/gallery-registry.test.ts`, `gallery-chunks.test.ts` (sealed), `examples/web-gpu/e2e/gallery*.e2e.ts` (browser)
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WGPU-48 | The registry lists DOGFOOD first, each demo with an id, title, one-line description and loader, and ids are unique. | `lists DOGFOOD first, each demo with an id, a title and a one-line description`, `has unique ids` | Implemented |
+| WGPU-49 | The route is the gallery, a registered demo, or the gallery with the unknown id; addresses keep only the backend. | `is the gallery with no app, and an empty app`, `is a registered demo for its id, whatever else the address holds`, `is the gallery with the unknown id, which is only ever shown as text`, `makes an address for a demo or the gallery that keeps the backend choice and nothing else` | Implemented |
+| WGPU-50 | The gallery lists every demo and opens DOGFOOD at its URL; return works and a reload opens the same demo. | `the gallery lists every registered demo, opens DOGFOOD at its URL, returns, and a reload of the URL opens the same demo` | Implemented |
+| WGPU-51 | A production build puts each demo in its own chunk, outside the entry chunk and its static imports, read from the manifest. | `names a module for every registered demo`, `puts each demo in a chunk of its own that is loaded on demand`, `keeps every demo out of the gallery entry chunk and the chunks it imports` | Implemented |
+| WGPU-52 | An unknown `?app=` shows the gallery with a message naming it. | `an unknown app shows the gallery with a message that names it` | Implemented |
+| WGPU-53 | A demo whose chunk cannot load shows the error in the page and the gallery stays usable. | `a demo whose code cannot load shows the error in the page, and the gallery stays usable` | Implemented |
+| WGPU-54 | Back and forward move between gallery and demo, leaving one canvas or none. | `the back and forward buttons move between the gallery and the demo, leaving one canvas or none` | Implemented |
+| WGPU-55 | In light and dark the gallery takes `l`, `Enter` and `Esc`; the theme menu switches themes. | `in the %s theme the gallery moves focus with l, opens a demo with Enter, and Esc opens the palette`, `the gallery switches between light and dark from its theme menu` | Implemented |
+| WGPU-56 | In a demo `Esc` returns from the chrome, and a focused Surface keeps every key. | `in a demo, the Esc key hint and the button return to the gallery from the chrome, and a focused Surface keeps every key` | Implemented |
+| WGPU-57 | Opening and closing DOGFOOD 50 times leaves one canvas while open, none after, and a stable listener count. | `opening and closing DOGFOOD 50 times leaves one canvas while open, none after, and a stable listener count` | Implemented |
