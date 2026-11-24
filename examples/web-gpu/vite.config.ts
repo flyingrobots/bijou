@@ -46,6 +46,8 @@ export default defineConfig({
       { find: /^@flyingrobots\/bijou-node$/u, replacement: fileURLToPath(new URL('src/browser-start-app.ts', import.meta.url)) },
       // DOGFOOD, by a name the showcase's own tsconfig describes in src/dogfood/docs-app.d.ts.
       { find: /^@bijou-examples\/docs$/u, replacement: fileURLToPath(new URL('../docs/app.ts', import.meta.url)) },
+      // The soak bench's browser adapter, described to the showcase's tsconfig by src/gallery/soak-app.d.ts.
+      { find: /^@bijou-examples\/soak$/u, replacement: fileURLToPath(new URL('../../bench/src/soak-browser.ts', import.meta.url)) },
       // The shadcn components' own imports, as components.json names them.
       { find: /^@\//u, replacement: fileURLToPath(new URL('src/', import.meta.url)) },
     ],

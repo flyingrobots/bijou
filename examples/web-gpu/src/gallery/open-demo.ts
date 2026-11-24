@@ -41,6 +41,7 @@ export function openDemo(container: HTMLElement, id: string, search: string, rep
       stopped = true;
       delete window.__bijouWebGpu;
       delete window.__bijouWebGpuError;
+      delete window.__bijouSoakLog;
       // Queued behind the mount, so a demo still loading is stopped as soon as it has mounted.
       void session.unmount().then(() => { atlas.dispose(); });
     },

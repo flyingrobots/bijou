@@ -19,7 +19,8 @@ export function createSoakApp(appCtx: BijouContext, host: SoakHost) {
         // until the first render tells us the real size.
         const w = latestPaneSize.width || 80;
         const h = latestPaneSize.height || 24;
-        return [initScenario(host, 0, 0, w, h), []];
+        const first = displayScenarios.findIndex((s) => s.id === host.options.scenario);
+        return [initScenario(host, Math.max(0, first), 0, w, h), []];
       },
       keyMap: createKeyMap<SoakMsg>().bind('`', 'Toggle perf overlay', { type: 'toggle-perf' }),
       update,

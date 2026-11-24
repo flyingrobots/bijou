@@ -17,10 +17,10 @@ const scenarios = (page: Page): Promise<string[]> => page.evaluate(() => (window
   return typeof entry === 'object' && entry !== null ? String(Reflect.get(entry, 'scenario')) : '';
 }));
 
-test('the bench opens from the gallery, shows no resident memory, and returns to the gallery cleanly', async ({ page }) => {
+test('the bench opens from the gallery and returns to the gallery cleanly', async ({ page }) => {
   const errors = collectErrors(page);
   await openGallery(page, 'backend=canvas2d');
-  await expect(page.locator('[data-gallery-demo="soak"]')).toContainText('soak');
+  await expect(page.locator('[data-gallery-demo="soak"]')).toContainText('Soak bench');
   await page.locator('[data-gallery-demo="soak"]').click();
   await expectDemoOpen(page, 'soak');
   await page.getByRole('button', BACK).click();
