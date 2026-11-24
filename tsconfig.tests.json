@@ -20,7 +20,8 @@
       "@flyingrobots/bijou-tui": ["./packages/bijou-tui/src/index.ts"],
       "@flyingrobots/bijou/adapters/test": ["./packages/bijou/src/adapters/test/index.ts"],
       "@flyingrobots/bijou/perf": ["./packages/bijou/src/core/render/packed-cell.ts"],
-      "@bijou-examples/docs": ["./examples/web-gpu/src/dogfood/docs-app.d.ts"]
+      "@bijou-examples/docs": ["./examples/web-gpu/src/dogfood/docs-app.d.ts"],
+      "@bijou-examples/soak": ["./examples/web-gpu/src/gallery/soak-app.d.ts"]
     }
   },
   "include": ["packages/*/src/**/*.test.ts", "packages/*/src/**/*.d.ts", "scripts/**/*.test.ts", "scripts/**/*.d.ts", "tests/**/*.test.ts", "tests/**/*.d.ts"]

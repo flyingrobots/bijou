@@ -10,6 +10,8 @@ export interface SoakOptions {
   readonly fps: number;
   /** Seconds spent on each scenario. */
   readonly dwell: number;
+  /** The id of the scenario the run starts with. Absent means the first. */
+  readonly scenario?: string;
 }
 
 /** Each figure in megabytes, or `undefined` where the host cannot measure it. */
@@ -38,8 +40,9 @@ export interface SoakHost {
 
 export const DEFAULT_SOAK_OPTIONS: SoakOptions = { cycles: Infinity, fps: 30, dwell: 4 };
 
-export function resolveSoakOptions(given: { readonly [K in keyof SoakOptions]?: number | undefined } = {}): SoakOptions {
+export function resolveSoakOptions(given: { readonly cycles?: number | undefined; readonly fps?: number | undefined; readonly dwell?: number | undefined; readonly scenario?: string | undefined } = {}): SoakOptions {
   return {
+    ...(given.scenario === undefined ? {} : { scenario: given.scenario }),
     cycles: given.cycles ?? DEFAULT_SOAK_OPTIONS.cycles,
     fps: given.fps ?? DEFAULT_SOAK_OPTIONS.fps,
     dwell: given.dwell ?? DEFAULT_SOAK_OPTIONS.dwell,

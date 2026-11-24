@@ -10,7 +10,7 @@ import { GALLERY_DEMOS } from '../../examples/web-gpu/src/gallery/demos.js';
 // chunk, with everything it imports statically, holds no demo's code.
 interface Item { readonly file: string; readonly isDynamicEntry?: boolean; readonly imports?: readonly string[] }
 /** Each demo's own module, as the manifest names it: a path from the showcase's root. */
-const DEMO_MODULES: Readonly<Record<string, string>> = { dogfood: '../docs/app.ts', fun: '../fun/browser.ts' };
+const DEMO_MODULES: Readonly<Record<string, string>> = { dogfood: '../docs/app.ts', soak: '../../bench/src/soak-browser.ts', fun: '../fun/browser.ts' };
 const config = fileURLToPath(new URL('../../examples/web-gpu/vite.config.ts', import.meta.url));
 const out = mkdtempSync(join(tmpdir(), 'bijou-gallery-chunks-'));
 let manifest: Record<string, Item> = {};

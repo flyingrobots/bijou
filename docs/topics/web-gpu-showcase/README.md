@@ -192,7 +192,7 @@ and opens every page, asserting no fault, no failure and no console error.
 `examples/web-gpu/gallery.html` is a fourth Rollup input. The registry,
 `src/gallery/demos.ts`, lists each demo with an id, a title, a one-line
 description and a `load()` that imports the app on demand, so no demo's code is
-in the entry chunk. DOGFOOD is the first entry, and the showcase page's app list
+in the entry chunk. DOGFOOD is the first entry, the soak bench the second, and the showcase page's app list
 (`src/apps.ts`) spreads the registry, so a new entry is one object there.
 
 The address chooses the page (`src/gallery/route.ts`):
@@ -223,6 +223,41 @@ button working. `Esc` returns only while focus is in the chrome: while the
 Surface has focus every key goes to the demo. The gallery also joins the header
 and the palette as `Space` then `a`. The build writes a manifest
 (`build.manifest`), which `tests/web-gpu/gallery-chunks.test.ts` reads.
+
+## Soak bench demo
+
+`?app=soak` runs the soak bench (`bench/src/soak-app.ts`): every display
+scenario in turn on the canvas, with a frame-cost panel that the backtick key
+toggles. The registry entry is `src/gallery/soak-demo.ts`. Its `load()` imports
+`@bijou-examples/soak`, which `vite.config.ts` resolves to
+`bench/src/soak-browser.ts` and `src/gallery/soak-app.d.ts` describes to the
+showcase's `tsconfig.json`, so the bench is one on-demand chunk (24.3 kB before
+compression in the production build) and no other chunk carries it.
+
+The browser adapter of the bench's three host ports is `soak-browser.ts` and
+`soak-query.ts`; neither names a Node API or a DOM type.
+
+| Port | In the browser |
+| --- | --- |
+| Options | `cycles` (whole number, at least 1), `fps` (above 0, at most 240), `dwell` (seconds, above 0) and `scenario` (the id of the first scenario), read from the query when the demo loads. A repeated, empty, malformed or out-of-range value rejects the load with `BIJOU_SOAK_BAD_QUERY: <name> must be ..., got "<value>"`, which the page shows; nothing is defaulted. Other keys (`app`, `backend`) are the page's. Opening the demo from the gallery list carries only `?backend=`, so use the address to choose options. |
+| Memory | `performance.memory.usedJSHeapSize` where Chrome offers it, as `heapUsedMB`. It is the JavaScript heap, not the resident set: `rssMB` is always `undefined`, and a missing, non-numeric, non-finite or zero reading is `undefined` too, so the panel and the log show no row and no field, never a zero. |
+| Log | The last 200 lines, in memory, one per scenario. While the demo is open, `window.__bijouSoakLog()` returns a copy; leaving the demo removes it. The page shows no log text. |
+
+The scenarios render with `createWebContext({ mode: 'interactive' })` from
+`@flyingrobots/bijou-web`, a public context made of the browser runtime, clock,
+style and output ports, built afresh for each `setup`. The Node adapter's
+`createTestContext()` comes from `@flyingrobots/bijou/adapters/test`, which
+pulls `vitest` and `path`, and is not in the page's graph.
+
+What the numbers mean here: the panel's "FPS" is the inverse of the mean CPU
+cost of a scenario frame, not presented frames
+(flyingrobots/bijou#885). A browser's clock is coarser than Node's
+(`performance.now()` is rounded, and more so without cross-origin isolation),
+so short frame costs are quantized. Heap figures come from Chrome only. These
+numbers say nothing about how the browser and Node compare.
+
+`examples/web-gpu/e2e/gallery-soak.e2e.ts` runs one full cycle, the
+address-chosen scenario, a refused value, a resize and ten opens and closes.
 
 ## Host switch
 

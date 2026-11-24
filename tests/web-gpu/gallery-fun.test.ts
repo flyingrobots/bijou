@@ -41,7 +41,9 @@ function frameOf(app: App<unknown, unknown>, messages: readonly (KeyMsg | MouseM
 
 describe('the gallery entry for the fun shell', () => {
   it('lists the fun shell after DOGFOOD, as one entry', () => {
-    expect(GALLERY_DEMOS.map((demo) => demo.id).slice(0, 2)).toEqual(['dogfood', 'fun']);
+    const ids = GALLERY_DEMOS.map((demo) => demo.id);
+    expect(ids.filter((id) => id === 'fun')).toHaveLength(1);
+    expect(ids.indexOf('fun')).toBeGreaterThan(ids.indexOf('dogfood'));
   });
 
   it('loads the shell on demand, and its header lists every demo of the fun registry', async () => {
