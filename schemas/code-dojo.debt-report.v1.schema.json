@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "code-dojo.debt-report.v1",
+  "title": "Code Dojo debt report",
+  "description": "Document written by npm run code-dojo:report. A single JSON file, not JSON Lines, as specified by DL-029. Byte-stable: no timestamps.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "totalViolations", "ceiling", "goalpostReduction", "nextGoalpostTarget", "sources", "eslintRules", "live"],
+  "definitions": {
+    "count": { "type": "integer", "minimum": 0 }
+  },
+  "properties": {
+    "schema": { "const": "code-dojo.debt-report.v1" },
+    "totalViolations": { "$ref": "#/definitions/count" },
+    "ceiling": { "$ref": "#/definitions/count" },
+    "goalpostReduction": { "$ref": "#/definitions/count" },
+    "nextGoalpostTarget": { "$ref": "#/definitions/count" },
+    "sources": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": [
+        { "type": "object", "additionalProperties": false, "required": ["id", "count"], "properties": { "id": { "const": "file-context" }, "count": { "$ref": "#/definitions/count" } } },
+        { "type": "object", "additionalProperties": false, "required": ["id", "count"], "properties": { "id": { "const": "mock-ban" }, "count": { "$ref": "#/definitions/count" } } },
+        { "type": "object", "additionalProperties": false, "required": ["id", "count", "overHardLimit"], "properties": { "id": { "const": "code-size" }, "count": { "$ref": "#/definitions/count" }, "overHardLimit": { "$ref": "#/definitions/count" } } },
+        { "type": "object", "additionalProperties": false, "required": ["id", "count"], "properties": { "id": { "const": "eslint" }, "count": { "$ref": "#/definitions/count" } } }
+      ]
+    },
+    "eslintRules": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ruleId", "count"],
+        "properties": { "ruleId": { "type": "string" }, "count": { "$ref": "#/definitions/count" } }
+      }
+    },
+    "live": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["eslintViolations", "eslintFiles"],
+          "properties": {
+            "eslintViolations": { "$ref": "#/definitions/count" },
+            "eslintFiles": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "array",
+                  "maxItems": 10,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["path", "count"],
+                    "properties": { "path": { "type": "string" }, "count": { "$ref": "#/definitions/count" } }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
