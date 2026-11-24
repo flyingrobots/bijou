@@ -71,6 +71,7 @@ The glossary and topic finder support practical lookup.
 - [Browser host adapter](./topics/bijou-web/README.md): the `@flyingrobots/bijou-web` port contracts, refusals, and [test plan](./topics/bijou-web/test-plan.md)
 - [Web GPU showcase](./topics/web-gpu-showcase/README.md): example apps on Geordi's WebGPU, WebGL2 and Canvas 2D presenters in a browser, the HUD, the pinned Geordi packages, and [test plan](./topics/web-gpu-showcase/test-plan.md)
 - [DOM host](./topics/bijou-web-dom/README.md): `mountBijouDom()` element mapping, keyed patching, events, focus fallback, theme sync, and [test plan](./topics/bijou-web-dom/test-plan.md)
+- [Replay event outbox](./topics/replay-events/README.md): `bijou-replay-event/1` JSONL in memory or a file, canonical bytes, errors, and [test plan](./topics/replay-events/test-plan.md)
 - Translation glossaries ([French](./topics/glossary.fr.md), [Spanish](./topics/glossary.es.md), [German](./topics/glossary.de.md)): one rendering per Bijou term, address form, and typography; decision in [DL-035](./design/DL-035-translation-glossary.md)
 - [TypeScript Code Standards](./typescript-code-standards.editors-edition.md)
 - [Code Dojo exceptions and debt](./code-dojo-exceptions.md)

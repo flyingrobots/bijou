@@ -8,6 +8,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `ReplayOutbox` records `bijou-replay-event/1` events (DL-033). It assigns
+  `seq` in append order, rejects non-plain payload values (functions, class
+  instances, `NaN`, cycles and the rest of the DL-033 list) before a `seq` is
+  used, and writes canonical JSONL with keys sorted by code point.
+  `createMemoryReplayOutbox()`, `createReplayOutbox(sink)`, `canonicalJson()`
+  and `surfaceFrameHash()` are pure and exported from `@flyingrobots/bijou`
+  (they run in a browser) and re-exported from `@flyingrobots/bijou-node`,
+  which adds `createReplayFileOutbox()`: one `fsync`ed line per append,
+  exclusive create unless `overwrite`, and byte-identical output to the memory
+  mode. Failures are typed `ReplayOutboxError` codes. The line schema is
+  `schemas/bijou-replay-event.v1.schema.json`. No host path emits to it yet
+  (#600).
+
 - `npm run code-dojo:report` writes the Code Dojo debt aggregate, next goalpost
   target, per-source counts, top ESLint rules and optional live ESLint data to
   `docs/code-dojo/debt-report.json` as a `code-dojo.debt-report.v1` document,
