@@ -10,9 +10,11 @@ export function stampPanel(
 ): void {
   const width = Math.max(...lines.map((line) => line.length)) + 4;
   const height = lines.length + 2;
+  // A line of only rule characters is a separator: it spans the panel's inner width, the box width less two borders.
+  const text = lines.map((line) => (/^─+$/u.test(line) ? '─'.repeat(width - 2) : line));
   if (surface.width < width || surface.height < height) return;
   const at = place({ x: surface.width - width, y: surface.height - height });
-  surface.blit(boxSurface(lines.join('\n'), { width, ctx }), at.x, at.y);
+  surface.blit(boxSurface(text.join('\n'), { width, ctx }), at.x, at.y);
 }
 
 /** The cell grid as braille dots: each cell is a 2 by 4 block of a grid `width * 2` wide. Returns the dot mask, 0 to 255. */

@@ -11,7 +11,7 @@ function rows(surface: { readonly width: number; readonly height: number }, text
 /** The panel's top border and its separator row, cut out of the frame text. */
 function panelRules(lines: readonly string[]): { readonly top: string; readonly rule: string } {
   const top = lines.map((line) => /┌─+┐/u.exec(line)?.[0]).find((found) => found !== undefined) ?? '';
-  const rule = lines.map((line) => /│─+│/u.exec(line)?.[0]).find((found) => found !== undefined) ?? '';
+  const rule = lines.map((line) => /│(─+) *│/u.exec(line)?.[1]).find((found) => found !== undefined) ?? '';
   return { top, rule };
 }
 
@@ -23,16 +23,16 @@ describe('the fun demos panel separator', () => {
     const text = cellsOf(surface).map((cell) => cell.char).join('');
     const { top, rule } = panelRules(rows(surface, text));
     expect(top).not.toBe('');
-    expect(rule.length).toBe(top.length);
+    expect(rule.length).toBe(top.length - 2);
   });
 
-  for (const entry of demos.filter((candidate) => candidate.id !== 'metaballs' || true)) {
+  for (const entry of demos) {
     it(`${entry.id} draws a separator as wide as its panel's inner width`, () => {
       const ctx = funContext(80, 24);
       const frame = feed(mountEntry(entry), frameScript(entry.id, 80, 24)).view(80, 24, ctx);
       const { top, rule } = panelRules(rows(frame, cellsOf(frame).map((cell) => cell.char).join('')));
       expect(top).not.toBe('');
-      expect(rule.length).toBe(top.length);
+      expect(rule.length).toBe(top.length - 2);
     });
   }
 });
