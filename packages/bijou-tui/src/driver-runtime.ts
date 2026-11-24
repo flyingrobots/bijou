@@ -33,12 +33,24 @@ export function initialSize(
   };
 }
 
+/**
+ * Render the frame to record for one update.
+ *
+ * A recorded frame is a snapshot of what was on screen at that update. A view
+ * that returns a Surface may hand back one surface it repaints every time (a
+ * framed app repaints its composed scratch surface), so that surface is
+ * cloned. A LayoutNode view is painted into a new surface, which no later
+ * render touches, so it needs no copy.
+ */
 export function normalizeFrame<Model, M>(
   app: App<Model, M>,
   model: Model,
   size: { width: number; height: number },
 ): Surface {
-  return normalizeViewOutput(app.view(model), size).surface;
+  const normalized = normalizeViewOutput(app.view(model), size);
+  return normalized.kind === 'surface'
+    ? normalized.surface.clone()
+    : normalized.surface;
 }
 
 export async function dispatchScriptStep<M>(

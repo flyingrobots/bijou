@@ -65,7 +65,7 @@ export type MouseWheelDirection = 'up' | 'down';
 
 /** Options for a scripted run, extending the base runtime options. */
 export interface RunScriptOptions extends RunOptions {
-  /** Capture each rendered frame. */
+  /** Capture each rendered frame: the same snapshot that `frames` records. */
   onFrame?: (frame: Surface, index: number) => void;
   /** Pulse frequency used to drive animation commands, or false to disable. */
   pulseFps?: number | false;
@@ -75,7 +75,10 @@ export interface RunScriptOptions extends RunOptions {
 export interface RunScriptResult<Model> {
   /** Final model state after all steps. */
   model: Model;
-  /** All rendered frames in order. */
+  /**
+   * All rendered frames in order. Each entry is a snapshot of the screen at
+   * that update, so later renders into a reused surface do not change it.
+   */
   frames: Surface[];
   /** Total elapsed time in milliseconds. */
   elapsed: number;

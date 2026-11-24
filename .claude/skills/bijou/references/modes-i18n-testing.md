@@ -42,6 +42,8 @@ Every branch carries the same meaning; only presentation differs.
   `{ resize }`, `{ mouse }`, `{ msg }`; or `testRuntime(app)` for an interactive harness (`press`, `pulse`,
   `resize`, `frame`, `model`). `runScript` drains every command before the next step, so a command that sleeps on a
   mock clock blocks it: run such commands detached (start them, deliver their message when they settle).
+  Each recorded frame (`frames[i]`, the `onFrame` frame, a snapshot's `frame`) is a snapshot of that update, so any
+  frame can be read, not only the last.
 - Bijou repo standards: vitest; no mocks (`vi.mock`, `spyOn` are banned: use in-memory fakes and observable
   behaviour); write the failing test first; frame tests with `npm run test:frames`.
 
