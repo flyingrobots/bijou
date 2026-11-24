@@ -74,6 +74,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `accessible` output is byte-identical to before; title text is never
   reversed (flyingrobots/bijou#626).
 
+- The Components Library's `r` toggle now reaches every story preview.
+  `createStoryProfileContext()` in `examples/_stories/protocol.ts` takes an
+  optional `direction`, and the library passes `ltr` or `rtl` from the toggle,
+  so a component that reads `ctx.direction` through `mirrorsLayout()` mirrors
+  in `interactive` and `static` previews and keeps logical order in `pipe` and
+  `accessible`. A story's own `direction` option still wins. At `ltr` every
+  existing frame is unchanged, and no story file gains copy
+  (flyingrobots/bijou#840).
+
 - CI publishes a per-job wall-time summary to the run's job summary, slowest
   finished job first, with skipped, in-progress and cancelled jobs labelled.
   The new `Wall time summary` job is read-only, non-blocking and required by
