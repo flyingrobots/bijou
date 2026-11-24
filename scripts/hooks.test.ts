@@ -21,7 +21,7 @@ describe('git hooks', () => {
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:debt -- --base HEAD^');
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:check');
     expect(workflow).toContain('docs/*)');
-    expect(policy.testJob.testRunCommand).toBe("node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_SHARD=${{ matrix.shard }}/4 npm run test:run'");
+    expect(policy.testJob.testRunCommand).toBe("node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_SHARD=${{ matrix.shard }}/8 npm run test:run'");
   });
 
   it('focused CI unit-test filters point at existing split docs-preview tests', () => {

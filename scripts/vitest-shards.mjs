@@ -1,7 +1,6 @@
 // Shard selection for the full Vitest suite. Pure: no file access, no process state.
-// The suite runs in chunks of files; a shard is every chunk whose position, counted
-// from zero, leaves the remainder index - 1 when divided by the shard count. Chunks
-// are dealt out in turn so each shard gets a spread of directories, not one block.
+// A shard is a share of the suite's test files, dealt by measured weight so the
+// shards take similar time; each shard then runs its files in chunks.
 
 /** Parse `BIJOU_VITEST_SHARD`: `k/n` with 1 <= k <= n, or nothing for the whole suite. */
 export function parseShard(raw) {
@@ -21,10 +20,37 @@ export function chunkFiles(files, size) {
   return chunks;
 }
 
-/** The chunks one shard runs; every chunk when there is no shard. */
-export function selectShard(chunks, shard) {
-  if (shard == null) return chunks.map((chunk) => [...chunk]);
-  return chunks.filter((_, position) => position % shard.count === shard.index - 1).map((chunk) => [...chunk]);
+/**
+ * Deal the files into `count` shards of similar total weight: heaviest file first, each to the
+ * shard that is lightest so far (ties to the lower shard). A file with no measured weight counts
+ * `weights.defaultSeconds`, and every file also counts `weights.perFileSeconds` for the start-up and
+ * import cost a test file has before its first test runs. Every file lands in exactly one shard whatever the weights say, so a
+ * stale or wrong weights file can make the shards uneven but can never drop or repeat a test.
+ */
+export function assignShards(files, weights, count) {
+  const seconds = (file) => (weights.files[file] ?? weights.defaultSeconds) + weights.perFileSeconds;
+  const ordered = [...files].sort((a, b) => seconds(b) - seconds(a) || a.localeCompare(b));
+  const shards = Array.from({ length: count }, () => ({ files: [], seconds: 0 }));
+  for (const file of ordered) {
+    let lightest = shards[0];
+    for (const shard of shards) if (shard.seconds < lightest.seconds) lightest = shard;
+    lightest.files.push(file);
+    lightest.seconds += seconds(file);
+  }
+  return shards.map((shard) => ({ files: shard.files.sort(), seconds: Math.round(shard.seconds * 10) / 10 }));
+}
+
+/** Read a `bijou.vitest-weights/1` document; anything else is refused. */
+export function parseWeights(text) {
+  const parsed = JSON.parse(text);
+  const files = parsed?.files;
+  const valid = parsed?.schema === 'bijou.vitest-weights/1'
+    && typeof parsed.defaultSeconds === 'number' && parsed.defaultSeconds > 0
+    && typeof parsed.perFileSeconds === 'number' && parsed.perFileSeconds >= 0
+    && files != null && typeof files === 'object' && !Array.isArray(files)
+    && Object.values(files).every((value) => typeof value === 'number' && value >= 0);
+  if (!valid) throw new Error('scripts/vitest-weights.json is not a bijou.vitest-weights/1 document');
+  return { defaultSeconds: parsed.defaultSeconds, perFileSeconds: parsed.perFileSeconds, files };
 }
 
 export function isIncludedTestFile(path) {

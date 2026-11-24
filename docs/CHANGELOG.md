@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- CI's full-suite shards are dealt by measured weight and there are eight of
+  them for each Node version. With shards cut by position the four took 156 to
+  341 s, because ten test files were 46% of the suite's time. Now the heaviest
+  file goes first, each to the shard that is lightest so far, using the
+  per-file times in `scripts/vitest-weights.json` (measured by
+  `scripts/measure-vitest-weights.mjs`). A stale weight only makes the shards
+  less even: every file is still in exactly one shard. Origin:
+  flyingrobots/bijou#907.
 - CI runs the full test suite as four parallel shards for each Node version
   (job `suite`), where one job ran its 25 chunks in series in 13 to 15 minutes.
   `BIJOU_VITEST_SHARD=k/n` makes `scripts/run-vitest.mjs` run the k-th of n

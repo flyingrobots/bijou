@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import './docker-seal/require-docker.mjs';
 import { spawnSync } from 'node:child_process';
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { chunkFiles, isIncludedTestFile, parseShard, selectShard } from './vitest-shards.mjs';
+import { assignShards, chunkFiles, isIncludedTestFile, parseShard, parseWeights } from './vitest-shards.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const VITEST = resolve(ROOT, 'node_modules', 'vitest', 'vitest.mjs');
@@ -33,11 +33,13 @@ try {
   process.exit(2);
 }
 const files = listTestFiles();
-const allChunks = chunkFiles(files, CHUNK_SIZE);
-const chunks = selectShard(allChunks, shard);
+// A shard's files are dealt by measured weight (scripts/vitest-weights.json), so shards take similar time.
+let chunks = chunkFiles(files, CHUNK_SIZE);
 if (shard) {
-  const count = chunks.reduce((sum, group) => sum + group.length, 0);
-  process.stdout.write(`vitest shard ${shard.index}/${shard.count}: ${chunks.length} of ${allChunks.length} chunks, ${count} of ${files.length} files\n`);
+  const weights = parseWeights(readFileSync(resolve(ROOT, 'scripts/vitest-weights.json'), 'utf8'));
+  const mine = assignShards(files, weights, shard.count)[shard.index - 1];
+  chunks = chunkFiles(mine.files, CHUNK_SIZE);
+  process.stdout.write(`vitest shard ${shard.index}/${shard.count}: ${mine.files.length} of ${files.length} files, about ${mine.seconds} s of measured test time\n`);
 }
 
 for (const [index, group] of chunks.entries()) {

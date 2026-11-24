@@ -73,18 +73,32 @@ network access as a fallback.
 
 `npm run test:run` with no file runs every test file, in chunks of 48 files,
 one chunk after another. `BIJOU_VITEST_SHARD=k/n` runs the k-th of n shares of
-those chunks: shard k takes every n-th chunk, so the n shards together run
-every file once. CI runs the suite as four shards on four runners, for each
-Node version.
+the files. The files are dealt by measured weight
+(`scripts/vitest-weights.json`): heaviest first, each to the shard that is
+lightest so far, so the shards take similar time and together run every file
+once. CI runs the suite as shards on separate runners, for each Node version;
+the workflow names how many.
 
 ```bash
-node scripts/docker-seal/run.mjs -- sh -c 'npm run build && BIJOU_VITEST_SHARD=2/4 npm run test:run'
+node scripts/docker-seal/run.mjs -- sh -c 'npm run build && BIJOU_VITEST_SHARD=2/8 npm run test:run'
 ```
 
-The run's first line names the share, in the form `vitest shard 2/4: 6 of 25 chunks,
-288 of 1159 files` (illustrative counts). A value that is not `k/n` with
-`1 <= k <= n` is refused with exit status 2. With the variable unset the whole
-suite runs, as before.
+The run's first line names the share, in the form `vitest shard 2/8: 150 of
+1159 files, about 110 s of measured test time` (illustrative counts). A value
+that is not `k/n` with `1 <= k <= n` is refused with exit status 2. With the
+variable unset the whole suite runs, as before.
+
+The weights are measurements, not rules. A file the weights do not list counts
+a default, and a stale weight only makes the shards less even: it cannot drop
+or repeat a test. Measure again after adding or speeding up slow test files:
+
+```bash
+node scripts/docker-seal/run.mjs --export scripts/vitest-weights.json -- \
+  sh -c 'npm run build && node scripts/measure-vitest-weights.mjs'
+```
+
+The measured file is written under the run's evidence directory, in
+`exports/scripts/vitest-weights.json`; copy it over the checked-in one.
 
 ## Inspect results
 
