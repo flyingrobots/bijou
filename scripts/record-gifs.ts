@@ -12,6 +12,7 @@ import {
   renderRecordSummary,
   type RecordResult,
 } from './record-gifs-report.js';
+import { watchRecorderProcess } from './record-gifs-settle.js';
 
 const ctx = initDefaultContext();
 const JOBS = parseInt(process.env['JOBS'] ?? '8', 10);
@@ -74,13 +75,7 @@ function recordOne(job: RecordJob): Promise<RecordResult> {
       stdio: ['ignore', 'ignore', 'ignore'],
     });
 
-    proc.on('close', (code) => {
-      finish(code === 0 ? 'success' : 'error');
-    });
-
-    proc.on('error', () => {
-      finish('error');
-    });
+    watchRecorderProcess(proc, finish);
 
     function finish(status: RecordResult['status']) {
       const elapsed = Date.now() - start;

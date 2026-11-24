@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- `scripts/record-gifs.ts` settles each VHS job exactly once. A spawn `error`
+  followed by `close` no longer appends a second result or counts a second
+  completion; the first outcome wins and spawn failures are still reported.
+
 ### Added
 
 - `ui-scene-ir/1` nodes can declare an optional `state.checked` boolean,
@@ -37,6 +43,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- `runScript()` records each frame as a snapshot of the screen at that update.
+  A framed app, DOGFOOD among them, repaints one reused Surface, and every
+  entry of `frames` was that one Surface, so every entry showed the last frame
+  and a test reading an earlier frame or searching all frames saw only the
+  final screen. A Surface view is now copied once per recorded frame, with
+  `Surface.clone()`; the frame passed to `onFrame` is the same snapshot, and
+  `testRuntime()` snapshot frames get the same fix. `recordDemoGif()` GIFs no
+  longer repeat the final frame for such apps. The result's shape is unchanged
+  (flyingrobots/bijou#822).
 - `npm run version` rejects versions with leading-zero numbers such as
   `01.0.0` and `1.0.0-rc.01` before it edits any manifest or runs npm, using
   the same canonical integer rule as release preflight. Stable and
