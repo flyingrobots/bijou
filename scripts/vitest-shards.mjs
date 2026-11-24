@@ -23,12 +23,14 @@ export function chunkFiles(files, size) {
 /**
  * Deal the files into `count` shards of similar total weight: heaviest file first, each to the
  * shard that is lightest so far (ties to the lower shard). A file with no measured weight counts
- * `weights.defaultSeconds`, and every file also counts `weights.perFileSeconds` for the start-up and
- * import cost a test file has before its first test runs. Every file lands in exactly one shard whatever the weights say, so a
+ * `weights.defaultSeconds`. Every file also counts a start-up cost for what it loads before its
+ * first test: `weights.perFileSeconds` for a file in `isolated`, which loads its modules itself, and
+ * `weights.sharedPerFileSeconds` for the rest, which share a worker's modules. Every file lands in exactly one shard whatever the weights say, so a
  * stale or wrong weights file can make the shards uneven but can never drop or repeat a test.
  */
-export function assignShards(files, weights, count) {
-  const seconds = (file) => (weights.files[file] ?? weights.defaultSeconds) + weights.perFileSeconds;
+export function assignShards(files, weights, count, isolated = new Set()) {
+  const seconds = (file) => (weights.files[file] ?? weights.defaultSeconds)
+    + (isolated.has(file) ? weights.perFileSeconds : weights.sharedPerFileSeconds);
   const ordered = [...files].sort((a, b) => seconds(b) - seconds(a) || a.localeCompare(b));
   const shards = Array.from({ length: count }, () => ({ files: [], seconds: 0 }));
   for (const file of ordered) {
@@ -47,10 +49,16 @@ export function parseWeights(text) {
   const valid = parsed?.schema === 'bijou.vitest-weights/1'
     && typeof parsed.defaultSeconds === 'number' && parsed.defaultSeconds > 0
     && typeof parsed.perFileSeconds === 'number' && parsed.perFileSeconds >= 0
+    && typeof parsed.sharedPerFileSeconds === 'number' && parsed.sharedPerFileSeconds >= 0
     && files != null && typeof files === 'object' && !Array.isArray(files)
     && Object.values(files).every((value) => typeof value === 'number' && value >= 0);
   if (!valid) throw new Error('scripts/vitest-weights.json is not a bijou.vitest-weights/1 document');
-  return { defaultSeconds: parsed.defaultSeconds, perFileSeconds: parsed.perFileSeconds, files };
+  return {
+    defaultSeconds: parsed.defaultSeconds,
+    perFileSeconds: parsed.perFileSeconds,
+    sharedPerFileSeconds: parsed.sharedPerFileSeconds,
+    files,
+  };
 }
 
 /**

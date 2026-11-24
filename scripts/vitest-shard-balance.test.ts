@@ -20,19 +20,19 @@ describe('weighted shards', () => {
     for (let round = 0; round < 200; round++) {
       const list = files.slice(0, next() % 400);
       const count = 1 + (next() % 24);
-      const weights = { defaultSeconds: 0.5, perFileSeconds: 0, files: Object.fromEntries(list.filter(() => next() % 5 === 0).map((file) => [file, (next() % 1400) / 10])) };
+      const weights = { defaultSeconds: 0.5, perFileSeconds: 0, sharedPerFileSeconds: 0, files: Object.fromEntries(list.filter(() => next() % 5 === 0).map((file) => [file, (next() % 1400) / 10])) };
       const taken = assignShards(list, weights, count).flatMap((shard) => shard.files);
       expect(taken.sort(), `${String(list.length)} files, ${String(count)} shards`).toEqual([...list].sort());
     }
   });
 
   it('ignores a weight for a file that is not in the suite, and gives an unlisted file the default', () => {
-    const shards = assignShards(['a.test.ts', 'b.test.ts'], { defaultSeconds: 2, perFileSeconds: 0.5, files: { 'gone.test.ts': 500, 'a.test.ts': 6 } }, 2);
-    expect(shards).toEqual([{ files: ['a.test.ts'], seconds: 6.5 }, { files: ['b.test.ts'], seconds: 2.5 }]);
+    const shards = assignShards(['a.test.ts', 'b.test.ts'], { defaultSeconds: 2, perFileSeconds: 0.5, sharedPerFileSeconds: 0.1, files: { 'gone.test.ts': 500, 'a.test.ts': 6 } }, 2, new Set(['a.test.ts']));
+    expect(shards).toEqual([{ files: ['a.test.ts'], seconds: 6.5 }, { files: ['b.test.ts'], seconds: 2.1 }]);
   });
 
   it('keeps the heaviest files apart: no shard is heavier than the mean plus the heaviest file', () => {
-    const weights = { defaultSeconds: 0.5, perFileSeconds: 0, files: { [files[0] ?? '']: 135, [files[1] ?? '']: 83, [files[2] ?? '']: 44, [files[3] ?? '']: 25 } };
+    const weights = { defaultSeconds: 0.5, perFileSeconds: 0, sharedPerFileSeconds: 0, files: { [files[0] ?? '']: 135, [files[1] ?? '']: 83, [files[2] ?? '']: 44, [files[3] ?? '']: 25 } };
     const shards = assignShards(files, weights, 8);
     const total = shards.reduce((sum, shard) => sum + shard.seconds, 0);
     for (const shard of shards) expect(shard.seconds).toBeLessThanOrEqual(total / 8 + 135);
@@ -41,13 +41,13 @@ describe('weighted shards', () => {
   });
 
   it('is the same on every run, so every CI job computes the same split', () => {
-    const weights = { defaultSeconds: 0.5, perFileSeconds: 0, files: { [files[7] ?? '']: 9, [files[8] ?? '']: 9 } };
+    const weights = { defaultSeconds: 0.5, perFileSeconds: 0, sharedPerFileSeconds: 0, files: { [files[7] ?? '']: 9, [files[8] ?? '']: 9 } };
     expect(assignShards([...files].reverse(), weights, 6)).toEqual(assignShards(files, weights, 6));
   });
 
   it('refuses a weights document of another shape', () => {
-    expect(parseWeights('{"schema":"bijou.vitest-weights/1","defaultSeconds":0.4,"perFileSeconds":0.5,"files":{"a.test.ts":3}}')).toEqual({ defaultSeconds: 0.4, perFileSeconds: 0.5, files: { 'a.test.ts': 3 } });
-    for (const bad of ['{}', '{"schema":"bijou.vitest-weights/1","defaultSeconds":1,"files":{}}', '{"schema":"other","defaultSeconds":1,"perFileSeconds":0.5,"files":{}}', '{"schema":"bijou.vitest-weights/1","defaultSeconds":0,"perFileSeconds":0.5,"files":{}}', '{"schema":"bijou.vitest-weights/1","defaultSeconds":1,"perFileSeconds":0.5,"files":{"a":"x"}}', '{"schema":"bijou.vitest-weights/1","defaultSeconds":1,"perFileSeconds":0.5,"files":[]}']) {
+    expect(parseWeights('{"schema":"bijou.vitest-weights/1","defaultSeconds":0.4,"perFileSeconds":0.5,"sharedPerFileSeconds":0.1,"files":{"a.test.ts":3}}')).toEqual({ defaultSeconds: 0.4, perFileSeconds: 0.5, sharedPerFileSeconds: 0.1, files: { 'a.test.ts': 3 } });
+    for (const bad of ['{}', '{"schema":"bijou.vitest-weights/1","defaultSeconds":1,"files":{}}', '{"schema":"bijou.vitest-weights/1","defaultSeconds":1,"perFileSeconds":0.5,"files":{}}', '{"schema":"other","defaultSeconds":1,"perFileSeconds":0.5,"sharedPerFileSeconds":0.1,"files":{}}', '{"schema":"bijou.vitest-weights/1","defaultSeconds":0,"perFileSeconds":0.5,"sharedPerFileSeconds":0.1,"files":{}}', '{"schema":"bijou.vitest-weights/1","defaultSeconds":1,"perFileSeconds":0.5,"sharedPerFileSeconds":0.1,"files":{"a":"x"}}', '{"schema":"bijou.vitest-weights/1","defaultSeconds":1,"perFileSeconds":0.5,"sharedPerFileSeconds":0.1,"files":[]}']) {
       expect(() => parseWeights(bad), bad).toThrow('bijou.vitest-weights/1');
     }
   });

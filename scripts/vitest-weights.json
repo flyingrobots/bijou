@@ -3,6 +3,7 @@
   "floorSeconds": 1,
   "defaultSeconds": 0.06,
   "perFileSeconds": 0.5,
+  "sharedPerFileSeconds": 0.1,
   "files": {
     "bench/src/soak-browser.test.ts": 1.2,
     "bench/src/soak-host.test.ts": 16.7,

@@ -103,6 +103,36 @@ node scripts/docker-seal/run.mjs --export scripts/vitest-weights.json -- \
 The measured file is written under the run's evidence directory, in
 `exports/scripts/vitest-weights.json`; copy it over the checked-in one.
 
+### Shared modules and isolated files
+
+Loading modules once for every test file was about three quarters of the
+suite's time. `scripts/run-vitest.mjs` therefore runs the full suite in two
+groups. A file that cannot change what other files see runs with isolation off,
+so the files in a worker share the modules they load. A file that changes
+shared state keeps a module graph of its own, as before.
+
+A file is isolated when its source uses a module mock, a global or environment
+stub, fake timers, a spy, a module-registry reset, a write to `process.env` or
+`globalThis`, `process.chdir`, or the default context (`setDefaultContext`,
+`_resetDefaultContextForTesting`). The rule is `needsIsolation` in
+`scripts/vitest-shards.mjs`. A file that changes shared state in a way the rule
+does not see asks for isolation with a comment line of its own:
+
+```ts
+// vitest: isolate (patches Date for the whole file)
+```
+
+A test that passes alone and fails in the full suite is the sign of such a
+file. Run the suite with every file isolated to tell the two apart:
+
+```bash
+node scripts/docker-seal/run.mjs -- sh -c 'npm run build && BIJOU_VITEST_ISOLATE=all npm run test:run'
+```
+
+If it passes that way, some file in the failing chunk changes shared state:
+find it and give it the comment line. Running named files
+(`npm run test:run -- path/to/file.test.ts`) is always isolated.
+
 ## Inspect results
 
 The launcher prints the path to its evidence directory. Admission and completion
