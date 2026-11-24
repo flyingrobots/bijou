@@ -1,7 +1,8 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ensureDocker } from '@git-stunts/docker-guard';
+import { readNetworkEntries } from './network-entries.mjs';
 import { verifyKernelSeal } from './seal-policy.mjs';
 import { requireWindows } from './require-windows.mjs';
 
@@ -19,7 +20,7 @@ export function requireDocker() {
   verifyKernelSeal({
     dockerFile: true,
     marker: readFileSync('/etc/bijou-test-seal', 'utf8'),
-    interfaces: readdirSync('/sys/class/net'),
+    interfaces: readNetworkEntries(),
     sockets: ['/var/run/docker.sock', '/run/docker.sock'].filter((path) => existsSync(path)),
     mountInfo: readFileSync('/proc/self/mountinfo', 'utf8'),
   });

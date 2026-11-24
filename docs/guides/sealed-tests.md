@@ -117,6 +117,14 @@ Linux workers use a read-only root, bounded temporary filesystems, private
 processes and networking, and no Docker socket or host mounts. CPU, memory,
 process, output and runtime limits remain active while commands execute.
 
+A worker has no network. Inside it, the seal reads `/sys/class/net` and admits
+only loopback, the bonding driver's `bonding_masters` control file, and the
+fallback tunnel devices that some kernels create in every network namespace
+(`tunl0`, `sit0`, `gre0` and their relatives), and those only while they are
+down. Docker Desktop's kernel lists them in a worker started with
+`--network none`. Any other device, or a fallback tunnel device that is up, is
+refused as `network interface beyond loopback`.
+
 Windows workers run as `ContainerUser` with process isolation, no host mounts,
 and no network while tests execute. Their storage limits differ from the Linux
 limits, and each has a different strength:
