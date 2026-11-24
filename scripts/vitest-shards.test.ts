@@ -1,20 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ciWorkflowPolicyFromYaml } from './ci-workflow-policy.js';
-import { chunkFiles, isIncludedTestFile, parseShard, selectShard } from './vitest-shards.mjs';
+import { chunkFiles, isIncludedTestFile, parseShard } from './vitest-shards.mjs';
 
 // flyingrobots/bijou#907. The full suite ran its chunks one after another on
-// one runner. A shard is a share of those chunks, so several runners can each
-// take one. These cases pin that the shards partition the chunks.
+// one runner. A shard is a share of the suite's files, so several runners can
+// each take one. scripts/vitest-shard-balance.test.ts pins that the shards
+// partition the files; these cases pin the shard value, the chunks and CI.
 const files = Array.from({ length: 1000 }, (_, index) => `tests/f${String(index).padStart(4, '0')}.test.ts`);
-
-function lcg(seed: number): () => number {
-  let state = seed;
-  return () => {
-    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
-    return state;
-  };
-}
 
 describe('vitest shards', () => {
   it('parses k/n and refuses anything else', () => {
@@ -27,42 +20,11 @@ describe('vitest shards', () => {
     }
   });
 
-  it('gives every chunk to exactly one shard, for 1, 4 and 25 shards', () => {
+  it('chunks a list in order, losing nothing', () => {
     const chunks = chunkFiles(files, 48);
-    for (const count of [1, 4, 25]) {
-      const taken = Array.from({ length: count }, (_, index) => selectShard(chunks, { index: index + 1, count }));
-      expect(taken.flat(2).sort()).toEqual([...files].sort());
-      expect(taken.flat(2)).toHaveLength(files.length);
-    }
-  });
-
-  it('with no shard, runs every chunk', () => {
-    expect(selectShard(chunkFiles(files, 48), undefined).flat()).toEqual(files);
-  });
-
-  it('gives a shard nothing when there are more shards than chunks', () => {
-    const chunks = chunkFiles(files.slice(0, 50), 48);
-    expect(chunks).toHaveLength(2);
-    expect(selectShard(chunks, { index: 3, count: 4 })).toEqual([]);
-    expect(selectShard(chunks, { index: 1, count: 4 }).flat()).toHaveLength(48);
-  });
-
-  it('spreads the chunks evenly: shard sizes differ by at most one chunk', () => {
-    const chunks = chunkFiles(files, 48);
-    const sizes = [1, 2, 3, 4].map((index) => selectShard(chunks, { index, count: 4 }).length);
-    expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(1);
-  });
-
-  it('partitions seeded file lists at seeded sizes and shard counts', () => {
-    const next = lcg(907);
-    for (let round = 0; round < 200; round++) {
-      const list = files.slice(0, next() % 1000);
-      const size = 1 + (next() % 60);
-      const count = 1 + (next() % 30);
-      const chunks = chunkFiles(list, size);
-      const taken = Array.from({ length: count }, (_, index) => selectShard(chunks, { index: index + 1, count })).flat(2);
-      expect(taken.sort(), `${String(list.length)} files, size ${String(size)}, ${String(count)} shards`).toEqual([...list].sort());
-    }
+    expect(chunks).toHaveLength(21);
+    expect(chunks.flat()).toEqual(files);
+    expect(chunkFiles([], 48)).toEqual([]);
   });
 
   it('keeps the suite’s file rule', () => {
@@ -89,13 +51,13 @@ describe('the CI workflow runs every shard', () => {
   });
 
   it('refuses a workflow whose shard list leaves one out', () => {
-    const missing = workflow.replace(/shard: \[1, 2, 3, 4\]/u, 'shard: [1, 2, 4]');
+    const missing = workflow.replace(/shard: \[1, 2, 3, /u, 'shard: [1, 2, ');
     expect(missing).not.toBe(workflow);
     expect(() => ciWorkflowPolicyFromYaml(missing)).toThrow('Full test suite shards must be 1 to');
   });
 
   it('refuses a workflow whose command names another shard count than the matrix has', () => {
-    const wrong = workflow.replace('${{ matrix.shard }}/4 npm run test:run', '${{ matrix.shard }}/5 npm run test:run');
+    const wrong = workflow.replace(/\$\{\{ matrix\.shard \}\}\/\d+ npm run test:run/u, '${{ matrix.shard }}/99 npm run test:run');
     expect(wrong).not.toBe(workflow);
     expect(() => ciWorkflowPolicyFromYaml(wrong)).toThrow('Full test suite shards must be 1 to');
   });

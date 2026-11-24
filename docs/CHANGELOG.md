@@ -8,6 +8,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- The full test suite runs most files with Vitest's isolation off, so the files
+  in a worker share the modules they load; loading them once per file was about
+  three quarters of the suite's time. A file that changes shared state (a
+  module mock, a stub, fake timers, a spy, `process.env`, `globalThis`, the
+  working directory or the Node host package), or that is measured at two
+  seconds or more, keeps a module graph of its own. `scripts/vitest-setup.ts`
+  clears the default context before every test file, so one file cannot hand
+  it to the next. A file can ask for isolation with a
+  `// vitest: isolate` comment, and `BIJOU_VITEST_ISOLATE=all` isolates every
+  file. In the sealed runner the whole suite passed three times in a row in
+  171 to 215 s on two workers; fully isolated, a quarter of it took 120 s. See `docs/guides/sealed-tests.md`. Origin:
+  flyingrobots/bijou#907.
 - CI no longer runs the native Windows lane ("Focused Unit Tests (windows,
   Node 22)"). Its sealed worker ran out of storage before any test started, so
   it was red on every run (flyingrobots/bijou#788). `README.md` has a
@@ -15,6 +27,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   why. The Windows launcher, its tests and the policy check that a Windows lane
   must use the native runner all remain, so the lane can be restored by adding
   its matrix entry back.
+- CI's full-suite shards are dealt by measured weight and there are eight of
+  them for each Node version. With shards cut by position the four took 156 to
+  341 s, because ten test files were 46% of the suite's time. Now the heaviest
+  file goes first, each to the shard that is lightest so far, using the
+  per-file times in `scripts/vitest-weights.json` (measured by
+  `scripts/measure-vitest-weights.mjs`). A stale weight only makes the shards
+  less even: every file is still in exactly one shard. Origin:
+  flyingrobots/bijou#907.
 - CI runs the full test suite as four parallel shards for each Node version
   (job `suite`), where one job ran its 25 chunks in series in 13 to 15 minutes.
   `BIJOU_VITEST_SHARD=k/n` makes `scripts/run-vitest.mjs` run the k-th of n
