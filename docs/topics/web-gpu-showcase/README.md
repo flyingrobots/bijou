@@ -13,6 +13,7 @@ cases that hold this behavior are listed in the [test plan](./test-plan.md).
 | `components` | `examples/components/library.ts` | `createLibraryApp(ctx)` with the `LIBRARY_CSS` stylesheet, which is what `examples/components/main.ts` runs with no arguments. |
 | `hero` | `examples/hero/app.ts` | `createHeroApp()` with the run's context and grid, and a perf tracker from `examples/hero/perf.ts` on the browser adapter of its memory port, as `examples/hero/main.ts` does with the Node adapter. |
 | `showcase` | `examples/showcase/app.ts`, unmodified | `createShowcaseApp(ctx)`, built from the run's context. |
+| `dual` | `examples/web-gpu/src/dual/dual-app.ts` | `createDualApp(ctx)`, a semantic scene app: `view()` paints cells and `viewScene()` describes the same model, so it mounts on either host. |
 
 Each mount passes `mountBijouCanvas()` a factory that sets the run's context
 as the default context, as `startApp()` does on Node, and then returns the
@@ -100,6 +101,8 @@ ratio, the atlas has a new cell size and the page mounts the app again.
 | Row | Source |
 | --- | --- |
 | App, Backend, Fallback reasons | The mount handle: `backend` and `fallbackReasons`, each as `backend: code (reason)`. |
+| Host | `Canvas` or `DOM`: which host presents the app. For an app with no scene projection it reads `Canvas (no DOM: <title> has no scene projection)`. |
+| Model | The live model's own string, number and boolean fields as `name value` pairs, cut at 96 characters. |
 | Grid | `ctx.runtime.columns` by `ctx.runtime.rows`. |
 | Cell, Device pixel ratio | The physical cell size and ratio the current mount was made with, so they always match its grid. |
 | Frame time | Milliseconds the last `present()` call took, measured around the call, and the number of frames presented. |
@@ -117,7 +120,8 @@ the page always reads back, so the HUD never shows it.
 | Control | Effect |
 | --- | --- |
 | App toggle group | Stop the mounted app and mount another. Operations run one at a time. |
-| Backend toggle group | `switchBackend()` to that backend on a fresh canvas. |
+| Host toggle group | Stop the mount and present the same app, with its model, on the other host. The DOM item is disabled for an app with no scene projection, and a line under the group says why. `Space` then `m` does the same. |
+| Backend toggle group | `switchBackend()` to that backend on a fresh canvas. Disabled while the DOM host presents. |
 | Lose the WebGL2 context | `WEBGL_lose_context.loseContext()`, then `restoreContext()` once the presenter reports the loss. |
 | Reset the glyph atlas | `atlas.invalidate(undefined, 'manual')`, a new atlas generation. |
 
@@ -151,6 +155,31 @@ input with a greeting that follows it, and a switch) with `mountBijouDom()`,
 passing the real `document` (`src/dom/probe.ts`). `window.__bijouDom` exposes the model, the
 controller's diagnostics and `stop()` to the browser suite. The model counts
 every action message it receives in `dispatches`.
+
+## Host switch
+
+An app with a scene projection (a `SemanticSceneApp`: an ordinary app plus
+`viewScene()` and `dispatchAction()`) can be presented two ways. The canvas
+host is `mountBijouCanvas()`, which paints `view()` and sends key messages.
+The DOM host is `mountBijouDom()`, which lowers `viewScene()` to native
+elements and sends the scene's actions.
+
+Switching reads the model from the live mount, stops that mount and waits for
+it, then starts the other host with the app wrapped by `withCarriedModel()`
+(`src/handoff.ts`), whose `init()` returns the carried model and no commands.
+The app's own init commands are not run again. Exactly one mount is alive at a
+time, and the switch runs on the same queue as every other operation.
+
+Coming back to the canvas uses the backend the canvas last presented on. If
+the new host cannot start, the previous host is started again with the same
+model and the HUD's refusal row shows the reason. A request for the DOM host
+on an app with no scene projection is refused with `BIJOU_WEB_GPU_NO_SCENE`
+and changes nothing.
+
+Of the five apps only `dual` has a scene projection. The DOM host lowers
+`group` and `text` nodes only, so its scene stays within those. A name the
+canvas cannot hold (a character two cells wide) is painted as `?` per
+character on the canvas and kept whole in the scene.
 
 ## Evidence
 

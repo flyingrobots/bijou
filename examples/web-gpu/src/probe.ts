@@ -13,6 +13,7 @@ export interface ShowcaseProbe {
   failures(): readonly string[];
   mountApp: ShowcaseSession['mountApp'];
   switchBackend: ShowcaseSession['switchBackend'];
+  switchHost: ShowcaseSession['switchHost'];
   loseContext: ShowcaseSession['loseContext'];
   resetAtlas: ShowcaseSession['resetAtlas'];
   unmount: ShowcaseSession['unmount'];
@@ -60,6 +61,7 @@ export function installProbe(session: ShowcaseSession): void {
     failures: () => session.failures(),
     mountApp: (id, backend) => session.mountApp(id, backend),
     switchBackend: (next) => session.switchBackend(next),
+    switchHost: (next) => session.switchHost(next),
     loseContext: () => session.loseContext(),
     resetAtlas: () => session.resetAtlas(),
     unmount: () => session.unmount(),
