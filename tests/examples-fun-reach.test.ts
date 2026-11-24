@@ -22,7 +22,7 @@ describe('examples/fun reaches only public packages and, in the terminal entry, 
 
   it('imports no package internal path, in any file', () => {
     const bad = files.flatMap((file) => imports(file).filter((spec) =>
-      /packages\//u.test(spec) || /\/(src|dist)\//u.test(spec)
+      spec.includes('packages/') || /\/(src|dist)\//u.test(spec)
       || /^@flyingrobots\/[a-z-]+\/(?!adapters\/test)/u.test(spec)));
     expect(bad).toEqual([]);
   });

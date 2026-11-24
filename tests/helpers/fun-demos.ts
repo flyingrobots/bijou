@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { createTestContext, type TestContext } from '@flyingrobots/bijou/adapters/test';
-import type { Surface } from '@flyingrobots/bijou';
+import type { Cell, Surface } from '@flyingrobots/bijou';
 import type { DemoEntry, DemoMsg, Session } from '../../examples/fun/contract.js';
 import { demos } from '../../examples/fun/registry.js';
 
@@ -11,8 +11,17 @@ export function funContext(columns: number, rows: number): TestContext {
   return createTestContext({ mode: 'interactive', runtime: { columns, rows } });
 }
 
+/** Every cell, read through `get`: the `cells` array does not follow `setRGB` writes into the packed buffer. */
+export function cellsOf(surface: Surface): Cell[] {
+  return Array.from({ length: surface.width * surface.height }, (_, i) => surface.get(i % surface.width, Math.floor(i / surface.width)));
+}
+
+export function textOf(surface: Surface): string {
+  return cellsOf(surface).map((cell) => cell.char).join('');
+}
+
 export function digest(surface: Surface): string {
-  return createHash('sha256').update(JSON.stringify(surface.cells)).digest('hex');
+  return createHash('sha256').update(JSON.stringify(cellsOf(surface))).digest('hex');
 }
 
 export function feed(session: Session, messages: readonly DemoMsg[]): Session {

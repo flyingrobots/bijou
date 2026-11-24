@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { demos } from '../examples/fun/registry.js';
-import { byId, digest, feed, funContext, lcg, mountEntry, pulses } from './helpers/fun-demos.js';
+import { byId, digest, textOf, feed, funContext, lcg, mountEntry, pulses } from './helpers/fun-demos.js';
 
 describe('the bijou-fun demos at the edges', () => {
   for (const entry of demos) {
@@ -40,7 +40,7 @@ describe('the bijou-fun demos at the edges', () => {
     const ctx = funContext(80, 24);
     const braille = feed(byId('wormhole').mount(1), pulses(3));
     const ascii = feed(braille, [{ type: 'key', key: 'm' }]);
-    const text = (s: typeof braille): string => s.view(80, 24, ctx).cells.map((cell) => cell.char).join('');
+    const text = (s: typeof braille): string => textOf(s.view(80, 24, ctx));
     expect(text(braille)).toMatch(/[⠁-⣿]/u);
     expect(text(ascii)).not.toMatch(/[⠁-⣿]/u);
   });

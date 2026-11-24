@@ -3,7 +3,7 @@ import type { Surface } from '@flyingrobots/bijou';
 import type { KeyMsg, MouseMsg, PulseMsg } from '@flyingrobots/bijou-tui';
 import { createFunApp } from '../examples/fun/shell.js';
 import { demos } from '../examples/fun/registry.js';
-import { SEED, digest, funContext } from './helpers/fun-demos.js';
+import { SEED, cellsOf, digest, funContext } from './helpers/fun-demos.js';
 
 const ctx = funContext(100, 30);
 const app = createFunApp({ ctx, entries: demos, seed: SEED });
@@ -22,7 +22,7 @@ function send(messages: readonly (KeyMsg | MouseMsg | PulseMsg)[]): Surface {
 }
 
 function rowText(surface: Surface, row: number): string {
-  return surface.cells.slice(row * surface.width, (row + 1) * surface.width).map((cell) => cell.char).join('');
+  return cellsOf(surface).slice(row * surface.width, (row + 1) * surface.width).map((cell) => cell.char).join('');
 }
 
 describe('the bijou-fun shell', () => {

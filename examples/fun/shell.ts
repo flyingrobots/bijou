@@ -1,0 +1,73 @@
+// Licensed under the Apache License, Version 2.0, like the rest of this repository.
+import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { isKeyMsg, isMouseMsg, isPulseMsg, isResizeMsg, quit, type App } from '@flyingrobots/bijou-tui';
+import type { DemoEntry, Session } from './contract.js';
+import { footerRow, headerRow } from './shell-chrome.js';
+
+const CHROME_ROWS = 2;
+
+export interface ShellModel {
+  readonly index: number;
+  readonly sessions: readonly Session[];
+  readonly columns: number;
+  readonly rows: number;
+}
+
+export interface ShellOptions {
+  readonly ctx: BijouContext;
+  readonly entries: readonly DemoEntry[];
+  readonly seed: number;
+}
+
+function withActive(model: ShellModel, change: (session: Session) => Session): ShellModel {
+  return { ...model, sessions: model.sessions.map((session, i) => (i === model.index ? change(session) : session)) };
+}
+
+function goTo(model: ShellModel, index: number): ShellModel {
+  const count = model.sessions.length;
+  return { ...model, index: ((index % count) + count) % count };
+}
+
+function digit(key: string, count: number): number | undefined {
+  const n = Number(key);
+  return Number.isInteger(n) && n >= 1 && n <= count ? n - 1 : undefined;
+}
+
+/**
+ * A shell that lists the demos in a header row, paints the active one between the header and a footer row, and
+ * routes input: tab and the arrows switch, a digit jumps, q quits, everything else goes to the demo. Pointer
+ * movement inside the demo's pane reaches it in the pane's own cells; outside the pane it is a pointer-leave.
+ */
+export function createFunApp({ ctx, entries, seed }: ShellOptions): App<ShellModel> {
+  return {
+    init: () => [{ index: 0, sessions: entries.map((entry) => entry.mount(seed)), columns: ctx.runtime.columns, rows: ctx.runtime.rows }, []],
+    update(msg, model) {
+      if (isResizeMsg(msg)) return [{ ...model, columns: msg.columns, rows: msg.rows }, []];
+      if (isPulseMsg(msg)) return [withActive(model, (s) => s.update({ type: 'pulse', dt: msg.dt })), []];
+      if (isMouseMsg(msg)) {
+        if (msg.action !== 'move' && msg.action !== 'press') return [model, []];
+        const row = msg.row - 1;
+        const inside = msg.col >= 0 && msg.col < model.columns && row >= 0 && row < model.rows - CHROME_ROWS;
+        return [withActive(model, (s) => s.update(inside ? { type: 'pointer', col: msg.col, row } : { type: 'pointer-leave' })), []];
+      }
+      if (!isKeyMsg(msg)) return [model, []];
+      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
+      if (msg.key === 'tab' || msg.key === 'right') return [goTo(model, model.index + (msg.shift ? -1 : 1)), []];
+      if (msg.key === 'left') return [goTo(model, model.index - 1), []];
+      const picked = digit(msg.key, model.sessions.length);
+      if (picked !== undefined) return [goTo(model, picked), []];
+      return [withActive(model, (s) => s.update({ type: 'key', key: msg.key })), []];
+    },
+    view(model): Surface {
+      const { columns, rows } = model;
+      const entry = entries[model.index];
+      const session = model.sessions[model.index];
+      const screen = createSurface(columns, rows);
+      if (entry === undefined || session === undefined) return screen;
+      screen.blit(headerRow(ctx, entries, model.index, columns), 0, 0);
+      screen.blit(session.view(columns, Math.max(1, rows - CHROME_ROWS), ctx), 0, 1);
+      screen.blit(footerRow(ctx, entry, session.paused, columns), 0, rows - 1);
+      return screen;
+    },
+  };
+}
