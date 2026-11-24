@@ -65,7 +65,9 @@ Les composants animés s'ouvrent sur leur variante animée. Le mode interactive 
 
 ## Disposition de droite à gauche
 
-`r` change le sens de lecture. La bibliothèque le transmet au cadre d'application via un runtime i18n et reflète son propre corps : le fil d'Ariane, la ligne des modes, le sens de défilement du carrousel et l'alignement du texte et des diapositives. En disposition de droite à gauche, `h`, `[` et la flèche gauche avancent vers la fin de la liste. Le code, les noms de fonctions et les composants eux-mêmes ne sont pas reflétés.
+`r` change le sens de lecture. La bibliothèque le transmet au cadre d'application via un runtime i18n et reflète son propre corps : le fil d'Ariane, la ligne des modes, le sens de défilement du carrousel et l'alignement du texte et des diapositives. En disposition de droite à gauche, `h`, `[` et la flèche gauche avancent vers la fin de la liste.
+
+La bibliothèque transmet aussi le sens de lecture à chaque aperçu de story, comme `direction` du contexte d'aperçu. Un composant qui le lit (via `mirrorsLayout()`) reflète sa disposition dans les modes `interactive` et `static` ; les sorties `pipe` et `accessible` gardent l'ordre logique. Une story qui passe sa propre `direction` à un composant la conserve. Le code, les noms de fonctions et les composants qui ne lisent pas encore le sens de lecture ne sont pas reflétés.
 
 Le cadre d'application ne reflète que ce qu'il prend en charge aujourd'hui : le tiroir des réglages et les notifications s'ouvrent depuis l'autre côté. L'en-tête, le pied de page et les bordures des volets ne sont pas encore reflétés ; les tickets #571 à #575 suivent le travail restant sur le droite à gauche.
 

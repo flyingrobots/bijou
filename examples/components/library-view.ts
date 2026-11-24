@@ -36,7 +36,9 @@ export function renderPreview(story: ComponentStory, variantIndex: number, model
   const libraryMode = LIBRARY_MODES[model.modeIndex] ?? LIBRARY_MODES[0];
   const variant = story.variants[wrap(variantIndex, story.variants.length)];
   if (libraryMode === undefined || variant === undefined) return createSurface(0, 0);
-  const previewCtx = createStoryProfileContext(ctx, { id: libraryMode.mode, label: libraryMode.label, mode: libraryMode.mode, width: w }, { width: w, height: h });
+  // The r toggle reaches the story: components that read ctx.direction mirror in interactive and static.
+  const direction = model.rtl ? 'rtl' : 'ltr';
+  const previewCtx = createStoryProfileContext(ctx, { id: libraryMode.mode, label: libraryMode.label, mode: libraryMode.mode, width: w }, { width: w, height: h, direction });
   // Static is one honest frame, so its clock stands still; interactive animates.
   const timeMs = libraryMode.mode === 'static' ? 0 : model.time * 1000;
   return storyPreviewSurface(variant.render({ width: w, ctx: previewCtx, state: variant.initialState, timeMs }));
