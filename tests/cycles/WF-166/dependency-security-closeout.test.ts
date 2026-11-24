@@ -16,6 +16,7 @@ const PATCHED_FLOORS: readonly PatchedFloor[] = [
   { packageName: 'fast-uri', minimum: '3.1.9' },
   { packageName: 'hono', minimum: '4.13.11' },
   { packageName: 'ip-address', minimum: '10.7.4' },
+  { packageName: 'minimatch', minimum: '11.0.1' },
   { packageName: 'proxy-addr', minimum: '2.0.8' },
   { packageName: 'qs', minimum: '6.16.0' },
   { packageName: 'nanoid', minimum: '3.3.18' },
@@ -51,7 +52,7 @@ describe('WF-166 dependency security closeout', () => {
 
   it.each(Object.entries({
     'body-parser': '^2.4.0', hono: '^4.13.11', 'ip-address': '^10.7.4',
-    'proxy-addr': '^2.0.8', qs: '^6.16.0', zod: '^4.6.6',
+    minimatch: '^11.0.1', 'proxy-addr': '^2.0.8', qs: '^6.16.0', zod: '^4.6.6',
   }))('keeps %s workspace installs on the patched runtime line', (name, floor) => {
     const manifest = readJsonObject(resolve(process.cwd(), 'package.json'));
     expect(readStringProperty(manifest['overrides'], name)).toBe(floor);

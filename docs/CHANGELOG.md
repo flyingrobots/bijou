@@ -149,6 +149,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   entry (`scripts/docker-seal/network-entries.mjs`) and admits loopback, that
   control file, and a named fallback tunnel device that is down. Any other
   device, and a fallback tunnel device that is up, is still refused (#910).
+- Workspace installs resolve `minimatch` 11.0.1 or later through a root
+  override, which clears the moderate denial-of-service advisory
+  GHSA-g3hv-75wg-m249 reached through `eslint`, `typescript-eslint` and
+  `shadcn`. `npm audit` reports no findings. The root manifest also approves
+  the install scripts of `esbuild@0.28.1` and `fsevents@2.3.3` in
+  `allowScripts`, so `npm install` no longer warns about them. Development
+  tooling only; no published package changes.
 - The sealed runner's local launchers (`scripts/docker-seal/run.mjs` and
   `bootstrap.mjs`) no longer wrap each run in `git locks with`, so `npm test`,
   `npm run soak` and every other local command run on a machine without
