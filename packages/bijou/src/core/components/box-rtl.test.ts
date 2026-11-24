@@ -7,8 +7,11 @@ import { graphemeWidth } from '../text/grapheme.js';
 
 const h = (n: number): string => '─'.repeat(n);
 const top = (text: string): string => text.split('\n')[0] ?? '';
-const surfaceTop = (text: string, options: Parameters<typeof boxSurface>[1]): string =>
-  top(surfaceToString(boxSurface(text, options), options?.ctx?.style));
+const surfaceTop = (text: string, options: Parameters<typeof boxSurface>[1]): string => {
+  const style = options?.ctx?.style;
+  if (style === undefined) throw new Error('surfaceTop needs options.ctx');
+  return top(surfaceToString(boxSurface(text, options), style));
+};
 
 describe('box() title alignment by direction', () => {
   it('keeps the title at the left edge in ltr (default)', () => {
