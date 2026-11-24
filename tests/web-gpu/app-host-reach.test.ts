@@ -22,6 +22,10 @@ describe('example app modules reach no Node host API', () => {
     ['components', 'examples/components/library.ts'],
     ['hero', 'examples/hero/app.ts'],
     ['hero perf sampler', 'examples/hero/perf.ts'],
+    ['DOGFOOD version and ids', 'examples/docs/app-ids.ts'],
+    ['DOGFOOD prompt font', 'examples/docs/app-prompt-font.ts'],
+    ['DOGFOOD landing renderer', 'examples/docs/app-landing-renderer.ts'],
+    ['DOGFOOD guide translations', 'examples/docs/app-guide-translations.ts'],
   ])('%s (%s) reaches none', async (_name, module) => {
     expect(await hostReachOf(module)).toEqual([]);
   });
