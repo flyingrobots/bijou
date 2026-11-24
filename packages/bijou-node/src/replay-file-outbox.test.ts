@@ -103,6 +103,17 @@ describe('ReplayOutbox golden output', () => {
   });
 });
 
+describe('docs/topics/replay-events/README.md', () => {
+  it('shows the bytes the appending example really writes', () => {
+    const outbox = createMemoryReplayOutbox();
+    outbox.append({ tick: 0, atMs: 0, kind: 'debug-fact', payload: { name: 'focus.target', value: 'search' } });
+    outbox.close();
+    expect(outbox.toJSONL()).toBe(
+      '{"atMs":0,"kind":"debug-fact","payload":{"name":"focus.target","value":"search"},"schema":"bijou-replay-event/1","seq":0,"tick":0}\n',
+    );
+  });
+});
+
 describe('surfaceFrameHash()', () => {
   it('hashes the canonical frame content, matching node:crypto and the golden', () => {
     const frame = GOLDEN_REPLAY_EVENTS.find((event) => event.kind === 'frame');

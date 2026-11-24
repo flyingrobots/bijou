@@ -91,9 +91,9 @@ describe('createReplayFileOutbox() lifecycle and errors', () => {
     expect(failure(() => outbox.append(callback)).code).toBe('non-plain-value');
     expect(outbox.append(fact)).toBe(1);
     outbox.close();
-    expect(readFileSync(path, 'utf8').split('\n').map((line) => line.slice(-16))).toEqual([
-      '"seq":0,"tick":0}', '"seq":1,"tick":0}', '',
-    ].map((tail) => tail.slice(-16)));
+    const line = (seq: number): string =>
+      `{"atMs":0,"kind":"debug-fact","payload":{"name":"x","value":1},"schema":"bijou-replay-event/1","seq":${String(seq)},"tick":0}\n`;
+    expect(readFileSync(path, 'utf8')).toBe(line(0) + line(1));
   });
 
   // Linux exposes a device that always reports a full disk.
