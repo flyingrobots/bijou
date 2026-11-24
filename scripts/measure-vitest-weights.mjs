@@ -5,6 +5,8 @@
 //   node scripts/docker-seal/run.mjs --export scripts/vitest-weights.json -- \
 //     sh -c 'npm run build && node scripts/measure-vitest-weights.mjs'
 // A stale file only makes the shards less even; it cannot drop or repeat a test.
+// The checked-in weights of 2026-11-24 were read from hosted CI's own shard logs instead (each log line
+// names a file and its time), because hosted runners are about twice as slow as a developer machine.
 import './docker-seal/require-docker.mjs';
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
