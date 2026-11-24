@@ -8,6 +8,8 @@ describe('the soak bench app module reaches no Node host API', () => {
     ['app', 'bench/src/soak-app.ts'],
     ['options and ports', 'bench/src/soak-ports.ts'],
     ['scenario table', 'bench/src/soak-config.ts'],
+    ['browser adapter', 'bench/src/soak-browser.ts'],
+    ['query options', 'bench/src/soak-query.ts'],
   ])('%s (%s) reaches none', async (_name, module) => {
     expect(await hostReachOf(module)).toEqual([]);
   });
