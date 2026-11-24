@@ -87,4 +87,13 @@ describe('wrapToWidth outputs that already fit stay as they were', () => {
     expect(wrapToWidth('   a。', 4)).toEqual(['  ', 'a。']);
     expect(wrapToWidth('     。', 4)).toEqual(['    ', '。']);
   });
+
+  it('holds when the space leads a continuation line, not the paragraph', () => {
+    // Found by the wide-paragraph property in CI (seed 1845764673). After the
+    // break that ends the line with 字, the next line starts with a one-cell
+    // space: a = 1 cell, 한 would be cells 2 and 3 of a 2-cell line.
+    const lines = wrapToWidth('字  a한', 2);
+    expect(lines).toEqual(['字', 'a', '한']);
+    expect(widths(lines)).toEqual([2, 1, 2]);
+  });
 });
