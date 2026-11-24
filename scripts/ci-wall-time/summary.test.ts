@@ -10,8 +10,10 @@ const job = (name: string, start: string | null, end: string | null, conclusion:
   end: end == null ? null : at(end),
   conclusion,
 });
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  value != null && typeof value === 'object' && !Array.isArray(value);
 const rowNames = (markdown: string): string[] =>
-  markdown.split('\n').filter((line) => /^\| \d+ \|/.test(line)).map((line) => line.split('|')[2]?.trim() ?? '');
+  markdown.split('\n').filter((line) => /^\| \d+ \|/.test(line)).map((line) => line.split(/(?<!\\)\|/)[2]?.trim() ?? '');
 
 describe('renderSummary', () => {
   it('lists jobs slowest first with minutes and seconds', () => {
@@ -76,20 +78,27 @@ describe('renderSummary', () => {
 
 describe('CI workflow wall-time summary contract', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8');
-  const jobs = (parse(workflow) as { jobs: Record<string, Record<string, unknown>> }).jobs;
+  const jobs = new Map<string, Record<string, unknown>>();
+  const parsed: unknown = parse(workflow);
+  const rawJobs = isRecord(parsed) ? parsed['jobs'] : undefined;
+  if (isRecord(rawJobs)) {
+    for (const [id, definition] of Object.entries(rawJobs)) {
+      if (isRecord(definition)) jobs.set(id, definition);
+    }
+  }
 
   it('has a final, non-blocking, read-only summary job that runs the script', () => {
-    const summary = jobs['wall_time_summary'];
+    const summary = jobs.get('wall_time_summary');
     expect(summary?.['name']).toBe('Wall time summary');
     expect(summary?.['if']).toBe('always()');
     expect(summary?.['continue-on-error']).toBe(true);
     expect(summary?.['permissions']).toEqual({ actions: 'read', contents: 'read' });
     expect(JSON.stringify(summary?.['steps'])).toContain('node scripts/ci-wall-time/publish.mjs');
-    expect(summary?.['needs']).toEqual(Object.keys(jobs).filter((id) => id !== 'wall_time_summary'));
+    expect(summary?.['needs']).toEqual([...jobs.keys()].filter((id) => id !== 'wall_time_summary'));
   });
 
   it('is not required by any other job', () => {
-    for (const [id, definition] of Object.entries(jobs)) {
+    for (const [id, definition] of jobs) {
       if (id !== 'wall_time_summary') expect(JSON.stringify(definition['needs'] ?? [])).not.toContain('wall_time_summary');
     }
   });
