@@ -50,7 +50,9 @@ beforeEach(() => {
   git('init', '-q', '-b', 'main');
 });
 
-afterEach(() => rmSync(repo, { recursive: true, force: true }));
+afterEach(() => {
+  rmSync(repo, { recursive: true, force: true });
+});
 
 describe('pre-push changed_paths_for_push', () => {
   it('detects paths from every commit of a first publication', () => {
