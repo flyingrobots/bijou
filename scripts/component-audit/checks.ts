@@ -1,5 +1,6 @@
 import { CONTRAST_ERROR, CONTRAST_WARNING, contrastRatio, dimmed, parseHex, themePalette, toHex, type Rgb } from './contrast.js';
 import { colorHex } from '../../packages/bijou/src/index.js';
+import { isDimmedBackdropCell } from '../../packages/bijou-tui/src/overlay-backdrop.js';
 import type { Rendered } from './render.js';
 
 export type Severity = 'error' | 'warning';
@@ -58,6 +59,8 @@ export function colourFindings(r: Rendered): Finding[] {
       const modifiers = cell.modifiers ?? [];
       if (modifiers.includes('inverse')) [fg, bg] = [bg, fg];
       const dim = modifiers.includes('dim');
+      // A backdrop the compositor dimmed under an overlay is not text the reader is asked to read.
+      if (isDimmedBackdropCell(surface, x, y)) continue;
       if (dim) fg = dimmed(fg, bg);
       const key = `${toHex(fg)} on ${toHex(bg)}${dim ? ' (dim, as drawn)' : ''}`;
       const seen = pairs.get(key);
