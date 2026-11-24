@@ -48,3 +48,43 @@ pulses of 1/30 s. Origin: flyingrobots/bijou#888.
 | --- | --- | --- | --- |
 | FD-33 | `funBuild` builds the shell from the registry or from the entries it is given. | `shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu` | Implemented |
 | FD-34 | A demo that throws in `view` is painted as a failure; header, footer and other demos work. | `paints the failure in the pane and keeps the header and footer`, `lets the reader switch to a demo that works` | Implemented |
+
+## Font demos: `examples-fun-fonts.test.ts`, `examples-fun-fonts-edges.test.ts`
+
+Origin: flyingrobots/bijou#891. The frame digests are in `tests/fixtures/examples-fun-font-goldens.ts`: seed 1888,
+30 pulses of 1/30 s, `r`, `i` and `Bijou` typed, `escape`, 30 more pulses, with the checked-in Space Mono file.
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-40 | The registry lists the two font demos after the demos that need no font. | `the registry lists both after the demos that need no font` | Implemented |
+| FD-41 | Each font demo's frames at 80x24 and 177x53 match the recorded digests. | `<id> paints its recorded frames at 80x24`, `<id> paints its recorded frames at 177x53` | Implemented |
+| FD-42 | Each font demo has a readable 80x24 text frame. | `<id> at 80x24 matches tests/fixtures/examples-fun/frames/<id>-80x24.txt` | Implemented |
+| FD-43 | The same seed and messages give the same frame. | `<id> repeats itself: the same seed and messages give the same frame` | Implemented |
+| FD-44 | Typing, in the demo's own update, edits the message and the HUD names the mode. | `<id> shows the message typed in its own update and the HUD that says so` | Implemented |
+| FD-45 | Backspace deletes, typing stops at 24 characters, an empty message is shown. | `<id> edits the message with backspace and stops at 24 characters` | Implemented |
+| FD-50 | A one-cell pane paints without throwing. | `<id> paints a one-cell pane without throwing` | Implemented |
+| FD-51 | An empty message, a character the font lacks and a lone surrogate paint without throwing. | `<id> paints an empty message, a missing character and a lone surrogate without throwing` | Implemented |
+| FD-52 | A paused session stands still and moves on resume. | `<id> stands still while paused and moves again on resume` | Implemented |
+| FD-53 | Space types a space while typing and does not pause. | `<id> types a space while typing instead of pausing` | Implemented |
+| FD-54 | Seeded printable messages of up to 200 characters, and a seeded storm of keys, do not throw. | `<id> paints seeded printable messages of up to 200 characters without throwing`, `<id> answers a seeded storm of keys without throwing` | Implemented |
+| FD-55 | A port that rejects or throws, bytes that are no font, or no bytes give a message in the pane and never a throw. | `shows a message in the pane for <label>, and never throws` | Implemented |
+| FD-56 | The pane says why the font is missing. | `says why in the pane when the port gave a reason` | Implemented |
+
+## Font demos and the shell: `examples-fun-fonts-shell.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-60 | While a demo takes text, `q`, digits, tab, arrows and space reach the demo, and shifted letters arrive as `shift+<letter>`. | `sends q, digits, tab, arrows and space to the demo, and shift letters as shift+letter` | Implemented |
+| FD-61 | `ctrl+c` still quits; `escape` gives the shell its keys back. | `still quits on ctrl+c, and takes its own keys back on escape` | Implemented |
+| FD-62 | The footer names the demo's keys. | `names the demo keys in the footer` | Implemented |
+| FD-63 | With no font the font demos show a message and the other demos run. | `shows the message in the font demos only, and the other demos still run` | Implemented |
+
+## Font and dependency: `examples-fun-fonts-licence.test.ts`, browser suite
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-70 | The font is the unmodified upstream file, with the SIL OFL 1.1 text beside it. | `checks in Space Mono Bold Italic unmodified, with the SIL Open Font License 1.1 beside it` | Implemented |
+| FD-71 | `NOTICE` names the font and the library with their licences. | `names the font and the library in a NOTICE file at the root` | Implemented |
+| FD-72 | `opentype.js` is an exactly pinned root development dependency and in no published package's manifest. | `is a development dependency of the repository, pinned exactly, and of no published package` | Implemented |
+| FD-73 | The font is read by a path from the reading module, never from the working directory, and no demo reads a file. | `reads the font by a path from its own module, never by one relative to the working directory` | Implemented |
+| FD-74 | In a real browser each font demo draws text from the fetched font, takes typing and leaves the console clean. | `on <backend> the <id> demo draws its text from the fetched font, takes typing, and the console stays clean` (`examples/web-gpu/e2e/gallery-fun-fonts.e2e.ts`) | Implemented |

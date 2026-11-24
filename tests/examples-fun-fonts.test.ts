@@ -53,12 +53,12 @@ describe('the two font demos of bijou-fun', () => {
     });
 
     it(`${id} edits the message with backspace and stops at 24 characters`, () => {
-      const ctx = funContext(100, 30);
+      const ctx = funContext(200, 30);
       const long = feed(fontEntry(id).mount(SEED), [key('r'), key('i'), ...Array.from({ length: 30 }, () => key('x'))]);
-      expect(textOf(long.view(100, 30, ctx))).toContain(`"${'x'.repeat(24)}"`);
+      expect(textOf(long.view(200, 30, ctx))).toContain(`"${'x'.repeat(24)}"`);
       const shorter = feed(long, [key('backspace'), key('backspace')]);
-      expect(textOf(shorter.view(100, 30, ctx))).toContain(`"${'x'.repeat(22)}"`);
-      expect(textOf(feed(fontEntry(id).mount(SEED), [key('r'), key('backspace'), key('i'), key('backspace')]).view(100, 30, ctx))).toContain('""');
+      expect(textOf(shorter.view(200, 30, ctx))).toContain(`"${'x'.repeat(22)}"`);
+      expect(textOf(feed(fontEntry(id).mount(SEED), [key('r'), key('backspace'), key('i'), key('backspace')]).view(200, 30, ctx))).toContain('""');
     });
   }
 });

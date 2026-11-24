@@ -1,6 +1,6 @@
 // Licensed under the Apache License, Version 2.0, like the rest of this repository.
 import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
-import { isKeyMsg, isMouseMsg, isPulseMsg, isResizeMsg, quit, type App } from '@flyingrobots/bijou-tui';
+import { isKeyMsg, isMouseMsg, isPulseMsg, isResizeMsg, quit, type App, type KeyMsg } from '@flyingrobots/bijou-tui';
 import type { DemoEntry, Session } from './contract.js';
 import { failurePane, footerRow, headerRow } from './shell-chrome.js';
 
@@ -28,6 +28,11 @@ function goTo(model: ShellModel, index: number): ShellModel {
   return { ...model, index: ((index % count) + count) % count };
 }
 
+/** The key a demo hears while it takes text: a shifted letter keeps its shift, so `B` is not `b`. */
+function typed(msg: KeyMsg): string {
+  return msg.shift && /^[a-z]$/u.test(msg.key) ? `shift+${msg.key}` : msg.key;
+}
+
 function digit(key: string, count: number): number | undefined {
   const n = Number(key);
   return Number.isInteger(n) && n >= 1 && n <= count ? n - 1 : undefined;
@@ -44,8 +49,9 @@ function paneOf(ctx: BijouContext, entry: DemoEntry, session: Session, width: nu
 
 /**
  * A shell that lists the demos in a header row, paints the active one between the header and a footer row, and
- * routes input: tab and the arrows switch, a digit jumps, q quits, everything else goes to the demo. Pointer
- * movement inside the demo's pane reaches it in the pane's own cells; outside the pane it is a pointer-leave.
+ * routes input: tab and the arrows switch, a digit jumps, q quits, everything else goes to the demo.
+ * A demo that is taking text gets every key but ctrl+c. Pointer movement inside the demo's pane reaches it in the
+ * pane's own cells; outside the pane it is a pointer-leave.
  */
 export function createFunApp({ ctx, entries, seed }: ShellOptions): App<ShellModel> {
   return {
@@ -60,7 +66,9 @@ export function createFunApp({ ctx, entries, seed }: ShellOptions): App<ShellMod
         return [withActive(model, (s) => s.update(inside ? { type: 'pointer', col: msg.col, row } : { type: 'pointer-leave' })), []];
       }
       if (!isKeyMsg(msg)) return [model, []];
-      if (msg.key === 'q' || (msg.ctrl && msg.key === 'c')) return [model, [quit()]];
+      if (msg.ctrl && msg.key === 'c') return [model, [quit()]];
+      if (model.sessions[model.index]?.capturing === true) return [withActive(model, (s) => s.update({ type: 'key', key: typed(msg) })), []];
+      if (msg.key === 'q') return [model, [quit()]];
       if (msg.key === 'tab' || msg.key === 'right') return [goTo(model, model.index + (msg.shift ? -1 : 1)), []];
       if (msg.key === 'left') return [goTo(model, model.index - 1), []];
       const picked = digit(msg.key, model.sessions.length);
