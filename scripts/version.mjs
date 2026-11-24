@@ -72,7 +72,12 @@ if (process.argv.length !== 3) {
 }
 
 const version = process.argv[2];
-if (!/^[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha)\.[0-9]+)?$/.test(version)) {
+// Same canonical integer rule as SEMVER_INT in release-metadata.part01.ts.
+const SEMVER_INT = '(?:0|[1-9][0-9]*)';
+const VERSION_PATTERN = new RegExp(
+  `^${SEMVER_INT}\\.${SEMVER_INT}\\.${SEMVER_INT}(?:-(?:rc|beta|alpha)\\.${SEMVER_INT})?$`,
+);
+if (!VERSION_PATTERN.test(version)) {
   console.error(`Error: invalid semver: ${version}`);
   console.error('Expected: X.Y.Z or X.Y.Z-(rc|beta|alpha).N');
   process.exit(1);
