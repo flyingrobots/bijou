@@ -44,6 +44,12 @@ describe('network entry facts', () => {
     expect(readNetworkEntries(netRoot({ tunl0: flags }))).toEqual([{ name: 'tunl0', device: true, up: true }]);
   });
 
+  it('treats a device with no flags attribute as up', () => {
+    const root = netRoot({});
+    mkdirSync(join(root, 'tunl0'));
+    expect(readNetworkEntries(root)).toEqual([{ name: 'tunl0', device: true, up: true }]);
+  });
+
   it.skipIf(process.platform !== 'linux')('reads the running kernel, where loopback is up', () => {
     expect(readNetworkEntries()).toContainEqual({ name: 'lo', device: true, up: true });
   });
