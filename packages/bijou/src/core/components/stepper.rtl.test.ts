@@ -21,8 +21,8 @@ function ctxFor(mode: OutputMode, direction?: 'ltr' | 'rtl') {
   return createTestContext({ mode, style: taggedStyle(), ...(direction ? { direction } : {}) });
 }
 
-const LTR = '<m>✓</m> <m>Account</m> <m>──</m> <m>●</m> <b>Payment</b> <m>──</m> <m>○</m> <m>Confirm</m>';
-const RTL = '<m>○</m> <m>Confirm</m> <m>──</m> <m>●</m> <b>Payment</b> <m>──</m> <m>✓</m> <m>Account</m>';
+const LTR = '<m>✓</m> <m>Account</m> <m>──</m> <b>●</b> <b>Payment</b> <m>──</m> <m>○</m> <m>Confirm</m>';
+const RTL = '<m>○</m> <m>Confirm</m> <m>──</m> <b>●</b> <b>Payment</b> <m>──</m> <m>✓</m> <m>Account</m>';
 
 describe('stepper direction', () => {
   it('ltr interactive keeps today\'s order', () => {
@@ -75,6 +75,6 @@ describe('stepper direction', () => {
 
   it('handles empty and single step lists under rtl', () => {
     expect(stepper([], { current: 0, ctx: ctxFor('interactive', 'rtl') })).toBe('');
-    expect(stepper([{ label: 'Only' }], { current: 0, ctx: ctxFor('interactive', 'rtl') })).toBe('<m>●</m> <b>Only</b>');
+    expect(stepper([{ label: 'Only' }], { current: 0, ctx: ctxFor('interactive', 'rtl') })).toBe('<b>●</b> <b>Only</b>');
   });
 });
