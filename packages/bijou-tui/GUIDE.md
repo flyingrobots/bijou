@@ -200,5 +200,12 @@ await harness.teardown();
 Keep `runScript()` for fixture playback, demo capture, and tests where you
 only need final frames plus model state.
 
+Every recorded frame is a snapshot of the screen at that update: each entry of
+`runScript()`'s `frames`, the frame passed to `onFrame`, and each
+`TestHarness` snapshot's `frame`. A view that repaints one Surface it reuses,
+as a framed app does, does not change frames already recorded, so a test can
+read any frame, not only the last. A Surface view is copied once per recorded
+frame; a LayoutNode view is painted into a new Surface and is not copied again.
+
 ---
 **The runtime view contract requires either a `Surface` or a `LayoutNode`. Raw strings must be converted explicitly.**
