@@ -98,14 +98,10 @@ export function reinitAtSize(model: SoakModel, width: number, height: number): S
   };
 }
 
-/** A log sink that throws loses that line but never stops the soak. */
+/** A sink failure ends the run with the sink's error: a soak must not lose its log silently. */
 export function logAndAdvanceCmd(model: SoakModel, host: SoakHost): Cmd<SoakMsg> {
   return () => {
-    try {
-      logScenarioStats(model, host);
-    } catch {
-      // The run is the product; its log is best effort.
-    }
+    logScenarioStats(model, host);
     currentScenario(model).teardown?.(model.scenarioState);
     return { type: 'advance-scenario' } satisfies SoakMsg;
   };

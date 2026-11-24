@@ -7,6 +7,7 @@ import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { surfaceToString } from '@flyingrobots/bijou';
 import { runScript } from '@flyingrobots/bijou-tui';
 import { createSoakApp } from './soak-app.js';
+import { initScenario, logAndAdvanceCmd } from './soak-scenarios.js';
 import { createNodeSoakHost, parseSoakArgs } from './soak-node.js';
 import { NO_MEMORY, resolveSoakOptions, type SoakHost } from './soak-ports.js';
 
@@ -70,11 +71,10 @@ describe('soak bench through host ports', () => {
     }
   });
 
-  it('a log sink that throws loses its lines but the soak still runs to its last cycle', async () => {
-    let calls = 0;
-    const log = () => { calls += 1; throw new Error('disk full'); };
-    const result = await run({ options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: NO_MEMORY, log });
-    expect(calls).toBeGreaterThan(1);
-    expect(result.frames.length).toBeGreaterThan(calls);
+  it('a log sink that throws ends the run with the sink error, as a failed append always did', () => {
+    const log = () => { throw new Error('disk full'); };
+    const host = { options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: NO_MEMORY, log };
+    const model = initScenario(0, 0, 80, 24);
+    expect(() => logAndAdvanceCmd(model, host)()).toThrow('disk full');
   });
 });

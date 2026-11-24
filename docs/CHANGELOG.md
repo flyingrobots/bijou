@@ -14,8 +14,8 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   reaches no Node API. `bench/src/soak-node.ts` is the Node adapter and keeps
   the arguments, log lines and frames of `npm run soak`. A host that cannot
   measure memory gets no heap or resident row and no such field in the log,
-  never a zero. A log sink that throws loses that line but no longer stops
-  the run.
+  never a zero. A log sink that throws still ends the run with its error,
+  as a failed append always did.
 - Four DOGFOOD modules no longer read Node files: `app-ids.ts` and
   `app-prompt-font.ts` import their JSON, and the landing logo and the
   translated guides are generated JSON copies (`examples/docs/generated/`,

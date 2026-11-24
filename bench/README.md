@@ -160,5 +160,5 @@ no row for it and the log line has no such field.
 
 `src/soak-node.ts` is the Node adapter: it parses `--cycles=`, `--fps=`,
 `--dwell=` and `--out=`, reads `process.memoryUsage()` and appends to the log
-file. A sink that throws loses that line; the soak carries on. The tests are
+file. A sink that throws ends the run with its error. The tests are
 `src/soak-host.test.ts` and `tests/web-gpu/soak-host-reach.test.ts`.
