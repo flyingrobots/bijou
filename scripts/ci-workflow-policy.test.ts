@@ -15,12 +15,25 @@ describe('CI isolation policy', () => {
   });
 
   it('rejects substituting a Linux container for Windows coverage', () => {
-    const wrongKernel = workflow.replace('sealed-runner: windows.mjs', 'sealed-runner: run.mjs --isolated-ci');
+    // The Windows lane is switched off (flyingrobots/bijou#788), so this adds one back with the wrong runner.
+    const wrongKernel = workflow.replace(
+      '            sealed-runner: run.mjs --isolated-ci\n',
+      '            sealed-runner: run.mjs --isolated-ci\n          - label: windows\n            os: windows-2022\n            sealed-runner: run.mjs --isolated-ci\n',
+    );
+    expect(wrongKernel).not.toBe(workflow);
 
     expect(() => ciWorkflowPolicyFromYaml(wrongKernel)).toThrow('Windows coverage requires the native Windows sealed runner');
   });
 
+  it('admits a Windows lane that uses the native Windows runner', () => {
+    const restored = workflow.replace(
+      '            sealed-runner: run.mjs --isolated-ci\n',
+      '            sealed-runner: run.mjs --isolated-ci\n          - label: windows\n            os: windows-2022\n            sealed-runner: windows.mjs\n',
+    );
+    expect(ciWorkflowPolicyFromYaml(restored).focusedPlatforms).toEqual(['ubuntu-latest', 'windows-2022']);
+  });
+
   it('admits the maintained platform matrix', () => {
-    expect(ciWorkflowPolicyFromYaml(workflow).focusedPlatforms).toContain('windows-2022');
+    expect(ciWorkflowPolicyFromYaml(workflow).focusedPlatforms).toContain('ubuntu-latest');
   });
 });

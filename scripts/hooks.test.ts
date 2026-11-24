@@ -54,11 +54,12 @@ describe('git hooks', () => {
     expect(policy.focusedUnitTestsJob.permissionsContents).toBe('read');
   });
 
-  it('sealed CI retains both Node versions and native Windows coverage', () => {
+  it('sealed CI retains both Node versions, and Linux coverage while the Windows lane is off', () => {
     const policy = readCiWorkflowPolicy(resolve(ROOT, '.github/workflows/ci.yml'));
 
     expect(policy.nodeVersions).toEqual([20, 22]);
-    expect(policy.focusedPlatforms).toEqual(['ubuntu-latest', 'windows-2022']);
+    // The native Windows lane is switched off until flyingrobots/bijou#788 is fixed; README.md states it.
+    expect(policy.focusedPlatforms).toEqual(['ubuntu-latest']);
   });
 
 
