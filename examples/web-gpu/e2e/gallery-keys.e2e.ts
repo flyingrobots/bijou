@@ -6,16 +6,17 @@ import { collectErrors } from './support.js';
 const themeClass = (page: Page) => page.evaluate(() => (document.documentElement.classList.contains('dark') ? 'dark' : 'light'));
 
 for (const scheme of ['light', 'dark'] as const) {
-  test(`in the ${scheme} theme the gallery moves focus with j and k, opens a demo with Enter, and Esc opens the palette`, async ({ page }) => {
+  test(`in the ${scheme} theme the gallery moves focus with l, opens a demo with Enter, and Esc opens the palette`, async ({ page }) => {
     const errors = collectErrors(page);
     await page.emulateMedia({ colorScheme: scheme });
     await openGallery(page, 'backend=canvas2d');
     await expect.poll(() => themeClass(page)).toBe(scheme);
     await expect(page.locator('[data-gallery-demo] kbd, [data-gallery] kbd').first()).toBeVisible();
     await page.locator('[data-nav]').first().focus();
-    await page.keyboard.press('j');
+    // `l` moves from the header to the next region: the list of demos.
+    await page.keyboard.press('l');
     const focused = () => page.evaluate(() => document.activeElement?.closest('[data-nav]')?.getAttribute('data-gallery-demo') ?? null);
-    await expect.poll(focused).not.toBeNull();
+    await expect.poll(focused).toBe('dogfood');
     await page.keyboard.press('Enter');
     await expectDemoOpen(page, 'dogfood');
     await page.keyboard.press('Escape');

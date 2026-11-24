@@ -33,6 +33,9 @@ npx vite preview --config examples/web-gpu/vite.config.ts --port 41797
 `/dom.html` is the page the browser suite checks `mountBijouDom()` on, and
 `/dogfood.html` shows DOGFOOD with no page chrome, its Surface filling the window.
 
+`/gallery.html` lists the demos in the registry (`src/gallery/demos.ts`), each loaded
+on demand and opened full-window at `/gallery.html?app=<id>`; `Esc` returns.
+
 The first mount is chosen in the address: `?app=counter`, `?app=components`,
 `?app=hero`, `?app=showcase`, `?app=dogfood` or `?app=dual`,
 and `&backend=auto` (the default), `webgpu`, `webgl2` or `canvas2d`.

@@ -13,24 +13,29 @@ export async function countListeners(page: Page): Promise<void> {
   await page.addInitScript(() => {
     const live = new Set<string>();
     const ids = new WeakMap<object, number>();
+    let issued = 0;
     const id = (value: object): number => {
       const known = ids.get(value);
       if (known !== undefined) return known;
-      ids.set(value, ids.size + 1);
-      return ids.size;
+      issued += 1;
+      ids.set(value, issued);
+      return issued;
     };
     const key = (target: EventTarget, type: string, listener: object, options: unknown): string => {
       const capture = typeof options === 'boolean' ? options : typeof options === 'object' && options !== null && Reflect.get(options, 'capture') === true;
       return `${String(id(target))}:${type}:${String(id(listener))}:${String(capture)}`;
     };
-    const { addEventListener, removeEventListener } = EventTarget.prototype;
+    const original = (name: string): unknown => Object.getOwnPropertyDescriptor(EventTarget.prototype, name)?.value;
+    const addEventListener = original('addEventListener');
+    const removeEventListener = original('removeEventListener');
+    if (typeof addEventListener !== 'function' || typeof removeEventListener !== 'function') throw new Error('EventTarget has no listener methods');
     EventTarget.prototype.addEventListener = function patched(this: EventTarget, type: string, listener: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void {
       if (listener !== null) live.add(key(this, type, listener, options));
-      addEventListener.call(this, type, listener, options);
+      Reflect.apply(addEventListener, this, [type, listener, options]);
     };
     EventTarget.prototype.removeEventListener = function patched(this: EventTarget, type: string, listener: EventListenerOrEventListenerObject | null, options?: boolean | EventListenerOptions): void {
       if (listener !== null) live.delete(key(this, type, listener, options));
-      removeEventListener.call(this, type, listener, options);
+      Reflect.apply(removeEventListener, this, [type, listener, options]);
     };
     window.__listenerCount = () => live.size;
   });

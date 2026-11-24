@@ -187,6 +187,31 @@ same probe. `examples/web-gpu/e2e/dogfood.e2e.ts` opens the landing screen,
 enters the guides, opens a guide, changes page and theme, resizes the window,
 and opens every page, asserting no fault, no failure and no console error.
 
+## Demo gallery
+
+`examples/web-gpu/gallery.html` is a fourth Rollup input. The registry,
+`src/gallery/demos.ts`, lists each demo with an id, a title, a one-line
+description and a `load()` that imports the app on demand, so no demo's code is
+in the entry chunk. DOGFOOD is the first entry, and the showcase page's app list
+(`src/apps.ts`) spreads the registry, so a new entry is one object there.
+
+The address chooses the page (`src/gallery/route.ts`):
+
+| Address | Page |
+| --- | --- |
+| `gallery.html` | The gallery: one shadcn `Item` link per demo, with `Enter` and `l` hints. |
+| `gallery.html?app=<id>` | That demo, full-window, with a Back button hinted `Esc`. Reloading opens the same demo. |
+| `gallery.html?app=<unknown>` | The gallery with an Alert that names the unknown id, shown as text. |
+
+Visits use `pushState`, so back and forward walk them. Only `?backend=` carries
+from one address to the next. Leaving a demo stops its mount, disposes its atlas
+and removes `window.__bijouWebGpu`, so no canvas, probe or listener stays behind.
+A demo whose code fails to load shows its error in an Alert and leaves the Back
+button working. `Esc` returns only while focus is in the chrome: while the
+Surface has focus every key goes to the demo. The gallery also joins the header
+and the palette as `Space` then `a`. The build writes a manifest
+(`build.manifest`), which `tests/web-gpu/gallery-chunks.test.ts` reads.
+
 ## Host switch
 
 An app with a scene projection (a `SemanticSceneApp`: an ordinary app plus

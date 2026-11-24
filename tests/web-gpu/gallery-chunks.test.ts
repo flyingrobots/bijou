@@ -15,9 +15,23 @@ const config = fileURLToPath(new URL('../../examples/web-gpu/vite.config.ts', im
 const out = mkdtempSync(join(tmpdir(), 'bijou-gallery-chunks-'));
 let manifest: Record<string, Item> = {};
 
+/** The manifest's items, each checked for the fields this test reads. */
+function toManifest(value: unknown): Record<string, Item> {
+  if (typeof value !== 'object' || value === null) throw new Error('the build manifest is not an object');
+  const items: Record<string, Item> = {};
+  for (const [key, item] of Object.entries(value)) {
+    const file: unknown = typeof item === 'object' && item !== null ? Reflect.get(item, 'file') : undefined;
+    const imports: unknown = typeof item === 'object' && item !== null ? Reflect.get(item, 'imports') : undefined;
+    const dynamic: unknown = typeof item === 'object' && item !== null ? Reflect.get(item, 'isDynamicEntry') : undefined;
+    if (typeof file !== 'string') throw new Error(`the manifest item ${key} has no file`);
+    items[key] = { file, isDynamicEntry: dynamic === true, imports: Array.isArray(imports) ? imports.filter((entry): entry is string => typeof entry === 'string') : [] };
+  }
+  return items;
+}
+
 beforeAll(async () => {
   await build({ configFile: config, logLevel: 'silent', build: { outDir: out, emptyOutDir: true, manifest: true } });
-  manifest = JSON.parse(readFileSync(join(out, '.vite', 'manifest.json'), 'utf8'));
+  manifest = toManifest(JSON.parse(readFileSync(join(out, '.vite', 'manifest.json'), 'utf8')));
 }, 280_000);
 afterAll(() => { rmSync(out, { recursive: true, force: true }); });
 

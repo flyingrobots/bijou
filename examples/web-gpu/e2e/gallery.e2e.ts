@@ -4,6 +4,11 @@ import { expectDemoOpen, expectGalleryOnly, openGallery } from './gallery-suppor
 import { collectErrors } from './support.js';
 
 // The gallery page: a registry's demos listed, each opened on demand at its own URL.
+/** The chunk file the build manifest names for the DOGFOOD app's module. */
+function chunkFile(manifest: unknown): unknown {
+  const item: unknown = typeof manifest === 'object' && manifest !== null ? Reflect.get(manifest, '../docs/app.ts') : undefined;
+  return typeof item === 'object' && item !== null ? Reflect.get(item, 'file') : undefined;
+}
 const BACK = { name: 'Back to the gallery' } as const;
 const demo = (page: Parameters<typeof openGallery>[0], id: string) => page.locator(`[data-gallery-demo="${id}"]`);
 
@@ -39,9 +44,9 @@ test('an unknown app shows the gallery with a message that names it', async ({ p
 });
 
 test('a demo whose code cannot load shows the error in the page, and the gallery stays usable', async ({ page }) => {
-  const manifest: Record<string, { file: string }> = JSON.parse(readFileSync(new URL('../dist/.vite/manifest.json', import.meta.url), 'utf8'));
-  const chunk = manifest['../docs/app.ts']?.file;
-  if (chunk === undefined) throw new Error('the build manifest has no chunk for the DOGFOOD app');
+  const manifest: unknown = JSON.parse(readFileSync(new URL('../dist/.vite/manifest.json', import.meta.url), 'utf8'));
+  const chunk: unknown = chunkFile(manifest);
+  if (typeof chunk !== 'string') throw new Error('the build manifest has no chunk for the DOGFOOD app');
   await page.route(`**/${chunk}`, (route) => route.abort());
   await openGallery(page, 'app=dogfood&backend=canvas2d');
   const failure = page.locator('[data-demo-error]');
