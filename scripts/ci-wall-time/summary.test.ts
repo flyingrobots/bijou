@@ -83,7 +83,7 @@ describe('CI workflow wall-time summary contract', () => {
     expect(summary?.['name']).toBe('Wall time summary');
     expect(summary?.['if']).toBe('always()');
     expect(summary?.['continue-on-error']).toBe(true);
-    expect(summary?.['permissions']).toEqual({ actions: 'read' });
+    expect(summary?.['permissions']).toEqual({ actions: 'read', contents: 'read' });
     expect(JSON.stringify(summary?.['steps'])).toContain('node scripts/ci-wall-time/publish.mjs');
     expect(summary?.['needs']).toEqual(Object.keys(jobs).filter((id) => id !== 'wall_time_summary'));
   });
