@@ -1,5 +1,5 @@
 import ARTICLES from './generated/guide-translations.json' with { type: 'json' };
-import { stripMarkdownFrontmatter } from './app-markdown.js';
+import { stripMarkdownFrontmatter } from './app-markdown-text.js';
 
 /**
  * Translated DOGFOOD articles: `content/i18n/<locale>/<guide id>.md`. A file may start with frontmatter carrying
@@ -11,6 +11,7 @@ export interface GuideTranslation {
   readonly body: string;
 }
 
+const articles: ReadonlyMap<string, string> = new Map(Object.entries(ARTICLES));
 const cache = new Map<string, GuideTranslation | null>();
 
 function parse(raw: string): GuideTranslation {
@@ -34,8 +35,8 @@ export function guideTranslation(guideId: string, locale: string | undefined): G
   const key = `${locale}/${guideId}`;
   const cached = cache.get(key);
   if (cached !== undefined) return cached ?? undefined;
-  const article = Object.hasOwn(ARTICLES, key) ? Object.getOwnPropertyDescriptor(ARTICLES, key)?.value : undefined;
-  const translation = typeof article === 'string' ? parse(article) : null;
+  const article = articles.get(key);
+  const translation = article === undefined ? null : parse(article);
   cache.set(key, translation);
   return translation ?? undefined;
 }
