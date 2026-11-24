@@ -1,9 +1,9 @@
-import { readDocumentationFile as readFileSync } from '../../scripts/documentation-corpus.js';
+import { readExampleDocsDocument } from '../_shared/documents.js';
 import { stripMarkdownFrontmatter } from './app-markdown-text.js';
 export { countMarkdownHeadings, stripMarkdownFrontmatter } from './app-markdown-text.js';
 
 export function readMarkdownDoc(path: string): string {
-  return stripMarkdownFrontmatter(readFileSync(new URL(path, import.meta.url), 'utf8')).trim();
+  return stripMarkdownFrontmatter(readExampleDocsDocument(path)).trim();
 }
 
 export function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[]): string {
