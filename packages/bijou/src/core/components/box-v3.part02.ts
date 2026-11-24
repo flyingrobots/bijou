@@ -3,12 +3,11 @@ import { resolveSafeCtx as resolveCtx } from '../resolve-ctx.js';
 import { clipToWidth } from '../text/clip.js';
 import { sanitizePlainTerminalText } from '../text/index.js';
 import { wrapToWidth } from '../text/wrap.js';
-import { mirrorsLayout } from '../direction/direction.js';
 import { resolveFillChar, type BoxOptions } from './box.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
 import { createTextSurface, segmentSurfaceText, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
-import { BORDER, titleStartX, normalizeFixedWidth, parseStyleRGB, withInheritedBackground } from './box-v3.part01.js';
+import { BORDER, mirrorsLayout, titleStartX, normalizeFixedWidth, parseStyleRGB, withInheritedBackground } from './box-v3.part01.js';
 
 /**
  * Render a bordered box around a Surface.

@@ -1,5 +1,6 @@
 import { isPackedSurface, type Surface } from '../../ports/surface.js';
 import { colorHex, colorRgb, type ColorRef } from '../theme/color.js';
+import { mirrorsLayout } from '../direction/direction.js';
 import { encodeModifiers, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_EMPTY, FLAG_BG_SET } from '../render/packed-cell.js';
 
 /** Pre-parse a CellTextStyle into numeric RGB + flags for setRGB. Returns undefined if not parseable. */
@@ -78,4 +79,4 @@ function withInheritedBackground(surface: Surface, background: ColorRef | undefi
   return next;
 }
 
-export { BORDER, titleStartX, normalizeFixedWidth, parseStyleRGB, withInheritedBackground };
+export { BORDER, mirrorsLayout, titleStartX, normalizeFixedWidth, parseStyleRGB, withInheritedBackground };
