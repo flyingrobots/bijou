@@ -65,7 +65,9 @@ Los componentes que se animan se abren con su variante animada. El modo interact
 
 ## Diseño de derecha a izquierda
 
-`r` cambia la dirección de lectura. La biblioteca se la pasa al marco de aplicación mediante un runtime de i18n y refleja su propio cuerpo: el flujo de la ruta de navegación, la fila de modos, la dirección de deslizamiento del carrusel y la alineación del texto y de las diapositivas. Con el diseño de derecha a izquierda, `h`, `[` y la flecha izquierda avanzan hacia el final de la lista. El código, los nombres de funciones y los propios componentes no se reflejan.
+`r` cambia la dirección de lectura. La biblioteca se la pasa al marco de aplicación mediante un runtime de i18n y refleja su propio cuerpo: el flujo de la ruta de navegación, la fila de modos, la dirección de deslizamiento del carrusel y la alineación del texto y de las diapositivas. Con el diseño de derecha a izquierda, `h`, `[` y la flecha izquierda avanzan hacia el final de la lista.
+
+La biblioteca también pasa la dirección a cada vista previa de historia, como la `direction` del contexto de la vista previa. Un componente que la lee (mediante `mirrorsLayout()`) refleja su diseño en los modos `interactive` y `static`; las salidas `pipe` y `accessible` mantienen el orden lógico. Una historia que pasa su propia `direction` a un componente la conserva. El código, los nombres de funciones y los componentes que aún no leen la dirección no se reflejan.
 
 El marco de aplicación refleja solo lo que admite hoy: el cajón de ajustes y las notificaciones se abren desde el otro lado. El encabezado, el pie y el chrome de los paneles aún no se reflejan; las issues #571 a #575 siguen el trabajo pendiente de derecha a izquierda.
 
