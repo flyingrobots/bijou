@@ -34,8 +34,8 @@ export const FUN_DEMO: GalleryDemo = {
   title: 'Bijou Fun',
   description: 'The bijou-fun demos in one shell: animated Surfaces that answer keys and follow the pointer.',
   async load() {
-    const { funBuild } = await import('../../../fun/browser.js');
-    return funBuild(Date.now() % 1_000_000);
+    const { loadFunBuild } = await import('../../../fun/browser.js');
+    return loadFunBuild(Date.now() % 1_000_000);
   },
 };
 
