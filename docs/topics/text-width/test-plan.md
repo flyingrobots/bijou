@@ -1,0 +1,59 @@
+# Test plan: East Asian text width
+
+This ledger lists each requirement of the [text width reference](./README.md)
+and the test that holds it. Text tests are in `packages/bijou/src/core/text/`
+and component tests in `packages/bijou/src/core/components/`, in the file named
+in each group heading. Every expected value is written by hand in the test,
+counted on the UAX #11 cell grid. Origin: flyingrobots/bijou#678.
+
+## Cell widths: `width-policy-wide.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| TW-01 | Han, kana, precomposed Hangul and fullwidth forms are two cells. | `measures Han, kana, precomposed Hangul and fullwidth forms as two cells` | Implemented |
+| TW-02 | Halfwidth katakana are one cell. | `measures halfwidth katakana as one cell each` | Implemented |
+| TW-03 | Combining marks take no cell. | `gives combining marks no cell of their own` | Implemented |
+| TW-04 | East Asian Ambiguous characters are one cell. | `measures every listed Ambiguous character as one cell` | Implemented |
+| TW-05 | Ambiguous characters wrap as one cell beside wide ones. | `wraps Ambiguous characters as one cell beside wide ones` | Implemented |
+| TW-06 | Conjoining jamo syllables are two cells. | none: flyingrobots/bijou#854 | Defect |
+| TW-07 | Halfwidth voiced marks are one cell each. | none: flyingrobots/bijou#855 | Defect |
+
+## Wrapping: `wrap-wide.test.ts` and `wrap-wide-paragraph.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| TW-10 | A mixed line that fits exactly stays on one line. | `keeps a mixed narrow/wide line that fits exactly on one line` | Implemented |
+| TW-11 | A line one cell over, ending in a wide character, moves that character. | `moves the last wide character when the line overflows by one cell` | Implemented |
+| TW-12 | A wide character with one cell left moves to the next line. | `never splits a wide character that meets the boundary with one cell left` | Implemented |
+| TW-13 | Only wide characters at an odd width leave one cell empty. | `fills an odd width with whole wide characters and leaves one cell empty` | Implemented |
+| TW-14 | Emoji between ideographs are two cells. | `counts emoji between ideographs as two cells, as graphemeWidth documents` | Implemented |
+| TW-15 | A spaceless 200-character Chinese paragraph wraps at widths 10, 11, 40 and 80. | `wraps at width 10 into forty lines of five ideographs`, `wraps at odd width 11 into five ideographs per line, one cell unused`, `wraps at width 40 into ten copies of the twenty-ideograph run`, `wraps at width 80 into five lines of forty ideographs` | Implemented |
+| TW-16 | For mixed CJK and Latin text and widths 2..120, no line exceeds the width and no grapheme is lost. | `keeps every line within widths 2..120 and loses no grapheme` | Implemented |
+| TW-17 | Width 1 never emits a two-cell line. | none: flyingrobots/bijou#852 | Defect |
+| TW-18 | A line starting with a space never wraps too wide. | none: flyingrobots/bijou#853 | Defect |
+
+## Truncation: `constrain-wide.test.ts`, `interactive` and `static`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| TW-20 | A mixed line that fits exactly is unchanged. | `leaves a mixed narrow/wide line that fits exactly unchanged` | Implemented |
+| TW-21 | A line one cell over, ending in a wide character, truncates to the exact width. | `truncates a line that overflows by one cell where the last character is wide` | Implemented |
+| TW-22 | Only wide characters at an odd width truncate to the exact width. | `truncates a line of only wide characters at an odd width` | Implemented |
+| TW-23 | At width 1 the ellipsis stands alone. | `keeps the ellipsis alone at width 1 rather than half a wide character` | Implemented |
+| TW-24 | No truncated line exceeds the width. | `never returns a line wider than maxWidth` | Implemented |
+| TW-25 | A wide character meeting the edge with one cell left is padded to the exact width. | none: flyingrobots/bijou#851 | Defect |
+
+## Tables: `table-wide.part01.test.ts` and `table-wide.part02.test.ts`, `interactive` and `static`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| TW-30 | Kana, Hangul and halfwidth katakana rows align by cell width. | `aligns kana, Hangul and halfwidth katakana rows by cell width` | Implemented |
+| TW-31 | Wide headers align over narrow cells. | `aligns wide headers over narrow cells` | Implemented |
+| TW-32 | Right and centre alignment count cells. | `right-aligns and centres wide cells by cell width` | Implemented |
+| TW-33 | A fixed-width cell that fits exactly is unchanged. | `keeps a mixed narrow/wide cell that fits exactly` | Implemented |
+| TW-34 | A cell one cell over, ending in a wide character, pads or wraps. | `handles a cell that overflows by one cell where the last character is wide` | Implemented |
+| TW-35 | A wide character ending at the column edge stays. | `keeps a wide character that ends exactly at the column edge` | Implemented |
+| TW-36 | An odd-width column of only wide characters pads one cell. | `pads an odd-width column of only wide characters` | Implemented |
+| TW-37 | Grapheme wrapping moves a wide character whole. | `wraps by grapheme the same way when wrap is "grapheme"` | Implemented |
+| TW-38 | A truncating width-1 column holds one space. | `pads a width-1 column instead of placing half a wide character` | Implemented |
+| TW-39 | Conjoining jamo rows align. | none: flyingrobots/bijou#854 | Defect |
