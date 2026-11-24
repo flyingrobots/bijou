@@ -42,7 +42,9 @@ function lines(output: readonly string[]): unknown[] {
 }
 
 function field(value: unknown, key: string): unknown {
-  return value != null && typeof value === 'object' ? Object.entries(value).find(([k]) => k === key)?.[1] : undefined;
+  if (value == null || typeof value !== 'object') return undefined;
+  const entries: [string, unknown][] = Object.entries(value);
+  return entries.find(([name]) => name === key)?.[1];
 }
 
 describe('Code Dojo live ESLint measurement', () => {
@@ -63,7 +65,7 @@ describe('Code Dojo live ESLint measurement', () => {
 
     expect(live.eslintViolations).toBe(summarizeEslintResults(results).total);
     expect(live.eslintFiles).toHaveLength(10);
-    expect(live.eslintFiles?.[0]).toEqual({ path: 'src/f11.ts', count: 11 });
+    expect(live.eslintFiles[0]).toEqual({ path: 'src/f11.ts', count: 11 });
     expect(validateLive(live), JSON.stringify(validateLive.errors)).toBe(true);
   });
 
@@ -139,6 +141,8 @@ describe('Code Dojo live ESLint measurement', () => {
     expect(field(lines(bad.stderr)[0], 'code')).toBe('bad-arguments');
     for (const event of lines(help.stdout)) expect(validateEvent(event), JSON.stringify(validateEvent.errors)).toBe(true);
     expect(human.stdout.join('\n')).toContain('slack');
-    expect(() => JSON.parse(human.stdout.join('\n'))).toThrow();
+    expect(() => {
+      JSON.parse(human.stdout.join('\n'));
+    }).toThrow();
   });
 });

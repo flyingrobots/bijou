@@ -14,6 +14,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   with `--check` for drift and `--live-input`/`--out` for a live artifact. The
   numbers come from the same `summarizeCodeDojoDebt()` the `code-dojo:debt`
   gate uses, which is unchanged. JSON Schemas are in `schemas/` (#603).
+- `npm run code-dojo:live` runs the ESLint ratchet's own analysis and writes a
+  `code-dojo.eslint-live.v1` file (default `.cache/code-dojo/eslint-live.json`)
+  for `code-dojo:report --live-input`. It prints one JSON Lines event with the
+  stored ESLint ceiling, the live count, the signed slack and the next legal
+  ceiling (`--human` for prose, `--schema` and `--help` for the contract). The
+  total uses `summarizeEslintResults`, the function `lint:eslint` uses. It is
+  not wired into CI, hooks or any gate, and no baseline or verdict changed
+  (#369).
 
 ### Fixed
 
