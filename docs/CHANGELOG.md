@@ -35,6 +35,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The web GPU showcase gallery lists the soak bench (`?app=soak`), loaded in
+  its own on-demand chunk through a browser adapter of the bench's host ports
+  (`bench/src/soak-browser.ts`): options from the address (`cycles`, `fps`,
+  `dwell`, `scenario`; an invalid value is refused with a message), a heap
+  reading only where Chrome measures one and never a resident figure, and a
+  log sink that keeps the last lines in memory. Scenarios render with
+  `createWebContext()`, not the test adapter. The panel's FPS is still the
+  inverse of CPU frame cost (flyingrobots/bijou#885).
 - The web GPU showcase has a demo gallery: `/gallery.html` lists a registry of
   demos (`examples/web-gpu/src/gallery/demos.ts`, DOGFOOD first), each loaded
   on demand into its own chunk and opened full-window at `?app=<id>`. A Back

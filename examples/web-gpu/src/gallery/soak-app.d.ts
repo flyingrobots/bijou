@@ -5,7 +5,7 @@ import type { App } from '@flyingrobots/bijou-tui';
 // by the repository's own tsconfig; this describes it to the showcase's stricter
 // one, which would otherwise read the whole bench.
 export interface BrowserSoak {
-  app(ctx: BijouContext): App<unknown, unknown>;
-  lines(): readonly string[];
+  readonly app: (ctx: BijouContext) => App<unknown, unknown>;
+  readonly lines: () => readonly string[];
 }
 export function createBrowserSoak(search: string, scenarioContext: () => BijouContext): BrowserSoak;

@@ -40,7 +40,7 @@ export interface SoakHost {
 
 export const DEFAULT_SOAK_OPTIONS: SoakOptions = { cycles: Infinity, fps: 30, dwell: 4 };
 
-export function resolveSoakOptions(given: { readonly [K in 'cycles' | 'fps' | 'dwell']?: number | undefined } & { readonly scenario?: string | undefined } = {}): SoakOptions {
+export function resolveSoakOptions(given: { readonly cycles?: number | undefined; readonly fps?: number | undefined; readonly dwell?: number | undefined; readonly scenario?: string | undefined } = {}): SoakOptions {
   return {
     ...(given.scenario === undefined ? {} : { scenario: given.scenario }),
     cycles: given.cycles ?? DEFAULT_SOAK_OPTIONS.cycles,

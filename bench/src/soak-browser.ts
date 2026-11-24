@@ -28,7 +28,7 @@ export function browserMemory(source: unknown = globalThis.performance): SoakMem
 export interface LogBuffer {
   readonly sink: SoakLogSink;
   /** A copy of the kept lines, oldest first. */
-  lines(): readonly string[];
+  readonly lines: () => readonly string[];
 }
 
 export function createLogBuffer(limit = 200): LogBuffer {
@@ -44,8 +44,8 @@ export function createLogBuffer(limit = 200): LogBuffer {
 
 /** A soak bench for a browser page. Its app is built from the run's context. */
 export interface BrowserSoak {
-  app(ctx: BijouContext): ReturnType<typeof createSoakApp>;
-  lines(): readonly string[];
+  readonly app: (ctx: BijouContext) => ReturnType<typeof createSoakApp>;
+  readonly lines: () => readonly string[];
 }
 
 /**
