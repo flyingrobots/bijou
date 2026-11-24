@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "code-dojo.eslint-live-event.v1",
+  "title": "Code Dojo live ESLint command line",
+  "description": "One JSON Lines object on stdout (live-written, help, schemas) or stderr (error) from npm run code-dojo:live.",
+  "type": "object",
+  "required": ["_schema", "kind"],
+  "properties": {
+    "_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "code-dojo.eslint-live-event" },
+        "version": { "const": "1.0.0" }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "live-written" },
+        "path": { "type": "string" },
+        "stored": { "type": "integer", "minimum": 0 },
+        "live": { "type": "integer", "minimum": 0 },
+        "slack": { "type": "integer" },
+        "nextCeiling": { "type": "integer", "minimum": 0 },
+        "files": { "type": "integer", "minimum": 0 },
+        "_schema": true
+      },
+      "required": ["kind", "path", "stored", "live", "slack", "nextCeiling", "files"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "help" },
+        "command": { "type": "string" },
+        "description": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["flag", "description"],
+            "properties": { "flag": { "type": "string" }, "description": { "type": "string" } }
+          }
+        },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "_schema": true
+      },
+      "required": ["kind", "command", "description", "options", "errors"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "schemas" },
+        "schemas": { "type": "array", "items": { "type": "object" } },
+        "_schema": true
+      },
+      "required": ["kind", "schemas"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "error" },
+        "code": { "enum": ["bad-arguments", "live-failed"] },
+        "message": { "type": "string" },
+        "_schema": true
+      },
+      "required": ["kind", "code", "message"],
+      "additionalProperties": false
+    }
+  ]
+}
