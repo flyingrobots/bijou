@@ -377,6 +377,12 @@ the presenter's `resize()` and resizes `ctx.runtime`, which sends the app a
 resize message. A box with zero width or height is ignored, so a mount into a
 hidden container waits, with nothing added, until the first box with area.
 
+Setting a canvas's pixel size clears it. A box change that alters the grid
+makes the app render at the new size, which paints it. A box change smaller
+than one cell leaves the grid as it was, so the app is told nothing; the mount
+then presents the last frame again, in full, on the next animation frame.
+Several such changes before that frame produce one present.
+
 `ctx` comes from `createWebInteractiveContext()`. Keys, IME and paste come
 from the hidden textarea, and pointer and wheel events from the current
 canvas, hit-tested over the cells the grid covers. A press on the canvas

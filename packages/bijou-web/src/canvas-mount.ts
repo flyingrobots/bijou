@@ -109,7 +109,8 @@ export async function mountBijouCanvas<Model, C extends BijouCanvasElement>(
   const bridge = createFrameBridge({ requestFrame: (callback) => clock.requestFrame(() => { callback(); }), onFault: fail });
   const stage = createCanvasStage({ container, textarea, surface, bridge, request, onFault: fail }, first);
   watch.onChange((next) => {
-    stage.apply(next);
+    const sameGrid = next.grid.columns === ctx.runtime.columns && next.grid.rows === ctx.runtime.rows;
+    stage.apply(next, sameGrid);
     ctx.runtime.resize(next.grid.columns, next.grid.rows);
   });
   const done = run(control.app, { ctx: runCtx, presenter: bridge, mouse: true, css: options.css })
