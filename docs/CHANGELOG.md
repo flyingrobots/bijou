@@ -13,6 +13,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   translated guides are generated JSON copies (`examples/docs/generated/`,
   written by `npm run components:data`, held to their files by
   `tests/dogfood-browser-data.test.ts`). Terminal output is unchanged.
+- DOGFOOD reads its Markdown documents through one seam,
+  `examples/_shared/documents.ts` (the live file, then the verified corpus,
+  as before). The web GPU showcase's build resolves it to a browser adapter
+  that serves a generated table of exactly the documents the app reads, so
+  `examples/docs/app.ts` reaches no Node API.
 
 ### Added
 
