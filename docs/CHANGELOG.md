@@ -63,6 +63,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   draws, dim or not, and dim text drawn without a dimming compositor are still
   measured. The baseline shrinks from 48 to 32 errors: the 16 `modal/*`
   entries were each its 158-cell dimmed backdrop (#581).
+- `wrapToWidth()` no longer returns a line one cell wider than the width when
+  a line starts with a one-cell whitespace (space, tab or no-break space), a
+  run fills the width, and the next grapheme is two cells:
+  `wrapToWidth(' aaa。', 4)` is now `['aaa', '。']` instead of `['aaa。']`.
+  The wide grapheme moves to the next line. Output that already fit the width
+  is unchanged (flyingrobots/bijou#853).
 
 ### Added
 
