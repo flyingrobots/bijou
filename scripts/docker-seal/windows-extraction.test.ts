@@ -36,8 +36,9 @@ describe('Windows Git toolchain extraction', () => {
     mkdirSync(join(source, 'etc'));
     mkdirSync(join(source, 'cmd'));
     writeFileSync(join(source, 'cmd', 'git.exe'), 'git');
-    for (const [link, target] of [['dev/fd', '/proc/self/fd'], ['dev/stdin', '/proc/self/fd/0'],
-      ['dev/stdout', '/proc/self/fd/1'], ['dev/stderr', '/proc/self/fd/2'], ['etc/mtab', '/proc/mounts']]) {
+    const links: readonly (readonly [string, string])[] = [['dev/fd', '/proc/self/fd'], ['dev/stdin', '/proc/self/fd/0'],
+      ['dev/stdout', '/proc/self/fd/1'], ['dev/stderr', '/proc/self/fd/2'], ['etc/mtab', '/proc/mounts']];
+    for (const [link, target] of links) {
       symlinkSync(target, join(source, link));
     }
     const target = join(root, 'target');

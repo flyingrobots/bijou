@@ -2,13 +2,20 @@ import { describe, expect, it } from 'vitest';
 import { win32 } from 'node:path';
 import { validateWindowsWorker, type WindowsWorkerInspection } from './windows-policy.mjs';
 
+function hostConfig(StorageOpt?: Readonly<Record<string, string>>) {
+  return {
+    NetworkMode: 'none', CpuCount: 2, Memory: 6 * 1024 ** 3, Isolation: 'process',
+    ...(StorageOpt === undefined ? {} : { StorageOpt }),
+  };
+}
+
 // Docker inspect is the runner's external admission boundary. These records test
 // its policy; only the native Windows CI lane can verify the Engine's behaviour.
 function worker(): WindowsWorkerInspection {
   return {
     Config: { Labels: { 'org.bijou.sealed-tests': 'windows-v1' } },
     Mounts: [],
-    HostConfig: { NetworkMode: 'none', CpuCount: 2, Memory: 6 * 1024 ** 3, StorageOpt: { size: '20G' }, Isolation: 'process' },
+    HostConfig: hostConfig({ size: '20G' }),
     NetworkSettings: { Networks: { none: {} } },
   };
 }
@@ -22,8 +29,7 @@ describe('Windows worker admission', () => {
     ['an extra storage option', { size: '20G', other: '1' }],
   ])('refuses %s', (_name, StorageOpt) => {
     // Oracle: hosted job 135334072019 measured 136229920768 bytes with no option; job 135323118345 measured 21339549696 with size=8G.
-    const candidate = worker();
-    expect(() => { validateWindowsWorker({ ...candidate, HostConfig: { ...candidate.HostConfig, StorageOpt } }, true); }).toThrow('isolation profile');
+    expect(() => { validateWindowsWorker({ ...worker(), HostConfig: hostConfig(StorageOpt) }, true); }).toThrow('isolation profile');
   });
 
   it('admits the bounded offline profile', () => {

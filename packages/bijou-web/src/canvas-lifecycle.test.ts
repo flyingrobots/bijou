@@ -128,7 +128,8 @@ describe('mountBijouCanvas() lifecycle', () => {
 
   it('refuses loudly when the host has no ResizeObserver', async () => {
     const env = createCanvasEnv();
-    const withoutHost = { ...env.options(), host: undefined };
+    const { host, ...withoutHost } = env.options();
+    if (host === undefined) throw new Error('the fake environment supplied no host to remove');
     await expect(mountBijouCanvas(counterApp, env.container, withoutHost))
       .rejects.toMatchObject({ code: 'BIJOU_WEB_CANVAS_NO_RESIZE_OBSERVER' });
     expect(env.container.children).toEqual([]);
