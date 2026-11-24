@@ -5,6 +5,7 @@ import { createI18nRuntime, createRuntimeLocalizationPort } from '../packages/bi
 import { exampleDocsKey } from '../examples/_shared/document-key.js';
 import { documentKeysRead, readExampleDocsDocument as readFromNode } from '../examples/_shared/documents.js';
 import { readExampleDocsDocument as readFromTable } from '../examples/_shared/documents.browser.js';
+import '../examples/docs/app.js';
 import { guideDocBody } from '../examples/docs/app-guide-access.js';
 import { GUIDE_DOCS } from '../examples/docs/app-guide-catalog.js';
 import { collectDogfoodMarkdownDocuments } from '../examples/docs/i18n-debt-markdown-discovery.js';
@@ -35,7 +36,9 @@ describe('the DOGFOOD document table', () => {
       }));
       for (const guide of GUIDE_DOCS) guideDocBody(guide, i18n);
     }
-    expect(Object.keys(table).sort()).toEqual(documentKeysRead());
+    const read = documentKeysRead();
+    const keys = Object.keys(table).sort();
+    expect({ tableOnly: keys.filter((key) => !read.includes(key)), readOnly: read.filter((key) => !keys.includes(key)) }).toEqual({ tableOnly: [], readOnly: [] });
   });
 
   it('holds every document a readMarkdownDoc call site names', () => {
