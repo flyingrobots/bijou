@@ -8,7 +8,7 @@ import { formatNs } from './stats.js';
 import { updateSoak } from './soak-update.js';
 
 export function createSoakApp(appCtx: BijouContext, host: SoakHost) {
-  const update = updateSoak(host);
+  const update = updateSoak(appCtx, host);
   return createFramedApp<SoakModel, SoakMsg>({
     title: 'Soak Runner',
     pages: [{
@@ -19,7 +19,7 @@ export function createSoakApp(appCtx: BijouContext, host: SoakHost) {
         // until the first render tells us the real size.
         const w = latestPaneSize.width || 80;
         const h = latestPaneSize.height || 24;
-        return [initScenario(0, 0, w, h), []];
+        return [initScenario(appCtx, 0, 0, w, h), []];
       },
       keyMap: createKeyMap<SoakMsg>().bind('`', 'Toggle perf overlay', { type: 'toggle-perf' }),
       update,

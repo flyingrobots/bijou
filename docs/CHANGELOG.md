@@ -14,7 +14,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   reaches no Node API. `bench/src/soak-node.ts` is the Node adapter and keeps
   the arguments, log lines and frames of `npm run soak`. A host that cannot
   measure memory gets no heap or resident row and no such field in the log,
-  never a zero. A log sink that throws still ends the run with its error,
+  never a zero. A scenario takes its context from the caller
+  (`Scenario.setup(ctx)` is now required, and `component-app` no longer builds a
+  test context when given none); the wall-time harness child creates the
+  interactive test context it used to get by default, and the soak app passes
+  its own. A log sink that throws still ends the run with its error,
   as a failed append always did.
 - Four DOGFOOD modules no longer read Node files: `app-ids.ts` and
   `app-prompt-font.ts` import their JSON, and the landing logo and the

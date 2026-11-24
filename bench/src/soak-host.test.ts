@@ -84,7 +84,7 @@ describe('soak bench through host ports', () => {
   it('a log sink that throws ends the run with the sink error, as a failed append always did', () => {
     const log = () => { throw new Error('disk full'); };
     const host = { options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: NO_MEMORY, log };
-    const model = initScenario(0, 0, 80, 24);
+    const model = initScenario(ctx, 0, 0, 80, 24);
     expect(() => logAndAdvanceCmd(model, host)()).toThrow('disk full');
   });
 });
