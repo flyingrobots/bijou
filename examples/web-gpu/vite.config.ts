@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
+import { dogfoodDocuments } from './documents-plugin.js';
 
 // The showcase bundles the Bijou packages from source so that every module,
 // and every module-level singleton such as the default context, has one copy.
@@ -32,7 +33,7 @@ export default defineConfig({
   root: fileURLToPath(new URL('.', import.meta.url)),
   base: './',
   // React and Tailwind build the page chrome; neither adds a Node built-in to the bundle.
-  plugins: [refuseNodeBuiltins(), react(), tailwindcss()],
+  plugins: [refuseNodeBuiltins(), dogfoodDocuments(), react(), tailwindcss()],
   resolve: {
     alias: [
       { find: /^@flyingrobots\/bijou\/perf$/u, replacement: source('bijou/src/core/render/packed-cell.ts') },
@@ -43,6 +44,8 @@ export default defineConfig({
       { find: /^@flyingrobots\/bijou-web$/u, replacement: source('bijou-web/src/index.ts') },
       // Only startApp() exists in the browser; see src/browser-start-app.ts.
       { find: /^@flyingrobots\/bijou-node$/u, replacement: fileURLToPath(new URL('src/browser-start-app.ts', import.meta.url)) },
+      // DOGFOOD, by a name the showcase's own tsconfig describes in src/dogfood/docs-app.d.ts.
+      { find: /^@bijou-examples\/docs$/u, replacement: fileURLToPath(new URL('../docs/app.ts', import.meta.url)) },
       // The shadcn components' own imports, as components.json names them.
       { find: /^@\//u, replacement: fileURLToPath(new URL('src/', import.meta.url)) },
     ],
@@ -54,6 +57,8 @@ export default defineConfig({
       input: {
         main: fileURLToPath(new URL('index.html', import.meta.url)),
         dom: fileURLToPath(new URL('dom.html', import.meta.url)),
+        // DOGFOOD full-window, with no page chrome.
+        dogfood: fileURLToPath(new URL('dogfood.html', import.meta.url)),
       },
     },
     emptyOutDir: true,

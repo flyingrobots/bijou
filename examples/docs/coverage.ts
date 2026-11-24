@@ -1,4 +1,4 @@
-import { readDocumentationFile as readFileSync } from '../../scripts/documentation-corpus.js';
+import { readExampleDocsDocument as readFileSync } from '../_shared/documents.js';
 interface CoverageStoryLike {
   readonly coverageFamilyIds?: readonly string[];
 }
@@ -16,10 +16,7 @@ export interface DogfoodDocsCoverage {
   readonly percent: number;
 }
 
-const COMPONENT_FAMILY_REFERENCE_TEXT = readFileSync(
-  new URL('../../docs/design-system/component-families.md', import.meta.url),
-  'utf8',
-);
+const COMPONENT_FAMILY_REFERENCE_TEXT = readFileSync('../../docs/design-system/component-families.md');
 
 export const DOGFOOD_COMPONENT_FAMILY_REFERENCE = Object.freeze(parseComponentFamilyReference(COMPONENT_FAMILY_REFERENCE_TEXT));
 

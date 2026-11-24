@@ -6,8 +6,27 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Changed
+
+- Four DOGFOOD modules no longer read Node files: `app-ids.ts` and
+  `app-prompt-font.ts` import their JSON, and the landing logo and the
+  translated guides are generated JSON copies (`examples/docs/generated/`,
+  written by `npm run components:data`, held to their files by
+  `tests/dogfood-browser-data.test.ts`). Terminal output is unchanged.
+- DOGFOOD reads its Markdown documents through one seam,
+  `examples/_shared/documents.ts` (the live file, then the verified corpus,
+  as before). The web GPU showcase's build resolves it to a browser adapter
+  that serves a table of exactly the documents the app reads, made from the
+  files at build time and never committed, so `examples/docs/app.ts` reaches
+  no Node API.
+
 ### Added
 
+- The web GPU showcase mounts DOGFOOD, the documentation app: `?app=dogfood`
+  on the showcase page, and `/dogfood.html`, a page with no chrome whose
+  Surface fills the window and resizes with it. The app and its document table
+  load on demand, so the page's entry chunk does not carry them. The browser's
+  language picks DOGFOOD's locale, and the choice stays in the page.
 - The web GPU showcase can present one app on either host and keep its state.
   A Host switch beside the backend switch (`Space` then `m`) stops the canvas
   mount and starts `mountBijouDom()` with the same model, and back again. The
