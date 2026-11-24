@@ -35,7 +35,7 @@ describe('CI web-gpu lanes', () => {
   });
 
   it('builds and typechecks the showcase inside the sealed runner', () => {
-    const build = steps(fields(jobs['test'], 'test'), 'test').find((step) => step['name'] === 'Build and typecheck the web-gpu showcase');
+    const build = steps(fields(jobs['smoke_gates'], 'smoke_gates'), 'smoke_gates').find((step) => step['name'] === 'Build and typecheck the web-gpu showcase');
     expect(build?.['run']).toBe("node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run web-gpu:build && npm run web-gpu:typecheck'");
   });
 });

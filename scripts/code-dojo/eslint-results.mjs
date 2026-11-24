@@ -16,13 +16,15 @@ export const lintTargets = [
   "vitest.config.ts",
 ];
 
-export function eslintCacheArgs(root, name = ".eslintcache") {
+const CACHE_LOCATION = ".cache/eslint/.eslintcache";
+
+export function eslintCacheArgs(root) {
   mkdirSync(path.join(root, ".cache", "eslint"), { recursive: true });
-  return cacheArgs(name);
+  return cacheArgs(CACHE_LOCATION);
 }
 
-function cacheArgs(name) {
-  return ["--cache", "--cache-strategy", "content", "--cache-location", `.cache/eslint/${name}`];
+function cacheArgs(location) {
+  return ["--cache", "--cache-strategy", "content", "--cache-location", location];
 }
 
 /**
@@ -36,7 +38,7 @@ export function eslintInvocations(_root, targets = lintTargets) {
     target,
     args: [
       "--format", "json", "--no-warn-ignored",
-      ...cacheArgs(`.eslintcache-${String(index)}-${target.replace(/[^a-z0-9]+/gi, "_")}`),
+      ...cacheArgs(`${CACHE_LOCATION}-${String(index)}-${target.replace(/[^a-z0-9]+/gi, "_")}`),
       target,
     ],
   }));

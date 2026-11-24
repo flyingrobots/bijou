@@ -69,6 +69,23 @@ there. Tests and lifecycle execution run afterward with networking disabled.
 Missing offline dependencies fail the run; the launcher does not restore
 network access as a fallback.
 
+### Run one shard of the full suite
+
+`npm run test:run` with no file runs every test file, in chunks of 48 files,
+one chunk after another. `BIJOU_VITEST_SHARD=k/n` runs the k-th of n shares of
+those chunks: shard k takes every n-th chunk, so the n shards together run
+every file once. CI runs the suite as four shards on four runners, for each
+Node version.
+
+```bash
+node scripts/docker-seal/run.mjs -- sh -c 'npm run build && BIJOU_VITEST_SHARD=2/4 npm run test:run'
+```
+
+The run's first line names the share, in the form `vitest shard 2/4: 6 of 25 chunks,
+288 of 1159 files` (illustrative counts). A value that is not `k/n` with
+`1 <= k <= n` is refused with exit status 2. With the variable unset the whole
+suite runs, as before.
+
 ## Inspect results
 
 The launcher prints the path to its evidence directory. Admission and completion
