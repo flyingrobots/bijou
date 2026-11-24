@@ -29,6 +29,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `breadcrumb()` mirrors under right-to-left layout (#615). With
+  `direction: 'rtl'` or an `rtl` context, `interactive` and `static` output
+  reads right to left, keeps the current item (the last logical one) styled,
+  and mirrors a directional separator glyph (`›` to `‹`). ASCII separators,
+  labels, paths and IDs are never changed, and `pipe` and `accessible` output
+  keep logical order. `ltr` output is unchanged. The Component Library heading
+  uses it instead of drawing the trail by hand.
+
 - CI publishes a per-job wall-time summary to the run's job summary, slowest
   finished job first, with skipped, in-progress and cancelled jobs labelled.
   The new `Wall time summary` job is read-only, non-blocking and required by

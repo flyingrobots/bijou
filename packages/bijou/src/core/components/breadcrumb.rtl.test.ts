@@ -88,7 +88,8 @@ describe('breadcrumb direction', () => {
   it('applies currentBgToken to the current item under rtl', () => {
     const ctx = createTestContext({ mode: 'interactive', direction: 'rtl' });
     const out = breadcrumb(items, { currentBgToken: { hex: '#ffffff', bg: '#001122' }, ctx });
-    expect(out.startsWith(' Profile ') || out.includes(' Profile ')).toBe(true);
-    expect(out.indexOf('Profile')).toBeLessThan(out.indexOf('Home'));
+    expect(out.indexOf('Profile')).toBeLessThan(out.indexOf('Settings'));
+    expect(out.indexOf('Settings')).toBeLessThan(out.indexOf('Home'));
+    expect(out).toContain(' Profile ');
   });
 });

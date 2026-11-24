@@ -75,20 +75,7 @@ export function dots(story: ComponentStory, model: LibraryModel, width: number, 
 export function heading(story: ComponentStory, model: LibraryModel, ctx: BijouContext, width: number): Surface {
   const items = [story.family, story.title];
   const surface = createSurface(width, 1);
-  if (model.rtl) {
-    // Breadcrumb flow mirrors in RTL (Localization and Bidirectionality doctrine). breadcrumb() has no
-    // direction option yet, and reversing its items would style the family as current, so draw it here.
-    const parts = [...items].reverse();
-    const line = parts.join(' ‹ ');
-    let x = Math.max(0, Math.floor((width - Array.from(line).length) / 2));
-    parts.forEach((part, i) => {
-      x = writeRow(surface, x, 0, part, false);
-      if (i === 0) for (let k = x - Array.from(part).length; k < x; k++) surface.set(k, 0, { ...surface.get(k, 0), modifiers: ['bold'] });
-      if (i < parts.length - 1) x = writeRow(surface, x, 0, ' ‹ ', false);
-    });
-    return surface;
-  }
-  const text = breadcrumb(items, { ctx });
+  const text = breadcrumb(items, { ctx, direction: model.rtl ? 'rtl' : 'ltr' });
   const len = Array.from(stripAnsi(text)).length;
   surface.blit(parseAnsiToSurface(text, Math.min(len, width), 1), Math.max(0, Math.floor((width - len) / 2)), 0);
   return surface;
