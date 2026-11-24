@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const FLOOR_SECONDS = 1;
-const PER_FILE_SECONDS = 0.5;
+const PER_FILE_SECONDS = 1.5;
 const SHARED_PER_FILE_SECONDS = 0.1;
 const directory = mkdtempSync(join(tmpdir(), 'bijou-weights-'));
 const report = join(directory, 'report.json');
@@ -40,7 +40,7 @@ try {
     floorSeconds: FLOOR_SECONDS,
     defaultSeconds: Math.round((lightSeconds / Math.max(light, 1)) * 100) / 100,
     // Start-up and import cost of one test file before its first test, which a file's own time leaves out.
-    // An estimate from CI chunk logs (48 files of about 1 s of tests took about 6 s on 2 workers), kept by hand.
+    // An estimate from CI chunk logs (23 isolated files spent 39 s importing, summed over 2 workers), kept by hand.
     perFileSeconds: PER_FILE_SECONDS,
     // The same cost for a file that shares its worker's modules (isolation off): estimated, kept by hand.
     sharedPerFileSeconds: SHARED_PER_FILE_SECONDS,

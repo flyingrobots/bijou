@@ -66,8 +66,12 @@ export function parseWeights(text) {
  * isolation off, so the files in a worker share loaded modules: loading them once per worker and
  * not once per file is most of the suite's time. A file needs isolation when it changes state that
  * other files in the worker would see: module mocks, global or environment stubs, fake timers,
- * the default context, the environment, the working directory, or the module registry. A file can
- * also ask for it with a comment line `// vitest: isolate`, with the reason after it.
+ * spies, the environment, the working directory, or the module registry. A file can also ask for
+ * it with a comment line `// vitest: isolate`, with the reason after it.
+ *
+ * Setting or resetting the default context is not on the list. The 133 files that do only that
+ * were measured sharing modules with every other shared file, in two groupings and orders, with
+ * no failure (2026-11-24), and isolating them was about half of the suite's remaining time.
  */
 export function needsIsolation(source) {
   return ISOLATION_MARKS.some((mark) => mark.test(source));
@@ -80,7 +84,6 @@ const ISOLATION_MARKS = [
   /\bdelete\s+process\.env\b/u,
   /\bprocess\.chdir\(/u,
   /\bglobalThis\.[A-Za-z_$][\w$]*\s*=[^=]/u,
-  /\b(?:setDefaultContext|_resetDefaultContextForTesting)\(/u,
 ];
 
 export function isIncludedTestFile(path) {

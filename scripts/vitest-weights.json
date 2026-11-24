@@ -2,7 +2,7 @@
   "schema": "bijou.vitest-weights/1",
   "floorSeconds": 1,
   "defaultSeconds": 0.06,
-  "perFileSeconds": 0.5,
+  "perFileSeconds": 1.5,
   "sharedPerFileSeconds": 0.1,
   "files": {
     "bench/src/soak-browser.test.ts": 1.2,

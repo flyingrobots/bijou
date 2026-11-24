@@ -21,8 +21,6 @@ describe('which test files keep a module graph of their own', () => {
     ['an environment delete', 'delete process.env.NO_COLOR;'],
     ['a working-directory change', 'process.chdir(root);'],
     ['a global write', 'globalThis.navigator = fake;'],
-    ['the default context', 'setDefaultContext(ctx);'],
-    ['a default-context reset', '_resetDefaultContextForTesting();'],
     ['its own request', '// vitest: isolate (patches Date)'],
   ])('isolates a file with %s', (_label, line) => {
     expect(needsIsolation(`import { it } from 'vitest';\n${line}\nit('x', () => {});\n`)).toBe(true);
@@ -33,7 +31,9 @@ describe('which test files keep a module graph of their own', () => {
     ['an environment read', "const quiet = process.env.NO_COLOR === '1';"],
     ['an environment comparison', "if (process.env.CI == 'true') skip();"],
     ['a global read', 'const g = globalThis.navigator == undefined;'],
-    ['the word in prose', '// this file does not call setDefaultContext'],
+    // Measured safe to share on 2026-11-24: see needsIsolation.
+    ['the default context', 'setDefaultContext(ctx);'],
+    ['a default-context reset', '_resetDefaultContextForTesting();'],
     ['a request that is not at the start of a line', "const note = 'see // vitest: isolate';"],
   ])('lets a file with %s share', (_label, line) => {
     expect(needsIsolation(`import { it } from 'vitest';\n${line}\n`)).toBe(false);

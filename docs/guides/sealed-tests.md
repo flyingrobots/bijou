@@ -113,9 +113,10 @@ shared state keeps a module graph of its own, as before.
 
 A file is isolated when its source uses a module mock, a global or environment
 stub, fake timers, a spy, a module-registry reset, a write to `process.env` or
-`globalThis`, `process.chdir`, or the default context (`setDefaultContext`,
-`_resetDefaultContextForTesting`). The rule is `needsIsolation` in
-`scripts/vitest-shards.mjs`. A file that changes shared state in a way the rule
+`globalThis`, or `process.chdir`. The rule is `needsIsolation` in
+`scripts/vitest-shards.mjs`. Setting or resetting the default context does not
+isolate a file: the files that do only that were measured sharing modules with
+no failure, in two groupings and orders. A file that changes shared state in a way the rule
 does not see asks for isolation with a comment line of its own:
 
 ```ts
