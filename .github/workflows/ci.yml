@@ -135,7 +135,7 @@ jobs:
       - name: Prepare sealed toolchain
         run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version ${{ matrix.node-version }}
       - name: Full test suite
-        run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_MAX_WORKERS=4 BIJOU_VITEST_SHARD=${{ matrix.shard }}/8 npm run test:run'
+        run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_SHARD=${{ matrix.shard }}/8 npm run test:run'
 
   # Gates that need neither the suite nor the documentation gates, in a job of
   # their own so they run beside them and not after them.
