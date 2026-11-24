@@ -59,8 +59,12 @@ export default defineConfig({
         dom: fileURLToPath(new URL('dom.html', import.meta.url)),
         // DOGFOOD full-window, with no page chrome.
         dogfood: fileURLToPath(new URL('dogfood.html', import.meta.url)),
+        // The demo gallery, and each demo full-window at ?app=<id>.
+        gallery: fileURLToPath(new URL('gallery.html', import.meta.url)),
       },
     },
+    // Which chunk holds what: the gallery's browser suite and build test read it.
+    manifest: true,
     emptyOutDir: true,
     target: 'es2022',
     reportCompressedSize: false,

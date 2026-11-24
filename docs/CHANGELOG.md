@@ -30,6 +30,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The web GPU showcase has a demo gallery: `/gallery.html` lists a registry of
+  demos (`examples/web-gpu/src/gallery/demos.ts`, DOGFOOD first), each loaded
+  on demand into its own chunk and opened full-window at `?app=<id>`. A Back
+  button and `Esc` return; an unknown id shows the gallery with a message; a
+  demo that fails to load shows its error and leaves the gallery usable.
+
 - The web GPU showcase mounts DOGFOOD, the documentation app: `?app=dogfood`
   on the showcase page, and `/dogfood.html`, a page with no chrome whose
   Surface fills the window and resizes with it. The app and its document table
