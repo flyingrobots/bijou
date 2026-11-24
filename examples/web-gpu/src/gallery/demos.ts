@@ -25,5 +25,19 @@ export const DOGFOOD_DEMO: GalleryDemo = {
   },
 };
 
+/**
+ * The bijou-fun shell and every demo in examples/fun/registry.ts, as one chunk. A demo added to that registry
+ * appears here with no change to the showcase. The seed is the page's choice: demos never read the clock.
+ */
+export const FUN_DEMO: GalleryDemo = {
+  id: 'fun',
+  title: 'Bijou Fun',
+  description: 'The bijou-fun demos in one shell: animated Surfaces that answer keys and follow the pointer.',
+  async load() {
+    const { funBuild } = await import('../../../fun/browser.js');
+    return funBuild(Date.now() % 1_000_000);
+  },
+};
+
 /** Every demo the gallery lists, in the order it lists them. One entry here is all a new demo needs. */
-export const GALLERY_DEMOS: readonly GalleryDemo[] = [DOGFOOD_DEMO, SOAK_DEMO];
+export const GALLERY_DEMOS: readonly GalleryDemo[] = [DOGFOOD_DEMO, SOAK_DEMO, FUN_DEMO];

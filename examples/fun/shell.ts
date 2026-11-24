@@ -2,7 +2,7 @@
 import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import { isKeyMsg, isMouseMsg, isPulseMsg, isResizeMsg, quit, type App } from '@flyingrobots/bijou-tui';
 import type { DemoEntry, Session } from './contract.js';
-import { footerRow, headerRow } from './shell-chrome.js';
+import { failurePane, footerRow, headerRow } from './shell-chrome.js';
 
 const CHROME_ROWS = 2;
 
@@ -31,6 +31,15 @@ function goTo(model: ShellModel, index: number): ShellModel {
 function digit(key: string, count: number): number | undefined {
   const n = Number(key);
   return Number.isInteger(n) && n >= 1 && n <= count ? n - 1 : undefined;
+}
+
+/** The demo's frame, or the failure that stopped it: one demo that throws does not take the shell down. */
+function paneOf(ctx: BijouContext, entry: DemoEntry, session: Session, width: number, height: number): Surface {
+  try {
+    return session.view(width, height, ctx);
+  } catch (error) {
+    return failurePane(ctx, entry, error, width, height);
+  }
 }
 
 /**
@@ -65,7 +74,7 @@ export function createFunApp({ ctx, entries, seed }: ShellOptions): App<ShellMod
       const screen = createSurface(columns, rows);
       if (entry === undefined || session === undefined) return screen;
       screen.blit(headerRow(ctx, entries, model.index, columns), 0, 0);
-      screen.blit(session.view(columns, Math.max(1, rows - CHROME_ROWS), ctx), 0, 1);
+      screen.blit(paneOf(ctx, entry, session, columns, Math.max(1, rows - CHROME_ROWS)), 0, 1);
       screen.blit(footerRow(ctx, entry, session.paused, columns), 0, rows - 1);
       return screen;
     },

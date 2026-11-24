@@ -4,7 +4,7 @@ import { parseRoute, routeHref } from '../../examples/web-gpu/src/gallery/route.
 
 describe('the showcase gallery registry', () => {
   it('lists DOGFOOD first and the soak bench second, each demo with an id, a title and a one-line description', () => {
-    expect(GALLERY_DEMOS.map((demo) => demo.id)).toEqual(['dogfood', 'soak']);
+    expect(GALLERY_DEMOS.map((demo) => demo.id)).toEqual(['dogfood', 'soak', 'fun']);
     for (const demo of GALLERY_DEMOS) {
       expect(demo.id).toMatch(/^[a-z][a-z0-9-]*$/u);
       expect(demo.title).not.toBe('');

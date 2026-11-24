@@ -35,6 +35,17 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The showcase gallery lists a second entry, `fun` ("Bijou Fun"), at
+  `gallery.html?app=fun`: the `examples/fun` shell with its three demos, in
+  the browser, answering keys and the pointer (the metaballs follow it with no
+  button held). `examples/fun/browser.ts` is the seam: `funBuild(seed, entries)`
+  builds the shell from the registry, so a demo added to
+  `examples/fun/registry.ts` appears in the gallery with no change under
+  `examples/web-gpu`, which `tests/web-gpu/gallery-fun.test.ts` shows with a
+  stub demo. The shell and its demos are one on-demand chunk (about 10 KB), not
+  one chunk per demo. A demo that throws in `view` now paints
+  `<name> failed: <reason>` in its pane and leaves the header, footer and the
+  other demos working. Origin: flyingrobots/bijou#892.
 - `examples/fun/` brings three demos from the owner's bijou-fun project (a
   rainbow gradient, a wormhole and colour-blending metaballs) into the
   repository, ported from Bijou 7.1. Each demo is a typed `Demo<S>` that owns

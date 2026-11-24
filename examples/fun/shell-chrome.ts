@@ -37,3 +37,11 @@ export function footerRow(ctx: BijouContext, entry: DemoEntry, paused: boolean, 
     { text: `  ·  ${entry.keys}  ·  tab or arrows switch, q quits${paused ? '  ·  PAUSED' : ''}` },
   ]);
 }
+
+/** The pane of a demo whose `view` threw: the demo's name and what it said, so the header and footer stay usable. */
+export function failurePane(ctx: BijouContext, entry: DemoEntry, error: unknown, width: number, height: number): Surface {
+  const reason = error instanceof Error ? error.message : String(error);
+  const pane = createSurface(width, height);
+  pane.blit(writeRuns(width, ctx, [{ text: `${entry.name} failed: ${reason}`, fg: ctx.semantic('error').hex, bold: true }]), 0, 0);
+  return pane;
+}
