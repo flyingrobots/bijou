@@ -75,7 +75,7 @@ The showcase bundle loads each app on demand, so the page's entry chunk does
 not carry them. In the production build, the entry chunk of the showcase page
 is `main-*.js` at 16.5 kB, with its preloaded chunks `mount-host-*.js` at
 481 kB and `keys-card-*.js` at 155 kB; neither holds an app. The DOGFOOD chunk
-(`app-*.js`, 1,310 kB before compression) carries the document table, the
+(`app-*.js`, 1,336 kB before compression) carries the document table, the
 translated guides, the catalogs and the app, and is the largest; `runtime-create-*.js`
 (525 kB) and `library-*.js` (98 kB) are loaded on demand by the Components
 library and DOGFOOD. A document's text appears in the build once, in the DOGFOOD
