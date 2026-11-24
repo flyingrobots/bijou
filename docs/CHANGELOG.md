@@ -6,6 +6,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- `npm run code-dojo:report` writes the Code Dojo debt aggregate, next goalpost
+  target, per-source counts, top ESLint rules and optional live ESLint data to
+  `docs/code-dojo/debt-report.json` as a `code-dojo.debt-report.v1` document,
+  with `--check` for drift and `--live-input`/`--out` for a live artifact. The
+  numbers come from the same `summarizeCodeDojoDebt()` the `code-dojo:debt`
+  gate uses, which is unchanged. JSON Schemas are in `schemas/` (#603).
+
 ### Fixed
 
 - `npm run dogfood:i18n:debt` prints each logical surface once. The inventory's
@@ -13,6 +22,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `aggregateDogfoodI18nDebtSurfaces()`, so a surface split across part files
   (`counter-block-demo`, `release-title`, `storybook-app`) is no longer repeated
   once per file. Totals, per-surface counts and baselines are unchanged (#490).
+
+- The Windows sealed runner's toolchain context measurement no longer fails
+  when a running step removes a directory after the walk listed it and before
+  it was read. Such a directory now counts as empty; a missing root or any
+  other error (`ENOTDIR`, `EACCES`) still fails, and the entry and byte limits
+  are unchanged. This is the Windows counterpart of the Linux supervisor fix
+  (flyingrobots/bijou#820) and does not address the Windows storage allowance
+  (flyingrobots/bijou#788) (flyingrobots/bijou#826).
 
 - The Theme Lab draft theme keeps its rule provenance. `cloneThemeForThemeLabEditor()`
   no longer hand-copies each token family: it copies through
@@ -34,6 +51,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   entries were each its 158-cell dimmed backdrop (#581).
 
 ### Added
+
+- `breadcrumb()` mirrors under right-to-left layout (#615). With
+  `direction: 'rtl'` or an `rtl` context, `interactive` and `static` output
+  reads right to left, keeps the current item (the last logical one) styled,
+  and mirrors a directional separator glyph (`›` to `‹`). ASCII separators,
+  labels, paths and IDs are never changed, and `pipe` and `accessible` output
+  keep logical order. `ltr` output is unchanged. The Component Library heading
+  uses it instead of drawing the trail by hand.
 
 - The Components Library's `r` toggle now reaches every story preview.
   `createStoryProfileContext()` in `examples/_stories/protocol.ts` takes an

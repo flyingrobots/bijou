@@ -181,6 +181,27 @@ The encoded ceiling is `0`. WF-165 originally reached its required `12`-or-lower
 goalpost from `62`; issue #527 clears the final twelve violations. Future
 goalposts must retain zero debt without resetting the denominator.
 
+## Machine-Readable Report
+
+`npm run code-dojo:report` writes the same aggregate as JSON to
+`docs/code-dojo/debt-report.json` (schema `code-dojo.debt-report.v1`, declared
+in `schemas/code-dojo.debt-report.v1.schema.json`). The report is built by
+`buildCodeDojoDebtReport()`, which calls the same `summarizeCodeDojoDebt()` the
+`code-dojo:debt` gate uses, so the totals cannot drift from the text aggregate.
+The file is a single JSON document with no timestamps, as DL-029 specifies,
+not JSON Lines.
+
+- `--check` exits `1` when the stored file is stale. It is opt-in and is not
+  part of `code-dojo:debt`, hooks or CI.
+- `--live-input <path> --out <path>` validates a `code-dojo.eslint-live.v1`
+  artifact and fills `live`; it refuses the committed output path. Without live
+  input, `live` is `null` (unavailable, not zero).
+- The command prints one JSON line per outcome (`report-written`,
+  `report-current`) on stdout and a schema'd `error` line on stderr, per
+  `schemas/code-dojo.debt-report-event.v1.schema.json`.
+- Recording history events (`--record`) belongs to the goalpost history task
+  and is not implemented here.
+
 ## Updating The Ceiling
 
 At a goalpost or bounded-tranche boundary:

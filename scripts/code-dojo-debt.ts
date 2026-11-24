@@ -51,15 +51,19 @@ export function summarizeCodeDojoDebt(input: CodeDojoDebtInput): CodeDojoDebtSum
   });
 }
 
-export function loadCodeDojoDebtSummary(root: string = ROOT): CodeDojoDebtSummary {
+export function loadCodeDojoDebtInput(root: string = ROOT): CodeDojoDebtInput {
   const baselineCounts = loadCodeDojoBaselineCounts(root);
 
-  return summarizeCodeDojoDebt({
+  return {
     fileContextEntries: baselineCounts.fileContextEntries,
     mockBanViolations: baselineCounts.mockBanViolations,
     codeSizeBaseline: CODE_SIZE_BASELINE,
     eslintViolations: baselineCounts.eslintViolations,
-  });
+  };
+}
+
+export function loadCodeDojoDebtSummary(root: string = ROOT): CodeDojoDebtSummary {
+  return summarizeCodeDojoDebt(loadCodeDojoDebtInput(root));
 }
 
 export function formatCodeDojoDebt(summary: CodeDojoDebtSummary): string {
