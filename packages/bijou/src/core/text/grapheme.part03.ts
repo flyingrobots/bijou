@@ -36,9 +36,8 @@ export function stripUnsafeControlChars(text: string): string {
  * Compute the terminal display width of a single grapheme cluster.
  *
  * The width is determined by the widest code point in the cluster:
- * - East Asian Wide / Fullwidth characters → 2
- * - Emoji (U+1F300+) → 2
- * - Everything else (ASCII, Latin, combining marks, etc.) → 1
+ * - UAX #11 Wide / Fullwidth code points (see {@link isWideChar}) → 2
+ * - Everything else (ASCII, Latin, Ambiguous, combining marks, etc.) → 1
  *
  * Zero-width characters (combining marks, ZWJ, variation selectors)
  * don't add width on their own — they're part of the cluster.
@@ -47,6 +46,17 @@ export function stripUnsafeControlChars(text: string): string {
  * @returns Display width: 1 for narrow characters, 2 for wide/emoji.
  */
 export function graphemeClusterWidth(grapheme: string): number {
+  return measureGraphemeCluster(grapheme, isWideChar);
+}
+
+/**
+ * The cluster rule of {@link graphemeClusterWidth} over a given wide-code-point
+ * predicate. Internal: lets the width report compare two tables under one rule.
+ */
+export function measureGraphemeCluster(
+  grapheme: string,
+  isWide: (cp: number) => boolean,
+): number {
   let maxWidth = 1;
   let hasEmojiPresentation = false;
   for (const ch of grapheme) {
@@ -65,7 +75,7 @@ export function graphemeClusterWidth(grapheme: string): number {
     ) {
       continue;
     }
-    if (isWideChar(cp)) {
+    if (isWide(cp)) {
       maxWidth = 2;
       break; // Can't be wider than 2
     }

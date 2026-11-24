@@ -54,6 +54,8 @@
     "generate:profunctor-page-target": "tsx scripts/generate-profunctor-page-target.ts",
     "check:profunctor-page-target": "tsx scripts/generate-profunctor-page-target.ts --check",
     "code:size": "tsx scripts/code-size-gate.ts",
+    "unicode:wide-table": "tsx scripts/unicode/generate-east-asian-wide.ts",
+    "unicode:width-report": "tsx scripts/unicode/width-consequences.ts",
     "code-dojo:debt": "tsx scripts/code-dojo-debt.ts --max 0",
     "code-dojo:report": "tsx scripts/code-dojo-debt-report.ts",
     "code-dojo:live": "tsx scripts/code-dojo-eslint-live.ts",
