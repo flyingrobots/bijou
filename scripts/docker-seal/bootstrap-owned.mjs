@@ -57,7 +57,7 @@ try {
     image: image.Id, source: 'Dockerfile and marker only', hostFree, vmFree,
     expectedGrowthBytes: 1024 * 1024, deadlineMs: 120_000,
     limits: 'no RUN, no pull, 1 KiB context files, 16 MiB output, bounded read-only probe',
-    probe, lockKeys: ['host/docker/bijou-sealed-probe/', 'host/docker/bijou-sealed-tests/'] };
+    probe, lockKeys: [] };
   console.log(JSON.stringify(evidence));
   writeFileSync(join(context, 'Dockerfile'), `FROM ${base}\nCOPY marker /etc/bijou-test-seal\nUSER 1000:1000\nWORKDIR /work/source\nENV HOME=/home/test TMPDIR=/tmp LANG=C.UTF-8 GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null\nCMD ["sleep", "infinity"]\n`);
   writeFileSync(join(context, 'marker'), MARKER);

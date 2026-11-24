@@ -49,6 +49,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The sealed runner's local launchers (`scripts/docker-seal/run.mjs` and
+  `bootstrap.mjs`) no longer wrap each run in `git locks with`, so `npm test`,
+  `npm run soak` and every other local command run on a machine without
+  `git-locks`. A second concurrent local run is refused at once with a message
+  saying another run holds the worker; callers that want queueing wrap their
+  own command (flyingrobots/bijou#865).
+
 - `mountBijouCanvas()` paints the last frame again after a container resize
   that leaves the grid unchanged. Resizing the presenter clears the canvas, and
   with no change of columns or rows the app rendered nothing, so the canvas
