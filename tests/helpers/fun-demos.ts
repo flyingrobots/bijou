@@ -50,3 +50,11 @@ export function byId(id: string): DemoEntry {
   if (found === undefined) throw new Error(`no demo named ${id}`);
   return found;
 }
+
+/** The messages the recorded frames are made from: 30 pulses, the demo's own input, 30 more pulses. */
+export function frameScript(id: string, width: number, height: number): DemoMsg[] {
+  const middle: DemoMsg[] = id === 'wormhole'
+    ? [{ type: 'key', key: 'm' }]
+    : id === 'metaballs' ? [{ type: 'pointer', col: Math.floor(width / 3), row: Math.floor(height / 2) }] : [];
+  return [...pulses(30), ...middle, ...pulses(30)];
+}
