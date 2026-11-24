@@ -18,7 +18,11 @@ function measure() {
     peak[root] = Math.max(peak[root] ?? 0, Number((f.blocks - f.bfree) * f.bsize));
     if (f.bavail * f.bsize < 1024n ** 2n) throw new Error(`Quota reserve exhausted: ${root}`);
   }
-  if (generatedBytes(roots, baseline) > request.generatedBudget) throw new Error('Conservative generated-log allowance exhausted');
+  let generated;
+  try { generated = generatedBytes(roots, baseline); } catch (error) {
+    throw new Error(`Sealed supervisor stopped the workload: its generated-byte measurement failed, not a test: ${error.message}`);
+  }
+  if (generated > request.generatedBudget) throw new Error('Conservative generated-log allowance exhausted');
 }
 function activeChildren() {
   return readdirSync('/proc').filter((name) => /^\d+$/.test(name) && !existing.has(name)).filter((name) => {

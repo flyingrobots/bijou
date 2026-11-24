@@ -39,7 +39,7 @@ function tagFiles(baseline: Map<string, number>, root: string): string[] {
 
 describe.skipIf(process.platform !== 'linux')('sealed generated-byte walk', () => {
   it.each([
-    ['has no tags at all', (_: ReturnType<typeof repositoryFixture>) => undefined],
+    ['has no tags at all', (): void => undefined],
     ['keeps its tags only in packed-refs', ({ root, git }: ReturnType<typeof repositoryFixture>) => {
       git(root, 'tag', 'v1'); git(root, 'pack-refs', '--all');
     }],
