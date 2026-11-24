@@ -16,6 +16,13 @@ export const lintTargets: readonly string[];
 
 export function runEslintJson(root: string, targets?: readonly string[]): EslintFileResult[];
 
+export function eslintInvocations(
+  root: string,
+  targets?: readonly string[],
+): { readonly target: string; readonly args: readonly string[] }[];
+
+export function mergeEslintResults(groups: readonly (readonly EslintFileResult[])[]): EslintFileResult[];
+
 export function summarizeEslintResults(results: readonly EslintFileResult[]): EslintSummary;
 
 export function summarizeEslintFiles(

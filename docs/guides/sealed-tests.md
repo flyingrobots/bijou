@@ -30,6 +30,9 @@ resource admission.
 Local execution uses Linux containers, including on macOS through Docker.
 The native Windows lane uses disposable Windows containers on GitHub-hosted
 Windows runners; the Windows launcher currently requires that CI environment.
+That lane is switched off in CI as of 2026-11-24, because its worker runs out
+of storage before any test starts (flyingrobots/bijou#788). Nothing verifies
+Bijou on Windows until it returns; the launcher and its tests remain.
 
 ```sh
 node scripts/docker-seal/bootstrap.mjs --node-version 22
@@ -69,6 +72,23 @@ there. Tests and lifecycle execution run afterward with networking disabled.
 Missing offline dependencies fail the run; the launcher does not restore
 network access as a fallback.
 
+### Run one shard of the full suite
+
+`npm run test:run` with no file runs every test file, in chunks of 48 files,
+one chunk after another. `BIJOU_VITEST_SHARD=k/n` runs the k-th of n shares of
+those chunks: shard k takes every n-th chunk, so the n shards together run
+every file once. CI runs the suite as four shards on four runners, for each
+Node version.
+
+```bash
+node scripts/docker-seal/run.mjs -- sh -c 'npm run build && BIJOU_VITEST_SHARD=2/4 npm run test:run'
+```
+
+The run's first line names the share, in the form `vitest shard 2/4: 6 of 25 chunks,
+288 of 1159 files` (illustrative counts). A value that is not `k/n` with
+`1 <= k <= n` is refused with exit status 2. With the variable unset the whole
+suite runs, as before.
+
 ## Inspect results
 
 The launcher prints the path to its evidence directory. Admission and completion
@@ -96,6 +116,14 @@ The `@git-stunts/docker-guard` package is paired with actual container checks.
 Linux workers use a read-only root, bounded temporary filesystems, private
 processes and networking, and no Docker socket or host mounts. CPU, memory,
 process, output and runtime limits remain active while commands execute.
+
+A worker has no network. Inside it, the seal reads `/sys/class/net` and admits
+only loopback, the bonding driver's `bonding_masters` control file, and the
+fallback tunnel devices that some kernels create in every network namespace
+(`tunl0`, `sit0`, `gre0` and their relatives), and those only while they are
+down. Docker Desktop's kernel lists them in a worker started with
+`--network none`. Any other device, or a fallback tunnel device that is up, is
+refused as `network interface beyond loopback`.
 
 Windows workers run as `ContainerUser` with process isolation, no host mounts,
 and no network while tests execute. Their storage limits differ from the Linux

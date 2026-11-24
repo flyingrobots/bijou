@@ -8,6 +8,29 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- CI no longer runs the native Windows lane ("Focused Unit Tests (windows,
+  Node 22)"). Its sealed worker ran out of storage before any test started, so
+  it was red on every run (flyingrobots/bijou#788). `README.md` has a
+  "Platform support" section that says Windows is not supported at present and
+  why. The Windows launcher, its tests and the policy check that a Windows lane
+  must use the native runner all remain, so the lane can be restored by adding
+  its matrix entry back.
+- CI runs the full test suite as four parallel shards for each Node version
+  (job `suite`), where one job ran its 25 chunks in series in 13 to 15 minutes.
+  `BIJOU_VITEST_SHARD=k/n` makes `scripts/run-vitest.mjs` run the k-th of n
+  shares of the chunks; unset, the whole suite runs as before. The interactive
+  smoke, test type-check, canary smoke and showcase build move from the Node 22
+  `test` job into a job of their own (`smoke_gates`) that runs beside it.
+  `scripts/ci-workflow-policy.ts` refuses a workflow whose shard list is not 1
+  to N or whose command names another N. See `docs/guides/sealed-tests.md`.
+  Origin: flyingrobots/bijou#907.
+- The whole-tree ESLint ratchet (`npm run lint:eslint`) lints one target per
+  process and merges the results, where it ran one process over every target.
+  That one process held the typed program for the whole tree and ran out of V8
+  heap, at about 2,000 MB, in hosted CI (job "Verify TypeScript doctrine") and
+  in the sealed worker. Each target has a cache file of its own under
+  `.cache/eslint/`. The findings counted are the same; a file two targets match
+  is counted once.
 - Test-only: the slowest test files run faster, with every case kept. Measured
   alone in the sealed runner: `tests/web-gpu/app-cell-widths.test.ts` 22.8 s
   to 11.0 s (library slides split into four parts, part k takes every fourth
@@ -143,6 +166,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The sealed runner admits a worker on Docker Desktop, whose kernel lists
+  fallback tunnel devices (`tunl0`, `sit0`, `gre0` and their relatives) and the
+  `bonding_masters` control file under `/sys/class/net` even with
+  `--network none`. Every run there was refused with `network interface beyond
+  loopback`, which also stopped the `pre-commit` hook. The seal now reads each
+  entry (`scripts/docker-seal/network-entries.mjs`) and admits loopback, that
+  control file, and a named fallback tunnel device that is down. Any other
+  device, and a fallback tunnel device that is up, is still refused (#910).
 - The sealed runner's local launchers (`scripts/docker-seal/run.mjs` and
   `bootstrap.mjs`) no longer wrap each run in `git locks with`, so `npm test`,
   `npm run soak` and every other local command run on a machine without

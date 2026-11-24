@@ -64,6 +64,20 @@ npm run markdown-font -- examples/markdown-font/sample.md --configure
 
 See the [changelog](docs/CHANGELOG.md) for release details and compatibility changes.
 
+## Platform support
+
+Bijou is developed and verified on macOS and Linux, on Node.js 20 and 22. CI runs
+the full test suite on Linux for both.
+
+> [!NOTE]
+> **Windows is not supported at present.** Nothing verifies Bijou on Windows:
+> the CI job that ran a focused set of tests in native Windows containers was
+> switched off on 2026-11-24, because its worker ran out of storage before any
+> test started, so it failed on every run and proved nothing
+> ([flyingrobots/bijou#788](https://github.com/flyingrobots/bijou/issues/788)).
+> Bijou may well work on Windows, in Windows Terminal or under WSL, but that is
+> untested. Windows support returns when that job does.
+
 ## Keep going
 
 [Documentation](docs/README.md) · [Application guide](docs/guides/getting-started.md) · [Contributor guide](docs/development.md) · [Issues](https://github.com/flyingrobots/bijou/issues) · [License](LICENSE)
