@@ -7,8 +7,8 @@ const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta
 describe('CI isolation policy', () => {
   it('rejects the old host full-suite command', () => {
     const unsealed = workflow.replace(
-      "node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_SHARD=${{ matrix.shard }}/8 npm run test:run'",
-      'BIJOU_VITEST_SHARD=${{ matrix.shard }}/8 npm run test:run',
+      "node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_SHARD=${{ matrix.shard }}/16 npm run test:run'",
+      'BIJOU_VITEST_SHARD=${{ matrix.shard }}/16 npm run test:run',
     );
 
     expect(() => ciWorkflowPolicyFromYaml(unsealed)).toThrow('Full test suite must enter the sealed runner');

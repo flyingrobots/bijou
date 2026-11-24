@@ -8,7 +8,7 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
-- CI's full-suite shards are dealt by measured weight and there are eight of
+- CI's full-suite shards are dealt by measured weight and there are sixteen of
   them for each Node version. With shards cut by position the four took 156 to
   341 s, because ten test files were 46% of the suite's time. Now the heaviest
   file goes first, each to the shard that is lightest so far, using the
