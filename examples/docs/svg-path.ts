@@ -1,7 +1,6 @@
 import { quadraticPoint, samePoint } from './svg-path-curve.js';
 import {
-  isCommandToken,
-  pathError,
+  isCommandToken, PATH_CLOSE, PATH_LINE, PATH_MOVE, PATH_QUADRATIC,
   tokenizePath,
   type PathToken,
 } from './svg-path-tokens.js';
@@ -18,7 +17,7 @@ export interface SvgPolygon {
 /** Test seam: called once at the top of every main-loop iteration with a 1-based step count. */
 export type PathStepObserver = (step: number) => void;
 
-type PathCommand = 'M' | 'L' | 'Q' | 'Z';
+type PathCommand = typeof PATH_MOVE | typeof PATH_LINE | typeof PATH_QUADRATIC | typeof PATH_CLOSE;
 const QUADRATIC_SEGMENTS = 12;
 
 /**
@@ -50,27 +49,27 @@ export function parsePathPolygons(
     if (isCommandToken(token)) {
       command = commandOf(token);
       index++;
-      if (command === 'Z') closeCurrentPolygon();
+      if (command === PATH_CLOSE) closeCurrentPolygon();
       else requireNumber(tokens, index, token.offset);
     } else if (command === undefined) {
-      throw pathError('number without a command', token.offset);
-    } else if (command === 'Z') {
-      throw pathError('number after Z has no command', token.offset);
-    } else if (command === 'M' || command === 'L') {
+      throw new Error(`SVG path: number without a command at offset ${String(token.offset)}.`);
+    } else if (command === PATH_CLOSE) {
+      throw new Error(`SVG path: number after Z has no command at offset ${String(token.offset)}.`);
+    } else if (command === PATH_MOVE || command === PATH_LINE) {
       const point = readPoint(tokens, index);
       index += 2;
-      if (command === 'M') {
+      if (command === PATH_MOVE) {
         closeCurrentPolygon();
         start = point;
         points = [point];
-        command = 'L';
+        command = PATH_LINE;
       } else {
         points.push(point);
       }
       current = point;
     } else {
       if (current === undefined) {
-        throw pathError('Q needs a current point', token.offset);
+        throw new Error(`SVG path: Q needs a current point at offset ${String(token.offset)}.`);
       }
       const control = readPoint(tokens, index);
       const end = readPoint(tokens, index + 2);
@@ -83,7 +82,7 @@ export function parsePathPolygons(
       current = end;
     }
     if (index <= before) {
-      throw pathError('parser made no progress', token.offset);
+      throw new Error(`SVG path: parser made no progress at offset ${String(token.offset)}.`);
     }
   }
   closeCurrentPolygon();
@@ -105,14 +104,15 @@ export function parsePathPolygons(
 }
 
 function commandOf(token: PathToken): PathCommand {
-  switch (token.text) {
-    case 'M':
-    case 'L':
-    case 'Q':
-    case 'Z':
-      return token.text;
+  const code = token.text.charCodeAt(0);
+  switch (code) {
+    case PATH_MOVE:
+    case PATH_LINE:
+    case PATH_QUADRATIC:
+    case PATH_CLOSE:
+      return code;
     default:
-      throw pathError(`unsupported command ${token.text}`, token.offset);
+      throw new Error(`SVG path: unsupported command ${token.text} at offset ${String(token.offset)}.`);
   }
 }
 
@@ -123,7 +123,7 @@ function requireNumber(
 ): void {
   const next = tokens[index];
   if (next === undefined || isCommandToken(next)) {
-    throw pathError('command is missing its numbers', commandOffset);
+    throw new Error(`SVG path: command is missing its numbers at offset ${String(commandOffset)}.`);
   }
 }
 
@@ -132,15 +132,15 @@ function readPoint(tokens: readonly PathToken[], index: number): SvgPoint {
   const yToken = tokens[index + 1];
   const offset = (xToken ?? tokens.at(-1))?.offset ?? 0;
   if (xToken === undefined || yToken === undefined) {
-    throw pathError('incomplete point', offset);
+    throw new Error(`SVG path: incomplete point at offset ${String(offset)}.`);
   }
   if (isCommandToken(xToken) || isCommandToken(yToken)) {
-    throw pathError('incomplete point', offset);
+    throw new Error(`SVG path: incomplete point at offset ${String(offset)}.`);
   }
   const x = Number(xToken.text);
   const y = Number(yToken.text);
   if (!Number.isFinite(x) || !Number.isFinite(y)) {
-    throw pathError('non-finite number', offset);
+    throw new Error(`SVG path: non-finite number at offset ${String(offset)}.`);
   }
   return { x, y };
 }

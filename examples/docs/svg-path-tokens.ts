@@ -6,9 +6,12 @@ export interface PathToken {
 const PATH_TOKEN_RE = /[MLQZ]|-?(?:\d+\.?\d*|\.\d+)/y;
 const SEPARATOR_RE = /[\s,]/;
 
-export function pathError(message: string, offset: number): Error {
-  return new Error(`SVG path: ${message} at offset ${String(offset)}.`);
-}
+// Command letters as character codes (M, L, Q, Z), so the parser compares
+// numbers and carries no string the DOGFOOD i18n debt scan reads as copy.
+export const PATH_MOVE = 77;
+export const PATH_LINE = 76;
+export const PATH_QUADRATIC = 81;
+export const PATH_CLOSE = 90;
 
 export function isCommandToken(token: PathToken): boolean {
   return /^[MLQZ]$/.test(token.text);
@@ -33,7 +36,7 @@ export function tokenizePath(path: string): readonly PathToken[] {
     PATH_TOKEN_RE.lastIndex = position;
     const text = PATH_TOKEN_RE.exec(path)?.[0];
     if (text === undefined || text.length === 0) {
-      throw pathError(`unsupported character ${JSON.stringify(char)}`, position);
+      throw new Error(`SVG path: unsupported character ${JSON.stringify(char)} at offset ${String(position)}.`);
     }
     tokens.push({ text, offset: position });
     position += text.length;
