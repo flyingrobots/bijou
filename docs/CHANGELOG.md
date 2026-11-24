@@ -141,6 +141,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The sealed runner admits a worker on Docker Desktop, whose kernel lists
+  fallback tunnel devices (`tunl0`, `sit0`, `gre0` and their relatives) and the
+  `bonding_masters` control file under `/sys/class/net` even with
+  `--network none`. Every run there was refused with `network interface beyond
+  loopback`, which also stopped the `pre-commit` hook. The seal now reads each
+  entry (`scripts/docker-seal/network-entries.mjs`) and admits loopback, that
+  control file, and a named fallback tunnel device that is down. Any other
+  device, and a fallback tunnel device that is up, is still refused (#910).
 - The sealed runner's local launchers (`scripts/docker-seal/run.mjs` and
   `bootstrap.mjs`) no longer wrap each run in `git locks with`, so `npm test`,
   `npm run soak` and every other local command run on a machine without
