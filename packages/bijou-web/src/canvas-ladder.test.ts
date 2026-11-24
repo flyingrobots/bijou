@@ -50,7 +50,9 @@ describe('mountBijouCanvas() backend ladder', () => {
 
   it('skips a backend that has no factory in auto mode and says so', async () => {
     const env = createCanvasEnv();
-    const handle = await mountAt(env, { presenters: { canvas2d: env.backends.presenters.canvas2d } });
+    const canvas2d = env.backends.presenters.canvas2d;
+    if (canvas2d === undefined) throw new Error('the fake backends supplied no canvas2d presenter factory');
+    const handle = await mountAt(env, { presenters: { canvas2d } });
     expect(handle.backend).toBe('canvas2d');
     expect(handle.fallbackReasons).toEqual([
       { backend: 'webgpu', code: 'BIJOU_WEB_CANVAS_NO_FACTORY', reason: 'no webgpu presenter factory was supplied' },

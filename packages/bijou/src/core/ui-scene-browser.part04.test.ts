@@ -90,9 +90,15 @@ describe('ui-scene-ir/1 browser seam host and receipt', () => {
 
   it('creates no text node for an element without text', () => {
     const host = fakeDocument();
-    const { root } = lowerUiSceneToBrowser(
-      withNode(debuggerScene, 'debugger.tick', { text: undefined }),
-    );
+    const { root } = lowerUiSceneToBrowser({
+      ...debuggerScene,
+      nodes: debuggerScene.nodes.map((node) => {
+        if (node.id !== 'debugger.tick') return node;
+        const { text, ...withoutText } = node;
+        if (text === undefined) throw new Error('the fixture node debugger.tick has no text to remove');
+        return withoutText;
+      }),
+    });
     createUiSceneBrowserDom(root, host);
     expect(host.created.filter((tag) => tag === '#text')).toHaveLength(2);
   });
