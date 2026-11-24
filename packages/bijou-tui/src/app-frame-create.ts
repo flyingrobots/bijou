@@ -1,3 +1,4 @@
+import { resolveClock } from '@flyingrobots/bijou';
 import type { App } from './types.js';
 import type {
   FramedApp,
@@ -16,6 +17,7 @@ import { updateFrameApp } from './app-frame-app-update.js';
 import { renderFrameApp } from './app-frame-app-view.js';
 import { createFocusedPaneMeasureCache } from './app-frame-scroll-measure-cache.js';
 import { createHostedFrameApp } from './app-frame-host.js';
+import { frameKeyConflictInitCommands } from './app-frame-key-conflict-init.js';
 
 /**
  * Create a fully framed TEA app shell.
@@ -41,13 +43,21 @@ export function createFramedApp<PageModel, Msg>(
   const app: App<InternalFrameModel<PageModel, Msg>, FramedAppMsg<Msg>> = {
     init: () => {
       measureCache.invalidate();
-      return initializeFrameApp({
+      const [model, commands] = initializeFrameApp({
         options,
         pagesById: registry.pagesById,
         pageOrder: registry.pageOrder,
         defaultPageId: registry.defaultPageId,
         themeRuntime,
       });
+      if (!controls.notificationOptions.enabled) return [model, commands];
+      const conflictCommands = frameKeyConflictInitCommands({
+        pages: options.pages,
+        frameKeys: controls.frameKeys,
+        keyPriority: options.keyPriority ?? 'frame-first',
+        now: () => resolveClock(controls.resolveContext()).now(),
+      });
+      return [model, [...commands, ...conflictCommands]];
     },
     update: (msg, model) =>
       updateFrameApp(msg, model, {

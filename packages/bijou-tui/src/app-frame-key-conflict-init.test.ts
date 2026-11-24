@@ -1,7 +1,6 @@
 import {
   afterAll,
   beforeAll,
-  collectCommandMessages,
   createFramedApp,
   createKeyMap,
   createTestContext,
@@ -26,8 +25,12 @@ function collidingPage(): Page {
 async function initWarnings(pages: Page[], extra: object = {}): Promise<string[]> {
   const app = createFramedApp({ pages, ...extra });
   const [, cmds] = app.init();
-  const groups = await Promise.all(cmds.map((cmd) => collectCommandMessages(cmd, [])));
-  return groups.flat().flatMap((msg) => {
+  const msgs = await Promise.all(cmds.map((cmd) => cmd(() => undefined, {
+    onPulse: () => ({ dispose: () => undefined }),
+    sleep: () => Promise.resolve(),
+    now: () => 0,
+  })));
+  return msgs.flatMap((msg) => {
     if (!isFrameScopedMsg(msg)) return [];
     return msg.action.type === 'runtime-issue' ? [msg.action.issue.message] : [];
   });
