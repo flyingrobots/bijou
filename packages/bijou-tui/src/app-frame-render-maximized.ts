@@ -1,6 +1,7 @@
 import {
   createSurface,
   type BijouContext,
+  type InlineDirection,
   type Surface,
 } from '@flyingrobots/bijou';
 import type { FramePage } from './app-frame.js';
@@ -38,6 +39,7 @@ export function renderMaximizedPane<PageModel, Msg>(
   maximizedPaneId: string,
   scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
   ctx?: BijouContext,
+  direction?: InlineDirection,
 ): RenderResult {
   const surface = createSurface(bodyRect.width, bodyRect.height);
   const geometry = renderMaximizedPaneInto(
@@ -51,6 +53,7 @@ export function renderMaximizedPane<PageModel, Msg>(
     0,
     scratchPool,
     ctx,
+    direction,
   );
   return {
     surface,
@@ -71,6 +74,7 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
   offsetCol = bodyRect.col,
   scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
   ctx?: BijouContext,
+  direction?: InlineDirection,
 ): FramePaneGeometryResult {
   const themeCtx = resolveRenderCtx(ctx);
   const background = resolveFrameBackgroundToken(themeCtx);
@@ -99,6 +103,7 @@ export function renderMaximizedPaneInto<PageModel, Msg>(
       offsetCol,
       scratchPool,
       ctx,
+      direction,
     );
   }
   const prior = model.scrollByPage[pageId]?.[maximizedPaneId] ?? { x: 0, y: 0 };

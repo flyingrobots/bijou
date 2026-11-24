@@ -1,6 +1,7 @@
 import {
   createSurface,
   type BijouContext,
+  type InlineDirection,
   type Surface,
 } from '@flyingrobots/bijou';
 import type { FramePage } from './app-frame.js';
@@ -32,6 +33,7 @@ export function renderPageContent<PageModel, Msg>(
   bodyRect: LayoutRect,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
   ctx?: BijouContext,
+  direction?: InlineDirection,
 ): RenderResult {
   const surface = createSurface(bodyRect.width, bodyRect.height);
   const geometry = renderPageContentInto(
@@ -44,6 +46,7 @@ export function renderPageContent<PageModel, Msg>(
     0,
     createFramePaneScratchPool(),
     ctx,
+    direction,
   );
   return {
     surface,
@@ -63,6 +66,7 @@ export function renderPageContentInto<PageModel, Msg>(
   offsetCol = bodyRect.col,
   scratchPool: FramePaneScratchPool = createFramePaneScratchPool(),
   ctx?: BijouContext,
+  direction?: InlineDirection,
 ): FramePaneGeometryResult {
   const themeCtx = resolveRenderCtx(ctx);
   const frameBackgroundToken = resolveFrameBackgroundToken(themeCtx);
@@ -90,6 +94,7 @@ export function renderPageContentInto<PageModel, Msg>(
     dockState: model.dockStateByPage[pageId] ?? createPanelDockState(),
     frameBackgroundToken,
     ctx: themeCtx,
+    direction,
   };
   return paintFrameNodeInto(
     layout,

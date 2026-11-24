@@ -60,7 +60,7 @@ describe('frame split panes under rtl', () => {
     expect(start).toEqual({ row: 0, col: 0, width: 6, height: H });
     expect(rtl.paneRects.get('start')).toEqual({ row: 0, col: 15, width: 6, height: H });
     expect(rtl.paneRects.get('end')).toEqual({ row: 0, col: 0, width: 14, height: H });
-    for (const [id, rect] of [['start', start], ['end', end]] as const) {
+    for (const rect of [start, end]) {
       expect(rect).toBeDefined();
       if (rect == null) continue;
       expect(cells(rtl.surface, mirrored(rect))).toEqual(cells(ltr.surface, rect));

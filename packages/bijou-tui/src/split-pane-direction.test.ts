@@ -3,14 +3,15 @@ import { createSplitPaneState, splitPaneLayout, splitPaneResizeBy } from './spli
 import { placeSplitPaneLayout } from './split-pane-direction.js';
 import type { SplitPaneLayout } from './split-pane.js';
 
-type Case = readonly [width: number, ratio: number, minA?: number, minB?: number];
+type Case = readonly [width: number, ratio: number, minA: number, minB: number];
 
 // Odd and even widths, every rounding case of round(ratio * available):
 // exact halves, .5 ties, near-0 and near-1, thirds, and min clamps.
 const CASES: readonly Case[] = [
-  [10, 0.5], [11, 0.5], [12, 0.5], [9, 0.25], [8, 0.25], [7, 1 / 3], [13, 2 / 3],
-  [10, 0], [10, 1], [11, 0.05], [11, 0.95], [6, 0.999], [6, 0.001], [3, 0.5], [2, 0.5],
-  [1, 0.5], [0, 0.5], [21, 0.5, 15, 0], [21, 0.5, 0, 15], [10, 0.5, 8, 8],
+  [10, 0.5, 0, 0], [11, 0.5, 0, 0], [12, 0.5, 0, 0], [9, 0.25, 0, 0], [8, 0.25, 0, 0],
+  [7, 1 / 3, 0, 0], [13, 2 / 3, 0, 0], [10, 0, 0, 0], [10, 1, 0, 0], [11, 0.05, 0, 0],
+  [11, 0.95, 0, 0], [6, 0.999, 0, 0], [6, 0.001, 0, 0], [3, 0.5, 0, 0], [2, 0.5, 0, 0],
+  [1, 0.5, 0, 0], [0, 0.5, 0, 0], [21, 0.5, 15, 0], [21, 0.5, 0, 15], [10, 0.5, 8, 8],
 ];
 
 function tiles(layout: SplitPaneLayout, width: number): void {

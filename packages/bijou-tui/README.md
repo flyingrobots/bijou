@@ -128,6 +128,34 @@ the shared runtime loop still does the heavy lifting, and frame timing/budget
 telemetry stays attached to the frame model for shell-owned UI. For Node-hosted
 apps, `startApp(app)` remains the default bootstrap.
 
+#### Split panes in right-to-left frames
+
+A framed app's `kind: 'split'` layout nodes follow the frame's inline
+direction: the `i18n` runtime's `direction` when it is `ltr` or `rtl`,
+otherwise `ctx.direction`, otherwise `ltr`.
+
+- Under `rtl` in `interactive` and `static` output, a `row` split puts pane A
+  (the logical start) on the physical right and pane B on the left. Pane and
+  divider sizes are exactly the `ltr` sizes, swapped; this holds at every
+  nesting depth. `column` (top and bottom) splits never mirror. `pipe` and
+  `accessible` output keep the `ltr` placement.
+- Drawing and mouse hit-testing use the same pane rectangles, so a click lands
+  on the pane drawn under the pointer. A click on the divider focuses no pane.
+- `Tab` and `Shift+Tab` move focus in logical order (pane A, then pane B) in
+  both directions. The dock keys are physical: `Ctrl+Shift+Left` moves the
+  focused pane toward the physical left, which in a mirrored row split is
+  toward the logical end.
+- A split ratio, including one saved by `serializeLayoutState()` and restored
+  through `initialLayout`, is pane A's share in both directions, so a saved
+  layout means the same thing after a direction change.
+- The text content of a pane, the divider glyph (`│` or an ASCII `|`, both
+  symmetric) and pane IDs are never changed.
+
+`splitPane()`, `splitPaneSurface()` and `splitPaneLayout()` called outside a
+frame do not read a direction and always place pane A on the left.
+`splitPaneResizeBy()` takes a logical delta (positive grows pane A); to move a
+divider physically right by `n` under `rtl`, pass `-n`.
+
 ## Runtime Diagnostics
 
 The EventBus exposes command queue facts through `getCommandDiagnostics()`.

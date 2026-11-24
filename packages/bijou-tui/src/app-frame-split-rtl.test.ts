@@ -40,10 +40,16 @@ const click = (col: number): MouseMsg => ({
 const key = (name: string, mods: Partial<Pick<KeyMsg, 'ctrl' | 'shift'>> = {}): KeyMsg => ({
   type: 'key', key: name, ctrl: mods.ctrl ?? false, alt: false, shift: mods.shift ?? false,
 });
-function bodyLine(f: Frame, model: Model): string {
+function bodyLine(f: Frame, model: Model, row = BODY_ROW): string {
   const view = f.app.view(model);
   if (typeof view === 'string' || !('get' in view)) throw new Error('Expected a Surface view.');
-  return Array.from({ length: view.width }, (_, x) => view.get(x, BODY_ROW).char).join('');
+  return Array.from({ length: view.width }, (_, x) => view.get(x, row).char).join('');
+}
+/** Column of a pane label on the first body row; fails when the label is not drawn. */
+function labelCol(f: Frame, model: Model, label: string): number {
+  const col = bodyLine(f, model, 1).indexOf(label);
+  expect(col).toBeGreaterThanOrEqual(0);
+  return col;
 }
 function press(f: Frame, model: Model, msg: KeyMsg | MouseMsg): Model {
   f.app.view(model);
@@ -57,9 +63,9 @@ describe('framed app split panes follow the frame direction', () => {
     const rtl = frame('rtl');
     expect(bodyLine(ltr, ltr.model).indexOf('¦')).toBe(20);
     expect(bodyLine(rtl, rtl.model).indexOf('¦')).toBe(20);
-    expect(bodyLine(ltr, ltr.model).indexOf('START')).toBeLessThan(20);
-    expect(bodyLine(rtl, rtl.model).indexOf('START')).toBeGreaterThan(20);
-    expect(bodyLine(rtl, rtl.model).indexOf('END')).toBeLessThan(20);
+    expect(labelCol(ltr, ltr.model, 'START')).toBeLessThan(20);
+    expect(labelCol(rtl, rtl.model, 'START')).toBeGreaterThan(20);
+    expect(labelCol(rtl, rtl.model, 'END')).toBeLessThan(20);
   });
 
   it.each([['ltr', 'start', 'end'], ['rtl', 'end', 'start']] as const)(
@@ -78,7 +84,7 @@ describe('framed app split panes follow the frame direction', () => {
     expect(focused(press(f, f.model, click(5)))).toBe('start');
     void f.i18n.setLocale('en', 'rtl');
     expect(focused(press(f, f.model, click(5)))).toBe('end');
-    expect(bodyLine(f, f.model).indexOf('START')).toBeGreaterThan(20);
+    expect(labelCol(f, f.model, 'START')).toBeGreaterThan(20);
   });
 
   it.each(['ltr', 'rtl'] as const)('Tab and Shift+Tab move focus in logical order (%s)', (direction) => {
@@ -94,12 +100,12 @@ describe('framed app split panes follow the frame direction', () => {
     expect(blocked.dockStateByPage['home']?.orderByContainer['s'] ?? ['start', 'end']).toEqual(['start', 'end']);
     const moved = press(rtl, rtl.model, key('left', { ctrl: true, shift: true }));
     expect(moved.dockStateByPage['home']?.orderByContainer['s']).toEqual(['end', 'start']);
-    expect(bodyLine(rtl, moved).indexOf('START')).toBeLessThan(20);
+    expect(labelCol(rtl, moved, 'START')).toBeLessThan(20);
 
     const ltr = frame('ltr');
     const ltrMoved = press(ltr, ltr.model, key('right', { ctrl: true, shift: true }));
     expect(ltrMoved.dockStateByPage['home']?.orderByContainer['s']).toEqual(['end', 'start']);
-    expect(bodyLine(ltr, ltrMoved).indexOf('START')).toBeGreaterThan(20);
+    expect(labelCol(ltr, ltrMoved, 'START')).toBeGreaterThan(20);
   });
 
   it('a serialized ratio is the start pane share in both directions and round-trips unchanged', () => {

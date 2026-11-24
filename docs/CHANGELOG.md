@@ -104,6 +104,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   glyph mapping applies. `pipe` and `accessible` output keep logical order.
   `ltr` output is unchanged.
 
+- Framed app split panes follow the frame's inline direction
+  (flyingrobots/bijou#572). Under `rtl` (the frame `i18n` runtime's direction,
+  else `ctx.direction`) in `interactive` and `static` output, each `row` split
+  puts pane A on the physical right at every nesting depth, with exactly the
+  `ltr` pane and divider sizes; `column` splits never mirror. Drawing and mouse
+  hit-testing share one placement, `Tab` order stays logical, the
+  `Ctrl+Shift+Left`/`Right` dock keys stay physical, and a saved split ratio
+  keeps meaning pane A's share. `pipe`, `accessible` and every `ltr` render are
+  unchanged, and so are the standalone `splitPane*()` functions.
+
 ### Added
 
 - `ui-scene-ir/1` nodes can declare an optional `state.checked` boolean,

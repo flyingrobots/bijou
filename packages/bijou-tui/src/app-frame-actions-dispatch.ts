@@ -20,6 +20,8 @@ import {
   applyToggleMinimize,
 } from './app-frame-actions-panel.js';
 import { cyclePane } from './app-frame-actions-pane.js';
+import { frameInlineDirection, frameMirrorsRowSplits } from './app-frame-split-direction.js';
+import { resolveRenderCtx } from './app-frame-render-surface.js';
 import { scrollFocusedPane } from './app-frame-actions-scroll.js';
 import { switchTab } from './app-frame-actions-tabs.js';
 import type { FocusedPaneMeasureCache } from './app-frame-scroll-measure-cache.js';
@@ -66,9 +68,10 @@ export function applyFrameAction<PageModel, Msg>(
     case 'dock-down':
       return [applyDockMove(model, 'down', pagesById), []];
     case 'dock-left':
-      return [applyDockMove(model, 'left', pagesById), []];
-    case 'dock-right':
-      return [applyDockMove(model, 'right', pagesById), []];
+    case 'dock-right': {
+      const mirrored = frameMirrorsRowSplits(frameInlineDirection(options.i18n), resolveRenderCtx(options.ctx));
+      return [applyDockMove(model, action.type === 'dock-left' ? 'left' : 'right', pagesById, mirrored), []];
+    }
     case 'scroll-up':
     case 'scroll-down':
     case 'page-up':
