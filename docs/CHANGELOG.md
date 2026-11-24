@@ -11,6 +11,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - `scripts/record-gifs.ts` settles each VHS job exactly once. A spawn `error`
   followed by `close` no longer appends a second result or counts a second
   completion; the first outcome wins and spawn failures are still reported.
+- `npm run audit:components` no longer measures a backdrop that
+  `compositeSurface()` dimmed under an overlay as unreadable text. The
+  compositor records, internally and without a new export or Surface field,
+  the rectangles its overlays covered; a cell outside them that still carries
+  the compositor's `dim` is skipped by the contrast check. Text an overlay
+  draws, dim or not, and dim text drawn without a dimming compositor are still
+  measured. The baseline shrinks from 48 to 32 errors: the 16 `modal/*`
+  entries were each its 158-cell dimmed backdrop (#581).
 
 ### Added
 
