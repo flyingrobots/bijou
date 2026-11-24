@@ -27,6 +27,8 @@ export default defineConfig({
   },
   test: {
     include: ['packages/*/src/**/*.test.ts', 'bench/src/**/*.test.ts', 'scripts/**/*.test.ts', 'tests/**/*.test.ts'],
+    // Every test file starts with no default context: see scripts/vitest-setup.ts.
+    setupFiles: ['./scripts/vitest-setup.ts'],
     maxWorkers: 2,
     testTimeout: 60_000,
   },

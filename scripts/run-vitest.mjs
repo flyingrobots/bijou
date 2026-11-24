@@ -11,6 +11,8 @@ const VITEST = resolve(ROOT, 'node_modules', 'vitest', 'vitest.mjs');
 const CHUNK_SIZE = parsePositiveInt(process.env.BIJOU_VITEST_CHUNK_SIZE, 48);
 // Files that share a worker's modules start quickly, so their chunks are larger: fewer Vitest start-ups.
 const SHARED_CHUNK_SIZE = parsePositiveInt(process.env.BIJOU_VITEST_SHARED_CHUNK_SIZE, 96);
+// A file measured at this many seconds or more runs isolated: see the note where `isolated` is built.
+const HEAVY_SECONDS = 2;
 const MAX_WORKERS = parsePositiveInt(process.env.BIJOU_VITEST_MAX_WORKERS, 2);
 const BASE_ARGS = [
   'run',
@@ -39,11 +41,16 @@ const files = listTestFiles();
 // other files see shares its worker's modules (isolation off); the rest keep a graph of their own.
 // BIJOU_VITEST_ISOLATE=all runs every file isolated, to tell a real failure from a shared-state one.
 const isolateAll = process.env.BIJOU_VITEST_ISOLATE === 'all';
-const isolated = new Set(files.filter((file) => isolateAll || needsIsolation(readFileSync(resolve(ROOT, file), 'utf8'))));
+const weights = parseWeights(readFileSync(resolve(ROOT, 'scripts/vitest-weights.json'), 'utf8'));
+// A heavy file also keeps a process of its own. A worker that shares modules keeps what every file
+// loaded, and a run of heavy files in one worker ended with "Worker exited unexpectedly"; a heavy
+// file spends its time in its tests, so loading its own modules costs it little.
+const isolated = new Set(files.filter((file) => isolateAll
+  || (weights.files[file] ?? 0) >= HEAVY_SECONDS
+  || needsIsolation(readFileSync(resolve(ROOT, file), 'utf8'))));
 let mine = files;
 if (shard) {
   // A shard's files are dealt by measured weight (scripts/vitest-weights.json), so shards take similar time.
-  const weights = parseWeights(readFileSync(resolve(ROOT, 'scripts/vitest-weights.json'), 'utf8'));
   const share = assignShards(files, weights, shard.count, isolated)[shard.index - 1];
   mine = share.files;
   process.stdout.write(`vitest shard ${shard.index}/${shard.count}: ${mine.length} of ${files.length} files, about ${share.seconds} s of measured test time\n`);

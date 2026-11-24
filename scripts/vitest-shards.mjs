@@ -69,9 +69,11 @@ export function parseWeights(text) {
  * spies, the environment, the working directory, or the module registry. A file can also ask for
  * it with a comment line `// vitest: isolate`, with the reason after it.
  *
- * Setting or resetting the default context is not on the list. The 133 files that do only that
- * were measured sharing modules with every other shared file, in two groupings and orders, with
- * no failure (2026-11-24), and isolating them was about half of the suite's remaining time.
+ * Setting or resetting the default context is not on the list, because every file starts with it
+ * cleared: `scripts/vitest-setup.ts` runs before each test file and resets it. Without that reset
+ * a leftover pipe-mode context made another file's app quit on `q` (hosted CI, 2026-11-24), since
+ * framework code falls back to the default context. Isolating the 133 files that only set or
+ * reset it was about half of the suite's remaining time.
  */
 export function needsIsolation(source) {
   return ISOLATION_MARKS.some((mark) => mark.test(source));
@@ -84,6 +86,9 @@ const ISOLATION_MARKS = [
   /\bdelete\s+process\.env\b/u,
   /\bprocess\.chdir\(/u,
   /\bglobalThis\.[A-Za-z_$][\w$]*\s*=[^=]/u,
+  // The Node host package registers the default context's initializer when it is first loaded, which a
+  // shared worker does once; a file that tests that package directly loads it for itself.
+  /from\s+['"](?:@flyingrobots\/bijou-node|[./]+\/packages\/bijou-node\/src\/[^'"]*)['"]/u,
 ];
 
 export function isIncludedTestFile(path) {

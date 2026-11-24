@@ -11,12 +11,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - The full test suite runs most files with Vitest's isolation off, so the files
   in a worker share the modules they load; loading them once per file was about
   three quarters of the suite's time. A file that changes shared state (a
-  module mock, a stub, fake timers, a spy, `process.env`, `globalThis` or the
-  working directory) keeps a module graph of its own: 10 of 1,162 files today. A file can ask for isolation with a
+  module mock, a stub, fake timers, a spy, `process.env`, `globalThis`, the
+  working directory or the Node host package), or that is measured at two
+  seconds or more, keeps a module graph of its own. `scripts/vitest-setup.ts`
+  clears the default context before every test file, so one file cannot hand
+  it to the next. A file can ask for isolation with a
   `// vitest: isolate` comment, and `BIJOU_VITEST_ISOLATE=all` isolates every
-  file. In the sealed runner the 1,152 shared files passed in two different
-  groupings and orders, in 159 to 173 s on two workers; fully isolated, a
-  quarter of the suite took 120 s. See `docs/guides/sealed-tests.md`. Origin:
+  file. In the sealed runner the whole suite passed three times in a row in
+  171 to 215 s on two workers; fully isolated, a quarter of it took 120 s. See `docs/guides/sealed-tests.md`. Origin:
   flyingrobots/bijou#907.
 - CI no longer runs the native Windows lane ("Focused Unit Tests (windows,
   Node 22)"). Its sealed worker ran out of storage before any test started, so
