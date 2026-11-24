@@ -1,7 +1,8 @@
 import type { BijouContext } from '../../ports/context.js';
 import type { GradientStop, TokenValue } from '../theme/tokens.js';
-import { lerp3 } from '../theme/gradient.js';
-import { mix } from '../theme/color.js';
+import { progressCells } from './progress-cells.js';
+import { mirrorsLayout, orderForDirection, type InlineDirection } from '../direction/direction.js';
+import { mirrorGlyphs } from '../direction/directional-glyph.js';
 import { sanitizeNonNegativeInt } from '../numeric.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
@@ -26,6 +27,12 @@ export interface ProgressBarOptions {
   labelToken?: TokenValue;
   /** Whether to prepend a percentage label (defaults to `true`). */
   showPercent?: boolean | undefined;
+  /**
+   * Logical layout direction. Overrides `ctx.direction`; absent both, `'ltr'`.
+   * Under `'rtl'` the fill grows from the right edge and the label moves to the
+   * right. Whole cells only; `pipe` and `accessible` output never change.
+   */
+  direction?: InlineDirection | undefined;
   /** Bijou context for I/O, styling, and mode detection. */
   ctx?: BijouContext;
 }
@@ -59,8 +66,10 @@ export function progressBar(
       accessible: () => `${percentLabel} percent complete.`,
       interactive: () => {
         const width = sanitizeNonNegativeInt(options.width, 20);
-        const filledChar = options.filled ?? '\u2588';
-        const emptyChar = options.empty ?? '\u2810';
+        const mirrored = mirrorsLayout({ direction: options.direction, ctx });
+        const swap = (glyph: string): string => (mirrored ? mirrorGlyphs(glyph, 'rtl') : glyph);
+        const filledChar = swap(options.filled ?? '\u2588');
+        const emptyChar = swap(options.empty ?? '\u2810');
         const showPercent = options.showPercent ?? true;
         const filledCount = Math.min(
           width,
@@ -68,43 +77,25 @@ export function progressBar(
         );
 
         const noColor = ctx.theme.noColor;
-        const stops = options.gradient;
         const filledToken = options.filledToken ?? ctx.semantic('info');
         const filledEndToken = options.filledEndToken ?? ctx.semantic('accent');
         const emptyToken = options.emptyToken ?? ctx.ui('trackEmpty');
         const labelToken = options.labelToken ?? ctx.semantic('primary');
 
-        let bar = '';
-        if (noColor) {
-          bar =
-            filledChar.repeat(filledCount) +
-            emptyChar.repeat(width - filledCount);
-        } else if (stops != null && stops.length > 0) {
-          for (let i = 0; i < filledCount; i++) {
-            const t_val = filledCount <= 1 ? 0 : i / (filledCount - 1);
-            const [r, g, b] = lerp3(stops, t_val * (pct / 100));
-            bar += ctx.style.rgb(r, g, b, filledChar);
-          }
-          bar += ctx.style.styled(
-            emptyToken,
-            emptyChar.repeat(width - filledCount),
-          );
-        } else {
-          for (let i = 0; i < filledCount; i++) {
-            const t_val = filledCount <= 1 ? 0 : i / (filledCount - 1);
-            const token = mix(filledToken, filledEndToken, t_val);
-            bar += ctx.style.styled(token, filledChar);
-          }
-          bar += ctx.style.styled(
-            emptyToken,
-            emptyChar.repeat(width - filledCount),
-          );
-        }
+        const cells = progressCells({
+          ctx, pct, width, filledCount, filledChar, emptyChar,
+          gradient: options.gradient, filledToken, filledEndToken, emptyToken,
+        });
+        const bar = mirrored
+          ? cells.empty + orderForDirection(cells.filled, 'rtl').join('')
+          : cells.filled.join('') + cells.empty;
 
         const label = showPercent ? `${percentLabel}%` : '';
-        return label
-          ? `${noColor ? label.padStart(4) : ctx.style.styled(labelToken, label.padStart(4))} ${bar}`
-          : bar;
+        if (!label) return bar;
+        // The label sits on the start side, flush against the bar: left in LTR, right when mirrored.
+        const text = mirrored ? label.padEnd(4) : label.padStart(4);
+        const shown = noColor ? text : ctx.style.styled(labelToken, text);
+        return mirrored ? `${bar} ${shown}` : `${shown} ${bar}`;
       },
     },
     options,

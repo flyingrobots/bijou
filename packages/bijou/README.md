@@ -71,7 +71,7 @@ fake duplication rather than a real second API.
 - **`dag()`**: Causal or dependency-based graphs.
 
 ### Progress and Wayfinding
-- **`progressBar()`**: Determinate completion.
+- **`progressBar()`**: Determinate completion. Takes `direction`; under `'rtl'` the fill grows from the right edge (see Layout Direction).
 - **`spinner()`**: Indeterminate activity.
 - **`breadcrumb()`**: Path context. Mirrors flow and separator under `direction: 'rtl'`.
 - **`stepper()`**: Ordered stages in a linear process.
@@ -259,6 +259,19 @@ think in start and end, not left and right).
   Swap directional glyphs (‹ ›, « », ▸ ◂, ▶ ◀, → ←, ⇒ ⇐ and similar) under
   `'rtl'`. Pass only Component-owned affordances; never code, paths, IDs,
   commands or URLs. ASCII `<` and `>` are never swapped.
+
+Mirrored Components:
+
+- **`progressBar()`**: Under `'rtl'` in `interactive` and `static` output the
+  fill grows from the right edge, the gradient's leading edge is the rightmost
+  cell, and the percentage label moves to the right, flush against the bar
+  (`⠐⠐⠐⠐⠐█████ 50% `). The label text is never reversed. The fill is whole
+  cells only (`round(percent / 100 * width)`), so there is no partial-block
+  glyph to mirror and precision is `1 / width` in both directions. Caller
+  `filled` and `empty` glyphs pass through `mirrorGlyphs()` (`▶` becomes `◀`);
+  symmetric glyphs, including ASCII `#`, `-`, `>` and `<`, are unchanged, so an
+  ASCII fallback needs no mapping. `pipe` (`Progress: 45%`) and `accessible`
+  (`45 percent complete.`) output are identical in both directions.
 
 Illustrative composition for a direction-sensitive Component; per-family
 integration is tracked separately:
