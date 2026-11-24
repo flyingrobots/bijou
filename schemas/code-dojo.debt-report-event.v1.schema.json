@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "code-dojo.debt-report-event.v1",
+  "title": "Code Dojo debt report command line",
+  "description": "One JSON Lines object on stdout (report-written, report-current) or stderr (error) from npm run code-dojo:report.",
+  "type": "object",
+  "required": ["_schema", "kind"],
+  "properties": {
+    "_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "code-dojo.debt-report-event" },
+        "version": { "const": "1.0.0" }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "enum": ["report-written", "report-current"] },
+        "path": { "type": "string" },
+        "totalViolations": { "type": "integer", "minimum": 0 },
+        "_schema": true
+      },
+      "required": ["kind", "path", "totalViolations"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "error" },
+        "code": { "enum": ["report-stale", "live-needs-out", "bad-arguments", "report-failed"] },
+        "message": { "type": "string" },
+        "_schema": true
+      },
+      "required": ["kind", "code", "message"],
+      "additionalProperties": false
+    }
+  ]
+}

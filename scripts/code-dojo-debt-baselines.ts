@@ -27,6 +27,29 @@ export function loadCodeDojoBaselineCounts(root: string): CodeDojoBaselineCounts
   };
 }
 
+export interface CodeDojoEslintRuleCount {
+  readonly ruleId: string;
+  readonly count: number;
+}
+
+export function loadCodeDojoEslintRules(root: string): readonly CodeDojoEslintRuleCount[] {
+  const rules = readArrayBaseline(
+    resolve(root, eslintBaselinePath),
+    'code-dojo.eslint-baseline.v1',
+    'rules',
+  );
+  return rules.map((rule) => {
+    if (!isRecord(rule) || typeof rule['ruleId'] !== 'string' || !isNonNegativeInteger(rule['count'])) {
+      throw new Error(`${eslintBaselinePath} has a malformed rule entry`);
+    }
+    return { ruleId: rule['ruleId'], count: rule['count'] };
+  });
+}
+
+export function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
+}
+
 function readArrayBaseline(path: string, schema: string, key: string): readonly unknown[] {
   const parsed = readJsonObject(path);
   const values = parsed[key];
