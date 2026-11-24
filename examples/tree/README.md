@@ -22,6 +22,14 @@ npx tsx examples/tree/main.ts
 - choose `dag()` when multiple parents or dependency flow matter
 - choose `table()` when comparison across attributes matters more than nesting
 
+## Right-to-left layout
+
+Pass `direction: 'rtl'`, or create the context with `direction: 'rtl'`. In `interactive` and
+`static` output the tree indents from the right and its connectors mirror
+(`├─` becomes `─┤`, `└─` becomes `─┘`; `│` and `─` map to themselves). Lines are padded on the left to the
+widest line by display width, so no width option is needed. Labels are never reversed. `pipe` and
+`accessible` output keep the logical indented order.
+
 ## What this example proves
 
 - `tree()` as a passive hierarchy renderer

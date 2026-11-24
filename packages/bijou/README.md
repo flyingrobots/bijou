@@ -66,7 +66,7 @@ fake duplication rather than a real second API.
 - **`confirm()`**: Strictly binary decisions.
 
 ### Hierarchy and Chronology
-- **`tree()`**: Parent/child nesting.
+- **`tree()`**: Parent/child nesting. Indents from the right and mirrors connectors under `direction: 'rtl'`.
 - **`timeline()`**: Sequential, time-ordered events.
 - **`dag()`**: Causal or dependency-based graphs.
 
@@ -259,6 +259,7 @@ think in start and end, not left and right).
   Swap directional glyphs (‹ ›, « », ▸ ◂, ▶ ◀, → ←, ⇒ ⇐ and similar) under
   `'rtl'`. Pass only Component-owned affordances; never code, paths, IDs,
   commands or URLs. ASCII `<` and `>` are never swapped.
+- **Mirrored Components**: `tree()`, `enumeratedList()` and `accordion()` indent from the right under `'rtl'`, padded to their widest line.
 
 Illustrative composition for a direction-sensitive Component; per-family
 integration is tracked separately:

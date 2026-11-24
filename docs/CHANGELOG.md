@@ -83,6 +83,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   hero perf overlay reads memory through a port with a Node and a browser
   adapter. Their terminal output is unchanged (#809).
 
+- `tree()`, `enumeratedList()` and `accordion()` mirror under right-to-left
+  layout (flyingrobots/bijou#622). With `direction: 'rtl'` (a new option on
+  each, as on `breadcrumb()`) or an `rtl` context, `interactive` and `static`
+  output indents from the right: tree connectors mirror by explicit mapping
+  (`├` to `┤`, `└` to `┘`), list markers keep their text and sit on the right
+  edge, and the accordion disclosure glyph follows the title (`▶` to `◀`; `▼`
+  is not directional). Lines are padded to the widest line by display width, so
+  no width option exists. Labels, paths and IDs are never changed, `pipe` and
+  `accessible` output keep logical order, and `ltr` output is unchanged.
+
 ### Changed
 
 - The DOGFOOD docs SVG path parser (`examples/docs/svg-path.ts`) is total and
