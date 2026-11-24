@@ -1,0 +1,9 @@
+{"atMs":0,"kind":"session","payload":{"claim":"frame-playback","clock":"mock","context":{"colorLevel":null,"mode":"static","theme":null},"label":"golden","pulses":"script","source":"test","viewport":{"columns":2,"rows":1}},"schema":"bijou-replay-event/1","seq":0,"tick":0}
+{"atMs":0,"kind":"frame","payload":{"cells":[["é",0],["😀",1]],"hash":"sha256:3e285a48879951c543928580df6ee2226847c8b289f232013b40c27487569e2a","height":1,"index":0,"styles":[{},{"fg":[255,0,0],"modifiers":["bold"]}],"width":2},"schema":"bijou-replay-event/1","seq":1,"tick":0}
+{"atMs":0,"kind":"command","payload":{"cmd":0,"phase":"start"},"schema":"bijou-replay-event/1","seq":2,"tick":0}
+{"atMs":16,"kind":"input","payload":{"msg":{"alt":false,"ctrl":false,"key":"q","shift":false,"type":"key"},"origin":"script"},"schema":"bijou-replay-event/1","seq":3,"tick":0}
+{"atMs":32,"kind":"pulse","payload":{"dt":0.016,"origin":"script"},"schema":"bijou-replay-event/1","seq":4,"tick":0}
+{"atMs":32,"kind":"resize","payload":{"cmd":0,"columns":3,"origin":"command","rows":2},"schema":"bijou-replay-event/1","seq":5,"tick":1}
+{"atMs":32,"kind":"command","payload":{"cmd":0,"outcome":"message","phase":"settle"},"schema":"bijou-replay-event/1","seq":6,"tick":1}
+{"atMs":48,"kind":"debug-fact","payload":{"name":"focus.target","value":{"Z":1,"a":0,"note":"say \"hi\"\n","ｚ":"bmp","😀":"astral"}},"schema":"bijou-replay-event/1","seq":7,"tick":1}
+{"atMs":48,"kind":"end","payload":{"frames":1,"pendingCommands":0,"reason":"steps-complete"},"schema":"bijou-replay-event/1","seq":8,"tick":1}
