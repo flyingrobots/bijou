@@ -16,6 +16,7 @@ const OWN_TESTS = new Set(['grapheme-uax11.test.ts']);
 const TEST_FILES: readonly (readonly [string, RegExp])[] = [
   ['packages/bijou/src/core/text', /\.test\.ts$/u],
   ['packages/bijou/src/core/layout', /\.test\.ts$/u],
+  ['packages/bijou/src/core/components', /^(table|constrain)[^/]*\.test\.ts$/u],
   ['packages/bijou-tui/src', /^(layout|surface-layout)[^/]*\.test\.ts$/u],
 ];
 
