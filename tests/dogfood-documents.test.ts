@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { createI18nRuntime } from '../packages/bijou-i18n/src/index.js';
+import { createI18nRuntime, createRuntimeLocalizationPort } from '../packages/bijou-i18n/src/index.js';
 import { exampleDocsKey } from '../examples/_shared/document-key.js';
 import { documentKeysRead, readExampleDocsDocument as readFromNode } from '../examples/_shared/documents.js';
 import { readExampleDocsDocument as readFromTable } from '../examples/_shared/documents.browser.js';
@@ -10,6 +10,7 @@ import { GUIDE_DOCS } from '../examples/docs/app-guide-catalog.js';
 import { collectDogfoodMarkdownDocuments } from '../examples/docs/i18n-debt-markdown-discovery.js';
 import { defaultMarkdownTemplateValues, readRepoFile } from '../examples/docs/i18n-debt-io.js';
 import { DOGFOOD_I18N_DEBT_SOURCES } from '../examples/docs/i18n-debt-sources.js';
+import { dogfoodI18nCatalogsForLocale } from '../examples/docs/i18n/dogfood-catalog.js';
 import { DOGFOOD_LOCALE_OPTIONS } from '../examples/docs/locale.js';
 import { dogfoodBrowserData, DOGFOOD_DATA_DIR } from '../scripts/dogfood-browser-data.js';
 
@@ -28,7 +29,10 @@ const sha256 = (text: string): string => createHash('sha256').update(text).diges
 describe('the DOGFOOD document table', () => {
   it('holds exactly the documents the app reads, in every locale', () => {
     for (const { id } of DOGFOOD_LOCALE_OPTIONS) {
-      const i18n = createI18nRuntime({ locale: id, direction: 'ltr' });
+      const i18n = createRuntimeLocalizationPort(createI18nRuntime({
+        locale: id, direction: 'ltr', fallbackLocale: 'en',
+        fallbackCatalogs: dogfoodI18nCatalogsForLocale('en'), catalogs: dogfoodI18nCatalogsForLocale(id),
+      }));
       for (const guide of GUIDE_DOCS) guideDocBody(guide, i18n);
     }
     expect(Object.keys(table).sort()).toEqual(documentKeysRead());

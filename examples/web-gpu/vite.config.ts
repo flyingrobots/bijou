@@ -46,7 +46,7 @@ export default defineConfig({
       // DOGFOOD reads documents through one seam, examples/_shared/documents.ts
       // (the live file, then the verified corpus). The page reads a table
       // generated from the same documents; nothing from Node is imported.
-      { find: /\/_shared\/documents\.js$/u, replacement: fileURLToPath(new URL('../_shared/documents.browser.ts', import.meta.url)) },
+      { find: /^(?:\.\.?\/)+_shared\/documents\.js$/u, replacement: fileURLToPath(new URL('../_shared/documents.browser.ts', import.meta.url)) },
       // The shadcn components' own imports, as components.json names them.
       { find: /^@\//u, replacement: fileURLToPath(new URL('src/', import.meta.url)) },
     ],
