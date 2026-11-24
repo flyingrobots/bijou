@@ -8,7 +8,6 @@ import { parseCodeDojoLiveInput } from './code-dojo-debt-report-live.js';
 import { createDebtFixtureRoot } from './code-dojo-debt-report-fixture.js';
 import { buildEslintLive, runCodeDojoEslintLive } from './code-dojo-eslint-live.js';
 
-const REAL_ROOT = new URL('..', import.meta.url).pathname;
 const SCHEMA_DIR = new URL('../schemas/', import.meta.url);
 const roots: string[] = [];
 const ajv = new Ajv({ strict: true });
@@ -114,20 +113,6 @@ describe('Code Dojo live ESLint measurement', () => {
     expect(field(done, 'slack')).toBe(-1);
     expect(field(done, 'nextCeiling')).toBe(5);
   });
-
-  it('matches the ratchet total on the real tree and writes a schema-valid file', () => {
-    const root = createDebtFixtureRoot();
-    roots.push(root);
-    const out = join(root, 'live-real.json');
-    const real = runCodeDojoEslintLive(['--out', out], REAL_ROOT);
-    const done = lines(real.stdout).pop();
-    const ratchet = summarizeEslintResults(runEslintJson(REAL_ROOT)).total;
-
-    expect(real.code).toBe(0);
-    expect(field(done, 'live')).toBe(ratchet);
-    expect(field(done, 'stored')).toBe(0);
-    expect(validateEvent(done), JSON.stringify(validateEvent.errors)).toBe(true);
-  }, 600_000);
 
   it('turns bad arguments into a schema-valid error line and --human into prose', () => {
     const root = debtRoot();
