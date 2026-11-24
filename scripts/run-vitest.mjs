@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { chunkFiles, isIncludedTestFile, parseShard, selectShard } from './vitest-shards.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const VITEST = resolve(ROOT, 'node_modules', 'vitest', 'vitest.mjs');
@@ -23,8 +24,21 @@ if (args.length > 0) {
   process.exit(runVitest([...BASE_ARGS, ...args]));
 }
 
+// BIJOU_VITEST_SHARD=k/n runs the k-th of n shares of the chunks, so n runners can split the suite.
+let shard;
+try {
+  shard = parseShard(process.env.BIJOU_VITEST_SHARD);
+} catch (error) {
+  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+  process.exit(2);
+}
 const files = listTestFiles();
-const chunks = chunk(files, CHUNK_SIZE);
+const allChunks = chunkFiles(files, CHUNK_SIZE);
+const chunks = selectShard(allChunks, shard);
+if (shard) {
+  const count = chunks.reduce((sum, group) => sum + group.length, 0);
+  process.stdout.write(`vitest shard ${shard.index}/${shard.count}: ${chunks.length} of ${allChunks.length} chunks, ${count} of ${files.length} files\n`);
+}
 
 for (const [index, group] of chunks.entries()) {
   process.stdout.write(`\nvitest chunk ${index + 1}/${chunks.length} (${group.length} files)\n`);
@@ -46,14 +60,6 @@ function parsePositiveInt(raw, fallback) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function chunk(values, size) {
-  const chunks = [];
-  for (let start = 0; start < values.length; start += size) {
-    chunks.push(values.slice(start, start + size));
-  }
-  return chunks;
-}
-
 function listTestFiles() {
   return walk(ROOT)
     .map((path) => relative(ROOT, path).replaceAll('\\', '/'))
@@ -70,13 +76,4 @@ function walk(dir) {
     return stat.isFile() ? [path] : [];
   });
   return entries;
-}
-
-function isIncludedTestFile(path) {
-  return (
-    /^packages\/[^/]+\/src\/.*\.test\.ts$/u.test(path)
-    || /^bench\/src\/.*\.test\.ts$/u.test(path)
-    || /^scripts\/.*\.test\.ts$/u.test(path)
-    || /^tests\/.*\.test\.ts$/u.test(path)
-  );
 }
