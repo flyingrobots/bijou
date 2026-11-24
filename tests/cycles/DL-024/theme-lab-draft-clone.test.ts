@@ -12,9 +12,8 @@ import {
 } from '../../../examples/docs/dogfood-shell-themes.js';
 import { themeLabProvenanceLines } from '../../../examples/docs/app-theme-lab-provenance.js';
 
-const THEMES: ReadonlyArray<readonly [string, Theme]> = [
-  ...Object.entries(PRESETS).flatMap(([id, theme]): ReadonlyArray<readonly [string, Theme]> =>
-    theme === undefined ? [] : [[id, theme]]),
+const THEMES: readonly (readonly [string, Theme])[] = [
+  ...Object.entries(PRESETS),
   ['dogfood-dark', DOGFOOD_DARK_THEME],
   ['dogfood-light', DOGFOOD_LIGHT_THEME],
 ];

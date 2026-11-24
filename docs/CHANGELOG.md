@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The Theme Lab draft theme keeps its rule provenance. `cloneThemeForThemeLabEditor()`
+  no longer hand-copies each token family: it copies through
+  `renameRuleAuthoredTheme()`, so a field added to `Theme` later is carried
+  and `ruleAuthoredDefinitions(draft)` returns the base theme's definitions.
+  The "Why this value" panel now inspects the draft being edited rather than
+  the unedited base, and reset restores value and provenance together (#503).
+
 - `scripts/record-gifs.ts` settles each VHS job exactly once. A spawn `error`
   followed by `close` no longer appends a second result or counts a second
   completion; the first outcome wins and spawn failures are still reported.
