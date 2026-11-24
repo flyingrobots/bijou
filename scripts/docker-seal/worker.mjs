@@ -42,6 +42,16 @@ export async function inspectWorker(name, cleanup = false) {
   if (/No such (object|container):/i.test(result.output.toString())) return null;
   throw new Error(`Cannot establish Docker worker state: ${result.output.toString()}`);
 }
+/**
+ * Refuse early when a worker is already in use, before any snapshot or
+ * dependency work. startWorker() repeats these checks and stays the atomic
+ * admission for simultaneous launches.
+ */
+export async function assertWorkerFree(name) {
+  const marker = quarantine(name);
+  if (existsSync(marker)) throw new Error(markerRefusal(name, marker));
+  if ((await inspectWorker(name))?.State.Running) throw new Error(`Worker already active: ${name}. ${BUSY}`);
+}
 export async function startWorker(name, image, network) {
   const marker = quarantine(name);
   if (existsSync(marker)) throw new Error(markerRefusal(name, marker));

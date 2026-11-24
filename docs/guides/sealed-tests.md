@@ -21,7 +21,7 @@ fixed name, and a second run started while it is active is refused at once
 with `Worker already active`; it does not wait. Run it again when the first
 finishes. A caller that wants runs to queue, such as several agents sharing a
 workstation, wraps its own command in a lock of its choosing, for example
-`git locks with --wait 600 <key> -- npm test` where
+`git locks with --job "seal-$$" --holder "${USER:-me}" --wait 600 <key> -- npm test` where
 [git-locks](https://github.com/git-stunts/locks) is installed. That is the
 caller's choice and never the repository's requirement.
 Bootstrap refuses an absent base image instead of downloading it without
