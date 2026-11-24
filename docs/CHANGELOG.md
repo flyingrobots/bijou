@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The `bijou-tui` raytrace vector helpers (`raytraceAdd`, `raytraceSub`,
+  `raytraceScale`, `raytraceCross`, `raytraceNormalize`, `raytraceReflect`)
+  accept an optional `target` of the new `RaytraceVector3Mutable` type. The
+  result is written into it and returned, so CPU-bound loops allocate nothing
+  per call; the target may alias any input, and results equal the allocating
+  form bit for bit. Calls without a target are unchanged (#348).
 - `npm run code-dojo:report` writes the Code Dojo debt aggregate, next goalpost
   target, per-source counts, top ESLint rules and optional live ESLint data to
   `docs/code-dojo/debt-report.json` as a `code-dojo.debt-report.v1` document,

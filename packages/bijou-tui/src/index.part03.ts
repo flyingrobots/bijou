@@ -69,6 +69,7 @@ export { evaluateSurfaceBudget } from './surface-budget.js';
 // Shader raytrace helpers
 export type {
   RaytraceVector3,
+  RaytraceVector3Mutable,
   RaytraceScreenPoint,
   RaytraceRay,
   RaytraceSphere,

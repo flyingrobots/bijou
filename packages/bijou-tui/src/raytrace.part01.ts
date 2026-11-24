@@ -1,5 +1,7 @@
 import { raytraceAdd, raytraceCross, raytraceLength, raytraceNormalize, raytracePlaneHit, raytraceScale, raytraceSphereHit, raytraceSub } from './raytrace.part02.js';
 export type RaytraceVector3 = readonly [number, number, number];
+/** A caller-owned vector that the `target` overloads of the raytrace helpers write into. */
+export type RaytraceVector3Mutable = [number, number, number];
 export type RaytraceScreenPoint = readonly [number, number];
 export interface RaytraceRay {
   readonly origin: RaytraceVector3;
