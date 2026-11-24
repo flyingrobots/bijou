@@ -1,6 +1,6 @@
 # bijou-fun demos
 
-Reference for `examples/fun/`: the demo contract, the shell, and the three demos that exist today. Origin:
+Reference for `examples/fun/`: the demo contract, the shell, and the demos that exist today. Origin:
 flyingrobots/bijou#888.
 
 ## Contract
@@ -30,6 +30,18 @@ Other mouse actions are dropped.
 | `rainbow-gradient` | none | `space` |
 | `wormhole` | 45 seeded particles and the render mode | `m` toggles braille and ascii |
 | `metaballs` | five blobs bouncing in the unit square, and the pointer | pointer steers a sixth blob |
+| `fluid` | up to 1,500 seeded particles in a fixed tank, the source side, the pour, a pending shake | `p` pour, `t` source side, `z` `x` `c` shake, `r` reset, `h` card |
+| `flip-fluid` | a FLIP fluid (grid and up to 8,000 particles) in the same tank, and the obstacle | the fluid keys, and `w` `a` `s` `d` or `up` `down` move the obstacle |
+
+### The fluid demos
+
+Both keep their whole simulation in their state and replace it on every pulse, so a session never changes under another
+(`FlipFluid.clone()` copies the grid and particles before a step). A pulse is one fixed step whatever its `dt`.
+Pouring takes randomness from the seed (`random.ts`) in the state. The tank is a fixed 80 by 22 cells
+(`demos/tank.ts`): a pane of another size centres it, or crops it evenly, and a resize never touches the fluid.
+`p` pours for the next five pulses, so holding it, as key repeat does, keeps pouring. A shake waits for the next
+pulse. The shell takes the digits and the left and right arrows, so the shake keys are `z`, `x`, `c` and the obstacle
+moves with `w a s d` and `up` `down`. Space pauses; the footer shows it.
 
 ## In the browser
 

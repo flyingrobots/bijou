@@ -48,3 +48,28 @@ pulses of 1/30 s. Origin: flyingrobots/bijou#888.
 | --- | --- | --- | --- |
 | FD-33 | `funBuild` builds the shell from the registry or from the entries it is given. | `shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu` | Implemented |
 | FD-34 | A demo that throws in `view` is painted as a failure; header, footer and other demos work. | `paints the failure in the pane and keeps the header and footer`, `lets the reader switch to a demo that works` | Implemented |
+
+## Fluid demos: `examples-fun-fluid.test.ts`, `examples-fun-fluid-edges.test.ts`
+
+The state hash is sha256 of the particle positions and velocities (the FLIP demo adds its grid velocities) after 300
+pulses from seed 1888: 60 pulses with a pour key each, a shake, and 240 more. Origin: flyingrobots/bijou#889.
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-40 | Both fluid demos are registered, with their names. | `the registry lists both fluid demos after the first three` | Implemented |
+| FD-41 | From a fixed seed and a scripted input the state after 300 steps has the recorded hash, on every run. | `<id> reaches the recorded state hash after 300 steps, and the same one on every run` | Implemented |
+| FD-42 | Two instances share no state. | `<id> gives two instances no shared state` | Implemented |
+| FD-43 | The step is fixed: the pulse `dt` changes nothing. | `<id> ignores the pulse dt: the step is fixed` | Implemented |
+| FD-44 | The seed drives the randomness; the same inputs give the same state. | `<id> reads its randomness from the seed`, `<id> follows a seeded input list to the same state twice` | Implemented |
+| FD-45 | `r` returns the fluid to its start. | `<id> resets to its start on r` | Implemented |
+| FD-46 | `p` pours from the side `t` picks; `w a s d` move the dam break's obstacle. | `pouring adds fluid, from the side that t picks`, `the dam break pours and moves its obstacle` | Implemented |
+| FD-47 | A paused session keeps its fluid and takes keys. | `a session paused by space keeps its fluid and still takes keys` | Implemented |
+| FD-50 | Zero particles stay finite and paint. | `the particle fluid starts empty, paints, and steps with nothing to move`, `a dam break with zero particles stays finite and paints` | Implemented |
+| FD-51 | A shake on the first pulse is safe. | `shaking an empty tank does nothing`, `shaking the dam break on its first pulse gives finite positions that differ from the unshaken run` | Implemented |
+| FD-52 | A pane resized mid-run paints at every size and leaves the fluid as it was. | `<id> paints every size and keeps its fluid as it was` | Implemented |
+| FD-53 | A long pour stops at the particle cap. | `stops the particle fluid at its cap`, `stops the dam break at its buffer` | Implemented |
+| FD-54 | 5,000 steps of seeded input keep positions finite and the particle count bounded. | `the particle fluid keeps finite positions and a bounded particle count`, `the dam break keeps finite positions and a bounded particle count` | Implemented |
+
+The fluid demos also fall under FD-02 (digests at 80x24 and 177x53), FD-03, FD-10, FD-11 and FD-14, and their 80x24
+text frames are `tests/fixtures/examples-fun/frames/fluid-80x24.txt` and `flip-fluid-80x24.txt`.
+

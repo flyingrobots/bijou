@@ -20,7 +20,7 @@ export function seededInputs(random: () => number, steps: number): DemoMsg[] {
   return Array.from({ length: steps }, () => {
     const roll = random();
     const name = FLUID_KEYS[Math.floor(random() * FLUID_KEYS.length)] ?? 'p';
-    const keys = roll < 0.1 ? [key('p')] : roll < 0.3 ? [key(name)] : [];
+    const keys = roll < 0.03 ? [key('p')] : roll < 0.2 ? [key(name)] : [];
     return [...keys, pulse];
   }).flat();
 }

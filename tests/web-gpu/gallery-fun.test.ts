@@ -9,7 +9,8 @@ import { funBuild } from '../../examples/fun/browser.js';
 import { GALLERY_DEMOS } from '../../examples/web-gpu/src/gallery/demos.js';
 import { cellsOf, funContext } from '../helpers/fun-demos.js';
 
-const ctx = funContext(100, 30);
+// Wide enough for the header to list every demo by name.
+const ctx = funContext(260, 30);
 const key = (name: string): KeyMsg => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false });
 const move = (col: number, row: number): MouseMsg =>
   ({ type: 'mouse', button: 'none', action: 'move', col, row, shift: false, alt: false, ctrl: false });
@@ -56,8 +57,9 @@ describe('the gallery entry for the fun shell', () => {
   it('shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu', () => {
     const app = funBuild(1888, [...demos, stub]).build(ctx);
     expect(rowText(frameOf(app, []), 0)).toContain('Stub Demo');
-    expect(rowText(frameOf(app, [key('4')]), 29)).toContain('A demo only the test registers');
-    expect(rowText(frameOf(app, [key('4'), move(5, 3), move(6, 3)]), 1)).toContain('moves 2');
+    const last = key(String(demos.length + 1));
+    expect(rowText(frameOf(app, [last]), 29)).toContain('A demo only the test registers');
+    expect(rowText(frameOf(app, [last, move(5, 3), move(6, 3)]), 1)).toContain('moves 2');
   });
 
   it('names no fun demo anywhere in the showcase source', () => {

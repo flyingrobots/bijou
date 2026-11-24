@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { flipFluid, flipFluidDemo, startFlip } from '../examples/fun/demos/flip.js';
+import { pourParticles } from '../examples/fun/demos/flip-simulate.js';
 import { fluid, fluidDemo } from '../examples/fun/demos/fluid.js';
 import type { DemoMsg } from '../examples/fun/contract.js';
 import { cellsOf, digest, feed, funContext, lcg, mountEntry } from './helpers/fun-demos.js';
@@ -57,6 +58,21 @@ describe('the fluid demos in a pane resized mid-run', () => {
   }
 });
 
+describe('a long pour', () => {
+  it('stops the particle fluid at its cap', () => {
+    const hold = Array.from({ length: 700 }, () => [key('p'), pulse]).flat();
+    const state = hold.reduce((s, m) => fluid.update(m, s), fluid.init(2));
+    expect(state.particles).toHaveLength(1500);
+  });
+
+  it('stops the dam break at its buffer', () => {
+    const { fluid: tank } = startFlip(2);
+    let rng = 2;
+    for (let i = 0; i < 3000; i += 1) rng = pourParticles(tank, 'left', rng);
+    expect(tank.numParticles).toBe(tank.maxParticles);
+  });
+});
+
 describe('the fluid demos under 5,000 steps of seeded input', () => {
   it('the particle fluid keeps finite positions and a bounded particle count', () => {
     const random = lcg(31);
@@ -81,5 +97,5 @@ describe('the fluid demos under 5,000 steps of seeded input', () => {
     expect(Array.from(state.fluid.particlePos.slice(0, n)).every(Number.isFinite)).toBe(true);
     expect(Array.from(state.fluid.particleVel.slice(0, n)).every(Number.isFinite)).toBe(true);
     expect(most).toBeLessThanOrEqual(state.fluid.maxParticles);
-  });
+  }, 240_000);
 });

@@ -119,6 +119,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   total uses `summarizeEslintResults`, the function `lint:eslint` uses. It is
   not wired into CI, hooks or any gate, and no baseline or verdict changed
   (#369).
+- `examples/fun` gains two fluid demos ported from the owner's bijou-fun
+  project: `fluid` (a particle fluid tank around a hidden well) and
+  `flip-fluid` (a FLIP dam break with a movable obstacle). Their simulation
+  state lives in the demo's model and advances one fixed step per pulse,
+  pouring draws from the seeded generator, and the pour, source side, obstacle,
+  shake and reset keys are handled in each demo's own `update`. The shell's
+  digits and left and right arrows switch demos, so the shake keys are `z`,
+  `x`, `c` and the obstacle moves with `w a s d`. Both appear in the browser
+  gallery through the registry alone. See `docs/topics/fun-demos/README.md`.
+  Origin: flyingrobots/bijou#889.
 
 ### Fixed
 
