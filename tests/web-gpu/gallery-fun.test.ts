@@ -57,7 +57,8 @@ describe('the gallery entry for the fun shell', () => {
   it('shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu', () => {
     const app = funBuild(1888, [...demos, stub]).build(ctx);
     expect(rowText(frameOf(app, []), 0)).toContain('Stub Demo');
-    const last = key(String(demos.length + 1));
+    // `left` from the first demo wraps to the last, which is the stub whatever the registry holds.
+    const last = key('left');
     expect(rowText(frameOf(app, [last]), 29)).toContain('A demo only the test registers');
     expect(rowText(frameOf(app, [last, move(5, 3), move(6, 3)]), 1)).toContain('moves 2');
   });

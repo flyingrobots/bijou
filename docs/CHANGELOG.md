@@ -132,6 +132,18 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   sends to every demo before its first pulse and whenever the screen changes;
   existing demos ignore it. See `docs/topics/fun-demos/README.md`.
   Origin: flyingrobots/bijou#889.
+- `npm run fun` has two more demos: the outline font renderer and the 3D text
+  cylinder, ported from bijou-fun. Both draw Space Mono Bold Italic
+  (`assets/fonts/space-mono`, SIL Open Font License 1.1, with its licence text,
+  listed in the new `NOTICE`) parsed with `opentype.js`, which was already a
+  development dependency and is in no published package. The font reaches the
+  demos through a port: the terminal entry reads the file by a path from its own
+  module and the gallery's `fun` entry fetches it (`loadFunBuild`), so a demo
+  module reads no file and nothing is read at import. A missing or unparseable
+  font shows a message in the demo's pane and leaves the shell and the other
+  demos working. A demo may take text (`captures` in the contract): the shell
+  then sends it every key but `ctrl+c`, and the font demos type, delete, clear
+  and hide the HUD in their own `update`.
 
 ### Fixed
 
