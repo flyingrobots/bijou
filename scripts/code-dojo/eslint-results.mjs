@@ -70,3 +70,15 @@ export function summarizeEslintResults(results) {
 
   return { total, errors, warnings, rules };
 }
+
+/** Per-file diagnostic counts, counted exactly as summarizeEslintResults counts `total`. */
+export function summarizeEslintFiles(results, root) {
+  const files = [];
+  for (const result of results) {
+    const count = (result.messages ?? []).length;
+    if (count === 0) continue;
+    const relative = path.relative(root, result.filePath).split(path.sep).join("/");
+    files.push({ path: relative, count });
+  }
+  return files.sort((a, b) => b.count - a.count || a.path.localeCompare(b.path));
+}

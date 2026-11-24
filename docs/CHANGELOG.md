@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The `bijou-tui` raytrace vector helpers (`raytraceAdd`, `raytraceSub`,
+  `raytraceScale`, `raytraceCross`, `raytraceNormalize`, `raytraceReflect`)
+  accept an optional `target` of the new `RaytraceVector3Mutable` type. The
+  result is written into it and returned, so CPU-bound loops allocate nothing
+  per call; the target may alias any input, and results equal the allocating
+  form bit for bit. Calls without a target are unchanged (#348).
 - `npm run code-dojo:cycles` holds the repository's runtime import cycles to a
   checked-in inventory, `scripts/code-dojo/baselines/runtime-scc.json`: the
   strongly connected components of the runtime import graph, built from
@@ -24,6 +30,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   with `--check` for drift and `--live-input`/`--out` for a live artifact. The
   numbers come from the same `summarizeCodeDojoDebt()` the `code-dojo:debt`
   gate uses, which is unchanged. JSON Schemas are in `schemas/` (#603).
+- `npm run code-dojo:live` runs the ESLint ratchet's own analysis and writes a
+  `code-dojo.eslint-live.v1` file (default `.cache/code-dojo/eslint-live.json`)
+  for `code-dojo:report --live-input`. It prints one JSON Lines event with the
+  stored ESLint ceiling, the live count, the signed slack and the next legal
+  ceiling (`--human` for prose, `--schema` and `--help` for the contract). The
+  total uses `summarizeEslintResults`, the function `lint:eslint` uses. It is
+  not wired into CI, hooks or any gate, and no baseline or verdict changed
+  (#369).
 
 ### Fixed
 
