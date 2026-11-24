@@ -119,14 +119,20 @@ jobs:
   # similar time (scripts/vitest-shard-balance.test.ts). Each shard runs in the
   # sealed runner. scripts/ci-workflow-policy.ts refuses a shard list that is not
   # 1 to N, or a command that names another N.
+  #
+  # Eight shards, by measurement (2026-11-24): a run of 26 jobs starts at once,
+  # a run of 34 does not. With twelve shards the suite jobs were shorter (92 to
+  # 135 s) but up to nine jobs waited 65 to 97 s for a runner, so the last one
+  # finished later than with eight. About 74 s of each job is setup before the
+  # first test, which more shards cannot reduce.
   suite:
-    name: Full test suite (Node ${{ matrix.node-version }}, shard ${{ matrix.shard }} of 12)
+    name: Full test suite (Node ${{ matrix.node-version }}, shard ${{ matrix.shard }} of 8)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         node-version: [20, 22]
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -135,7 +141,7 @@ jobs:
       - name: Prepare sealed toolchain
         run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version ${{ matrix.node-version }}
       - name: Full test suite
-        run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_SHARD=${{ matrix.shard }}/12 npm run test:run'
+        run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_SHARD=${{ matrix.shard }}/8 npm run test:run'
 
   # Gates that need neither the suite nor the documentation gates, in a job of
   # their own so they run beside them and not after them.
