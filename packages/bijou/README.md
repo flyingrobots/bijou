@@ -73,7 +73,7 @@ fake duplication rather than a real second API.
 ### Progress and Wayfinding
 - **`progressBar()`**: Determinate completion.
 - **`spinner()`**: Indeterminate activity.
-- **`breadcrumb()`**: Path context.
+- **`breadcrumb()`**: Path context. Mirrors flow and separator under `direction: 'rtl'`.
 - **`stepper()`**: Ordered stages in a linear process.
 
 ### Theme Authoring
