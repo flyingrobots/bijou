@@ -19,7 +19,13 @@ type PathCommand =
 const PATH_COMMAND_RE = /[MLQZ]|-?(?:\d+\.?\d*|\.\d+)/g;
 const QUADRATIC_SEGMENTS = 12;
 
-export function parsePathPolygons(path: string): readonly SvgPolygon[] {
+/** Test seam: called once at the top of every main-loop iteration with a 1-based step count. */
+export type PathStepObserver = (step: number) => void;
+
+export function parsePathPolygons(
+  path: string,
+  onStep?: PathStepObserver,
+): readonly SvgPolygon[] {
   const tokens = Array.from(path.matchAll(PATH_COMMAND_RE), ([token]) => token);
   const polygons: SvgPolygon[] = [];
   let index = 0;
@@ -28,7 +34,9 @@ export function parsePathPolygons(path: string): readonly SvgPolygon[] {
   let start: SvgPoint | undefined;
   let points: SvgPoint[] = [];
 
+  let step = 0;
   while (index < tokens.length) {
+    onStep?.(++step);
     const token = tokens[index];
     if (token == null) break;
     const nextCommand = pathCommand(token);
