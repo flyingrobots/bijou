@@ -6,6 +6,7 @@ import type { BijouNodeOptions } from './types.js';
 import { resolveOverflowBehavior } from './overflow.js';
 import { drawBox } from './box-render.js';
 import { resolveFillChar } from './box-fill.js';
+import { mirrorsLayout } from '../direction/direction.js';
 
 /** Configuration for rendering a bordered box. */
 export interface BoxOptions extends BijouNodeOptions {
@@ -81,6 +82,7 @@ export function box(
           resolvedFill,
           options.title,
           overflow,
+          mirrorsLayout({ direction: options.direction, ctx }),
         );
       },
     },

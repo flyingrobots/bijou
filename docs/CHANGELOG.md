@@ -68,6 +68,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   glyphs go through `mirrorGlyphs()`. `pipe` and `accessible` output and every
   left-to-right render are unchanged.
 
+- `box()`, `headerBox()`, `boxSurface()` and `headerBoxSurface()` align the
+  border title to the logical start edge of the resolved direction: the right
+  edge under `rtl` in `interactive` and `static` modes. `ltr`, `pipe` and
+  `accessible` output is byte-identical to before; title text is never
+  reversed (flyingrobots/bijou#626).
+
 - The Components Library's `r` toggle now reaches every story preview.
   `createStoryProfileContext()` in `examples/_stories/protocol.ts` takes an
   optional `direction`, and the library passes `ltr` or `rtl` from the toggle,
