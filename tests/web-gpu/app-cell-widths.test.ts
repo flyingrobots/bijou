@@ -7,7 +7,7 @@ import { COLS, PART_COUNT, refusals, ROWS, slidesOfPart } from './app-cell-width
 describe('the components and hero apps paint only what the canvas contract takes', () => {
   it('the library parts together take every Components library slide exactly once', () => {
     const union = Array.from({ length: PART_COUNT }, (_part, index) => slidesOfPart(index)).flat();
-    expect(union.toSorted()).toEqual([...SEQUENCE].toSorted());
+    expect([...union].sort()).toEqual([...SEQUENCE].sort());
   });
 
   it('the whole hero reel, with the palette open and a theme switch', async () => {

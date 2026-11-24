@@ -11,7 +11,7 @@ afterEach(() => { _resetDefaultContextForTesting(); });
 describe('book theme runtime localization', () => {
   it('the locale parts together take every locale case exactly once', () => {
     const union = Array.from({ length: PART_COUNT }, (_part, index) => casesOfPart(index)).flat();
-    expect(union.map(([locale]) => locale).toSorted()).toEqual(LOCALE_CASES.map(([locale]) => locale).toSorted());
+    expect(union.map(([locale]) => locale).sort()).toEqual(LOCALE_CASES.map(([locale]) => locale).sort());
   });
 
   it.each(casesOfPart(0))('localizes actual %s picker, mode descriptions, Theme Lab and Inspector', async (...row) => {
