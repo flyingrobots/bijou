@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "code-dojo.runtime-scc-event.v1",
+  "title": "Code Dojo runtime SCC command line",
+  "description": "One JSON Lines object from npm run code-dojo:cycles (scripts/code-dojo-runtime-scc-gate.ts). graph-built, inventory-current, inventory-written, help and schema go to stdout; violation and error go to stderr.",
+  "type": "object",
+  "required": ["_schema", "kind"],
+  "properties": {
+    "_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "code-dojo.runtime-scc-event" },
+        "version": { "const": "1.0.0" }
+      }
+    }
+  },
+  "definitions": {
+    "count": { "type": "integer", "minimum": 0 },
+    "strings": { "type": "array", "items": { "type": "string" } }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "graph-built" },
+        "files": { "$ref": "#/definitions/count" },
+        "edges": { "$ref": "#/definitions/count" },
+        "componentCount": { "$ref": "#/definitions/count" },
+        "moduleCount": { "$ref": "#/definitions/count" },
+        "elapsedMs": { "$ref": "#/definitions/count" },
+        "_schema": true
+      },
+      "required": ["kind", "files", "edges", "componentCount", "moduleCount", "elapsedMs"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "inventory-current" },
+        "path": { "type": "string" },
+        "componentCount": { "$ref": "#/definitions/count" },
+        "moduleCount": { "$ref": "#/definitions/count" },
+        "_schema": true
+      },
+      "required": ["kind", "path", "componentCount", "moduleCount"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "inventory-written" },
+        "path": { "type": "string" },
+        "componentCount": { "$ref": "#/definitions/count" },
+        "moduleCount": { "$ref": "#/definitions/count" },
+        "acceptedViolations": { "$ref": "#/definitions/count" },
+        "_schema": true
+      },
+      "required": ["kind", "path", "componentCount", "moduleCount", "acceptedViolations"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "violation" },
+        "code": { "enum": ["new-component", "merged-components", "grown-component", "new-edge"] },
+        "component": { "type": "string" },
+        "baseline": { "$ref": "#/definitions/strings" },
+        "addedModules": { "$ref": "#/definitions/strings" },
+        "addedEdges": { "type": "array", "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } } },
+        "_schema": true
+      },
+      "required": ["kind", "code", "component", "baseline", "addedModules", "addedEdges"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "error" },
+        "code": { "enum": ["ratchet-failed", "growth-not-accepted", "inventory-stale", "inventory-missing", "inventory-invalid", "bad-arguments", "scc-failed"] },
+        "message": { "type": "string" },
+        "_schema": true
+      },
+      "required": ["kind", "code", "message"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "help" },
+        "command": { "type": "string" },
+        "description": { "type": "string" },
+        "usage": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["flag", "description"],
+            "properties": { "flag": { "type": "string" }, "description": { "type": "string" } }
+          }
+        },
+        "_schema": true
+      },
+      "required": ["kind", "command", "description", "usage", "options"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "kind": { "const": "schema" },
+        "name": { "enum": ["code-dojo.runtime-scc-inventory.v1", "code-dojo.runtime-scc-event.v1"] },
+        "schema": { "type": "object" },
+        "_schema": true
+      },
+      "required": ["kind", "name", "schema"],
+      "additionalProperties": false
+    }
+  ]
+}

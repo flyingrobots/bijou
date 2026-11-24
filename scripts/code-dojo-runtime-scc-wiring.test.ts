@@ -17,7 +17,7 @@ function steps(command: string | undefined): string[] {
 
 describe('runtime SCC ratchet wiring', () => {
   it('exposes the check as code-dojo:cycles', () => {
-    expect(scripts()['code-dojo:cycles']).toBe('tsx scripts/code-dojo-runtime-scc.ts --check');
+    expect(scripts()['code-dojo:cycles']).toBe('tsx scripts/code-dojo-runtime-scc-gate.ts --check');
   });
 
   it('runs in the hosted Code Dojo lane and the local full gate', () => {
