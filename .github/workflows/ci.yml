@@ -112,19 +112,49 @@ jobs:
             node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run dogfood:i18n:complete -- --base HEAD^ && npm run dogfood:i18n:debt -- --base HEAD^'
           fi
           node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run dogfood:i18n:check'
+
+  # The full suite, split across runners (flyingrobots/bijou#907). The suite runs
+  # in chunks of files; shard k of N takes every N-th chunk, so the shards
+  # partition the suite (scripts/vitest-shards.test.ts). Each shard runs in the
+  # sealed runner. scripts/ci-workflow-policy.ts refuses a shard list that is not
+  # 1 to N, or a command that names another N.
+  suite:
+    name: Full test suite (Node ${{ matrix.node-version }}, shard ${{ matrix.shard }} of 4)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version ${{ matrix.node-version }}
       - name: Full test suite
-        run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && npm run test:run'
+        run: node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_SHARD=${{ matrix.shard }}/4 npm run test:run'
+
+  # Gates that need neither the suite nor the documentation gates, in a job of
+  # their own so they run beside them and not after them.
+  smoke_gates:
+    name: Smoke and type gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version 22
       - name: Smoke interactive examples
-        if: matrix.node-version == 22
         run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run verify:interactive-examples'
       - name: Typecheck tests
-        if: matrix.node-version == 22
         run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run typecheck:test'
       - name: Smoke canary apps
-        if: matrix.node-version == 22
         run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run build && npm run smoke:canaries -- --skip-build'
       - name: Build and typecheck the web-gpu showcase
-        if: matrix.node-version == 22
         run: node scripts/docker-seal/run.mjs --isolated-ci -- bash -lc 'npm run web-gpu:build && npm run web-gpu:typecheck'
 
   # The one suite that runs outside the sealed runner: the sealed workers have no
@@ -301,7 +331,7 @@ jobs:
     name: Wall time summary
     if: always()
     continue-on-error: true
-    needs: [changes, test, browser_web_gpu, unit_cross_platform, smoke_dogfood, bench_gradient]
+    needs: [changes, test, suite, smoke_gates, browser_web_gpu, unit_cross_platform, smoke_dogfood, bench_gradient]
     runs-on: ubuntu-latest
     permissions:
       actions: read

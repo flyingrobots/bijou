@@ -1,5 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
+import { suitePolicy, type CiWorkflowSuiteJobPolicy } from './ci-workflow-suite-policy.js';
+
+export type { CiWorkflowSuiteJobPolicy } from './ci-workflow-suite-policy.js';
 
 export interface CiWorkflowTestJobPolicy {
   readonly checkoutUses: string;
@@ -11,6 +14,7 @@ export interface CiWorkflowTestJobPolicy {
 
 export interface CiWorkflowPolicy {
   readonly testJob: CiWorkflowTestJobPolicy;
+  readonly suiteJob: CiWorkflowSuiteJobPolicy;
   readonly nodeVersions: readonly number[];
   readonly focusedPlatforms: readonly string[];
   readonly focusedUnitTestsJob: {
@@ -55,11 +59,12 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   }
 
   const i18nPolicyGate = asRecord(steps[i18nPolicyGateIndex], 'workflow.jobs.test.i18nPolicyGate');
-  const testRunStep = steps.map((step) => {
-    return asRecord(step, 'workflow.jobs.test.steps[]');
+  const suiteJob = asRecord(jobs['suite'], 'workflow.jobs.suite');
+  const testRunStep = asArray(suiteJob['steps'], 'workflow.jobs.suite.steps').map((step) => {
+    return asRecord(step, 'workflow.jobs.suite.steps[]');
   }).find((step) => step['name'] === 'Full test suite');
   if (testRunStep == null) {
-    throw new Error('CI workflow test job is missing full test run step');
+    throw new Error('CI workflow suite job is missing full test run step');
   }
 
   const focusedPortableStep = focusedUnitTestsSteps.map((step) => {
@@ -71,7 +76,8 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   const testMatrix = asRecord(asRecord(testJob['strategy'], 'test.strategy')['matrix'], 'test.matrix');
   const focusedMatrix = asRecord(asRecord(focusedUnitTestsJob['strategy'], 'focused.strategy')['matrix'], 'focused.matrix');
   const platforms = asArray(focusedMatrix['include'], 'focused.include').map((entry) => asRecord(entry, 'focused.platform'));
-  const fullTestCommand = asString(testRunStep['run'], 'workflow.jobs.test.fullTest.run');
+  const fullTestCommand = asString(testRunStep['run'], 'workflow.jobs.suite.fullTest.run');
+  const suite = suitePolicy(suiteJob, fullTestCommand);
   if (!fullTestCommand.startsWith('node scripts/docker-seal/run.mjs --isolated-ci ')) {
     throw new Error('Full test suite must enter the sealed runner');
   }
@@ -83,6 +89,7 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   }
 
   return {
+    suiteJob: suite,
     nodeVersions: asArray(testMatrix['node-version'], 'test.node-version').map(Number),
     focusedPlatforms: platforms.map((entry) => asString(entry['os'], 'focused.platform.os')),
     testJob: {
