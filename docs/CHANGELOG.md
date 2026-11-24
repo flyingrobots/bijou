@@ -6,6 +6,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Changed
+
+- Four DOGFOOD modules no longer read Node files: `app-ids.ts` and
+  `app-prompt-font.ts` import their JSON, and the landing logo and the
+  translated guides are generated JSON copies (`examples/docs/generated/`,
+  written by `npm run components:data`, held to their files by
+  `tests/dogfood-browser-data.test.ts`). Terminal output is unchanged.
+
 ### Added
 
 - The web GPU showcase can present one app on either host and keep its state.

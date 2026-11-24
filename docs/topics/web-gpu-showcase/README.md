@@ -43,6 +43,8 @@ module load is imported instead, so the bundler inlines it:
 | --- | --- | --- |
 | DM Sans and Jacquard 12 raster fonts | `assets/dm-sans-ascii.json`, `assets/jacquard12-bijou.json` | JSON import attributes. Coverage masks are decoded by `examples/_shared/base64.ts`, which accepts exactly the canonical base64 that `Buffer` round-trips. |
 | DOGFOOD runtime catalogs | `examples/docs/i18n/catalogs/<locale>/*.json` | JSON import attributes, one table entry per file. `tests/dogfood-catalog-imports.test.ts` holds the table to the directory. |
+| DOGFOOD package version, prompt font | `packages/bijou/package.json`, `assets/space-grotesk-ascii.json` | JSON import attributes; the font's masks go through `examples/_shared/base64.ts`. |
+| DOGFOOD landing logo, translated guides | `assets/flyingrobotslogo.txt`, `examples/docs/content/i18n/<locale>/<guide>.md` | Generated JSON in `examples/docs/generated/`, written by `npm run components:data`. `tests/dogfood-browser-data.test.ts` regenerates it and fails on drift. |
 | Example code snippets and design-system families | The story sources in `examples/docs/` and `docs/design-system/component-families.md` (in the archived book corpus) | Generated copies in `examples/components/generated/`, written by `npm run components:data`. `tests/components-browser-data.test.ts` regenerates them and fails on drift; `npm run components:data:check` does the same. |
 
 The hero perf overlay reads memory through a port (`MemorySampler` in
