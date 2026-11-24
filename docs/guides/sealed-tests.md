@@ -72,6 +72,15 @@ there. Tests and lifecycle execution run afterward with networking disabled.
 Missing offline dependencies fail the run; the launcher does not restore
 network access as a fallback.
 
+That setup worker does two things: it installs the producer graph from the
+lockfile, then warms npm's cache for the consumer graphs that the packaging
+smokes install offline. A run that installs no packed package can skip the
+second with `--no-consumer-graphs`; the lockfile install is unchanged. CI's
+full-suite shards use it, because the Vitest suite installs nothing: it passed
+in the sealed runner with the warm-up skipped, and the warm-up was 12 to 15 s
+of every shard. A test that did need an offline install would fail there with
+no network, not fetch anything.
+
 ### Run one shard of the full suite
 
 `npm run test:run` with no file runs every test file, in chunks of 48 files,

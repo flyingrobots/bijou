@@ -16,6 +16,9 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const argv = process.argv.slice(2); const split = argv.indexOf('--');
 if (split < 0 || split === argv.length - 1) throw new Error('Missing command');
 let version = '22'; let isolated = false; let sourceIndex; let fullPush = false; const exports = [];
+// The consumer graphs warm npm's cache for runs that install packed packages offline. A run that
+// installs nothing can skip that preparation; the producer graph is installed from the lockfile either way.
+let consumerGraphs = true;
 for (let i = 0; i < split; i++) {
   if (argv[i] === '--node-version') version = argv[++i];
   else if (argv[i] === '--export') exports.push(argv[++i]);
@@ -24,6 +27,7 @@ for (let i = 0; i < split; i++) {
     sourceIndex = argv[++i];
   }
   else if (argv[i] === '--isolated-ci') isolated = true;
+  else if (argv[i] === '--no-consumer-graphs') consumerGraphs = false;
   else if (argv[i] === '--full-push') {
     if (fullPush) throw new Error('Duplicate full-push control');
     fullPush = true;
@@ -62,7 +66,7 @@ try {
     generatedBudget: 128 * 1024 ** 2 - retained - exportReserve - 22 * 1024 ** 2,
     signal: controller.signal, sourceIndex, fullPush,
   });
-  const dependencyArchive = await prepareDependencies(snap, image, worker, controller.signal);
+  const dependencyArchive = await prepareDependencies(snap, image, worker, controller.signal, consumerGraphs);
   const config = await startWorker(worker, image, 'none'); started = true;
   writeFileSync(join(destination, 'admission.json'), JSON.stringify({ sourceSha256: snap.digest,
     sourceBytes: snap.sourceBytes, archiveBytes: snap.archive.length, image: inspected.Id,

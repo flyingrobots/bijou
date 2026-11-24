@@ -10,11 +10,21 @@ import { parse } from 'yaml';
 const read = (path: string): string => readFileSync(new URL(path, import.meta.url), 'utf8');
 
 interface Step { readonly name?: string; readonly run?: string }
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value != null && typeof value === 'object' && !Array.isArray(value);
+}
+
 function steps(job: string): readonly Step[] {
-  const workflow = parse(read('../../.github/workflows/ci.yml')) as { jobs: Record<string, { steps: Step[] }> };
-  const found = workflow.jobs[job];
-  if (found === undefined) throw new Error(`no job ${job}`);
-  return found.steps;
+  const workflow: unknown = parse(read('../../.github/workflows/ci.yml'));
+  const jobs = isRecord(workflow) ? workflow['jobs'] : undefined;
+  const found = isRecord(jobs) ? jobs[job] : undefined;
+  const list = isRecord(found) ? found['steps'] : undefined;
+  if (!Array.isArray(list)) throw new Error(`no steps for job ${job}`);
+  return list.filter(isRecord).map((step) => ({
+    ...(typeof step['name'] === 'string' ? { name: step['name'] } : {}),
+    ...(typeof step['run'] === 'string' ? { run: step['run'] } : {}),
+  }));
 }
 
 describe('the sealed runner can leave the consumer graphs unprepared', () => {

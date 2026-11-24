@@ -5,7 +5,7 @@ import { startWorker, stopWorker, measureWorker } from './worker.mjs';
 import { LIMITS, WORKER } from './constants.mjs';
 import { templateConsumerManifest } from './consumer-manifest.mjs';
 import { copyLocalTarballs } from './local-tarballs.mjs';
-export async function prepareDependencies(snapshot, image, worker = WORKER, signal) {
+export async function prepareDependencies(snapshot, image, worker = WORKER, signal, consumerGraphs = true) {
   const run = (argv, options = {}) => execute(argv, { ...options, signal });
   const name = `${worker}-dependencies`;
   const directory = join(snapshot.directory, 'dependency-input');
@@ -31,7 +31,7 @@ export async function prepareDependencies(snapshot, image, worker = WORKER, sign
   try {
     await run(['docker', 'exec', '-i', name, 'tar', 'xf', '-', '-C', '/work'], { input: payload });
     // This phase executes no package lifecycle, application source, test or build.
-    await run(['docker', 'exec', name, 'node', '/work/control/dependencies.mjs'], {
+    await run(['docker', 'exec', name, 'node', '/work/control/dependencies.mjs', ...(consumerGraphs ? [] : ['--no-consumer-graphs'])], {
       monitor: () => measureWorker(name), onData: (chunk) => process.stdout.write(chunk),
     });
     return (await run(['docker', 'exec', name, 'tar', 'cf', '-',

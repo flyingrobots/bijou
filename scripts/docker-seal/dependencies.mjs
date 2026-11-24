@@ -59,6 +59,11 @@ function externalEntries(entries = {}) {
 // Keep every consumer graph separate: equal package names with different ranges
 // must not overwrite each other in a synthetic union. Real npm resolution warms
 // transitive packuments and tarballs, including packages absent from the root lock.
+// A run that installs no packed package asks for the producer graph only (run.mjs --no-consumer-graphs).
+if (process.argv.includes('--no-consumer-graphs')) {
+  process.stdout.write('Consumer graphs not prepared: this run asked for the producer graph only\n');
+  process.exit(0);
+}
 const consumerRoot = '/work/consumer-cache';
 for (const [index, { original, includeDevelopment }] of manifests.entries()) {
   const manifest = { name: `bijou-cache-consumer-${index}`, version: '0.0.0', private: true };

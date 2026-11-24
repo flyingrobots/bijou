@@ -10,7 +10,7 @@ const args = process.argv.slice(2);
 if (process.env.GIT_INDEX_FILE) args.unshift('--source-index', resolve(process.cwd(), process.env.GIT_INDEX_FILE));
 if (process.env.BIJOU_FULL_PUSH === '1') args.unshift('--full-push');
 if (!args.includes('--') || args.indexOf('--') === args.length - 1) {
-  console.error('Usage: node scripts/docker-seal/run.mjs [--isolated-ci] [--node-version 20|22|24] [--export relative/path] -- command args...');
+  console.error('Usage: node scripts/docker-seal/run.mjs [--isolated-ci] [--no-consumer-graphs] [--node-version 20|22|24] [--export relative/path] -- command args...');
   process.exit(2);
 }
 const env = { ...cleanEnvironment() };
