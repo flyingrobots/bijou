@@ -64,7 +64,7 @@ describe('soak bench through host ports', () => {
 
   it('a memory port that reports only heap shows the heap row and not the resident row', async () => {
     const memory = () => ({ heapUsedMB: 12.5, rssMB: undefined });
-    const result = await run({ options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory, log: NO_LOG }, false);
+    const result = await run({ options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory, log: NO_LOG, scenarioContext }, false);
     const text = result.frames.map((f) => surfaceToString(f, ctx.style)).join('\n');
     expect(text).toMatch(/heap/i);
     expect(text).toContain('12.5');
