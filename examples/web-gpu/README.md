@@ -33,7 +33,7 @@ npx vite preview --config examples/web-gpu/vite.config.ts --port 41797
 `/dom.html` is the page the browser suite checks `mountBijouDom()` on.
 
 The first mount is chosen in the address: `?app=counter`, `?app=components`,
-`?app=hero` or `?app=showcase`,
+`?app=hero`, `?app=showcase` or `?app=dual`,
 and `&backend=auto` (the default), `webgpu`, `webgl2` or `canvas2d`.
 
 ## The page chrome
@@ -119,6 +119,7 @@ palette or a menu is open. `src/chrome/keys.ts` holds the rule.
 | `j` `k`, `↓` `↑` | Move focus through the controls. |
 | `h` `l`, `←` `→` | Move focus to the previous or next region. Inside a toggle group the arrows move between its items. |
 | `Space` `s` | Focus the Surface, so the next keys go to the app. |
+| `Space` `m` | Switch host between the canvas and the DOM, keeping the app's state. Works only for an app with a scene projection. |
 | `Space` `g`, `Space` `d` | Open the GPU showcase or the DOM check page. |
 | `Space` `t` | Open the theme menu. |
 
