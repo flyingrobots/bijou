@@ -1,5 +1,6 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { readNetworkEntries, type NetworkEntry } from './network-entries.mjs';
 import { verifyKernelSeal, type KernelSealFacts } from './seal-policy.mjs';
 
 /** Use the admitted worker's real mount table, not an invented Docker topology. */
@@ -8,10 +9,19 @@ function admittedFacts(): KernelSealFacts {
     dockerFile: true,
     marker: readFileSync('/etc/bijou-test-seal', 'utf8'),
     sockets: [],
-    interfaces: readdirSync('/sys/class/net'),
+    interfaces: readNetworkEntries(),
     mountInfo: readFileSync('/proc/self/mountinfo', 'utf8'),
   };
 }
+
+const LOOPBACK: NetworkEntry = { name: 'lo', device: true, up: true };
+
+/** The entries Docker Desktop's kernel lists in a worker started with no network. */
+const FALLBACK_ENTRIES: readonly NetworkEntry[] = [
+  { name: 'bonding_masters', device: false, up: false },
+  ...['erspan0', 'gre0', 'gretap0', 'ip6_vti0', 'ip6gre0', 'ip6tnl0', 'ip_vti0', 'sit0', 'tunl0']
+    .map((name) => ({ name, device: true, up: false })),
+];
 
 describe.skipIf(process.platform !== 'linux')('kernel test seal', () => {
   it('admits the actual sealed worker', () => {
@@ -21,10 +31,25 @@ describe.skipIf(process.platform !== 'linux')('kernel test seal', () => {
   it.each([
     ['Docker identity', { dockerFile: false }, 'missing /.dockerenv'],
     ['image identity', { marker: 'bijou-test-seal-v1' }, 'invalid image seal'],
-    ['network isolation', { interfaces: ['lo', 'eth0'] }, 'network interface'],
+    ['network isolation', { interfaces: [LOOPBACK, { name: 'eth0', device: true, up: true }] }, 'network interface'],
     ['Docker socket', { sockets: ['/run/docker.sock'] }, 'Docker socket'],
   ] as const)('rejects a broken %s boundary', (_name, mutation, reason) => {
     expect(() => { verifyKernelSeal({ ...admittedFacts(), ...mutation }); }).toThrow(reason);
+  });
+
+  it('admits a worker whose kernel lists down fallback tunnel devices', () => {
+    const interfaces = [LOOPBACK, ...FALLBACK_ENTRIES];
+    expect(() => { verifyKernelSeal({ ...admittedFacts(), interfaces }); }).not.toThrow();
+  });
+
+  it.each([
+    ['a fallback tunnel device that is up', { name: 'tunl0', device: true, up: true }],
+    ['a down device that is not a fallback tunnel', { name: 'eth0', device: true, up: false }],
+    ['a control file other than bonding_masters', { name: 'tunl0', device: false, up: false }],
+    ['a device named like the bonding control file', { name: 'bonding_masters', device: true, up: false }],
+  ] as const)('rejects %s', (_name, entry) => {
+    const interfaces = [LOOPBACK, entry];
+    expect(() => { verifyKernelSeal({ ...admittedFacts(), interfaces }); }).toThrow('network interface beyond loopback');
   });
 
   it.each(['/work', '/tmp', '/home/test'])('requires independent tmpfs at %s', (path) => {

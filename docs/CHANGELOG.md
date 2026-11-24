@@ -51,6 +51,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   in the sealed worker. Each target has a cache file of its own under
   `.cache/eslint/`. The findings counted are the same; a file two targets match
   is counted once.
+- Test-only: the slowest test files run faster, with every case kept. Measured
+  alone in the sealed runner: `tests/web-gpu/app-cell-widths.test.ts` 22.8 s
+  to 11.0 s (library slides split into four parts, part k takes every fourth
+  slide, and one assertion proves the parts cover the deck),
+  `tests/dogfood-book-theme-localization.test.ts` 47.7 s to 14.6 s (one file
+  per locale), `bench/src/soak-host.test.ts` 16.6 s to 9.4 s (two files), and
+  the two Markdown CLI resize cases now run side by side. Refs
+  flyingrobots/bijou#907.
+
 - The soak bench (`npm run soak`) takes its options, memory readings and log
   through host ports (`bench/src/soak-ports.ts`) instead of reading
   `process.argv`, `process.memoryUsage()` and `node:fs`, so its app module
@@ -177,6 +186,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The sealed runner admits a worker on Docker Desktop, whose kernel lists
+  fallback tunnel devices (`tunl0`, `sit0`, `gre0` and their relatives) and the
+  `bonding_masters` control file under `/sys/class/net` even with
+  `--network none`. Every run there was refused with `network interface beyond
+  loopback`, which also stopped the `pre-commit` hook. The seal now reads each
+  entry (`scripts/docker-seal/network-entries.mjs`) and admits loopback, that
+  control file, and a named fallback tunnel device that is down. Any other
+  device, and a fallback tunnel device that is up, is still refused (#910).
 - The sealed runner's local launchers (`scripts/docker-seal/run.mjs` and
   `bootstrap.mjs`) no longer wrap each run in `git locks with`, so `npm test`,
   `npm run soak` and every other local command run on a machine without

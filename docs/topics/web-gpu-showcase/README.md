@@ -67,10 +67,12 @@ row.
 
 `tests/examples-terminal-frames.test.ts` pins, by digest, the styled frames
 both apps paint in a 120 by 36 terminal, recorded before the data moved to
-imports. `tests/web-gpu/app-cell-widths.test.ts` paints every Components
-library slide in each output mode and the hero reel, and finds no width-2
-grapheme and no unpacked Surface, either of which the canvas contract
-refuses.
+imports. `tests/web-gpu/app-cell-widths.test.ts` paints the hero reel, and
+`tests/web-gpu/app-cell-widths.part01.test.ts` to `part04` paint every
+Components library slide in each output mode (part k takes every fourth
+slide, and the first file asserts the parts take each slide once). They find
+no width-2 grapheme and no unpacked Surface, either of which the canvas
+contract refuses.
 
 The showcase bundle loads each app on demand, so the page's entry chunk does
 not carry them. In the production build, the entry chunk of the showcase page
