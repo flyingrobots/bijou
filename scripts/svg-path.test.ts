@@ -1,18 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parsePathPolygons } from '../examples/docs/svg-path.js';
-
-/**
- * Parse with a step budget the test can check: a parser that consumes input on
- * every iteration needs at most one step per input character. Exceeding the
- * budget throws, so the very bug under test (a non-consuming loop) fails fast
- * instead of hanging the run.
- */
-export function parseBounded(path: string): ReturnType<typeof parsePathPolygons> {
-  const budget = path.length + 1;
-  return parsePathPolygons(path, (step) => {
-    if (step > budget) throw new Error(`STALL: step ${String(step)} exceeds budget ${String(budget)}`);
-  });
-}
+import { parseBounded } from './svg-path.test-support.js';
 
 describe('svg path parser: valid paths are unchanged', () => {
   it('closes a triangle with comma separators and implicit line repeats', () => {
@@ -36,8 +23,8 @@ describe('svg path parser: a number after Z is rejected with its offset', () => 
     ['M0 0 L1 1 Z -5', 12],
     ['M0 0 L1 1 Z .5', 12],
     ['M0 0 L1 1 Z,5', 12],
-    ['M0 0 L1 1 Z  \n 5', 14],
-    ['M0 0 L1 0 L1 1 Z 2 2', 16],
+    ['M0 0 L1 1 Z  \n 5', 15],
+    ['M0 0 L1 0 L1 1 Z 2 2', 17],
     ['M0 0 L1 1 Z 5 Z 5', 12],
   ] as const)('%j fails at offset %i', (path, offset) => {
     expect(() => parseBounded(path)).toThrow(new RegExp(`^SVG path.* offset ${String(offset)}\\b`));
@@ -55,7 +42,7 @@ describe('svg path parser: malformed input throws instead of being reinterpreted
   it.each([
     ['m 0 0 l 10 0 l 0 10 z', 0],
     ['M0 0 L1 1 X', 10],
-    ['M0 0 L1e5 1', 8],
+    ['M0 0 L1e5 1', 7],
     ['M0 0 L +1 1', 7],
     ['M0 0 L - 1', 7],
     ['M0 0 # 1 1', 5],
