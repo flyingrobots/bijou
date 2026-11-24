@@ -119,3 +119,16 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | --- | --- | --- | --- |
 | WGPU-38 | The canvas and textarea a mount creates have the computed non-inherited styles of the same elements in a document with no author CSS, and the canvas fills the host's content box. | `no chrome style reaches the canvas or the textarea mountBijouCanvas() creates` | Implemented |
 | WGPU-39 | Every element `mountBijouDom()` creates has the computed non-inherited styles of the same element in a document with no author CSS. | `no chrome style reaches the elements mountBijouDom() creates` | Implemented |
+
+## Host switch: `examples/web-gpu/e2e/host.e2e.ts`, `host-stress.e2e.ts` (browser), `tests/web-gpu/host-handoff.test.ts`, `dual-app.test.ts` (sealed)
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WGPU-41 | A count set to 5 on the canvas host is 5 on the DOM host, takes an increment there, and is 6 back on the canvas, whose frame equals a fresh mount counted to 6. One mount exists after each switch. | `the dual-host counter set to 5 on the canvas shows 5 on the DOM host, takes an increment there, and the canvas then shows 6` | Implemented |
+| WGPU-42 | A presenter switch after a host round trip keeps the state, the backend toggle is disabled on the DOM host, and the canvas returns on the backend it left. | `a presenter switch after a host round trip keeps the state, and the canvas comes back on the backend it left` | Implemented |
+| WGPU-43 | An app with no scene projection has a disabled DOM item, a HUD row and a note that say why, `Space` then `m` does nothing, and a direct request is refused with `BIJOU_WEB_GPU_NO_SCENE` and changes nothing. | `an app without a scene projection offers no DOM host, and the HUD and the controls say why` | Implemented |
+| WGPU-44 | A seeded walk of 36 host switches, presenter switches and inputs keeps one count, with one mount after every step. The seed is logged and set by `BIJOU_HOST_STRESS_SEED`. | `a seeded walk of 36 host switches, presenter switches and inputs keeps one count` | Implemented |
+| WGPU-45 | The handoff wrapper starts from the carried model, runs neither the app's init nor its commands, keeps every other member, and leaves the handed object unchanged. | `starts from the carried model and runs neither the app init nor its commands`, `keeps every other member of the app, so both projections and the update are the same functions`, `carries on from the handed model: the next action updates it, and the handed object is left as it was` | Implemented |
+| WGPU-46 | The dual-host counter's scene has `group` and `text` nodes only with an action per control, its Surface is packed with width-1 cells only, and it takes both the counter keys and the scene actions. | `lowers to group and text nodes only, and declares an action for each control`, `paints a name the canvas cannot hold with one cell per grapheme, and the scene keeps it whole`, `takes the counter keys and t as key messages`, `takes the scene actions through the controller: increment, decrement, rename and toggle` | Implemented |
+| WGPU-47 | When the new host cannot start, the previous host is started again with the same model. | Not yet tested: no host failure can be provoked from the page without a test seam. | Planned |
+

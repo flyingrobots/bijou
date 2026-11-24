@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The web GPU showcase can present one app on either host and keep its state.
+  A Host switch beside the backend switch (`Space` then `m`) stops the canvas
+  mount and starts `mountBijouDom()` with the same model, and back again. The
+  new dual-host counter example has both projections; apps with no scene
+  projection keep the DOM choice disabled and say why (flyingrobots/bijou#869).
+
 - The `bijou-tui` raytrace vector helpers (`raytraceAdd`, `raytraceSub`,
   `raytraceScale`, `raytraceCross`, `raytraceNormalize`, `raytraceReflect`)
   accept an optional `target` of the new `RaytraceVector3Mutable` type. The
