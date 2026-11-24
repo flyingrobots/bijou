@@ -23,8 +23,8 @@ export interface CanvasStageInput<C extends BijouCanvasElement> {
 export interface CanvasStage<C extends BijouCanvasElement> {
   backend(): BijouCanvasBackend;
   canvas(): C;
-  /** Resize the presenter for new geometry. */
-  apply(geometry: CanvasGeometry): void;
+  /** Resize the presenter for new geometry; with `repaint`, present the last frame again. */
+  apply(geometry: CanvasGeometry, repaint: boolean): void;
   /** Queue a switch; switches run one at a time. */
   switchTo(next: BijouCanvasBackend): Promise<void>;
   /** Abort pending switches and refuse new ones. Safe to call again. */
@@ -86,12 +86,16 @@ export function createCanvasStage<C extends BijouCanvasElement>(
   return {
     backend: () => live.backend,
     canvas: () => live.canvas,
-    apply(geometry) {
+    apply(geometry, repaint) {
       try {
         live.presenter.resize(geometry.size);
       } catch (error: unknown) {
         input.onFault(error);
+        return;
       }
+      // Setting a canvas's size clears it. With the grid unchanged the app renders
+      // nothing, so the last frame is painted again; a new grid brings its own frame.
+      if (repaint) bridge.refresh();
     },
     switchTo(next) {
       const result = queue.then(() => run(next));

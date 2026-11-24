@@ -56,6 +56,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   saying another run holds the worker; callers that want queueing wrap their
   own command (flyingrobots/bijou#865).
 
+- `mountBijouCanvas()` paints the last frame again after a container resize
+  that leaves the grid unchanged. Resizing the presenter clears the canvas, and
+  with no change of columns or rows the app rendered nothing, so the canvas
+  stayed blank until the next key (flyingrobots/bijou#867).
+
 - `npm run dogfood:i18n:debt` prints each logical surface once. The inventory's
   per-surface rows are now aggregated from the entries by surface through
   `aggregateDogfoodI18nDebtSurfaces()`, so a surface split across part files
