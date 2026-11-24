@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Regression tests prove East Asian wide-character layout in `wrapToWidth()`,
+  `constrain()` truncation and `table()` in `interactive` and `static` modes,
+  for Han, kana, halfwidth katakana, precomposed Hangul, fullwidth forms and
+  emoji between ideographs, with a property test over widths 2..120. The
+  narrow East Asian Ambiguous policy is now stated and pinned. The reference is
+  `docs/topics/text-width/`. The tests found five defects, filed as #851,
+  #852, #853, #854 and #855 (#678).
+
 - `npm run code-dojo:report` writes the Code Dojo debt aggregate, next goalpost
   target, per-source counts, top ESLint rules and optional live ESLint data to
   `docs/code-dojo/debt-report.json` as a `code-dojo.debt-report.v1` document,
