@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { exampleDocsKey } from '../examples/_shared/document-key.js';
 import { collectDogfoodMarkdownDocuments, localizedMarkdownCandidatePaths } from '../examples/docs/i18n-debt-markdown-discovery.js';
 import { defaultMarkdownTemplateValues, readRepoFile, repoFileExists } from '../examples/docs/i18n-debt-io.js';
 import { readDogfoodMarkdownLocalizationSpec } from '../examples/docs/i18n-debt-markdown-spec.js';
@@ -10,7 +11,11 @@ import { DEFAULT_LOCALE, DOGFOOD_LOCALE_OPTIONS } from '../examples/docs/locale.
  * `readMarkdownDoc('<literal>')` call site comes from the localization
  * inventory's own discovery; each is joined by the translations of it that
  * exist, which the guides pick by locale, and by the one document
- * `coverage.ts` reads.
+ * `coverage.ts` reads. The inventory cannot see a document that is named only
+ * in a table of per-locale paths (the release changelog history is one), so
+ * each `./content/<name>.md` literal in a DOGFOOD source is a key too;
+ * `tests/dogfood-documents.test.ts` fails if any key is not read, or any
+ * document read is not a key.
  */
 const COVERAGE_DOCUMENT = 'docs/design-system/component-families.md';
 
@@ -19,6 +24,7 @@ export function discoveredDocumentKeys(): readonly string[] {
   const keys = new Set<string>([COVERAGE_DOCUMENT]);
   const locales = DOGFOOD_LOCALE_OPTIONS.map((option) => option.id).filter((id) => id !== DEFAULT_LOCALE.id);
   for (const source of DOGFOOD_I18N_DEBT_SOURCES) {
+    for (const [, path = ''] of readRepoFile(source.path).matchAll(/['"`](\.\/content\/[\w.-]+\.md)['"`]/gu)) keys.add(exampleDocsKey(path));
     for (const document of collectDogfoodMarkdownDocuments(source, templateValues, readRepoFile)) {
       keys.add(document.path);
       const spec = readDogfoodMarkdownLocalizationSpec(document.path, readRepoFile);
