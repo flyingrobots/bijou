@@ -104,7 +104,7 @@ export function renderThemeLabPane(options: ThemeLabPaneOptions): Surface {
         spacer(1, 1),
         leftBox(
           renderThemeLabProvenanceSurface(
-            activeTheme.theme,
+            draftTheme,
             selectedPath,
             leftBody,
             renderTokens,
