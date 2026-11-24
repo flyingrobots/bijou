@@ -37,6 +37,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- `runScript()` records each frame as a snapshot of the screen at that update.
+  A framed app, DOGFOOD among them, repaints one reused Surface, and every
+  entry of `frames` was that one Surface, so every entry showed the last frame
+  and a test reading an earlier frame or searching all frames saw only the
+  final screen. A Surface view is now copied once per recorded frame, with
+  `Surface.clone()`; the frame passed to `onFrame` is the same snapshot, and
+  `testRuntime()` snapshot frames get the same fix. `recordDemoGif()` GIFs no
+  longer repeat the final frame for such apps. The result's shape is unchanged
+  (flyingrobots/bijou#822).
 - DOGFOOD's "Language set to ..." notice now appears in the language just
   chosen in settings, not the one being left: choosing Spanish from French
   shows "Idioma establecido en español / Español." The notice is localized
