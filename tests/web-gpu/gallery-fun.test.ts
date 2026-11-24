@@ -21,7 +21,8 @@ const stub = defineDemo<{ readonly moves: number }>({
   update: (msg, state) => (msg.type === 'pointer' ? { moves: state.moves + 1 } : state),
   view(state, { width, height }) {
     const surface = createSurface(width, height);
-    for (const [i, char] of [...`moves ${String(state.moves)}`].entries()) surface.set(i, 0, { char, empty: false });
+    const text = `moves ${String(state.moves)}`;
+    for (let i = 0; i < text.length; i += 1) surface.set(i, 0, { char: text.charAt(i), empty: false });
     return surface;
   },
 });

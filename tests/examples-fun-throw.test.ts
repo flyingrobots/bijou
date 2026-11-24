@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSurface, type Surface } from '@flyingrobots/bijou';
+import type { Surface } from '@flyingrobots/bijou';
 import type { PulseMsg } from '@flyingrobots/bijou-tui';
 import { defineDemo } from '../examples/fun/contract.js';
 import { createFunApp } from '../examples/fun/shell.js';

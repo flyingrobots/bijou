@@ -203,6 +203,18 @@ The address chooses the page (`src/gallery/route.ts`):
 | `gallery.html?app=<id>` | That demo, full-window, with a Back button hinted `Esc`. Reloading opens the same demo. |
 | `gallery.html?app=<unknown>` | The gallery with an Alert that names the unknown id, shown as text. |
 
+The second entry is `fun` ("Bijou Fun"). It loads `examples/fun/browser.ts`, whose
+`funBuild(seed, entries)` builds the fun shell from `examples/fun/registry.ts`, so a
+demo registered there appears in the gallery with no change under `examples/web-gpu`
+(`src/` names no fun demo; a test checks it). The shell and its three demos are one
+on-demand chunk of about 10 KB (4.6 KB gzipped): a chunk per demo would need the
+registry to hold lazy entries, which is a change to `examples/fun`. The page picks the
+seed, since demos never read the clock. The canvas mount delivers pointer movement
+with no button held (`pointermove` becomes a `move` mouse message), in cells of the
+canvas's CSS box, so a scaled display lands on the right cell. It does not deliver a
+pointer leaving the canvas (`bijou-web` binds no `pointerleave`), so a blob stays at
+the last cell the pointer crossed until it enters the header or footer row.
+
 Visits use `pushState`, so back and forward walk them. Only `?backend=` carries
 from one address to the next. Leaving a demo stops its mount, disposes its atlas
 and removes `window.__bijouWebGpu`, so no canvas, probe or listener stays behind.

@@ -61,12 +61,12 @@ test('switching demos 100 times leaves one canvas and a stable listener count', 
   await expectDemoOpen(page, 'fun');
   await focusSurface(page);
   const listeners = () => page.evaluate(() => window.__listenerCount?.() ?? -1);
-  await page.keyboard.press('tab');
+  await page.keyboard.press('2');
   const baseline = await listeners();
-  for (let visit = 0; visit < 100; visit += 1) await page.keyboard.press('tab');
+  for (let visit = 0; visit < 100; visit += 1) await page.keyboard.press(String((visit % 3) + 1));
   await expect.poll(async () => (await mounted(page)).canvases).toBe(1);
   expect(await listeners()).toBe(baseline);
-  expect(await activeIndex(page)).toBe(2);
+  await expect.poll(() => activeIndex(page)).toBe(0);
   expect(errors).toEqual([]);
 });
 

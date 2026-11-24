@@ -31,7 +31,15 @@ Other mouse actions are dropped.
 | `wormhole` | 45 seeded particles and the render mode | `m` toggles braille and ascii |
 | `metaballs` | five blobs bouncing in the unit square, and the pointer | pointer steers a sixth blob |
 
+## In the browser
+
+`examples/fun/browser.ts` exports `funBuild(seed, entries = demos)`, which builds the shell for a page that hosts it;
+the showcase gallery's `fun` entry uses it, so a demo added to `registry.ts` appears there with no showcase change.
+If a demo's `view` throws, the shell paints `<name> failed: <reason>` in the pane (`shell-chrome.ts`), keeps the
+header and footer, and the other demos keep running.
+
 ## Pointer limits
 
 `main.ts` runs with `mouseMode: 'any'`, which the public `run` options provide, so pointer movement with no button
-held reaches the metaballs. A terminal that does not report it leaves the blob where the last press or move put it.
+held reaches the metaballs. A terminal that does not report it leaves the blob where the last press or move put it. The browser canvas mount
+delivers movement with no button held, but not a pointer leaving the canvas.

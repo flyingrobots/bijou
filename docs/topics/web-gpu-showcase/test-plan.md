@@ -147,3 +147,19 @@ run with `npm run test:browser:web-gpu` in Google Chrome, outside the seal.
 | WGPU-55 | In light and dark the gallery takes `l`, `Enter` and `Esc`; the theme menu switches themes. | `in the %s theme the gallery moves focus with l, opens a demo with Enter, and Esc opens the palette`, `the gallery switches between light and dark from its theme menu` | Implemented |
 | WGPU-56 | In a demo `Esc` returns from the chrome, and a focused Surface keeps every key. | `in a demo, the Esc key hint and the button return to the gallery from the chrome, and a focused Surface keeps every key` | Implemented |
 | WGPU-57 | Opening and closing DOGFOOD 50 times leaves one canvas while open, none after, and a stable listener count. | `opening and closing DOGFOOD 50 times leaves one canvas while open, none after, and a stable listener count` | Implemented |
+
+## Fun demos in the gallery: `tests/web-gpu/gallery-fun.test.ts` (sealed), `examples/web-gpu/e2e/gallery-fun*.e2e.ts` (browser)
+
+Origin: flyingrobots/bijou#892. IDs start at 70 to leave 58 to 69 to parallel work.
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| WGPU-70 | The registry lists the fun shell after DOGFOOD and loads it on demand. | `lists the fun shell after DOGFOOD, as one entry`, `loads the shell on demand, and its header lists every demo of the fun registry` | Implemented |
+| WGPU-71 | A demo registered in the fun shell appears, by key and pointer, with no change under `examples/web-gpu`. | `shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu`, `names no fun demo anywhere in the showcase source` | Implemented |
+| WGPU-72 | The fun chunk is dynamic and outside the entry chunk. | `puts each demo in a chunk of its own that is loaded on demand`, `keeps every demo out of the gallery entry chunk and the chunks it imports` | Implemented |
+| WGPU-73 | On WebGPU and on Canvas 2D each demo opens, advances and logs no console error. | `on webgpu each fun demo opens, advances with the clock and the keys, and the console stays clean`, `on canvas2d each fun demo opens, advances with the clock and the keys, and the console stays clean` | Implemented |
+| WGPU-74 | The metaballs follow a pointer with no button held, by cell, at device scale 1 and 2 on both backends, and let go in the header row. | `the metaballs follow a pointer with no button held, by cell, and let go in the header row` | Implemented |
+| WGPU-75 | The gallery lists the fun shell and opens it; leaving it leaves no canvas. | `the gallery lists the fun shell and opens it by click`, `leaving the fun shell returns to the gallery with no canvas left` | Implemented |
+| WGPU-76 | A backend switch keeps the shell on the same demo, still advancing. | `a backend switch while a demo runs keeps the shell on the same demo, still advancing` | Implemented |
+| WGPU-77 | 100 demo switches leave one canvas and a stable listener count. | `switching demos 100 times leaves one canvas and a stable listener count` | Implemented |
+| WGPU-78 | A pointer leaving the canvas is not delivered by the canvas mount. | None: documented limit of `bijou-web`, which binds no `pointerleave`. | Not covered |

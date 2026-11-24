@@ -34,6 +34,7 @@ frame count and the pause, so every demo pauses the same way.
 - `contract.ts`, `random.ts`, `panel.ts` (card and braille helpers): the shared parts.
 - `shell.ts`, `shell-chrome.ts`: the header row, the footer row, input routing.
 - `registry.ts`: the list of demos. `demos/`: one file per demo, split where a demo needs more than one.
+- `browser.ts`: the browser entry, `funBuild(seed, entries)`; the showcase gallery loads it.
 - `main.ts`: the terminal entry. It is the only file that reaches Node, so the rest can run in a browser.
 
 Adding a demo is a `Demo<S>` in `demos/` and one line in `registry.ts`.
