@@ -1,0 +1,233 @@
+{
+ "frames": [
+  "6aef6808bbcb29a0",
+  "527837ad2d3dbb49",
+  "fee6a62e1c8c7d55",
+  "93bf08dd3ccf31f8",
+  "dce2fedb53c5f91c",
+  "5227ca93a648f8b7",
+  "7666bfa98bf78c03",
+  "755679018a7ef9e1",
+  "93bf08dd3ccf31f8",
+  "835de529c37b4955",
+  "1694a3397414d1a2"
+ ],
+ "log": [
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "paint-ascii",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "paint-rgb-fixed",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "paint-set-hex-palette",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "paint-set-preparsed-palette",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "paint-gradient-rgb",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "diff-gradient",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "diff-sparse",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "diff-static",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "dogfood-realistic",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "component-app",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "flame",
+   "frames": 1
+  },
+  {
+   "keys": [
+    "ts",
+    "cycle",
+    "scenario",
+    "frames",
+    "nsPerFrame",
+    "p50",
+    "p90",
+    "p99",
+    "covPct",
+    "heapUsedMB",
+    "rssMB"
+   ],
+   "cycle": 0,
+   "scenario": "soak",
+   "frames": 1
+  }
+ ]
+}
