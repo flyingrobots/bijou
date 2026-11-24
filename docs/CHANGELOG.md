@@ -60,6 +60,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   keep logical order. `ltr` output is unchanged. The Component Library heading
   uses it instead of drawing the trail by hand.
 
+- `progressBar()` mirrors under right-to-left layout (#619). It takes
+  `direction` (or reads `ctx.direction`); in `interactive` and `static` output
+  the fill grows from the right edge, the gradient's leading edge is the
+  rightmost cell and the percentage label moves to the right of the bar. Fill
+  stays whole cells, so there is no partial-block glyph to mirror; caller fill
+  glyphs go through `mirrorGlyphs()`. `pipe` and `accessible` output and every
+  left-to-right render are unchanged.
+
 - `box()`, `headerBox()`, `boxSurface()` and `headerBoxSurface()` align the
   border title to the logical start edge of the resolved direction: the right
   edge under `rtl` in `interactive` and `static` modes. `ltr`, `pipe` and
@@ -77,6 +85,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   object id), asserting paths from every commit are detected, a branch with
   unrelated files stays non-relevant, and an existing remote branch diffs
   against the remote object (#552).
+
+- `stepper()` and `paginator()` mirror under right-to-left layout (#617). With
+  `direction: 'rtl'` or an `rtl` context, `interactive` and `static` output
+  runs the steps and page dots right to left: the first step or page is
+  rightmost and the logically next one sits to its left. Step markers, labels,
+  step numbers, the `──` connector and the `Page X of Y` text are never
+  reversed or altered, and neither component emits a directional glyph, so no
+  glyph mapping applies. `pipe` and `accessible` output keep logical order.
+  `ltr` output is unchanged.
 
 ### Added
 
@@ -97,6 +114,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   JSON, kept current by `npm run components:data` and a drift test), and the
   hero perf overlay reads memory through a port with a Node and a browser
   adapter. Their terminal output is unchanged (#809).
+
+- `tree()`, `enumeratedList()` and `accordion()` mirror under right-to-left
+  layout (flyingrobots/bijou#622). With `direction: 'rtl'` (a new option on
+  each, as on `breadcrumb()`) or an `rtl` context, `interactive` and `static`
+  output indents from the right: tree connectors mirror by explicit mapping
+  (`├` to `┤`, `└` to `┘`), list markers keep their text and sit on the right
+  edge, and the accordion disclosure glyph follows the title (`▶` to `◀`; `▼`
+  is not directional). Lines are padded to the widest line by display width, so
+  no width option exists. Labels, paths and IDs are never changed, `pipe` and
+  `accessible` output keep logical order, and `ltr` output is unchanged.
 
 ### Changed
 
