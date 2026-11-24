@@ -6,6 +6,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Added
+
+- `npm run code-dojo:report` writes the Code Dojo debt aggregate, next goalpost
+  target, per-source counts, top ESLint rules and optional live ESLint data to
+  `docs/code-dojo/debt-report.json` as a `code-dojo.debt-report.v1` document,
+  with `--check` for drift and `--live-input`/`--out` for a live artifact. The
+  numbers come from the same `summarizeCodeDojoDebt()` the `code-dojo:debt`
+  gate uses, which is unchanged. JSON Schemas are in `schemas/` (#603).
+
 ### Fixed
 
 - The Theme Lab draft theme keeps its rule provenance. `cloneThemeForThemeLabEditor()`

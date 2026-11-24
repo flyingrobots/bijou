@@ -1,0 +1,28 @@
+{
+  "schema": "code-dojo.debt-report.v1",
+  "totalViolations": 0,
+  "ceiling": 0,
+  "goalpostReduction": 50,
+  "nextGoalpostTarget": 0,
+  "sources": [
+    {
+      "id": "file-context",
+      "count": 0
+    },
+    {
+      "id": "mock-ban",
+      "count": 0
+    },
+    {
+      "id": "code-size",
+      "count": 0,
+      "overHardLimit": 0
+    },
+    {
+      "id": "eslint",
+      "count": 0
+    }
+  ],
+  "eslintRules": [],
+  "live": null
+}

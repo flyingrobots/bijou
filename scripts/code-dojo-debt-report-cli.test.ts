@@ -1,6 +1,6 @@
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import Ajv from 'ajv';
+import { Ajv } from 'ajv';
 import { afterEach, describe, expect, it } from 'vitest';
 import { loadCodeDojoDebtReport } from './code-dojo-debt-report.js';
 import { runCodeDojoDebtReport } from './code-dojo-debt-report-cli.js';
@@ -10,9 +10,10 @@ const SCHEMA_DIR = new URL('../schemas/', import.meta.url);
 const roots: string[] = [];
 const ajv = new Ajv({ strict: true });
 
-function schema(name: string): Record<string, unknown> {
+function schema(name: string): object {
   const parsed: unknown = JSON.parse(readFileSync(new URL(name, SCHEMA_DIR), 'utf8'));
-  return parsed as Record<string, unknown>;
+  if (parsed == null || typeof parsed !== 'object') throw new Error(`${name} is not a schema object`);
+  return parsed;
 }
 
 const validateReport = ajv.compile(schema('code-dojo.debt-report.v1.schema.json'));
@@ -38,7 +39,7 @@ describe('Code Dojo debt report command', () => {
   it('writes the committed report path and emits one schema-valid JSON line', () => {
     const root = fixtureRoot();
     const result = runCodeDojoDebtReport([], root);
-    const written = JSON.parse(readFileSync(join(root, 'docs/code-dojo/debt-report.json'), 'utf8')) as unknown;
+    const written: unknown = JSON.parse(readFileSync(join(root, 'docs/code-dojo/debt-report.json'), 'utf8'));
 
     expect(result.code).toBe(0);
     expect(result.stderr).toEqual([]);
