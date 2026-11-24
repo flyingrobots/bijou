@@ -86,6 +86,7 @@ describe('soak bench through host ports', () => {
     const log = () => { throw new Error('disk full'); };
     const host = { options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: NO_MEMORY, log, scenarioContext };
     const model = initScenario(host, 0, 0, 80, 24);
-    expect(() => logAndAdvanceCmd(model, host)()).toThrow('disk full');
+    const capabilities = { onPulse: () => ({ dispose: NO_LOG }) };
+    expect(() => logAndAdvanceCmd(model, host)(NO_LOG, capabilities)).toThrow('disk full');
   });
 });
