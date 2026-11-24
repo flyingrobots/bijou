@@ -15,6 +15,8 @@ export interface ShowcaseSession {
   switchBackend(next: BijouCanvasBackend): Promise<void>;
   /** Stop the mount and present the same app, with its model, on the other host. */
   switchHost(next: ShowcaseHost): Promise<void>;
+  /** Switch to the other host; does nothing for an app with no scene projection. */
+  toggleHost(): Promise<void>;
   /** Lose the WebGL2 context with `WEBGL_lose_context`, then restore it. */
   loseContext(): Promise<void>;
   resetAtlas(): Promise<void>;
@@ -86,9 +88,10 @@ export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtl
     if (from === undefined || built === undefined) throw new Error('BIJOU_WEB_GPU_NOT_MOUNTED: no app is mounted');
     if (next === from.host) return;
     if (next === 'dom' && built.scene === undefined) throw new Error(`BIJOU_WEB_GPU_NO_SCENE: ${hostNote({ appTitle: title, sceneApp: false }) ?? ''}`);
-    const carried: Carried = { model: from.model() };
     if (from.canvas?.backend != null) lastBackend = from.canvas.backend;
     await from.stop();
+    // Read after the stop settles, so a message that landed while stopping is in the carried model.
+    const carried: Carried = { model: from.model() };
     live = undefined;
     try {
       await start(next, lastBackend, carried);
@@ -111,6 +114,11 @@ export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtl
       await canvas.switchBackend(next);
     }),
     switchHost: (next) => enqueue(() => toHost(next)),
+    toggleHost: () => enqueue(async () => {
+      // The target is chosen here, on the queue, from the live mount: never from a polled reading.
+      if (live === undefined || built?.scene === undefined) return;
+      await toHost(live.host === 'dom' ? 'canvas' : 'dom');
+    }),
     loseContext: () => enqueue(async () => {
       const gl = handle()?.canvas?.getContext('webgl2');
       const lose = gl?.getExtension('WEBGL_lose_context');

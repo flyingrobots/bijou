@@ -65,6 +65,14 @@ describe('examples/web-gpu dual-host counter', () => {
     ]);
   });
 
+  it('labels every action, so a host has a name for a control whose own text is its value', () => {
+    const scene = app.viewScene({ count: 0, name: 'Ada', enabled: true }, ctx);
+    expect(scene.actions.map((action) => [action.id, action.label])).toEqual([
+      ['app.increment', { kind: 'literal', value: 'Increment' }], ['app.decrement', { kind: 'literal', value: 'Decrement' }],
+      ['app.name', { kind: 'literal', value: 'Name' }], ['app.enabled', { kind: 'literal', value: 'Switch' }],
+    ]);
+  });
+
   it('paints a name the canvas cannot hold with one cell per grapheme, and the scene keeps it whole', () => {
     const model: DualModel = { count: 2, name: 'ab日本🙂', enabled: true };
     expect(painted(model)).toContain('Hello, ab???');

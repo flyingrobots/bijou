@@ -26,16 +26,21 @@ export function pageCommands(setTheme: (theme: Theme) => void): readonly ChromeC
   ];
 }
 
-/** Switch host, unless the mounted app cannot take it: then there is nothing to ask the session for. */
+/**
+ * Switch host, unless the mounted app cannot take it: then there is nothing to ask the session for.
+ * A request for the host already presenting still goes to the session, whose queue ignores it; the
+ * polled HUD may be a switch behind.
+ */
 export function switchHost(store: ShowcaseStore, host: ShowcaseHost): void {
   const hud = store.snapshot().hud;
-  if (hud === null || hud.host === host || (host === 'dom' && !hud.sceneApp)) return;
+  if (hud === null || (host === 'dom' && !hud.sceneApp)) return;
   store.run((session) => session.switchHost(host));
 }
 
-/** The other host from the one presenting now. */
+/** The other host from the one presenting when the request reaches the session's queue. */
 export function toggleHost(store: ShowcaseStore): void {
-  switchHost(store, store.snapshot().hud?.host === 'dom' ? 'canvas' : 'dom');
+  if (store.snapshot().hud?.sceneApp !== true) return;
+  store.run((session) => session.toggleHost());
 }
 
 /** The showcase's controls as commands: the same operations its buttons run. */

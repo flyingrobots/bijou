@@ -67,6 +67,8 @@ const ROWS: readonly Row[] = [
   ['app.enabled', 'switch', 'toggle'],
 ];
 
+const ACTION_LABELS: Readonly<Record<string, string>> = { increment: 'Increment', decrement: 'Decrement', rename: 'Name', toggle: 'Switch' };
+
 function rowText(model: DualModel, id: string): string {
   if (id === 'app.count') return countText(model);
   if (id === 'app.increment') return 'Increment';
@@ -84,7 +86,11 @@ export function dualScene(model: DualModel): UiSceneIr {
     ...(id === 'app.enabled' ? { state: { checked: model.enabled } } : {}),
     text: { kind: 'literal', value: rowText(model, id) },
   }));
-  const actions = ROWS.flatMap(([id, , command]): UiAction[] => (command === undefined ? [] : [{ id, command, targetNodeId: id }]));
+  // Each action carries a label: the name a host can give its control. The rename textbox has no
+  // other text to be named by.
+  const actions = ROWS.flatMap(([id, , command]): UiAction[] => (command === undefined ? [] : [
+    { id, command, targetNodeId: id, label: { kind: 'literal', value: ACTION_LABELS[command] ?? command } },
+  ]));
   return {
     irVersion: 'ui-scene-ir/1',
     id: 'web-gpu.dual-host-counter',

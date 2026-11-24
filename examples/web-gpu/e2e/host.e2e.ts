@@ -110,3 +110,24 @@ test('an app without a scene projection offers no DOM host, and the HUD and the 
   await expect(page.locator('[data-host-note]')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
+
+test('Space then s focuses the live host, and two quick toggles end where they began', async ({ page }) => {
+  const errors = collectErrors(page);
+  await open(page, 'app=dual&backend=canvas2d');
+  await pressOnCanvas(page, 'k');
+  await expectCount(page, 'canvas', 1);
+  // Two toggles inside one HUD poll: each picks its target on the session's queue, so they cancel out.
+  await page.evaluate(() => { void window.__bijouWebGpu?.toggleHost(); return window.__bijouWebGpu?.toggleHost(); });
+  await waitFor(page, (current) => current.host === 'canvas' && current.presents > 0);
+  await expectCount(page, 'canvas', 1);
+  await expectOnly(page, 'canvas');
+
+  await switchHost(page, 'dom');
+  await hostItem(page, 'dom').focus();
+  await page.keyboard.press(' ');
+  await page.keyboard.press('s');
+  await expect(page.locator('#surface [data-bijou-node-id="app.increment"]')).toBeFocused();
+  expect(await page.evaluate(() => window.__bijouWebGpu?.failures())).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
