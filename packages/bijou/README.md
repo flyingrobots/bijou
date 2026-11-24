@@ -74,7 +74,7 @@ fake duplication rather than a real second API.
 - **`progressBar()`**: Determinate completion. Takes `direction`; under `'rtl'` the fill grows from the right edge (see Layout Direction).
 - **`spinner()`**: Indeterminate activity.
 - **`breadcrumb()`**: Path context. Mirrors flow and separator under `direction: 'rtl'`.
-- **`stepper()`**: Ordered stages in a linear process.
+- **`stepper()`**: Ordered stages in a linear process. Steps run right to left under `direction: 'rtl'`.
 
 ### Theme Authoring
 - **`extendTheme(base, extensions)`**: Build a custom theme from a known-good

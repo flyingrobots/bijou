@@ -80,6 +80,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   unrelated files stays non-relevant, and an existing remote branch diffs
   against the remote object (#552).
 
+- `stepper()` and `paginator()` mirror under right-to-left layout (#617). With
+  `direction: 'rtl'` or an `rtl` context, `interactive` and `static` output
+  runs the steps and page dots right to left: the first step or page is
+  rightmost and the logically next one sits to its left. Step markers, labels,
+  step numbers, the `──` connector and the `Page X of Y` text are never
+  reversed or altered, and neither component emits a directional glyph, so no
+  glyph mapping applies. `pipe` and `accessible` output keep logical order.
+  `ltr` output is unchanged.
+
 ### Added
 
 - `ui-scene-ir/1` nodes can declare an optional `state.checked` boolean,

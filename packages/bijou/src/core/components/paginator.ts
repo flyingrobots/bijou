@@ -1,6 +1,7 @@
 import type { BijouContext } from '../../ports/context.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { mirrorsLayout, orderForDirection, type InlineDirection } from '../direction/direction.js';
 import { sanitizeNonNegativeInt, sanitizePositiveInt } from '../numeric.js';
 
 /** Configuration options for the {@link paginator} component. */
@@ -13,6 +14,11 @@ export interface PaginatorOptions {
   style?: 'dots' | 'text' | undefined;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
+  /**
+   * Logical layout direction. Overrides `ctx.direction`; absent both, `'ltr'`.
+   * Under `'rtl'` in `interactive` and `static` output the dots run right to left.
+   */
+  direction?: InlineDirection | undefined;
 }
 
 /**
@@ -22,6 +28,10 @@ export interface PaginatorOptions {
  * - `pipe`: `[page/total]` format.
  * - `accessible`: `Page N of M` format.
  * - `interactive`/`static`: dot indicators (`●`/`○`) or text depending on style option.
+ *   Under `rtl` the dots run right to left: page one is rightmost and the next
+ *   page sits to the left of the current one. The `text` style (`Page X of Y`)
+ *   keeps its digits and order. The dots are symmetric, so no glyph mapping
+ *   applies. `pipe` and `accessible` keep logical order.
  *
  * @param options - Paginator configuration including current page, total, and display style.
  * @returns The formatted paginator string.
@@ -52,7 +62,8 @@ export function paginator(options: PaginatorOptions): string {
           dots.push(ctx.style.styled(ctx.semantic('muted'), '○'));
         }
       }
-      return dots.join(' ');
+      const visual = mirrorsLayout({ ...options, ctx }) ? 'rtl' : 'ltr';
+      return orderForDirection(dots, visual).join(' ');
     },
   }, options);
 }
