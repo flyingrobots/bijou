@@ -8,14 +8,20 @@ export interface CodePointFacts {
   readonly generalCategory: string;
 }
 
+/** One emoji-test.txt line: the sequence and its status (fully-qualified, ...). */
+export interface EmojiSequence {
+  readonly sequence: string;
+  readonly status: string;
+}
+
 /** The parsed UCD inputs of the width report. */
 export interface WidthUcd {
   readonly inputs: readonly UcdInput[];
   /** Every assigned code point (General_Category not Cn, Cs or Co). */
   readonly assigned: ReadonlyMap<number, CodePointFacts>;
   readonly blockOf: (cp: number) => string;
-  /** Code point sequences of every line of emoji-test.txt. */
-  readonly emojiSequences: readonly string[];
+  /** Every sequence of emoji-test.txt with its qualification status. */
+  readonly emojiSequences: readonly EmojiSequence[];
 }
 
 const RANGE = /^([0-9A-F]{4,6})(?:\.\.([0-9A-F]{4,6}))?\s*;\s*([^#]+?)\s*(?:#\s*(\S+).*)?$/u;
@@ -50,12 +56,12 @@ export function readWidthUcd(root: string, directory: string): WidthUcd {
     const block = blocks.find(([first, last]) => cp >= first && cp <= last);
     return block === undefined ? 'No_Block' : block[2];
   };
-  const emojiSequences: string[] = [];
+  const emojiSequences: EmojiSequence[] = [];
   for (const line of readInput(root, `${directory}/emoji-test.txt`, inputs).split('\n')) {
-    const match = /^([0-9A-F ]+);/u.exec(line);
-    if (match?.[1] === undefined) continue;
+    const match = /^([0-9A-F ]+);\s*([a-z-]+)/u.exec(line);
+    if (match?.[1] === undefined || match[2] === undefined) continue;
     const cps = match[1].trim().split(/\s+/u).map((part) => parseInt(part, 16));
-    emojiSequences.push(String.fromCodePoint(...cps));
+    emojiSequences.push({ sequence: String.fromCodePoint(...cps), status: match[2] });
   }
   return { inputs, assigned, blockOf, emojiSequences };
 }

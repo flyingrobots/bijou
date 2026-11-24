@@ -7,7 +7,12 @@ export interface CorpusSource {
   readonly strings: readonly string[];
 }
 
-/** Test files whose string literals are measured: grapheme, text and layout tests. */
+/**
+ * Test files whose string literals are measured: grapheme, text and layout
+ * tests. grapheme-uax11.test.ts is this change's own regression test, so it
+ * is left out: the report counts inputs that existed before it.
+ */
+const OWN_TESTS = new Set(['grapheme-uax11.test.ts']);
 const TEST_FILES: readonly (readonly [string, RegExp])[] = [
   ['packages/bijou/src/core/text', /\.test\.ts$/u],
   ['packages/bijou/src/core/layout', /\.test\.ts$/u],
@@ -69,7 +74,7 @@ const readText = (root: string, path: string): string => readFileSync(resolve(ro
 /** The repository corpora: test literals, DOGFOOD catalogs and content, the book corpus. */
 export function readRepositoryCorpus(root: string): readonly CorpusSource[] {
   const testFiles = TEST_FILES.flatMap(([directory, pattern]) =>
-    walk(root, directory, (name) => pattern.test(name)));
+    walk(root, directory, (name) => pattern.test(name) && !OWN_TESTS.has(name)));
   const catalogs = walk(root, 'examples/docs/i18n/catalogs', (name) => name.endsWith('.json'));
   const content = walk(root, 'examples/docs/content', (name) => name.endsWith('.md'));
   const json = (path: string): string[] => jsonStrings(JSON.parse(readText(root, path)), []);

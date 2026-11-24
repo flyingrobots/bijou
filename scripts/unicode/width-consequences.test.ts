@@ -23,7 +23,7 @@ describe('compareWidths', () => {
       [0x3248, { eastAsianWidth: 'A', generalCategory: 'No' }],
     ]),
     blockOf: (cp) => (cp < 0x80 ? 'Basic Latin' : cp < 0x2400 ? 'Miscellaneous Technical' : 'Enclosed CJK'),
-    emojiSequences: ['⌚'],
+    emojiSequences: [{ sequence: '⌚', status: 'fully-qualified' }],
   };
   const before = (cluster: string): number => (cluster.includes('㉈') ? 2 : 1);
   const after = (cluster: string): number => (cluster.includes('⌚') ? 2 : 1);
@@ -34,10 +34,10 @@ describe('compareWidths', () => {
       corpus: [{ source: 'test-literal', strings: ['A⌚', '㉈'] }],
       before,
       after,
-      segment: (text) => [...text],
+      segment: (text) => Array.from(text),
     });
     expect(result.groups.map((g) => [g.kind, g.source, g.block, g.direction, g.count])).toEqual([
-      ['cluster', 'emoji-test', 'Miscellaneous Technical', '1->2', 1],
+      ['cluster', 'emoji-test fully-qualified', 'Miscellaneous Technical', '1->2', 1],
       ['cluster', 'test-literal', 'Enclosed CJK', '2->1', 1],
       ['cluster', 'test-literal', 'Miscellaneous Technical', '1->2', 1],
       ['code-point', 'assigned', 'Enclosed CJK', '2->1', 1],
@@ -46,7 +46,7 @@ describe('compareWidths', () => {
     expect(result.sources.map((s) => [s.source, s.clusters, s.changed])).toEqual([
       ['assigned', 3, 2],
       ['test-literal', 3, 2],
-      ['emoji-test', 1, 1],
+      ['emoji-test fully-qualified', 1, 1],
     ]);
     expect(result.groups[1]?.examples).toEqual(['U+3248 ㉈']);
   });

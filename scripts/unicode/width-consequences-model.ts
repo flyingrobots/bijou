@@ -26,7 +26,7 @@ export interface SourceSummary {
 const EXAMPLES = 3;
 const u = (cp: number): string => `U+${cp.toString(16).toUpperCase().padStart(4, '0')}`;
 const describe = (cluster: string): string =>
-  `${[...cluster].map((ch) => u(ch.codePointAt(0) ?? 0)).join(' ')} ${cluster}`;
+  `${Array.from(cluster).map((ch) => u(ch.codePointAt(0) ?? 0)).join(' ')} ${cluster}`;
 
 interface MutableGroup {
   count: number;
@@ -78,21 +78,25 @@ export function compareWidths(options: {
   const sources: SourceSummary[] = [
     { source: 'assigned', clusters: ucd.assigned.size, changed: changedCodePoints, multiClusterStrings: 0 },
   ];
-  const corpus = [...options.corpus, { source: 'emoji-test', strings: ucd.emojiSequences }];
+  const statuses = [...new Set(ucd.emojiSequences.map((entry) => entry.status))];
+  const corpus = [...options.corpus, ...statuses.map((status) => ({
+    source: `emoji-test ${status}`,
+    strings: ucd.emojiSequences.filter((entry) => entry.status === status).map((entry) => entry.sequence),
+  }))];
   for (const { source, strings } of corpus) {
     const seen = new Set<string>();
     let changed = 0;
     let multiClusterStrings = 0;
     for (const text of strings) {
       const clusters = [...options.segment(text)];
-      if (source === 'emoji-test' && clusters.length > 1) multiClusterStrings += 1;
+      if (source.startsWith('emoji-test') && clusters.length > 1) multiClusterStrings += 1;
       for (const cluster of clusters) {
         if (seen.has(cluster)) continue;
         seen.add(cluster);
         const [was, now] = [before(cluster), after(cluster)];
         if (was === now) continue;
         changed += 1;
-        const responsible = [...cluster].map((ch) => ch.codePointAt(0) ?? 0)
+        const responsible = Array.from(cluster).map((ch) => ch.codePointAt(0) ?? 0)
           .find((cp) => before(String.fromCodePoint(cp)) !== after(String.fromCodePoint(cp))) ?? 0;
         grouper.add('cluster', source, ucd.blockOf(responsible), `${String(was)}->${String(now)}`,
           eawOf(responsible), describe(cluster));
