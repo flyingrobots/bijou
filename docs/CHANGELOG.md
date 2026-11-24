@@ -17,6 +17,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `scripts/ci-workflow-policy.ts` refuses a workflow whose shard list is not 1
   to N or whose command names another N. See `docs/guides/sealed-tests.md`.
   Origin: flyingrobots/bijou#907.
+- The whole-tree ESLint ratchet (`npm run lint:eslint`) lints one target per
+  process and merges the results, where it ran one process over every target.
+  That one process held the typed program for the whole tree and ran out of V8
+  heap, at about 2,000 MB, in hosted CI (job "Verify TypeScript doctrine") and
+  in the sealed worker. Each target has a cache file of its own under
+  `.cache/eslint/`. The findings counted are the same; a file two targets match
+  is counted once.
 - The soak bench (`npm run soak`) takes its options, memory readings and log
   through host ports (`bench/src/soak-ports.ts`) instead of reading
   `process.argv`, `process.memoryUsage()` and `node:fs`, so its app module
