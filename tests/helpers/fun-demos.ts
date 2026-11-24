@@ -3,6 +3,7 @@ import { createTestContext, type TestContext } from '@flyingrobots/bijou/adapter
 import type { Cell, Surface } from '@flyingrobots/bijou';
 import type { DemoEntry, DemoMsg, Session } from '../../examples/fun/contract.js';
 import { demos } from '../../examples/fun/registry.js';
+import { threeDMiddle } from './fun-3d.js';
 
 export const SEED = 1888;
 export const DT = 1 / 30;
@@ -55,6 +56,6 @@ export function byId(id: string): DemoEntry {
 export function frameScript(id: string, width: number, height: number): DemoMsg[] {
   const middle: DemoMsg[] = id === 'wormhole'
     ? [{ type: 'key', key: 'm' }]
-    : id === 'metaballs' ? [{ type: 'pointer', col: Math.floor(width / 3), row: Math.floor(height / 2) }] : [];
+    : id === 'metaballs' ? [{ type: 'pointer', col: Math.floor(width / 3), row: Math.floor(height / 2) }] : threeDMiddle(id, width, height);
   return [...pulses(30), ...middle, ...pulses(30)];
 }
