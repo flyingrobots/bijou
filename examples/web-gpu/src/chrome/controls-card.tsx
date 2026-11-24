@@ -23,14 +23,14 @@ export function ControlsCard({ view, store }: { view: ShowcaseView; store: Showc
       <CardContent className="flex flex-col gap-6">
         <FieldSet>
           <FieldLegend>App</FieldLegend>
-          <ToggleGroup type="single" variant="outline" size="lg" value={view.hud?.app ?? ''} disabled={disabled}
+          <ToggleGroup type="single" variant="outline" size="lg" className="flex-wrap" value={view.hud?.app ?? ''} disabled={disabled}
             onValueChange={(id) => { if (id !== '') store.run((session) => session.mountApp(id)); }}>
             {SHOWCASE_APPS.map((app) => <ToggleGroupItem key={app.id} value={app.id} data-app={app.id} data-nav="">{app.title}</ToggleGroupItem>)}
           </ToggleGroup>
         </FieldSet>
         <FieldSet>
           <FieldLegend>Host</FieldLegend>
-          <ToggleGroup type="single" variant="outline" size="lg" value={view.hud?.host ?? ''} disabled={disabled}
+          <ToggleGroup type="single" variant="outline" size="lg" className="flex-wrap" value={view.hud?.host ?? ''} disabled={disabled}
             onValueChange={(host) => { if (isHost(host)) store.run((session) => session.switchHost(host)); }}>
             {HOSTS.map((host) => (
               <ToggleGroupItem key={host} value={host} data-host={host} data-nav="" disabled={host === 'dom' && view.hud?.sceneApp !== true}>{HOST_LABELS[host]}</ToggleGroupItem>
@@ -40,7 +40,7 @@ export function ControlsCard({ view, store }: { view: ShowcaseView; store: Showc
         </FieldSet>
         <FieldSet>
           <FieldLegend>Backend</FieldLegend>
-          <ToggleGroup type="single" variant="outline" size="lg" value={view.hud?.backend ?? ''} disabled={disabled || onDom}
+          <ToggleGroup type="single" variant="outline" size="lg" className="flex-wrap" value={view.hud?.backend ?? ''} disabled={disabled || onDom}
             onValueChange={(name) => { if (isBackend(name)) store.run((session) => session.switchBackend(name)); }}>
             {BACKENDS.map((name) => <ToggleGroupItem key={name} value={name} data-backend={name} data-nav="">{BACKEND_LABELS[name]}</ToggleGroupItem>)}
           </ToggleGroup>

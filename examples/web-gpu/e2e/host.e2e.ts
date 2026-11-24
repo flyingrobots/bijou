@@ -21,6 +21,9 @@ test('the dual-host counter set to 5 on the canvas shows 5 on the DOM host, take
   await waitFor(page, (current) => current.host === 'dom');
   await expect(domCount(page)).toHaveText('Count 5');
   await expect(hud(page, 'host')).toHaveText('DOM');
+  // The DOM host is not "negotiating": it shows its own status, and every app is reachable in the controls.
+  await expect(page.locator('[data-status="dom"]')).toHaveText('DOM · native elements');
+  for (const app of await page.locator('[data-app]').all()) await expect(app).toBeInViewport();
   await expect(hostItem(page, 'dom')).toHaveAttribute('data-state', 'on');
   await expectOnly(page, 'dom');
   await clickInDom(page, 'app.increment');
