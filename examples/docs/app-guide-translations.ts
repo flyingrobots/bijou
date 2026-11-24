@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import ARTICLES from './generated/guide-translations.json' with { type: 'json' };
 import { stripMarkdownFrontmatter } from './app-markdown.js';
 
 /**
@@ -34,8 +34,8 @@ export function guideTranslation(guideId: string, locale: string | undefined): G
   const key = `${locale}/${guideId}`;
   const cached = cache.get(key);
   if (cached !== undefined) return cached ?? undefined;
-  const url = new URL(`./content/i18n/${locale}/${guideId}.md`, import.meta.url);
-  const translation = existsSync(url) ? parse(readFileSync(url, 'utf8')) : null;
+  const article = Object.hasOwn(ARTICLES, key) ? Object.getOwnPropertyDescriptor(ARTICLES, key)?.value : undefined;
+  const translation = typeof article === 'string' ? parse(article) : null;
   cache.set(key, translation);
   return translation ?? undefined;
 }
