@@ -22,6 +22,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `examples/fun/` brings three demos from the owner's bijou-fun project (a
+  rainbow gradient, a wormhole and colour-blending metaballs) into the
+  repository, ported from Bijou 7.1. Each demo is a typed `Demo<S>` that owns
+  its state, its `update` for keys, pointer and pulses, and a `view` that
+  returns a Surface; there is no shared options bag. A small shell lists and
+  switches demos and routes pointer input. Run it with `npm run fun`. Frames
+  are driven by frame and elapsed arguments and a seed, and no demo or shell
+  module reaches a Node API, so a later browser host can mount them. The
+  terminal entry asks for `mouseMode: 'any'`, so the metaballs follow the
+  pointer with no button held (flyingrobots/bijou#888).
 - The web GPU showcase has a demo gallery: `/gallery.html` lists a registry of
   demos (`examples/web-gpu/src/gallery/demos.ts`, DOGFOOD first), each loaded
   on demand into its own chunk and opened full-window at `?app=<id>`. A Back
