@@ -68,6 +68,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   glyphs go through `mirrorGlyphs()`. `pipe` and `accessible` output and every
   left-to-right render are unchanged.
 
+- `box()`, `headerBox()`, `boxSurface()` and `headerBoxSurface()` align the
+  border title to the logical start edge of the resolved direction: the right
+  edge under `rtl` in `interactive` and `static` modes. `ltr`, `pipe` and
+  `accessible` output is byte-identical to before; title text is never
+  reversed (flyingrobots/bijou#626).
+
 - CI publishes a per-job wall-time summary to the run's job summary, slowest
   finished job first, with skipped, in-progress and cancelled jobs labelled.
   The new `Wall time summary` job is read-only, non-blocking and required by

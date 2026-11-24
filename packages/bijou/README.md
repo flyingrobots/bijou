@@ -274,6 +274,16 @@ Mirrored Components:
   ASCII fallback needs no mapping. `pipe` (`Progress: 45%`) and `accessible`
   (`45 percent complete.`) output are identical in both directions.
 
+Components that read the direction today:
+
+- **`box()`, `headerBox()`, `boxSurface()`, `headerBoxSurface()`**: Under a
+  resolved `'rtl'` direction in `interactive` and `static` modes the title in
+  the top border sits at the right edge (the logical start) instead of the
+  left. A title too long for the border is clipped exactly as in `'ltr'`, then
+  aligned the same way. Title text is never reversed, and `pipe` and
+  `accessible` output keep their plain logical form. These components have no
+  title-alignment option; a title is always at the logical start edge.
+
 Illustrative composition for a direction-sensitive Component; per-family
 integration is tracked separately:
 
