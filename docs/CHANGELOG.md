@@ -70,6 +70,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `testRuntime()` snapshot frames get the same fix. `recordDemoGif()` GIFs no
   longer repeat the final frame for such apps. The result's shape is unchanged
   (flyingrobots/bijou#822).
+- `npm run version` rejects versions with leading-zero numbers such as
+  `01.0.0` and `1.0.0-rc.01` before it edits any manifest or runs npm, using
+  the same canonical integer rule as release preflight. Stable and
+  `-(rc|beta|alpha).N` versions behave as before
+  (flyingrobots/bijou#553).
 - DOGFOOD's "Language set to ..." notice now appears in the language just
   chosen in settings, not the one being left: choosing Spanish from French
   shows "Idioma establecido en español / Español." The notice is localized
