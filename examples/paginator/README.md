@@ -22,6 +22,13 @@ npx tsx examples/paginator/main.ts
 - choose `stepper()` when the sequence is a staged process rather than plain pagination
 - choose a list or summary label when the content is effectively unbounded and page counts would mislead
 
+## Right-to-left layout
+
+Pass `direction: 'rtl'`, or create the context with `direction: 'rtl'`. In `interactive` and `static`
+output the dots run right to left: page one is rightmost, and the next page is to the left of the
+current one. The `text` style (`Page 2 of 4`), `pipe` (`[2/4]`) and `accessible` output keep their
+digits and reading order. The dots are symmetric, so no glyph is mirrored.
+
 ## What this example proves
 
 - `paginator()` in dot and text variants

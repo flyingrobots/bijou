@@ -3,6 +3,7 @@ import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { makeBgFill } from '../bg-fill.js';
+import { mirrorsLayout, orderForDirection, type InlineDirection } from '../direction/direction.js';
 
 /** Represent a single step in a multi-step process. */
 export interface StepperStep {
@@ -18,6 +19,11 @@ export interface StepperOptions {
   activeBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
+  /**
+   * Logical layout direction. Overrides `ctx.direction`; absent both, `'ltr'`.
+   * Under `'rtl'` in `interactive` and `static` output the steps run right to left.
+   */
+  direction?: InlineDirection | undefined;
 }
 
 /**
@@ -30,6 +36,10 @@ export interface StepperOptions {
  * - `pipe`: `[x]`/`[*]`/`[ ]` markers joined by ` -- `.
  * - `accessible`: `Step N of M: label (state), ...` format.
  * - `interactive`/`static`: `✓`/`●`/`○` icons with themed colors and `──` connectors.
+ *   Under `rtl` the steps run right to left: the first step is rightmost and the
+ *   next step sits to the left of the current one. Each step keeps its marker
+ *   and label as written; the symmetric `──` connector and markers need no glyph
+ *   mapping. `pipe` and `accessible` keep logical order.
  *
  * @param steps - Array of steps to render.
  * @param options - Rendering options including current step index and context.
@@ -58,7 +68,8 @@ export function stepper(steps: StepperStep[], options: StepperOptions): string {
       // interactive + static
       const connector = ctx.style.styled(ctx.semantic('muted'), '──');
       const bgFill = makeBgFill(options.activeBgToken, ctx);
-      return steps
+      const visual = mirrorsLayout({ ...options, ctx }) ? 'rtl' : 'ltr';
+      const items = steps
         .map((step, i) => {
           if (i < current) {
             const token = ctx.status('success');
@@ -72,8 +83,8 @@ export function stepper(steps: StepperStep[], options: StepperOptions): string {
           }
           const token = ctx.semantic('muted');
           return `${ctx.style.styled(token, '○')} ${ctx.style.styled(token, step.label)}`;
-        })
-        .join(` ${connector} `);
+        });
+      return orderForDirection(items, visual).join(` ${connector} `);
     },
   }, options);
 }
