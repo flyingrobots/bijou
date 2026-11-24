@@ -1,5 +1,6 @@
 import type { ShowcaseBuild } from '../apps.js';
 import { createBrowserDogfoodLocalePort } from '../dogfood/browser-locale.js';
+import { SOAK_DEMO } from './soak-demo.js';
 
 /** One demo of the gallery: what a person sees in the list, and how its code loads on demand. */
 export interface GalleryDemo {
@@ -25,4 +26,4 @@ export const DOGFOOD_DEMO: GalleryDemo = {
 };
 
 /** Every demo the gallery lists, in the order it lists them. One entry here is all a new demo needs. */
-export const GALLERY_DEMOS: readonly GalleryDemo[] = [DOGFOOD_DEMO];
+export const GALLERY_DEMOS: readonly GalleryDemo[] = [DOGFOOD_DEMO, SOAK_DEMO];
