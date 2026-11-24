@@ -37,6 +37,11 @@ function normalizeFixedWidth(width: number | undefined): number | undefined {
   return Math.max(2, Math.floor(width));
 }
 
+/** First column of a top-border title: left of the border at the logical start, mirrored to the right edge under rtl. */
+function titleStartX(outerWidth: number, titleLength: number, mirrored: boolean): number {
+  return mirrored ? outerWidth - 2 - titleLength : 2;
+}
+
 function withInheritedBackground(surface: Surface, background: ColorRef | undefined): Surface {
   if (background == null) return surface;
 
@@ -73,4 +78,4 @@ function withInheritedBackground(surface: Surface, background: ColorRef | undefi
   return next;
 }
 
-export { BORDER, normalizeFixedWidth, parseStyleRGB, withInheritedBackground };
+export { BORDER, titleStartX, normalizeFixedWidth, parseStyleRGB, withInheritedBackground };

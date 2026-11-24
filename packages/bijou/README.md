@@ -260,6 +260,16 @@ think in start and end, not left and right).
   `'rtl'`. Pass only Component-owned affordances; never code, paths, IDs,
   commands or URLs. ASCII `<` and `>` are never swapped.
 
+Components that read the direction today:
+
+- **`box()`, `headerBox()`, `boxSurface()`, `headerBoxSurface()`**: Under a
+  resolved `'rtl'` direction in `interactive` and `static` modes the title in
+  the top border sits at the right edge (the logical start) instead of the
+  left. A title too long for the border is clipped exactly as in `'ltr'`, then
+  aligned the same way. Title text is never reversed, and `pipe` and
+  `accessible` output keep their plain logical form. These components have no
+  title-alignment option; a title is always at the logical start edge.
+
 Illustrative composition for a direction-sensitive Component; per-family
 integration is tracked separately:
 
