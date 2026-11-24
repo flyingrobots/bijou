@@ -23,7 +23,7 @@ npm run fun
 ## The contract
 
 `contract.ts` is the contract. A demo is a `Demo<S>`: `init(seed)` makes its state, `update(msg, state)` takes a
-`DemoMsg` (a key, a pointer position in the demo's own cells, a pointer leaving, a pulse), and `view(state, frame)`
+`DemoMsg` (a key, a pointer position in the demo's own cells, a pointer leaving, a pulse, the pane's size), and `view(state, frame)`
 returns a Surface from the pane size, a frame number and the elapsed seconds. There is no shared options bag: the
 metaballs keep their blobs and pointer in their own state, the wormhole its particles and render mode, the fluids their particles or grid, the source side and the pour. A demo never
 reads the clock or `Math.random`; a seed (`random.ts`) and the pulses `dt` drive everything, so a frame at a given

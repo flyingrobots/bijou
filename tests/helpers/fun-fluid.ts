@@ -6,10 +6,11 @@ const key = (name: string): DemoMsg => ({ type: 'key', key: name });
 export const pulse: DemoMsg = { type: 'pulse', dt: 1 / 30 };
 
 /** The two fluid demos' own input: pour with a key a pulse, then shake up, then let it settle. */
-export function fluidScript(id: string): DemoMsg[] | undefined {
+export function fluidScript(id: string, size?: { readonly width: number; readonly height: number }): DemoMsg[] | undefined {
   if (id !== 'fluid' && id !== 'flip-fluid') return undefined;
+  const sized: DemoMsg[] = size === undefined ? [] : [{ type: 'resize', ...size }];
   const pours = Array.from({ length: 30 }, () => [key('p'), pulse]).flat();
-  return [...pours, key('x'), ...Array.from({ length: 30 }, () => pulse)];
+  return [...sized, ...pours, key('x'), ...Array.from({ length: 30 }, () => pulse)];
 }
 
 /** Every key the fluid demos answer to, plus keys that mean nothing to them. */

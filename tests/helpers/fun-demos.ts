@@ -54,7 +54,7 @@ export function byId(id: string): DemoEntry {
 
 /** The messages the recorded frames are made from: 30 pulses, the demo's own input, 30 more pulses. */
 export function frameScript(id: string, width: number, height: number): DemoMsg[] {
-  const own = fluidScript(id);
+  const own = fluidScript(id, { width, height });
   if (own !== undefined) return own;
   const middle: DemoMsg[] = id === 'wormhole'
     ? [{ type: 'key', key: 'm' }]

@@ -6,7 +6,13 @@ export type DemoMsg =
   | { readonly type: 'key'; readonly key: string }
   | { readonly type: 'pointer'; readonly col: number; readonly row: number }
   | { readonly type: 'pointer-leave' }
-  | { readonly type: 'pulse'; readonly dt: number };
+  | { readonly type: 'pulse'; readonly dt: number }
+  /**
+   * The demo's pane in cells. The shell sends it before the first pulse and again whenever the pane changes, to every
+   * demo, including one that is not showing. A demo that sizes its simulation from the pane keeps that size in its state;
+   * one that paints from `view`'s width and height alone ignores it.
+   */
+  | { readonly type: 'resize'; readonly width: number; readonly height: number };
 
 /** What a demo is told when it paints: the pane, and the clock the session keeps. */
 export interface DemoFrame {

@@ -33,7 +33,7 @@ export function createFluid(numX: number, numY: number, limit = Infinity): FlipF
   const pNumX = Math.floor((0.4 * numX * SPACING - 2.0 * h - 2.0 * r) / dx);
   const pNumY = Math.floor((0.7 * numY * SPACING - 2.0 * h - 2.0 * r) / dy);
   const f = new FlipFluid(1000.0, numX * SPACING, numY * SPACING, h, r, MAX_PARTICLES);
-  f.numParticles = Math.max(0, Math.min(pNumX * pNumY, limit));
+  f.numParticles = Math.max(0, Math.min(pNumX * pNumY, limit, MAX_PARTICLES));
   let p = 0;
   for (let i = 0; i < pNumX; i += 1) {
     for (let j = 0; j < pNumY && p < 2 * f.numParticles; j += 1) {

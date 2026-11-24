@@ -1,10 +1,20 @@
 // Licensed under the Apache License, Version 2.0, like the rest of this repository.
 import { createSurface, type Surface } from '@flyingrobots/bijou';
 
-/** The fluid demos simulate in a tank of this many cells, whatever the pane is: a resize never disturbs the fluid. */
-export const TANK = { width: 80, height: 22 } as const;
+export interface TankSize {
+  readonly width: number;
+  readonly height: number;
+}
 
-/** Centre the tank in a pane of any size. A pane smaller than the tank crops it evenly on each side. */
+/** The tank before the shell has sent a `resize`: the pane an 80 by 24 terminal gives a demo. */
+export const DEFAULT_TANK: TankSize = { width: 80, height: 22 };
+
+/** The tank is the pane, but never smaller than the solvers can work in. */
+export function tankFor(width: number, height: number): TankSize {
+  return { width: Math.max(8, Math.floor(width)), height: Math.max(6, Math.floor(height)) };
+}
+
+/** Centre the tank in a pane. They match once the shell has sized the demo; a pane under the tank's minimum crops it. */
 export function framePane(tank: Surface, width: number, height: number): Surface {
   const pane = createSurface(width, height);
   const dx = Math.floor((width - tank.width) / 2);

@@ -1,24 +1,24 @@
                                                                                 
                                    ┌────────────────────────────────────┐       
                                    │  ***  BIJOU FLUID DYNAMICS  ***    │       
- ui     +.                         │────────────────────────────────────│       
- FL    ~u+                         │  Obstacle:    Convex 5-sided Well  │       
-        ~                          │  Particles:   102                  │       
-                                   │  Frame:       60                   │       
-                                   │  Source:      TOP-LEFT             │       
-                                   │────────────────────────────────────│       
- +lui            ~:    .~          │  R reset the simulation            │       
- idFL     ui     Df    FL:         │  T toggle the source side          │       
- LU+Df    FL     ~~    ~Df         │  Hold P to pour fluid              │       
- Df.+:                  ui         │  Z, X, C shake left, up, right     │       
- ui                                │  H hide this card                  │       
- FL.                               └────────────────────────────────────┘       
- ID:                                                                            
- lui       .        .:           .d+                                            
- .FL       dF       id:          :U+                                            
- UI    .~  U+       :+                   U:                                     
- fl:   LUI    :~+                       ~f+                                     
- id~::.~fl ~~FLUIDf.     ~+.        .   .~  ~U~                                 
-FLUIDfluidFLUIDfluidFLUIDfluidFLUIDfluidFL IDfl+id  UI                          
-IDfluidFLUIDfluidFLUIDfluidFLUIDfluidFLUID luid+LU  fl                          
-                                                                                
+       ~                           │────────────────────────────────────│       
+     ~+d+                          │  Obstacle:    Convex 5-sided Well  │       
+    +F+U.                          │  Particles:   102                  │       
+ dF .+                             │  Frame:       60                   │       
+ UI    i+                          │  Source:      TOP-LEFT             │       
+       LU                          │────────────────────────────────────│       
+ id    .   :                       │  R reset the simulation            │       
+ LU  fl   ~L+                      │  T toggle the source side          │       
+ Df  id   .D.                      │  Hold P to pour fluid              │       
+ ui                                │  Z, X, C shake left, up, right     │       
+                 lu                │  H hide this card                  │       
+ IDf  :+         dF                └────────────────────────────────────┘       
+ lui: LU:                                                                       
+ dF~  Df~                                                                       
+ ~~ :lui~             ~+          fl                                            
+ fl :dFLU       FL    lu          id                                            
+ id. UID+       ID    ::                                                        
+ LU  .:      :D                 :I~                                             
+ +f~.i+:.:  :lu~. : :           +l+                                             
+~uidFLUIDfluidFLUIDfluidFLUIDfluidFLUIDfluidFLUID+lu                            
+~FLUIDfluidFLUIDfluidFLUIDfluidFLUIDfluidFLUIDflu+dF                            

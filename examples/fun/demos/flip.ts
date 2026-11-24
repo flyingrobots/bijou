@@ -5,7 +5,7 @@ import { stampPanel } from '../panel.js';
 import type { FlipFluid } from './flip-core.js';
 import { paintFluid } from './flip-render.js';
 import { applyObstacle, createFluid, pourParticles, shakeParticles, simulate, type Circle } from './flip-simulate.js';
-import { framePane, POUR_PULSES, SHAKES, TANK } from './tank.js';
+import { DEFAULT_TANK, framePane, POUR_PULSES, SHAKES, tankFor, type TankSize } from './tank.js';
 
 export interface FlipState {
   readonly seed: number;
@@ -26,20 +26,20 @@ const MOVES: Readonly<Record<string, { readonly x: number; readonly y: number }>
   a: { x: -0.03, y: 0 }, d: { x: 0.03, y: 0 },
 };
 
-function circleOf(at: { readonly x: number; readonly y: number }): Circle {
-  return { x: at.x * TANK.width, y: at.y * TANK.height, radius: Math.max(3.0, Math.min(TANK.width, TANK.height) * 0.12) };
+function circleOf(at: { readonly x: number; readonly y: number }, tank: FlipFluid): Circle {
+  return { x: at.x * tank.fNumX, y: at.y * tank.fNumY, radius: Math.max(3.0, Math.min(tank.fNumX, tank.fNumY) * 0.12) };
 }
 
 /** A dam break in the tank. `limit` caps the starting particles: zero gives an empty tank. */
-export function startFlip(seed: number, limit = Infinity): FlipState {
-  const fluid = createFluid(TANK.width, TANK.height, limit);
+export function startFlip(seed: number, limit = Infinity, size: TankSize = DEFAULT_TANK): FlipState {
+  const fluid = createFluid(size.width, size.height, limit);
   return { seed, rng: seed, fluid, source: 'left', pour: 0, shake: null, hud: true, obstacle: { x: 0.5, y: 0.54 } };
 }
 
 /** One fixed step on a copy of the fluid: the obstacle goes into the grid, then any shake, any pour, then the solver. */
 function advance(state: FlipState): FlipState {
   const fluid = state.fluid.clone();
-  const obstacle = circleOf(state.obstacle);
+  const obstacle = circleOf(state.obstacle, state.fluid);
   applyObstacle(fluid, obstacle);
   if (state.shake !== null) shakeParticles(fluid, state.shake.x, state.shake.y);
   const rng = state.pour > 0 ? pourParticles(fluid, state.source, state.rng) : state.rng;
@@ -47,8 +47,15 @@ function advance(state: FlipState): FlipState {
   return { ...state, fluid, rng, shake: null };
 }
 
+/** A new size starts the dam break again at that size, as the original did when its grid no longer matched the pane. */
+function resize(state: FlipState, size: TankSize): FlipState {
+  if (size.width === state.fluid.fNumX && size.height === state.fluid.fNumY) return state;
+  return { ...state, fluid: createFluid(size.width, size.height) };
+}
+
 function update(msg: DemoMsg, state: FlipState): FlipState {
   if (msg.type === 'pulse') return advance({ ...state, pour: Math.max(0, state.pour - 1) });
+  if (msg.type === 'resize') return resize(state, tankFor(msg.width, msg.height));
   if (msg.type !== 'key') return state;
   const shake = SHAKES[msg.key];
   const move = MOVES[msg.key];
@@ -60,7 +67,7 @@ function update(msg: DemoMsg, state: FlipState): FlipState {
   if (msg.key === 'p') return { ...state, pour: POUR_PULSES };
   if (msg.key === 't') return { ...state, source: state.source === 'left' ? 'right' : 'left' };
   if (msg.key === 'h') return { ...state, hud: !state.hud };
-  if (msg.key === 'r') return { ...startFlip(state.seed), source: state.source, hud: state.hud, obstacle: state.obstacle };
+  if (msg.key === 'r') return { ...startFlip(state.seed, Infinity, { width: state.fluid.fNumX, height: state.fluid.fNumY }), source: state.source, hud: state.hud, obstacle: state.obstacle };
   return state;
 }
 
@@ -72,7 +79,7 @@ export const flipFluid: Demo<FlipState> = {
   init: (seed) => startFlip(seed),
   update,
   view(state, { width, height, frame, ctx }) {
-    const pane = framePane(paintFluid(state.fluid, circleOf(state.obstacle)), width, height);
+    const pane = framePane(paintFluid(state.fluid, circleOf(state.obstacle, state.fluid)), width, height);
     if (state.hud) {
       stampPanel(pane, [
         '  ***  BIJOU FLIP FLUID (DAM BREAK)  ***  ',

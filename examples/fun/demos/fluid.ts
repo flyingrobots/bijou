@@ -4,7 +4,7 @@ import { stampPanel } from '../panel.js';
 import type { Particle } from './fluid-collide.js';
 import { paintTank } from './fluid-render.js';
 import { MAX_PARTICLES, spawn, stepParticles } from './fluid-step.js';
-import { framePane, POUR_PULSES, SHAKES, TANK } from './tank.js';
+import { DEFAULT_TANK, framePane, POUR_PULSES, SHAKES, tankFor, type TankSize } from './tank.js';
 
 export interface FluidState {
   readonly seed: number;
@@ -17,6 +17,8 @@ export interface FluidState {
   /** A shake waiting for the next step. */
   readonly shake: { readonly x: number; readonly y: number } | null;
   readonly hud: boolean;
+  /** The tank, set from the pane. A resize keeps the particles, as the original did: the walls move and the next step holds them in. */
+  readonly tank: TankSize;
 }
 
 function advance(state: FluidState): FluidState {
@@ -24,16 +26,17 @@ function advance(state: FluidState): FluidState {
   const { x, y } = state.shake ?? { x: 0, y: 0 };
   particles = particles.map((p) => ({ ...p, vx: p.vx + x, vy: p.vy + y }));
   if (state.pour > 0 && particles.length < MAX_PARTICLES) {
-    const [made, next] = spawn(rng, state.source, TANK.width);
+    const [made, next] = spawn(rng, state.source, state.tank.width);
     particles = [...particles, ...made.slice(0, MAX_PARTICLES - particles.length)];
     rng = next;
   }
-  return { ...state, rng, particles: stepParticles(particles, TANK.width, TANK.height), shake: null };
+  return { ...state, rng, particles: stepParticles(particles, state.tank.width, state.tank.height), shake: null };
 }
 
 /** A pulse is one fixed step whatever its `dt`; keys pour, switch the source, shake, hide the card or reset. */
 function update(msg: DemoMsg, state: FluidState): FluidState {
   if (msg.type === 'pulse') return advance({ ...state, pour: Math.max(0, state.pour - 1) });
+  if (msg.type === 'resize') return { ...state, tank: tankFor(msg.width, msg.height) };
   if (msg.type !== 'key') return state;
   const shake = SHAKES[msg.key];
   if (shake !== undefined) return { ...state, shake };
@@ -49,10 +52,10 @@ export const fluid: Demo<FluidState> = {
   name: 'Fluid Dynamics Tank',
   description: 'A 2D particle fluid flowing around a hidden obstacle well',
   keys: 'p pour, t source side, z x c shake, r reset, h card, space pause',
-  init: (seed) => ({ seed, rng: seed, particles: [], source: 'left', pour: 0, shake: null, hud: true }),
+  init: (seed) => ({ seed, rng: seed, particles: [], source: 'left', pour: 0, shake: null, hud: true, tank: DEFAULT_TANK }),
   update,
   view(state, { width, height, frame, ctx }) {
-    const pane = framePane(paintTank(state.particles, TANK.width, TANK.height), width, height);
+    const pane = framePane(paintTank(state.particles, state.tank.width, state.tank.height), width, height);
     if (state.hud) {
       stampPanel(pane, [
         '  ***  BIJOU FLUID DYNAMICS  ***  ',

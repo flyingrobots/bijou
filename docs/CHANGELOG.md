@@ -127,7 +127,10 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   shake and reset keys are handled in each demo's own `update`. The shell's
   digits and left and right arrows switch demos, so the shake keys are `z`,
   `x`, `c` and the obstacle moves with `w a s d`. Both appear in the browser
-  gallery through the registry alone. See `docs/topics/fun-demos/README.md`.
+  gallery through the registry alone. The fluid tank follows the pane: the
+  demo contract gains a `resize` message (`width`, `height`) that the shell
+  sends to every demo before its first pulse and whenever the screen changes;
+  existing demos ignore it. See `docs/topics/fun-demos/README.md`.
   Origin: flyingrobots/bijou#889.
 
 ### Fixed
