@@ -8,6 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- CI runs the full test suite as four parallel shards for each Node version
+  (job `suite`), where one job ran its 25 chunks in series in 13 to 15 minutes.
+  `BIJOU_VITEST_SHARD=k/n` makes `scripts/run-vitest.mjs` run the k-th of n
+  shares of the chunks; unset, the whole suite runs as before. The interactive
+  smoke, test type-check, canary smoke and showcase build move from the Node 22
+  `test` job into a job of their own (`smoke_gates`) that runs beside it.
+  `scripts/ci-workflow-policy.ts` refuses a workflow whose shard list is not 1
+  to N or whose command names another N. See `docs/guides/sealed-tests.md`.
+  Origin: flyingrobots/bijou#907.
 - The soak bench (`npm run soak`) takes its options, memory readings and log
   through host ports (`bench/src/soak-ports.ts`) instead of reading
   `process.argv`, `process.memoryUsage()` and `node:fs`, so its app module
