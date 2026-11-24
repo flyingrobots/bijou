@@ -189,6 +189,22 @@ const preview = canvas(32, 12, ({ u, v }) => {
 });
 ```
 
+In CPU-bound shader or raytrace loops, the vector helpers (`raytraceAdd`,
+`raytraceSub`, `raytraceScale`, `raytraceCross`, `raytraceNormalize`,
+`raytraceReflect`) accept an optional last `target` argument. The result is
+written into it and the same array is returned, so the loop allocates nothing
+per call. Without a target they return a fresh tuple, exactly as before.
+```typescript
+import { raytraceAdd, raytraceScale, type RaytraceVector3Mutable } from '@flyingrobots/bijou-tui';
+
+const scratch: RaytraceVector3Mutable = [0, 0, 0];
+raytraceScale(direction, distance, scratch);
+raytraceAdd(origin, scratch, scratch); // the target may alias any input
+```
+Every helper reads all of its inputs before writing the target, so the target
+may be the same array as any input. A zero-length vector still normalizes to
+`[0, 0, 0]`. Results are bit-for-bit equal to the allocating form.
+
 When Braille is too textured for a logo or icon, fit sampled 2x4 coverage to a
 regular glyph directly from `canvas()`:
 ```typescript

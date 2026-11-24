@@ -25,13 +25,13 @@ function rng(seed: number): () => number {
 
 function sameBits(actual: RaytraceVector3, expected: RaytraceVector3, label: string): void {
   for (let i = 0; i < 3; i++) {
-    expect(Object.is(actual[i], expected[i]), `${label} [${i}] ${actual[i]} vs ${expected[i]}`).toBe(true);
+    expect(Object.is(actual[i], expected[i]), `${label} [${String(i)}] ${String(actual[i])} vs ${String(expected[i])}`).toBe(true);
   }
 }
 
 describe('raytrace target helpers equal the immutable helpers bit for bit', () => {
-  it(`over seeded random vectors (seed ${SEED})`, () => {
-    console.info(`raytrace property seed=${SEED}`);
+  it(`over seeded random vectors (seed ${String(SEED)})`, () => {
+    console.info(`raytrace property seed=${String(SEED)}`);
     const next = rng(SEED);
     const scalar = (): number => {
       const r = next();
@@ -42,7 +42,7 @@ describe('raytrace target helpers equal the immutable helpers bit for bit', () =
       const a = vec();
       const b = vec();
       const s = scalar();
-      const label = `seed=${SEED} n=${n} a=${a} b=${b} s=${s}`;
+      const label = `seed=${String(SEED)} n=${String(n)} a=${a.join(',')} b=${b.join(',')} s=${String(s)}`;
       const out: RaytraceVector3Mutable = [1, 1, 1];
       sameBits(raytraceAdd(a, b, out), raytraceAdd(a, b), `add ${label}`);
       sameBits(raytraceSub(a, b, out), raytraceSub(a, b), `sub ${label}`);
