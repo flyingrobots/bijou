@@ -30,6 +30,9 @@ resource admission.
 Local execution uses Linux containers, including on macOS through Docker.
 The native Windows lane uses disposable Windows containers on GitHub-hosted
 Windows runners; the Windows launcher currently requires that CI environment.
+That lane is switched off in CI as of 2026-11-24, because its worker runs out
+of storage before any test starts (flyingrobots/bijou#788). Nothing verifies
+Bijou on Windows until it returns; the launcher and its tests remain.
 
 ```sh
 node scripts/docker-seal/bootstrap.mjs --node-version 22

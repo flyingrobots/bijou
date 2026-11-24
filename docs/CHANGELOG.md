@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- CI no longer runs the native Windows lane ("Focused Unit Tests (windows,
+  Node 22)"). Its sealed worker ran out of storage before any test started, so
+  it was red on every run (flyingrobots/bijou#788). `README.md` has a
+  "Platform support" section that says Windows is not supported at present and
+  why. The Windows launcher, its tests and the policy check that a Windows lane
+  must use the native runner all remain, so the lane can be restored by adding
+  its matrix entry back.
 - CI's full-suite shards are dealt by measured weight and there are eight of
   them for each Node version. With shards cut by position the four took 156 to
   341 s, because ten test files were 46% of the suite's time. Now the heaviest
@@ -25,6 +32,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   `scripts/ci-workflow-policy.ts` refuses a workflow whose shard list is not 1
   to N or whose command names another N. See `docs/guides/sealed-tests.md`.
   Origin: flyingrobots/bijou#907.
+- The whole-tree ESLint ratchet (`npm run lint:eslint`) lints one target per
+  process and merges the results, where it ran one process over every target.
+  That one process held the typed program for the whole tree and ran out of V8
+  heap, at about 2,000 MB, in hosted CI (job "Verify TypeScript doctrine") and
+  in the sealed worker. Each target has a cache file of its own under
+  `.cache/eslint/`. The findings counted are the same; a file two targets match
+  is counted once.
 - The soak bench (`npm run soak`) takes its options, memory readings and log
   through host ports (`bench/src/soak-ports.ts`) instead of reading
   `process.argv`, `process.memoryUsage()` and `node:fs`, so its app module
