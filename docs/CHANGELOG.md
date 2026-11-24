@@ -8,6 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- `npm run dogfood:i18n:debt` prints each logical surface once. The inventory's
+  per-surface rows are now aggregated from the entries by surface through
+  `aggregateDogfoodI18nDebtSurfaces()`, so a surface split across part files
+  (`counter-block-demo`, `release-title`, `storybook-app`) is no longer repeated
+  once per file. Totals, per-surface counts and baselines are unchanged (#490).
+
 - The Theme Lab draft theme keeps its rule provenance. `cloneThemeForThemeLabEditor()`
   no longer hand-copies each token family: it copies through
   `renameRuleAuthoredTheme()`, so a field added to `Theme` later is carried

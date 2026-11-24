@@ -9,6 +9,7 @@ import type {
 } from './i18n-debt-contract.js';
 import { freezeInventory, readRepoFile } from './i18n-debt-io.js';
 import { maybeAddEntry } from './i18n-debt-source-scan.js';
+import { aggregateDogfoodI18nDebtSurfaces } from './i18n-debt-surfaces.js';
 import { DOGFOOD_I18N_DEBT_SOURCES } from './i18n-debt-sources.js';
 
 export function collectDogfoodI18nDebt(
@@ -16,14 +17,7 @@ export function collectDogfoodI18nDebt(
 ): DogfoodI18nDebtInventory {
   const sources = options.sources ?? DOGFOOD_I18N_DEBT_SOURCES;
   const entries = sources.flatMap(collectDogfoodSourceDebt);
-  const bySurface = sources
-    .map((source) => ({
-      surface: source.surface,
-      count: entries.filter(
-        (entry) => entry.surface === source.surface,
-      ).length,
-    }))
-    .filter((entry) => entry.count > 0);
+  const bySurface = aggregateDogfoodI18nDebtSurfaces(entries);
   return freezeInventory({
     entries,
     bySurface,
