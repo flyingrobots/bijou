@@ -47,6 +47,8 @@ export default defineConfig({
       // (the live file, then the verified corpus). The page reads a table
       // generated from the same documents; nothing from Node is imported.
       { find: /^(?:\.\.?\/)+_shared\/documents\.js$/u, replacement: fileURLToPath(new URL('../_shared/documents.browser.ts', import.meta.url)) },
+      // DOGFOOD, by a name the showcase's own tsconfig describes in src/dogfood/docs-app.d.ts.
+      { find: /^@bijou-examples\/docs$/u, replacement: fileURLToPath(new URL('../docs/app.ts', import.meta.url)) },
       // The shadcn components' own imports, as components.json names them.
       { find: /^@\//u, replacement: fileURLToPath(new URL('src/', import.meta.url)) },
     ],
@@ -58,6 +60,8 @@ export default defineConfig({
       input: {
         main: fileURLToPath(new URL('index.html', import.meta.url)),
         dom: fileURLToPath(new URL('dom.html', import.meta.url)),
+        // DOGFOOD full-window, with no page chrome.
+        dogfood: fileURLToPath(new URL('dogfood.html', import.meta.url)),
       },
     },
     emptyOutDir: true,

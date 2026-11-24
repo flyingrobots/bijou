@@ -21,6 +21,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The web GPU showcase mounts DOGFOOD, the documentation app: `?app=dogfood`
+  on the showcase page, and `/dogfood.html`, a page with no chrome whose
+  Surface fills the window and resizes with it. The app and its document table
+  load on demand, so the page's entry chunk does not carry them. The browser's
+  language picks DOGFOOD's locale, and the choice stays in the page.
 - The web GPU showcase can present one app on either host and keep its state.
   A Host switch beside the backend switch (`Space` then `m`) stops the canvas
   mount and starts `mountBijouDom()` with the same model, and back again. The

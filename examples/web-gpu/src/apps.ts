@@ -1,6 +1,7 @@
 import type { BijouContext } from '@flyingrobots/bijou';
 import type { App, SemanticSceneApp } from '@flyingrobots/bijou-tui';
 import { startedApp } from './browser-start-app.js';
+import { createBrowserDogfoodLocalePort } from './dogfood/browser-locale.js';
 
 export { REFUSED_APPS, type RefusedApp } from './refused-apps.js';
 
@@ -63,6 +64,16 @@ export const SHOWCASE_APPS: readonly ShowcaseApp[] = [
     async load() {
       const { createShowcaseApp } = await import('../../showcase/app.js');
       return { build: (ctx) => createShowcaseApp(ctx) };
+    },
+  },
+  {
+    id: 'dogfood',
+    title: 'DOGFOOD',
+    // The documentation app, loaded on demand with its document table. The locale choice stays in this port.
+    async load() {
+      const { createDocsApp } = await import('@bijou-examples/docs');
+      const localePort = createBrowserDogfoodLocalePort(navigator);
+      return { build: (ctx) => createDocsApp(ctx, { localePort }) };
     },
   },
   {
