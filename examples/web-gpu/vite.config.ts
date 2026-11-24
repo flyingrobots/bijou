@@ -37,6 +37,7 @@ export default defineConfig({
   resolve: {
     alias: [
       { find: /^@flyingrobots\/bijou\/perf$/u, replacement: source('bijou/src/core/render/packed-cell.ts') },
+      { find: /^@flyingrobots\/bijou\/adapters\/test$/u, replacement: source('bijou/src/adapters/test/index.ts') },
       { find: /^@flyingrobots\/bijou\/viz$/u, replacement: source('bijou/src/core/viz/index.ts') },
       { find: /^@flyingrobots\/bijou$/u, replacement: source('bijou/src/index.ts') },
       { find: /^@flyingrobots\/bijou-i18n$/u, replacement: source('bijou-i18n/src/index.ts') },
