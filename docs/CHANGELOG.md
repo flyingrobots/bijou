@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- CI no longer runs the native Windows lane ("Focused Unit Tests (windows,
+  Node 22)"). Its sealed worker ran out of storage before any test started, so
+  it was red on every run (flyingrobots/bijou#788). `README.md` has a
+  "Platform support" section that says Windows is not supported at present and
+  why. The Windows launcher, its tests and the policy check that a Windows lane
+  must use the native runner all remain, so the lane can be restored by adding
+  its matrix entry back.
 - CI runs the full test suite as four parallel shards for each Node version
   (job `suite`), where one job ran its 25 chunks in series in 13 to 15 minutes.
   `BIJOU_VITEST_SHARD=k/n` makes `scripts/run-vitest.mjs` run the k-th of n

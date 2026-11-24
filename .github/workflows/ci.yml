@@ -199,9 +199,14 @@ jobs:
           - label: ubuntu
             os: ubuntu-latest
             sealed-runner: run.mjs --isolated-ci
-          - label: windows
-            os: windows-2022
-            sealed-runner: windows.mjs
+          # The native Windows lane is switched off (2026-11-24): its sealed
+          # worker runs out of storage before any test starts
+          # (flyingrobots/bijou#788), so it was red on every run and proved
+          # nothing. Windows is not verified until it returns; README.md says
+          # so. To restore it, add back:
+          #   - label: windows
+          #     os: windows-2022
+          #     sealed-runner: windows.mjs
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
