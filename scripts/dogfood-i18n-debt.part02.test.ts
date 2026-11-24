@@ -86,7 +86,9 @@ describe('DOGFOOD i18n debt inventory', () => {
       // Alignment option enums are control values, not visible copy (#624).
       // The guidedFlow story's status discriminants are typed, not copy (#586).
       // Ten layout and init literals were removed by the #627 drawer work.
-      expect(inventory.total).toBe(2242);
+      // app-ids.ts no longer looks up 'version' by name: the package version is
+      // a typed JSON import (#872).
+      expect(inventory.total).toBe(2241);
       expect(surfaces).not.toContain('app-root-view');
       expect(surfaces).toContain('stories-story-guided-flow');
       expect(surfaces).not.toContain('docs-app');
