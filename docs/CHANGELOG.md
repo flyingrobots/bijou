@@ -6,6 +6,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- `scripts/record-gifs.ts` settles each VHS job exactly once. A spawn `error`
+  followed by `close` no longer appends a second result or counts a second
+  completion; the first outcome wins and spawn failures are still reported.
+
 ### Added
 
 - `ui-scene-ir/1` nodes can declare an optional `state.checked` boolean,

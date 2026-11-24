@@ -52,6 +52,6 @@ describe('record-gifs completion settles exactly once', () => {
     const { proc } = watched();
     proc.emit('close', 0);
     expect(proc.listenerCount('close')).toBe(0);
-    expect(proc.listenerCount('error')).toBe(0);
+    expect(() => proc.emit('error', new Error('late'))).not.toThrow();
   });
 });
