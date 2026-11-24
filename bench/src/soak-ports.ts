@@ -23,10 +23,17 @@ export type SoakMemoryPort = () => SoakMemory;
 /** Receives one JSON log line, without its newline. */
 export type SoakLogSink = (line: string) => void;
 
+import type { BijouContext } from '@flyingrobots/bijou';
+
 export interface SoakHost {
   readonly options: SoakOptions;
   readonly memory: SoakMemoryPort;
   readonly log: SoakLogSink;
+  /**
+   * The context a scenario's `setup` renders with, built afresh for each
+   * `setup` call. It is not the app's own context.
+   */
+  readonly scenarioContext: () => BijouContext;
 }
 
 export const DEFAULT_SOAK_OPTIONS: SoakOptions = { cycles: Infinity, fps: 30, dwell: 4 };

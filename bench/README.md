@@ -154,7 +154,7 @@ npm run -s bench:ci:gradient -- --out /tmp/bijou-gradient-ci.json
 (`src/soak-app.ts`) reaches no Node API. `createSoakApp(ctx, host)` takes a
 `SoakHost` (`src/soak-ports.ts`): already-parsed `options` (`cycles`, `fps`,
 `dwell`), a `memory` reading that returns `heapUsedMB` and `rssMB` or
-`undefined` for a figure the host cannot measure, and a `log` sink that gets
+`undefined` for a figure the host cannot measure, and a `scenarioContext` factory (the Node adapter builds an interactive test context per `setup` call) and a `log` sink that gets
 one JSON line per scenario. Where a figure is `undefined` the perf panel shows
 no row for it and the log line has no such field.
 

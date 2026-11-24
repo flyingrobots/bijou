@@ -12,9 +12,9 @@ describe('the soak bench app module reaches no Node host API', () => {
     expect(await hostReachOf(module)).toEqual([]);
   });
 
-  it('the Node adapter is where the reach lives', async () => {
+  it('the Node adapter is the one soak module that reaches Node, and the test adapter', async () => {
     const reach = await hostReachOf('bench/src/soak-node.ts');
-    expect(reach.length).toBeGreaterThan(0);
-    expect(reach.every((line) => line.endsWith('bench/src/soak-node.ts'))).toBe(true);
+    expect(reach).toContain('node:fs imported by bench/src/soak-node.ts');
+    expect(reach.filter((line) => line.includes(' bench/')).every((line) => line.endsWith(' bench/src/soak-node.ts'))).toBe(true);
   });
 });

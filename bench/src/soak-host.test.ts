@@ -23,6 +23,7 @@ const steps = (perfOff: boolean) => [
 // the perf panel, help line and framework toast carry wall-clock and memory.
 const signature = (frame: Parameters<typeof surfaceToString>[0]): string =>
   createHash('sha256').update(surfaceToString(frame, ctx.style).split('\n').slice(0, 16).map((l) => l.slice(0, 46)).join('\n')).digest('hex').slice(0, 16);
+const scenarioContext = () => createTestContext({ mode: 'interactive' });
 const NO_LOG = (): undefined => undefined;
 function entryOf(line: string): Record<string, unknown> {
   const parsed: unknown = JSON.parse(line);
@@ -55,7 +56,7 @@ describe('soak bench through host ports', () => {
   });
 
   it('a memory port that reports nothing leaves no heap or resident row, and no zero', async () => {
-    const result = await run({ options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: NO_MEMORY, log: NO_LOG }, false);
+    const result = await run({ options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: NO_MEMORY, log: NO_LOG, scenarioContext }, false);
     const text = result.frames.map((f) => surfaceToString(f, ctx.style)).join('\n');
     expect(text).toContain('Perf');
     expect(text).not.toMatch(/heap|rss/i);
@@ -72,7 +73,7 @@ describe('soak bench through host ports', () => {
 
   it('a log line omits a figure the host cannot measure', async () => {
     const lines: string[] = [];
-    await run({ options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: () => ({ heapUsedMB: 3, rssMB: undefined }), log: (l) => { lines.push(l); } });
+    await run({ options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: () => ({ heapUsedMB: 3, rssMB: undefined }), log: (l) => { lines.push(l); }, scenarioContext });
     expect(lines.length).toBeGreaterThan(0);
     for (const line of lines) {
       const entry = entryOf(line);
@@ -83,8 +84,8 @@ describe('soak bench through host ports', () => {
 
   it('a log sink that throws ends the run with the sink error, as a failed append always did', () => {
     const log = () => { throw new Error('disk full'); };
-    const host = { options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: NO_MEMORY, log };
-    const model = initScenario(ctx, 0, 0, 80, 24);
+    const host = { options: resolveSoakOptions({ cycles: 1, dwell: 0.1 }), memory: NO_MEMORY, log, scenarioContext };
+    const model = initScenario(host, 0, 0, 80, 24);
     expect(() => logAndAdvanceCmd(model, host)()).toThrow('disk full');
   });
 });

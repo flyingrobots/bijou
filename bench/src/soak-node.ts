@@ -1,5 +1,6 @@
 import { appendFileSync, existsSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { resolveSoakOptions, type SoakHost, type SoakLogSink, type SoakMemoryPort, type SoakOptions } from './soak-ports.js';
 
 /** Today's `npm run soak` arguments: `--cycles=`, `--fps=`, `--dwell=` and `--out=`. */
@@ -32,5 +33,6 @@ export function fileLogSink(path: string): SoakLogSink {
 
 export function createNodeSoakHost(args: readonly string[]): SoakHost {
   const { options, out } = parseSoakArgs(args);
-  return { options, memory: nodeMemory, log: fileLogSink(out) };
+  // A new test context for every setup, as the scenarios' own fallback built.
+  return { options, memory: nodeMemory, log: fileLogSink(out), scenarioContext: () => createTestContext({ mode: 'interactive' }) };
 }

@@ -1,15 +1,14 @@
-import type { BijouContext } from '@flyingrobots/bijou';
 import { quit, type Cmd, type FramePageMsg } from '@flyingrobots/bijou-tui';
 import { latestPaneSize, type SoakModel, type SoakMsg } from './soak-model.js';
 import { displayScenarios } from './soak-config.js';
 import type { SoakHost } from './soak-ports.js';
 import { currentScenario, initScenario, reinitAtSize, logAndAdvanceCmd } from './soak-scenarios.js';
 
-export function updateSoak(ctx: BijouContext, host: SoakHost): (msg: FramePageMsg<SoakMsg>, model: SoakModel) => [SoakModel, Cmd<SoakMsg>[]] {
-  return (msg, model) => updateModel(ctx, host, msg, model);
+export function updateSoak(host: SoakHost): (msg: FramePageMsg<SoakMsg>, model: SoakModel) => [SoakModel, Cmd<SoakMsg>[]] {
+  return (msg, model) => updateModel(host, msg, model);
 }
 
-function updateModel(ctx: BijouContext, host: SoakHost, msg: FramePageMsg<SoakMsg>, model: SoakModel): [SoakModel, Cmd<SoakMsg>[]] {
+function updateModel(host: SoakHost, msg: FramePageMsg<SoakMsg>, model: SoakModel): [SoakModel, Cmd<SoakMsg>[]] {
   const { cycles: MAX_CYCLES, dwell: DWELL_SECS, fps } = host.options;
   const FRAME_INTERVAL_MS = 1000 / fps;
   if (msg.type === 'toggle-perf') {
@@ -25,9 +24,9 @@ function updateModel(ctx: BijouContext, host: SoakHost, msg: FramePageMsg<SoakMs
       if (nextCycle >= MAX_CYCLES) {
         return [model, [quit()]];
       }
-      return [initScenario(ctx, 0, nextCycle, w, h, model), []];
+      return [initScenario(host, 0, nextCycle, w, h, model), []];
     }
-    return [initScenario(ctx, nextIndex, model.cycle, w, h, model), []];
+    return [initScenario(host, nextIndex, model.cycle, w, h, model), []];
   }
 
   if (msg.type === 'pulse') {
@@ -39,7 +38,7 @@ function updateModel(ctx: BijouContext, host: SoakHost, msg: FramePageMsg<SoakMs
     const pw = latestPaneSize.width || model.paneWidth;
     const ph = latestPaneSize.height || model.paneHeight;
     if (pw !== model.paneWidth || ph !== model.paneHeight) {
-      return [reinitAtSize(ctx, model, pw, ph), []];
+      return [reinitAtSize(host, model, pw, ph), []];
     }
 
     // Check if dwell time expired.

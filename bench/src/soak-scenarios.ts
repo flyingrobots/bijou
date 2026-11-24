@@ -1,4 +1,4 @@
-import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
+import { createSurface, type Surface } from '@flyingrobots/bijou';
 import type { Cmd } from '@flyingrobots/bijou-tui';
 import type { AnyScenario } from './scenarios/types.js';
 import { computeStats } from './stats.js';
@@ -65,9 +65,9 @@ export function renderScenarioSurface(model: SoakModel, width: number, height: n
   return fallback;
 }
 
-export function initScenario(ctx: BijouContext, scenarioIndex: number, cycle: number, width: number, height: number, prev?: SoakModel): SoakModel {
+export function initScenario(host: SoakHost, scenarioIndex: number, cycle: number, width: number, height: number, prev?: SoakModel): SoakModel {
   const scenario = scenarioAt(scenarioIndex);
-  const state = scenario.setup(ctx, width, height);
+  const state = scenario.setup(host.scenarioContext(), width, height);
   runWarmup(scenario, state);
   return {
     scenarioIndex,
@@ -82,10 +82,10 @@ export function initScenario(ctx: BijouContext, scenarioIndex: number, cycle: nu
   };
 }
 
-export function reinitAtSize(ctx: BijouContext, model: SoakModel, width: number, height: number): SoakModel {
+export function reinitAtSize(host: SoakHost, model: SoakModel, width: number, height: number): SoakModel {
   currentScenario(model).teardown?.(model.scenarioState);
   const scenario = currentScenario(model);
-  const state = scenario.setup(ctx, width, height);
+  const state = scenario.setup(host.scenarioContext(), width, height);
   runWarmup(scenario, state);
   return {
     ...model,
