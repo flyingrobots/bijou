@@ -68,7 +68,7 @@ resource usage. A started worker or a printed admission record is not a pass.
 Only a completed run with a successful exit status establishes test success.
 
 While the command runs, the Linux supervisor samples the bytes written under
-`/work`, `/tmp`, `/home/test` and `/dev/shm` every 250 ms by walking those
+`/work`, `/tmp`, `/dev/shm` and the test user's home directory every 250 ms by walking those
 trees, and stops the workload with exit status 2 when a limit is reached or
 the measurement itself fails. A directory that the workload removes during a
 walk, such as a test's temporary Git repository, counts as empty. A
