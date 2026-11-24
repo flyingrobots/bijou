@@ -8,6 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- Test-only: the slowest test files run faster, with every case kept. Measured
+  alone in the sealed runner: `tests/web-gpu/app-cell-widths.test.ts` 22.8 s
+  to 11.0 s (library slides split into four parts, part k takes every fourth
+  slide, and one assertion proves the parts cover the deck),
+  `tests/dogfood-book-theme-localization.test.ts` 47.7 s to 14.6 s (one file
+  per locale), `bench/src/soak-host.test.ts` 16.6 s to 9.4 s (two files), and
+  the two Markdown CLI resize cases now run side by side. Refs
+  flyingrobots/bijou#907.
+
 - The soak bench (`npm run soak`) takes its options, memory readings and log
   through host ports (`bench/src/soak-ports.ts`) instead of reading
   `process.argv`, `process.memoryUsage()` and `node:fs`, so its app module
