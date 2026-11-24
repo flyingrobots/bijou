@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { exampleDocsKey } from '../examples/_shared/document-key.js';
 import { collectDogfoodMarkdownDocuments, localizedMarkdownCandidatePaths } from '../examples/docs/i18n-debt-markdown-discovery.js';
 import { defaultMarkdownTemplateValues, readRepoFile, repoFileExists } from '../examples/docs/i18n-debt-io.js';
@@ -38,12 +37,7 @@ export function discoveredDocumentKeys(): readonly string[] {
   return [...keys].sort();
 }
 
-/** key → exact text, read the way the Node adapter reads it. */
+/** key → exact text, read the way the Node adapter reads it. The showcase's build makes it, in memory, every time. */
 export function documentTable(): Readonly<Record<string, string>> {
   return Object.fromEntries(discoveredDocumentKeys().map((key) => [key, readRepoFile(key)]));
-}
-
-/** key → SHA-256 of the text, recorded at generation time. */
-export function documentDigests(table: Readonly<Record<string, string>>): Readonly<Record<string, string>> {
-  return Object.fromEntries(Object.entries(table).map(([key, text]) => [key, createHash('sha256').update(text).digest('hex')]));
 }

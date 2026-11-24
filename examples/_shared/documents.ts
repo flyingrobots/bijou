@@ -3,7 +3,8 @@ import { exampleDocsKey } from './document-key.js';
 
 // The one seam through which DOGFOOD reads a document. This is the Node
 // adapter: the live file first, then the SHA-256-verified book corpus. The
-// showcase's Vite config resolves this module to `documents.browser.ts`.
+// showcase's build swaps this module for a reader over a table of the documents
+// the app reads (examples/web-gpu/documents-plugin.ts).
 const ROOT = new URL('../../', import.meta.url);
 const seen = new Set<string>();
 

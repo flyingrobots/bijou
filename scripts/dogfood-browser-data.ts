@@ -1,5 +1,4 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { documentDigests, documentTable } from './dogfood-documents.js';
 import { localPathViolations } from './no-local-path-policy.js';
 
 /**
@@ -47,10 +46,7 @@ function translations(root: URL): Record<string, string> {
 
 /** Each generated file, by its path from the repository root, and its exact text. */
 export function dogfoodBrowserData(root: URL = ROOT): ReadonlyMap<string, string> {
-  const documents = documentTable();
   return new Map([
-    [`${DOGFOOD_DATA_DIR}/documents.json`, checkedJson(`${DOGFOOD_DATA_DIR}/documents.json`, asLines(documents))],
-    [`${DOGFOOD_DATA_DIR}/documents.sha256.json`, json(documentDigests(documents))],
     [`${DOGFOOD_DATA_DIR}/flyingrobotslogo.json`, json(readFileSync(new URL(LOGO, root), 'utf8'))],
     [`${DOGFOOD_DATA_DIR}/guide-translations.json`, checkedJson(`${DOGFOOD_DATA_DIR}/guide-translations.json`, asLines(translations(root)))],
   ]);

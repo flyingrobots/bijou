@@ -16,8 +16,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 - DOGFOOD reads its Markdown documents through one seam,
   `examples/_shared/documents.ts` (the live file, then the verified corpus,
   as before). The web GPU showcase's build resolves it to a browser adapter
-  that serves a generated table of exactly the documents the app reads, so
-  `examples/docs/app.ts` reaches no Node API.
+  that serves a table of exactly the documents the app reads, made from the
+  files at build time and never committed, so `examples/docs/app.ts` reaches
+  no Node API.
 
 ### Added
 
