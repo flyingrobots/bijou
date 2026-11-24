@@ -9,7 +9,7 @@ import { graphemeWidth } from '../text/grapheme.part04.js';
 function taggingStyle(): StylePort {
   return {
     ...plainStyle(),
-    styled: (token, text) => `[${token.hex ?? '?'}]${text}`,
+    styled: (token, text) => `[${token.hex}]${text}`,
   };
 }
 
@@ -67,7 +67,7 @@ describe('progressBar direction', () => {
     for (let pct = 0; pct <= 100; pct += 7) {
       const ltr = progressBar(pct, { width: 9, showPercent: false, direction: 'ltr', ctx });
       const rtl = progressBar(pct, { width: 9, showPercent: false, direction: 'rtl', ctx });
-      expect([...rtl].reverse().join('')).toBe(ltr);
+      expect(Array.from(rtl).reverse().join('')).toBe(ltr);
     }
   });
 

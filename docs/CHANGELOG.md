@@ -29,6 +29,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `progressBar()` mirrors under right-to-left layout (#619). It takes
+  `direction` (or reads `ctx.direction`); in `interactive` and `static` output
+  the fill grows from the right edge, the gradient's leading edge is the
+  rightmost cell and the percentage label moves to the right of the bar. Fill
+  stays whole cells, so there is no partial-block glyph to mirror; caller fill
+  glyphs go through `mirrorGlyphs()`. `pipe` and `accessible` output and every
+  left-to-right render are unchanged.
+
 - CI publishes a per-job wall-time summary to the run's job summary, slowest
   finished job first, with skipped, in-progress and cancelled jobs labelled.
   The new `Wall time summary` job is read-only, non-blocking and required by
