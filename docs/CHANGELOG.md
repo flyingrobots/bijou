@@ -14,6 +14,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   (`counter-block-demo`, `release-title`, `storybook-app`) is no longer repeated
   once per file. Totals, per-surface counts and baselines are unchanged (#490).
 
+- The Windows sealed runner's toolchain context measurement no longer fails
+  when a running step removes a directory after the walk listed it and before
+  it was read. Such a directory now counts as empty; a missing root or any
+  other error (`ENOTDIR`, `EACCES`) still fails, and the entry and byte limits
+  are unchanged. This is the Windows counterpart of the Linux supervisor fix
+  (flyingrobots/bijou#820) and does not address the Windows storage allowance
+  (flyingrobots/bijou#788) (flyingrobots/bijou#826).
+
 - The Theme Lab draft theme keeps its rule provenance. `cloneThemeForThemeLabEditor()`
   no longer hand-copies each token family: it copies through
   `renameRuleAuthoredTheme()`, so a field added to `Theme` later is carried

@@ -28,6 +28,24 @@ function removingAfterListing(doomed: string): ContextFiles {
   };
 }
 
+/**
+ * Real files, except that `doomed` is removed (and optionally replaced by a
+ * file) right before the walk reads it: the directory was listed by its parent,
+ * then a running step removed it.
+ */
+function removingBeforeRead(doomed: string, replacement?: string): ContextFiles {
+  return {
+    readdirSync: (path) => {
+      if (path === doomed) {
+        rmSync(doomed, { recursive: true });
+        if (replacement !== undefined) writeFileSync(doomed, replacement);
+      }
+      return readdirSync(path);
+    },
+    lstatSync,
+  };
+}
+
 describe('Windows toolchain context measurement', () => {
   it('counts the bytes and entries of every file in the context', () => {
     const state = { entries: 0, bytes: 0 };
@@ -50,4 +68,24 @@ describe('Windows toolchain context measurement', () => {
       expect(measureContext(root, undefined, removingAfterListing(join(root, doomed)))).toBe(remaining);
     },
   );
+
+  it('counts a listed directory as empty when a running step removes it before it is read', () => {
+    const root = scratch();
+    const git = join(root, 'context', 'git');
+    const state = { entries: 0, bytes: 0 };
+    // Oracle: git.exe went with its directory; only the 7-byte archive remains.
+    // Entries: context, git, git.tar.bz2 (git.exe was never listed).
+    expect(measureContext(root, state, removingBeforeRead(git))).toBe(7);
+    expect(state).toEqual({ entries: 3, bytes: 7 });
+  });
+
+  it('still fails on a missing root', () => {
+    expect(() => measureContext(join(scratch(), 'absent-root'))).toThrow(/ENOENT: .*scandir/u);
+  });
+
+  it('still fails when a listed directory is replaced by a file before it is read', () => {
+    const root = scratch();
+    expect(() => measureContext(root, undefined, removingBeforeRead(join(root, 'context', 'git'), 'not a directory')))
+      .toThrow(/ENOTDIR: .*scandir/u);
+  });
 });
