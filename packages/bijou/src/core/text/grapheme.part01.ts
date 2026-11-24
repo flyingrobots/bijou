@@ -38,6 +38,7 @@ export function segmenter(): Intl.Segmenter {
  * - Enclosed CJK Letters (U+3200–U+33FF)
  * - CJK Compatibility (U+FE30–U+FE4F)
  * - Hangul Syllables (U+AC00–U+D7A3)
+ * - Hangul leading consonant jamo (U+1100–U+115F, U+A960–U+A97C)
  * - Emoji (most U+1F000+)
  *
  * @param cp - Unicode code point to test.
@@ -59,6 +60,12 @@ export function isWideChar(cp: number): boolean {
 
   // CJK Unified Ideographs
   if (cp >= 0x4e00 && cp <= 0x9fff) return true;
+
+  // Hangul leading consonant jamo (choseong) are UAX #11 W; a conjoining
+  // syllable takes the width of its leading jamo. Vowel and final jamo
+  // (U+1160–U+11FF, Jamo Extended-B U+D7B0–U+D7FF) are N and stay out.
+  if (cp >= 0x1100 && cp <= 0x115f) return true;
+  if (cp >= 0xa960 && cp <= 0xa97c) return true;
 
   // Hangul Syllables (U+AC00–U+D7A3; excludes Jamo Extended-B which are narrow)
   if (cp >= 0xac00 && cp <= 0xd7a3) return true;

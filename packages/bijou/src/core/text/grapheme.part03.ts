@@ -33,25 +33,48 @@ export function stripUnsafeControlChars(text: string): string {
 // ---------------------------------------------------------------------------
 
 /**
+ * UAX #11 Halfwidth (H) code points: U+20A9 and the halfwidth forms
+ * U+FF61–U+FFDC and U+FFE8–U+FFEE (EastAsianWidth.txt, Unicode 15.1 and 16.0).
+ */
+function isHalfwidth(cp: number): boolean {
+  return (
+    cp === 0x20a9 ||
+    (cp >= 0xff61 && cp <= 0xffdc) ||
+    (cp >= 0xffe8 && cp <= 0xffee)
+  );
+}
+const GRAPHEME_EXTEND_RE = /^\p{Grapheme_Extend}$/u;
+
+/**
  * Compute the terminal display width of a single grapheme cluster.
  *
- * The width is determined by the widest code point in the cluster:
- * - East Asian Wide / Fullwidth characters → 2
- * - Emoji (U+1F300+) → 2
- * - Everything else (ASCII, Latin, combining marks, etc.) → 1
- *
- * Zero-width characters (combining marks, ZWJ, variation selectors)
- * don't add width on their own — they're part of the cluster.
+ * A cluster occupies the cells of its base plus one cell for every extender
+ * that is itself a spacing character:
+ * - The base is as wide as the widest code point of the cluster: 2 for East
+ *   Asian Wide / Fullwidth characters (including the leading jamo of a
+ *   conjoining Hangul syllable) and emoji, or for emoji presentation (U+FE0F);
+ *   1 otherwise.
+ * - An extender (UAX #29 Grapheme_Extend) that UAX #11 classes Halfwidth adds
+ *   one cell: the halfwidth sound marks U+FF9E and U+FF9F, so `ｶﾞ` is 2.
+ * - Every other extender adds nothing: combining marks, ZWJ and the
+ *   pictographs it joins, variation selectors, skin-tone modifiers, tag
+ *   characters, the second flag letter, and conjoining vowel and final jamo.
  *
  * @param grapheme - A single grapheme cluster string.
- * @returns Display width: 1 for narrow characters, 2 for wide/emoji.
+ * @returns Display width in terminal cells (at least 1).
  */
 export function graphemeClusterWidth(grapheme: string): number {
-  let maxWidth = 1;
+  let baseWidth = 1;
   let hasEmojiPresentation = false;
+  let spacingExtenders = 0;
+  let isFirst = true;
   for (const ch of grapheme) {
     const cp = ch.codePointAt(0);
     if (cp === undefined) continue;
+    if (!isFirst && isHalfwidth(cp) && GRAPHEME_EXTEND_RE.test(ch)) {
+      spacingExtenders++;
+    }
+    isFirst = false;
     // Detect emoji presentation selector (U+FE0F) — forces base char to 2-wide
     if (cp === 0xfe0f) {
       hasEmojiPresentation = true;
@@ -65,13 +88,10 @@ export function graphemeClusterWidth(grapheme: string): number {
     ) {
       continue;
     }
-    if (isWideChar(cp)) {
-      maxWidth = 2;
-      break; // Can't be wider than 2
-    }
+    if (isWideChar(cp)) baseWidth = 2;
   }
   // Emoji presentation (U+FE0F) makes any base character 2-wide.
   // This handles Dingbats (✂️ ✈️) and other text chars presented as emoji.
-  if (hasEmojiPresentation && maxWidth < 2) maxWidth = 2;
-  return maxWidth;
+  if (hasEmojiPresentation) baseWidth = 2;
+  return baseWidth + spacingExtenders;
 }

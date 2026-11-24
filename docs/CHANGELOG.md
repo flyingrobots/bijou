@@ -23,6 +23,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- `graphemeClusterWidth()` measures a grapheme cluster as the cells of its
+  base plus one cell for every extender that is itself a spacing character.
+  A Hangul syllable written as conjoining jamo (`U+1112 U+1161 U+11AB`) and a
+  lone leading jamo are now two cells, because `isWideChar()` covers the
+  UAX #11 Wide leading jamo `U+1100..U+115F` and `U+A960..U+A97C`; vowel and
+  final jamo still add nothing. A halfwidth katakana letter with the halfwidth
+  sound mark `ﾞ` or `ﾟ` (`ｶﾞ`) is now two cells, one per halfwidth character.
+  Emoji ZWJ, flag, skin-tone, keycap, VS16 and tag sequences keep two cells
+  (flyingrobots/bijou#854, flyingrobots/bijou#855).
+
 - `npm run dogfood:i18n:debt` prints each logical surface once. The inventory's
   per-surface rows are now aggregated from the entries by surface through
   `aggregateDogfoodI18nDebtSurfaces()`, so a surface split across part files
