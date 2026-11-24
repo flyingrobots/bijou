@@ -14,6 +14,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   result is written into it and returned, so CPU-bound loops allocate nothing
   per call; the target may alias any input, and results equal the allocating
   form bit for bit. Calls without a target are unchanged (#348).
+- Regression tests prove East Asian wide-character layout in `wrapToWidth()`,
+  `constrain()` truncation and `table()` in `interactive` and `static` modes,
+  for Han, kana, halfwidth katakana, precomposed Hangul, fullwidth forms and
+  emoji between ideographs, with a property test over widths 2..120. The
+  narrow East Asian Ambiguous policy is now stated and pinned. The reference is
+  `docs/topics/text-width/`. The tests found five defects, filed as #851,
+  #852, #853, #854 and #855 (#678).
+
 - `npm run code-dojo:cycles` holds the repository's runtime import cycles to a
   checked-in inventory, `scripts/code-dojo/baselines/runtime-scc.json`: the
   strongly connected components of the runtime import graph, built from
