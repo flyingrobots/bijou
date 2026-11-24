@@ -28,6 +28,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- The DOGFOOD docs SVG path parser (`examples/docs/svg-path.ts`) is total and
+  no longer loops forever on a number after `Z` (for example
+  `M0 0 L1 0 L1 1 Z 2 2`). Malformed input now throws
+  `SVG path: ... at offset N.`: a number after `Z`, a command with too few
+  numbers, and any unsupported character (lowercase commands, exponents,
+  unsupported command letters), which were previously dropped or reinterpreted
+  under the previous command. Valid uppercase `M`, `L`, `Q`, `Z` paths render
+  unchanged (#473).
+
 - DOGFOOD story documentation shows canonical family Content guidance and
   Ownership, matching the Components Library while preserving the story's own
   summary and usage advice (#586).

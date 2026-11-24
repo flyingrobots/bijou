@@ -1,3 +1,11 @@
+import { quadraticPoint, samePoint } from './svg-path-curve.js';
+import {
+  isCommandToken,
+  pathError,
+  tokenizePath,
+  type PathToken,
+} from './svg-path-tokens.js';
+
 export interface SvgPoint {
   readonly x: number;
   readonly y: number;
@@ -7,65 +15,62 @@ export interface SvgPolygon {
   readonly points: readonly SvgPoint[];
 }
 
-const PATH_MOVE = 77;
-const PATH_LINE = 76;
-const PATH_QUADRATIC = 81;
-const PATH_CLOSE = 90;
-type PathCommand =
-  | typeof PATH_MOVE
-  | typeof PATH_LINE
-  | typeof PATH_QUADRATIC
-  | typeof PATH_CLOSE;
-const PATH_COMMAND_RE = /[MLQZ]|-?(?:\d+\.?\d*|\.\d+)/g;
-const QUADRATIC_SEGMENTS = 12;
-
 /** Test seam: called once at the top of every main-loop iteration with a 1-based step count. */
 export type PathStepObserver = (step: number) => void;
 
+type PathCommand = 'M' | 'L' | 'Q' | 'Z';
+const QUADRATIC_SEGMENTS = 12;
+
+/**
+ * Total over every string: it returns polygons or throws `SVG path: ... at
+ * offset N.` Unsupported syntax and malformed input are rejected, never
+ * skipped or reinterpreted under the previous command.
+ */
 export function parsePathPolygons(
   path: string,
   onStep?: PathStepObserver,
 ): readonly SvgPolygon[] {
-  const tokens = Array.from(path.matchAll(PATH_COMMAND_RE), ([token]) => token);
+  const tokens = tokenizePath(path);
   const polygons: SvgPolygon[] = [];
   let index = 0;
+  let step = 0;
   let command: PathCommand | undefined;
   let current: SvgPoint | undefined;
   let start: SvgPoint | undefined;
   let points: SvgPoint[] = [];
 
-  let step = 0;
   while (index < tokens.length) {
+    // Invariant: every iteration consumes at least one token (index strictly
+    // grows) or throws, so the loop runs at most tokens.length times. The
+    // check after the branches makes that true by construction.
     onStep?.(++step);
+    const before = index;
     const token = tokens[index];
-    if (token == null) break;
-    const nextCommand = pathCommand(token);
-    if (nextCommand !== undefined) {
-      command = nextCommand;
+    if (token === undefined) break;
+    if (isCommandToken(token)) {
+      command = commandOf(token);
       index++;
-      if (command === PATH_CLOSE) closeCurrentPolygon();
-      continue;
-    }
-    if (command === undefined) {
-      throw new Error('SVG path needs a command.');
-    }
-    if (command === PATH_MOVE || command === PATH_LINE) {
+      if (command === 'Z') closeCurrentPolygon();
+      else requireNumber(tokens, index, token.offset);
+    } else if (command === undefined) {
+      throw pathError('number without a command', token.offset);
+    } else if (command === 'Z') {
+      throw pathError('number after Z has no command', token.offset);
+    } else if (command === 'M' || command === 'L') {
       const point = readPoint(tokens, index);
       index += 2;
-      if (command === PATH_MOVE) {
+      if (command === 'M') {
         closeCurrentPolygon();
         start = point;
         points = [point];
-        command = PATH_LINE;
+        command = 'L';
       } else {
         points.push(point);
       }
       current = point;
-      continue;
-    }
-    if (command === PATH_QUADRATIC) {
+    } else {
       if (current === undefined) {
-        throw new Error('SVG quadratic point missing.');
+        throw pathError('Q needs a current point', token.offset);
       }
       const control = readPoint(tokens, index);
       const end = readPoint(tokens, index + 2);
@@ -76,6 +81,9 @@ export function parsePathPolygons(
         );
       }
       current = end;
+    }
+    if (index <= before) {
+      throw pathError('parser made no progress', token.offset);
     }
   }
   closeCurrentPolygon();
@@ -96,49 +104,43 @@ export function parsePathPolygons(
   }
 }
 
-function readPoint(tokens: readonly string[], index: number): SvgPoint {
-  const x = Number(tokens[index]);
-  const y = Number(tokens[index + 1]);
+function commandOf(token: PathToken): PathCommand {
+  switch (token.text) {
+    case 'M':
+    case 'L':
+    case 'Q':
+    case 'Z':
+      return token.text;
+    default:
+      throw pathError(`unsupported command ${token.text}`, token.offset);
+  }
+}
+
+function requireNumber(
+  tokens: readonly PathToken[],
+  index: number,
+  commandOffset: number,
+): void {
+  const next = tokens[index];
+  if (next === undefined || isCommandToken(next)) {
+    throw pathError('command is missing its numbers', commandOffset);
+  }
+}
+
+function readPoint(tokens: readonly PathToken[], index: number): SvgPoint {
+  const xToken = tokens[index];
+  const yToken = tokens[index + 1];
+  const offset = (xToken ?? tokens.at(-1))?.offset ?? 0;
+  if (xToken === undefined || yToken === undefined) {
+    throw pathError('incomplete point', offset);
+  }
+  if (isCommandToken(xToken) || isCommandToken(yToken)) {
+    throw pathError('incomplete point', offset);
+  }
+  const x = Number(xToken.text);
+  const y = Number(yToken.text);
   if (!Number.isFinite(x) || !Number.isFinite(y)) {
-    throw new Error('SVG point.');
+    throw pathError('non-finite number', offset);
   }
   return { x, y };
-}
-
-function quadraticPoint(
-  from: SvgPoint,
-  control: SvgPoint,
-  to: SvgPoint,
-  factor: number,
-): SvgPoint {
-  const inverse = 1 - factor;
-  return {
-    x:
-      inverse * inverse * from.x +
-      2 * inverse * factor * control.x +
-      factor * factor * to.x,
-    y:
-      inverse * inverse * from.y +
-      2 * inverse * factor * control.y +
-      factor * factor * to.y,
-  };
-}
-
-function pathCommand(token: string): PathCommand | undefined {
-  switch (token.charCodeAt(0)) {
-    case PATH_MOVE:
-      return PATH_MOVE;
-    case PATH_LINE:
-      return PATH_LINE;
-    case PATH_QUADRATIC:
-      return PATH_QUADRATIC;
-    case PATH_CLOSE:
-      return PATH_CLOSE;
-    default:
-      return undefined;
-  }
-}
-
-function samePoint(left: SvgPoint, right: SvgPoint): boolean {
-  return left.x === right.x && left.y === right.y;
 }
