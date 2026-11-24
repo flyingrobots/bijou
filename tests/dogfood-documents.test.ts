@@ -21,7 +21,7 @@ import { dogfoodBrowserData, DOGFOOD_DATA_DIR } from '../scripts/dogfood-browser
 const parse = (name: string): Record<string, string> => {
   const value: unknown = JSON.parse(dogfoodBrowserData().get(`${DOGFOOD_DATA_DIR}/${name}`) ?? '');
   if (typeof value !== 'object' || value === null) throw new Error(`${name} is not an object`);
-  return Object.fromEntries(Object.entries(value).map(([key, text]) => [key, String(text)]));
+  return Object.fromEntries(Object.entries(value).map(([key, text]) => [key, Array.isArray(text) ? text.join('\n') : String(text)]));
 };
 const table = parse('documents.json');
 const digests = parse('documents.sha256.json');

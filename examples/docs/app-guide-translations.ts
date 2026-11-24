@@ -11,7 +11,7 @@ export interface GuideTranslation {
   readonly body: string;
 }
 
-const articles: ReadonlyMap<string, string> = new Map(Object.entries(ARTICLES));
+const articles: ReadonlyMap<string, string> = new Map(Object.entries(ARTICLES).map(([key, lines]) => [key, lines.join('\n')]));
 const cache = new Map<string, GuideTranslation | null>();
 
 function parse(raw: string): GuideTranslation {
