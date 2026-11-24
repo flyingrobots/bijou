@@ -8,6 +8,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- The sealed runner takes `--no-consumer-graphs`, which skips warming npm's
+  cache for the consumer graphs after the lockfile install. CI's full-suite
+  shards use it: the Vitest suite installs no packed package, and it passed in
+  the sealed runner with the warm-up skipped. The jobs that install packed
+  packages keep the warm-up. Origin: flyingrobots/bijou#907.
 - The full test suite runs most files with Vitest's isolation off, so the files
   in a worker share the modules they load; loading them once per file was about
   three quarters of the suite's time. A file that changes shared state (a
