@@ -168,6 +168,7 @@ See [docs](./docs/) for the first living-docs preview built from those shared st
 | [`command-palette`](./command-palette/) | `commandPaletteSurface()`, `commandPaletteKeyMap()` | Filterable action list with fixed search row and viewport-backed results |
 | [`tooltip`](./tooltip/) | `tooltip()`, `compositeSurface()` | Positioned overlay with directional placement |
 | [`canvas`](./canvas/) | `canvas()`, `ShaderFn` | Deliberate shader-driven visual surface |
+| [`fun`](./fun/) | a typed demo contract, a shell, `mouseMode: 'any'` | Rainbow gradient, wormhole and metaballs demos from the owner's bijou-fun project |
 | [`mouse`](./mouse/) | `parseMouse()`, `MouseMsg` | Mouse event inspector |
 | [`focus-area`](./focus-area/) | `focusArea()`, `focusAreaKeyMap()` | Scrollable pane with colored focus gutter |
 | [`dag-pane`](./dag-pane/) | `dagPane()`, `dagPaneKeyMap()` | Interactive DAG inspection pane with viewport and focus |

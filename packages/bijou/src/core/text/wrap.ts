@@ -55,6 +55,8 @@ function wrapPreparedLine(
     }
 
     if (lastBreakIndex >= 0) {
+      const styleBeforeToken = activeStyle;
+      const osc8BeforeToken = activeOsc8;
       const lineTokens = currentTokens.slice(0, lastBreakIndex);
       if (tokensWidth(lineTokens) > 0) {
         lines.push(
@@ -81,7 +83,12 @@ function wrapPreparedLine(
       lastBreakIndex = -1;
       activeStyleAtLastBreak = activeStyle;
       activeOsc8AtLastBreak = activeOsc8;
-      continue;
+      if (currentWidth <= maxWidth) continue;
+      // Breaking at a one-cell whitespace with nothing visible before it
+      // frees one cell, which a two-cell token does not fit into. The
+      // remainder before this token fits, so break hard before the token.
+      activeStyle = styleBeforeToken;
+      activeOsc8 = osc8BeforeToken;
     }
 
     const lineTokens = currentTokens.slice(0, -1);
@@ -115,6 +122,10 @@ export function wrapPreparedTextToWidth(
  * Wrap a string to the requested display width while preserving ANSI styling.
  *
  * Wrapping is grapheme-aware and hard-wraps long lines without adding ellipses.
+ * It breaks at the last whitespace that fits, dropping that whitespace, and
+ * otherwise between graphemes. When `maxWidth` is at least the widest
+ * grapheme, every line is at most `maxWidth` cells and every non-whitespace
+ * grapheme is kept, in order.
  *
  * @param str - Input string, possibly containing ANSI SGR escapes.
  * @param maxWidth - Maximum display width in columns.
