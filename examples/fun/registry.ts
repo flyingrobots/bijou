@@ -6,10 +6,15 @@ import { fontDemos } from './demos/fonts.js';
 import { wormholeDemo } from './demos/wormhole.js';
 import { flipFluidDemo } from './demos/flip.js';
 import { fluidDemo } from './demos/fluid.js';
+import { raycasterDemo } from './demos/raycaster.js';
+import { raymarcherDemo } from './demos/raymarcher.js';
+import { raytracerDemo } from './demos/raytracer.js';
 import type { Typeface } from './demos/typeface.js';
 
 /** The demos the shell lists, in order. Adding a demo is one line here. */
-export const demos: readonly DemoEntry[] = [rainbowGradient, wormholeDemo, metaballsDemo, fluidDemo, flipFluidDemo];
+export const demos: readonly DemoEntry[] = [
+  rainbowGradient, wormholeDemo, metaballsDemo, fluidDemo, flipFluidDemo, raymarcherDemo, raycasterDemo, raytracerDemo,
+];
 
 /**
  * The demos that draw a font's outlines need the font's bytes, which only a host can supply, so they are not in `demos`.

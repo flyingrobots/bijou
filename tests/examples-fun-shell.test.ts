@@ -6,7 +6,7 @@ import { demos } from '../examples/fun/registry.js';
 import { SEED, cellsOf, digest, funContext } from './helpers/fun-demos.js';
 
 // Wide enough for the header to list every demo by name.
-const ctx = funContext(200, 30);
+const ctx = funContext(300, 30);
 const app = createFunApp({ ctx, entries: demos, seed: SEED });
 const key = (name: string): KeyMsg => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false });
 const mouse = (col: number, row: number, action: MouseMsg['action'] = 'move'): MouseMsg =>
@@ -49,7 +49,7 @@ describe('the bijou-fun shell', () => {
 
   it('draws the demo into the body between the header and the footer', () => {
     const view = send([key('3'), pulse, pulse]);
-    expect([view.width, view.height]).toEqual([200, 30]);
+    expect([view.width, view.height]).toEqual([300, 30]);
   });
 
   it('turns mouse moves in the body into pointer messages offset by the header, and moves outside into a leave', () => {

@@ -1,7 +1,8 @@
 # bijou-fun demos
 
 The shell lists the demos the registry holds: a rainbow gradient, a wormhole, colour-blending metaballs, a particle fluid
-tank, a FLIP dam break, and, when a host supplies the font, an outline font renderer and a 3D text cylinder. They come
+tank, a FLIP dam break, a raymarcher, a raycaster game, a raytracer, and, when a host supplies the font, an outline
+font renderer and a 3D text cylinder. They come
 from the owner's bijou-fun project, written against Bijou 7.1 and ported here.
 
 ## Run
@@ -44,6 +45,31 @@ frame count and the pause, so every demo pauses the same way (a demo taking text
 - `demos/`: one file per demo, split where a demo needs more than one.
 - `browser.ts`: the browser entry, `funBuild(seed, entries)` and `loadFunBuild(seed)` (which fetches the font); the showcase gallery loads it.
 - `main.ts`: the terminal entry. It is the only file that reaches Node (it reads the font file and hands the bytes to the demos), so the rest can run in a browser.
+
+## The 3D demos
+
+`demos/raymarcher*.ts`, `demos/raycaster*.ts` and `demos/raytracer*.ts` are ported from bijou-fun with the rendering
+maths moved as it was. The raycaster keeps the player, the level's sprites, health and score in its model; `update`
+walks, turns, tests `canMoveTo` (the collision, in `raycaster-map.ts`), fires and moves the monsters on each pulse.
+The raytracer keeps its seed, camera distance and pointer in its model; the lens jitter and soft-shadow samples come
+from `random.ts` through `raytracer-sampler.ts`, seeded from the model's seed, the sub-pixel and the frame.
+
+Two controls differ from the original because the shell speaks no scroll wheel and no mouse button: the raytracer
+zooms on `+` and `-` (the original used the wheel), and the raycaster shoots on `f` or `p` only (the original also
+shot on a left click and walked on the wheel). The shell keeps the arrow keys for switching demos, so the raycaster
+and the raymarcher answer `up` and `down` and use `a` and `d` to turn and to move sideways.
+
+### Frame cost at 177 by 53
+
+Median time of one `view` call at 177 by 53 cells, after 30 pulses, over 15 calls. Measured on 2026-11-24 on an
+Apple M5 inside the sealed Linux test container, Node v22.23.4. These are one machine's numbers, recorded so a later
+change can be compared; nothing gates on them.
+
+| Demo | Median | Fastest | Slowest |
+| --- | --- | --- | --- |
+| `raymarcher` | 14.6 ms | 14.0 ms | 26.3 ms |
+| `raycaster` | 8.6 ms | 8.2 ms | 12.4 ms |
+| `raytracer` | 76.6 ms | 75.3 ms | 89.4 ms |
 
 Adding a demo is a `Demo<S>` in `demos/` and one line in `registry.ts`.
 

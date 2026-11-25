@@ -10,7 +10,7 @@ import { GALLERY_DEMOS } from '../../examples/web-gpu/src/gallery/demos.js';
 import { cellsOf, funContext } from '../helpers/fun-demos.js';
 
 // Wide enough for the header to list every demo by name.
-const ctx = funContext(260, 30);
+const ctx = funContext(400, 30);
 const key = (name: string): KeyMsg => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false });
 const move = (col: number, row: number): MouseMsg =>
   ({ type: 'mouse', button: 'none', action: 'move', col, row, shift: false, alt: false, ctrl: false });

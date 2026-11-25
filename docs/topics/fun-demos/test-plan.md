@@ -113,3 +113,24 @@ pulses from seed 1888: 60 pulses with a pour key each, a shake, and 240 more. Or
 The recorded frames are made after a `resize` to the frame's size. The fluid demos also fall under FD-02 (digests at 80x24 and 177x53), FD-03, FD-10, FD-11 and FD-14, and their 80x24
 text frames are `tests/fixtures/examples-fun/frames/fluid-80x24.txt` and `flip-fluid-80x24.txt`.
 
+## 3D demos: `examples-fun-3d.test.ts`, `examples-fun-raycaster.test.ts`
+
+Origin: flyingrobots/bijou#890. The frame digests of the raymarcher, the raycaster and the raytracer are in the same fixture, and their 80x24 text frames are `tests/fixtures/examples-fun/frames/<id>-80x24.txt` (FD-02 and the frames test cover them).
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-100 | The registry lists the three 3D demos. | `the registry lists the raymarcher, the raycaster and the raytracer` | Implemented |
+| FD-101 | A one-row pane paints at several widths. | `<id> paints a one-row pane at several widths` | Implemented |
+| FD-102 | A frame is a pure function of the model: painting twice gives the same cells. | `<id> paints the same frame twice from the same state` | Implemented |
+| FD-103 | `h` hides the heads-up panel and a second `h` restores it. | `<id> h hides the heads-up panel and a second h brings it back` | Implemented |
+| FD-104 | The raymarcher light follows `w`, `s`, `a`, `d` and stops at the edge of the unit square. | `the raymarcher light follows w, s, a and d and stops at the edge of the unit square`, `the raymarcher paints a different frame once the light has moved` | Implemented |
+| FD-105 | The raytracer camera distance stops at 1.5 and 10, on keys. | `the raytracer camera distance stops at both limits, on keys` | Implemented |
+| FD-106 | The raytracer's dithering depends on the seed and on nothing else. | `the raytracer dithering depends on the seed and on nothing else` | Implemented |
+| FD-107 | The raytracer tilts with the pointer and keeps the tilt on leave. | `the raytracer tilts with the pointer and keeps the tilt when the pointer leaves` | Implemented |
+| FD-110 | The raycaster starts where the original did. | `starts at 3.5, 3.5 facing a quarter pi with full health` | Implemented |
+| FD-111 | A scripted walk ends at a known position. | `a scripted walk ends at a known position: three steps, a turn of two, three more` | Implemented |
+| FD-112 | Walking into a wall stops at the wall; walking along one slides. | `walking into a wall stops at the wall and the player never stands inside it`, `walking along a wall slides instead of stopping dead` | Implemented |
+| FD-113 | Collision lives in `update`: it holds with no frame painted. | `collision holds with no frame ever painted, and w and s walk the same line` | Implemented |
+| FD-114 | A seeded walk of 2,000 steps never enters a wall. | `a seeded walk of 2,000 steps never enters a wall and never leaves the map` | Implemented |
+| FD-115 | A shot in the firing cone kills a monster in two hits; a shot at nothing hurts nobody; `r` restarts. | `shoots a monster in the firing cone dead in two shots and scores 150`, `a shot at nothing hurts nobody, and r restarts the level` | Implemented |
+| FD-116 | Treasure scores 250; a touching monster bites. | `collects treasure for 250 points and takes damage from a monster that touches the player` | Implemented |

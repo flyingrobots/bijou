@@ -19,7 +19,8 @@ describe('the bijou-fun demos at the edges', () => {
       const resumed = feed(held, [{ type: 'key', key: 'space' }, ...pulses(20)]);
       expect(resumed.paused).toBe(false);
       expect(resumed.frame).toBe(30);
-      if (entry.id !== 'rainbow-gradient') {
+      // The raycaster stands still until someone walks or shoots: tests/examples-fun-raycaster.test.ts covers its motion.
+      if (entry.id !== 'rainbow-gradient' && entry.id !== 'raycaster') {
         expect(digest(resumed.view(80, 24, ctx))).not.toBe(digest(held.view(80, 24, ctx)));
       }
     });

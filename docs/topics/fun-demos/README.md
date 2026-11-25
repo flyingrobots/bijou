@@ -1,8 +1,8 @@
 # bijou-fun demos
 
 Reference for `examples/fun/`: the demo contract, the shell, and the demos the registry lists. Origin:
-flyingrobots/bijou#888, for the two font demos flyingrobots/bijou#891, and for the two fluid demos
-flyingrobots/bijou#889.
+flyingrobots/bijou#888, for the two font demos flyingrobots/bijou#891, for the two fluid demos
+flyingrobots/bijou#889, and for the three 3D demos flyingrobots/bijou#890.
 
 ## Contract
 
@@ -38,6 +38,9 @@ Other mouse actions are dropped.
 | `metaballs` | five blobs bouncing in the unit square, and the pointer | pointer steers a sixth blob |
 | `fluid` | up to 1,500 seeded particles in a fixed tank, the source side, the pour, a pending shake | `p` pour, `t` source side, `z` `x` `c` shake, `r` reset, `h` card |
 | `flip-fluid` | a FLIP fluid (grid and up to 8,000 particles) in the same tank, and the obstacle | the fluid keys, and `w` `a` `s` `d` or `up` `down` move the obstacle |
+| `raymarcher` | the light's place in the unit square | `w` `a` `s` `d` (or `up` and `down`) move the light |
+| `raycaster` | the player, nine sprites, health, score, flash and shot counters, a pulse count | `w` `s` walk, `a` `d` turn, `f` or `p` shoot, `r` restarts |
+| `raytracer` | the seed, the camera distance (1.5 to 10) and the pointer | pointer tilts the camera, `+` and `-` zoom |
 | `font-renderer` | the message, whether it is taking text, whether the HUD shows | `i` types, `r` clears, `h` hides the HUD |
 | `text-cylinder` | the same | the same; the message's words become four rolling lines |
 
@@ -59,6 +62,15 @@ break's buffer holds 8,000 particles, so a very large pane starts with fewer tha
 pulse. The shell takes the digits and the left and right arrows, so the shake keys are `z`, `x`, `c` and the obstacle
 moves with `w a s d` and `up` `down`; the particle cap of 1,500, the five-pulse pour and these keys are choices of the
 port. Space pauses; the footer shows it.
+
+### The 3D demos
+
+Every 3D demo also answers `h`, which hides its heads-up panel. The raycaster's walking, its wall collision
+(`canMoveTo`), the monsters and the shooting run in its own `update`, so they hold with no frame painted. The
+raytracer draws lens jitter and soft-shadow samples from `random.ts`, seeded by the model's seed, the sub-pixel and
+the frame; a frame is a pure function of the model. A paused session drops pulses, so the monsters and the
+animation stop but a key still walks the player. The wheel is not a demo message, so the raytracer zooms on keys.
+Frame cost at 177 by 53 is in [`examples/fun/README.md`](../../../examples/fun/README.md).
 
 ## The font demos
 
