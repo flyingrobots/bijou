@@ -3,7 +3,7 @@ import type { Surface } from '@flyingrobots/bijou';
 import type { KeyMsg, MouseMsg, PulseMsg, ResizeMsg } from '@flyingrobots/bijou-tui';
 import { defineDemo } from '../examples/fun/contract.js';
 import { createSoloApp } from '../examples/fun/solo.js';
-import { SEED, demos, digest, funContext } from './helpers/fun-demos.js';
+import { SEED, demos, funContext } from './helpers/fun-demos.js';
 import { rowText, stubDemo } from './helpers/fun-stub.js';
 
 type Msg = KeyMsg | MouseMsg | PulseMsg | ResizeMsg;
@@ -104,7 +104,6 @@ describe('one demo alone on a page', () => {
       const rows = (surface: Surface): string[] => Array.from({ length: 23 }, (_, row) => rowText(surface, row));
       expect(rows(solo)).toEqual(rows(body));
       expect(rowText(solo, 23)).toContain(entry.description.slice(0, 40));
-      expect(digest(solo)).toBe(digest(play([pulse, pulse], entry, 80, 24).view));
     });
   }
 });

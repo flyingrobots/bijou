@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import type { Surface } from '@flyingrobots/bijou';
 import type { KeyMsg } from '@flyingrobots/bijou-tui';
+import type { DemoEntry } from '../examples/fun/contract.js';
 import { createFunApp } from '../examples/fun/shell.js';
 import { catalog, loadDemos } from '../examples/fun/registry.js';
-import { SEED, cellsOf, funContext } from './helpers/fun-demos.js';
-import { demosWithFonts, face } from './helpers/fun-font.js';
+import { FONT_IDS, SEED, cellsOf, funContext } from './helpers/fun-demos.js';
+import { face, fontDemos } from './helpers/fun-font.js';
+import { recordingDemo } from './helpers/fun-stub.js';
 
-// Wide enough for the header to name every demo, the font demos last.
-const ctx = funContext(260, 30);
+// The shell is given a fake and the two font demos: where the real catalog puts them cannot change these tests.
+const other = recordingDemo('other', 'Other Demo', 'A fake that needs no font');
+const withFonts = (fonts: readonly DemoEntry[]): DemoEntry[] => [other, ...fonts];
+const ctx = funContext(120, 30);
 const keyMsg = (name: string, extra: Partial<KeyMsg> = {}): KeyMsg => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false, ...extra });
 
 function rowText(surface: Surface, row: number): string {
@@ -17,7 +21,7 @@ function rowText(surface: Surface, row: number): string {
 const FIRST = 'font-renderer';
 
 /** Open the shell on the font renderer, then send `keys`: the view, the model and every command the shell gave. */
-function play(keys: readonly KeyMsg[], entries = demosWithFonts(face)) {
+function play(keys: readonly KeyMsg[], entries = withFonts(fontDemos(face))) {
   const app = createFunApp({ ctx, entries, seed: SEED });
   const at = entries.findIndex((entry) => entry.id === FIRST);
   let [model] = app.init();
@@ -52,13 +56,15 @@ describe('the shell while a demo is taking text', () => {
 
 describe('the shell with no font', () => {
   it('shows the message in the font demos only, and the other demos still run', async () => {
-    const entries = await loadDemos({ font: () => Promise.reject(new Error('offline')) });
-    expect(entries.map((entry) => entry.id)).toEqual(catalog.map((entry) => entry.id));
+    const loaded = await loadDemos({ font: () => Promise.reject(new Error('offline')) });
+    expect(loaded.map((entry) => entry.id)).toEqual(catalog.map((entry) => entry.id));
+    const entries = withFonts(loaded.filter((entry) => FONT_IDS.some((id) => id === entry.id)));
+    expect(entries).toHaveLength(1 + FONT_IDS.length);
     const shown = play([], entries);
     expect(rowText(shown.view, 0)).toContain('TTF Font Vector Renderer');
     expect(Array.from({ length: 30 }, (_, row) => rowText(shown.view, row)).join('\n')).toContain('Error: TTF Font file missing or failed to parse.');
     expect(shown.at).toBeGreaterThan(0);
-    const other = play([keyMsg('1')], entries);
-    expect(rowText(other.view, 29)).toContain(entries[0]?.description ?? 'missing');
+    const first = play([keyMsg('1')], entries);
+    expect(rowText(first.view, 29)).toContain('A fake that needs no font');
   });
 });

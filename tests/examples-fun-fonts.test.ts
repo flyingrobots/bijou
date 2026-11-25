@@ -11,8 +11,8 @@ const SIZES: readonly (readonly [number, number])[] = [[80, 24], [177, 53]];
 const FRAMES = join(import.meta.dirname, 'fixtures', 'examples-fun', 'frames');
 
 describe('the two font demos of bijou-fun', () => {
-  it('the registry lists both after the demos that need no font', () => {
-    expect(catalog.slice(-2).map((entry) => entry.id)).toEqual([...FONT_IDS]);
+  it('the catalog lists both font demos', () => {
+    expect(catalog.map((entry) => entry.id)).toEqual(expect.arrayContaining([...FONT_IDS]));
   });
 
   for (const id of FONT_IDS) {

@@ -4,7 +4,7 @@ import { fontRendererDemo } from '../../examples/fun/demos/font-renderer.js';
 import { GREETING } from '../../examples/fun/demos/font-typing.js';
 import { textCylinderDemo } from '../../examples/fun/demos/text-cylinder.js';
 import { loadTypeface, type FontPort, type Typeface } from '../../examples/fun/demos/typeface.js';
-import { demos, pulses } from './fun-demos.js';
+import { pulses } from './fun-demos.js';
 
 export { FONT_IDS } from './fun-demos.js';
 
@@ -17,11 +17,6 @@ export const face = await loadTypeface(fontPort);
 /** The two font demos drawing `typeface`, in the catalog's order. */
 export function fontDemos(typeface: Typeface, message: string = GREETING): DemoEntry[] {
   return [fontRendererDemo(typeface, message), textCylinderDemo(typeface, message)];
-}
-
-/** Every demo, as a shell lists them: the ones that need no font, then the two that draw `typeface`. */
-export function demosWithFonts(typeface: Typeface): DemoEntry[] {
-  return [...demos, ...fontDemos(typeface)];
 }
 
 export function fontEntry(id: string, message?: string): DemoEntry {

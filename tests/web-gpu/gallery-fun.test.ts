@@ -7,6 +7,7 @@ import { catalog } from '../../examples/fun/registry.js';
 import { GALLERY_DEMOS, funGalleryDemos } from '../../examples/web-gpu/src/gallery/demos.js';
 import { parseRoute } from '../../examples/web-gpu/src/gallery/route.js';
 import { funContext } from '../helpers/fun-demos.js';
+import { fixtureCatalog } from '../helpers/fun-fixture.js';
 import { rowText, stubCatalogEntry } from '../helpers/fun-stub.js';
 
 const ctx = funContext(100, 30);
@@ -24,13 +25,36 @@ function frameOf(app: App<unknown, unknown>, messages: readonly (KeyMsg | MouseM
 
 const fun = GALLERY_DEMOS.filter((demo) => demo.id.startsWith('fun-'));
 
-describe('the gallery entries for the fun demos', () => {
-  it('lists one entry per demo of the fun catalog, in its order, after DOGFOOD and the soak bench', () => {
-    expect(GALLERY_DEMOS.map((demo) => demo.id)).toEqual(['dogfood', 'soak', ...catalog.map((entry) => `fun-${entry.id}`)]);
-    expect(fun).toHaveLength(10);
+describe('the gallery entries made from a catalog', () => {
+  it('makes one card per entry, in the catalog\'s order, at fun-<id>, with the entry\'s name and description', () => {
+    const { entries } = fixtureCatalog();
+    expect(funGalleryDemos(entries).map(({ id, title, description }) => ({ id, title, description })))
+      .toEqual(entries.map((entry) => ({ id: `fun-${entry.id}`, title: entry.name, description: entry.description })));
+    expect(funGalleryDemos([])).toEqual([]);
   });
 
-  it('shows each demo by the name and description its catalog entry has', () => {
+  it('opens each card on its own entry and no other', async () => {
+    const { entries, log } = fixtureCatalog();
+    const cards = funGalleryDemos(entries);
+    for (const [index, card] of cards.entries()) {
+      const before = log.loads.length;
+      const built = await card.load();
+      expect(log.loads.slice(before).map((load) => load.id), card.id).toEqual([entries[index]?.id]);
+      expect(rowText(frameOf(built.build(ctx), []), 0), card.id).toContain(`demo ${entries[index]?.id ?? 'missing'}`);
+    }
+  });
+
+  it('routes fun-<id> to that card, and an id the catalog lacks to the gallery', () => {
+    const cards = funGalleryDemos(fixtureCatalog().entries);
+    const route = parseRoute('?app=fun-gamma&backend=canvas2d', cards);
+    expect(route.kind === 'demo' && route.demo.title).toBe('Fake gamma');
+    expect(parseRoute('?app=fun-zeta', cards)).toEqual({ kind: 'gallery', unknown: 'fun-zeta' });
+  });
+});
+
+describe('the gallery entries for the fun demos', () => {
+  it('lists the fun catalog\'s demos, in its order, after DOGFOOD and the soak bench', () => {
+    expect(GALLERY_DEMOS.map((demo) => demo.id)).toEqual(['dogfood', 'soak', ...catalog.map((entry) => `fun-${entry.id}`)]);
     expect(fun.map(({ title, description }) => ({ title, description })))
       .toEqual(catalog.map(({ name, description }) => ({ title: name, description })));
   });
