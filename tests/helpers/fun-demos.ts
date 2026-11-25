@@ -67,6 +67,12 @@ export function byId(id: string): DemoEntry {
 export function frameScript(id: string, width: number, height: number): DemoMsg[] {
   const own = fluidScript(id, { width, height });
   if (own !== undefined) return own;
+  if (id === 'starfield') {
+    return [{ type: 'resize', width, height }, ...pulses(30), { type: 'pointer', col: Math.floor(width / 3), row: Math.floor(height / 2) }, ...pulses(30)];
+  }
+  const generative: Readonly<Record<string, string>> = { 'directional-tiles': '+', 'doyle-spiral': ']', 'deformed-rectangles': 's' };
+  const generativeKey = generative[id];
+  if (generativeKey !== undefined) return [...pulses(30), { type: 'key', key: generativeKey }, ...pulses(30)];
   const middle: DemoMsg[] = id === 'wormhole'
     ? [{ type: 'key', key: 'm' }]
     : id === 'metaballs' ? [{ type: 'pointer', col: Math.floor(width / 3), row: Math.floor(height / 2) }] : threeDMiddle(id, width, height);
