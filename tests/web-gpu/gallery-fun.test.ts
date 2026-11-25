@@ -1,66 +1,80 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { createSurface, type Surface } from '@flyingrobots/bijou';
+import type { Surface } from '@flyingrobots/bijou';
 import type { App, KeyMsg, MouseMsg } from '@flyingrobots/bijou-tui';
-import { defineDemo } from '../../examples/fun/contract.js';
-import { demos } from '../../examples/fun/registry.js';
-import { funBuild } from '../../examples/fun/browser.js';
-import { GALLERY_DEMOS } from '../../examples/web-gpu/src/gallery/demos.js';
-import { cellsOf, funContext } from '../helpers/fun-demos.js';
+import { catalog } from '../../examples/fun/registry.js';
+import { GALLERY_DEMOS, funGalleryDemos } from '../../examples/web-gpu/src/gallery/demos.js';
+import { parseRoute } from '../../examples/web-gpu/src/gallery/route.js';
+import { funContext } from '../helpers/fun-demos.js';
+import { rowText, stubCatalogEntry } from '../helpers/fun-stub.js';
 
-// Wide enough for the header to list every demo by name.
-const ctx = funContext(400, 30);
+const ctx = funContext(100, 30);
 const key = (name: string): KeyMsg => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false });
 const move = (col: number, row: number): MouseMsg =>
   ({ type: 'mouse', button: 'none', action: 'move', col, row, shift: false, alt: false, ctrl: false });
-
-/** A demo nothing in the showcase has heard of: it paints how many pointer moves it has had. */
-const stub = defineDemo<{ readonly moves: number }>({
-  id: 'stub', name: 'Stub Demo', description: 'A demo only the test registers', keys: 'none',
-  init: () => ({ moves: 0 }),
-  update: (msg, state) => (msg.type === 'pointer' ? { moves: state.moves + 1 } : state),
-  view(state, { width, height }) {
-    const surface = createSurface(width, height);
-    const text = `moves ${String(state.moves)}`;
-    for (let i = 0; i < text.length; i += 1) surface.set(i, 0, { char: text.charAt(i), empty: false });
-    return surface;
-  },
-});
-
-function rowText(surface: Surface, row: number): string {
-  return cellsOf(surface).slice(row * surface.width, (row + 1) * surface.width).map((cell) => cell.char).join('');
-}
 
 function frameOf(app: App<unknown, unknown>, messages: readonly (KeyMsg | MouseMsg)[]): Surface {
   let [model] = app.init();
   for (const msg of messages) [model] = app.update(msg, model);
   const view = app.view(model);
-  if (!('cells' in view)) throw new Error('the shell must return a Surface');
+  if (!('cells' in view)) throw new Error('the demo page must paint a Surface');
   return view;
 }
 
-describe('the gallery entry for the fun shell', () => {
-  it('lists the fun shell after DOGFOOD, as one entry', () => {
-    const ids = GALLERY_DEMOS.map((demo) => demo.id);
-    expect(ids.filter((id) => id === 'fun')).toHaveLength(1);
-    expect(ids.indexOf('fun')).toBeGreaterThan(ids.indexOf('dogfood'));
+const fun = GALLERY_DEMOS.filter((demo) => demo.id.startsWith('fun-'));
+
+describe('the gallery entries for the fun demos', () => {
+  it('lists one entry per demo of the fun catalog, in its order, after DOGFOOD and the soak bench', () => {
+    expect(GALLERY_DEMOS.map((demo) => demo.id)).toEqual(['dogfood', 'soak', ...catalog.map((entry) => `fun-${entry.id}`)]);
+    expect(fun).toHaveLength(10);
   });
 
-  it('loads the shell on demand, and its header lists every demo of the fun registry', async () => {
-    const built = await GALLERY_DEMOS.find((demo) => demo.id === 'fun')?.load();
-    if (built === undefined) throw new Error('the gallery has no fun entry');
-    const header = rowText(frameOf(built.build(ctx), []), 0);
-    for (const entry of demos) expect(header).toContain(entry.name);
+  it('shows each demo by the name and description its catalog entry has', () => {
+    expect(fun.map(({ title, description }) => ({ title, description })))
+      .toEqual(catalog.map(({ name, description }) => ({ title: name, description })));
   });
 
-  it('shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu', () => {
-    const app = funBuild(1888, [...demos, stub]).build(ctx);
-    expect(rowText(frameOf(app, []), 0)).toContain('Stub Demo');
-    // `left` from the first demo wraps to the last, which is the stub whatever the registry holds.
-    const last = key('left');
-    expect(rowText(frameOf(app, [last]), 29)).toContain('A demo only the test registers');
-    expect(rowText(frameOf(app, [last, move(5, 3), move(6, 3)]), 1)).toContain('moves 2');
+  it('has no entry for the shell that once held them all, and routes its old address to no demo', () => {
+    expect(GALLERY_DEMOS.some((demo) => demo.id === 'fun')).toBe(false);
+    expect(parseRoute('?app=fun').kind).toBe('gallery');
+  });
+
+  it('routes fun-<id> to that demo, and an unknown fun-<id> to the gallery with the id it was asked for', () => {
+    const route = parseRoute('?app=fun-wormhole&backend=canvas2d');
+    expect(route.kind === 'demo' && route.demo.title).toBe('Retro Wormhole');
+    expect(parseRoute('?app=fun-nope')).toEqual({ kind: 'gallery', unknown: 'fun-nope' });
+  });
+
+  it('gives a stub entry added to the catalog a card that opens it alone, with no change under examples/web-gpu', async () => {
+    const cards = funGalleryDemos([...catalog, stubCatalogEntry]);
+    const card = cards.at(-1);
+    expect(card).toMatchObject({ id: 'fun-stub', title: 'Stub Demo', description: 'A demo only the test registers' });
+    expect(parseRoute('?app=fun-stub', cards).kind).toBe('demo');
+    const built = await card?.load();
+    if (built === undefined) throw new Error('the stub has no card');
+    const app = built.build(ctx);
+    expect(rowText(frameOf(app, []), 2)).toContain('pane 100x29');
+    // Its keys and the pointer reach it, the keys a shell would keep included, and nothing lists another demo.
+    const played = frameOf(app, [key('tab'), key('2'), key('q'), move(5, 3), move(6, 0)]);
+    expect(rowText(played, 0)).toContain('keys tab 2 q');
+    expect(rowText(played, 1)).toContain('pointer 6,0');
+    expect(rowText(played, 29)).toContain('A demo only the test registers');
+    for (const entry of catalog) expect(Array.from({ length: 30 }, (_, row) => rowText(played, row)).join('\n')).not.toContain(entry.name);
+  });
+
+  it('loads a demo of the catalog on demand and mounts it alone, with its own key hints', async () => {
+    const built = await GALLERY_DEMOS.find((demo) => demo.id === 'fun-wormhole')?.load();
+    if (built === undefined) throw new Error('the gallery has no wormhole entry');
+    const frame = frameOf(built.build(ctx), []);
+    expect(rowText(frame, 29)).toContain('Perspective rings and vector lines');
+    expect(rowText(frame, 29)).toContain('m ');
+    expect(rowText(frame, 29)).not.toMatch(/switch|quits/u);
+  });
+
+  it('rejects the load when the demo module fails to load, so the page can say so', async () => {
+    const broken = { ...stubCatalogEntry, id: 'broken', load: () => Promise.reject(new Error('chunk missing')) };
+    await expect(funGalleryDemos([broken])[0]?.load()).rejects.toThrow('chunk missing');
   });
 
   it('names no fun demo anywhere in the showcase source', () => {
@@ -68,7 +82,7 @@ describe('the gallery entry for the fun shell', () => {
     const files = readdirSync(root, { recursive: true, encoding: 'utf8' }).filter((name) => /\.tsx?$/u.test(name));
     const named = files.filter((file) => {
       const text = readFileSync(join(root, file), 'utf8');
-      return /fun\/demos|metaballs|wormhole|rainbow/iu.test(text) || demos.some((entry) => text.includes(entry.id));
+      return /fun\/demos|metaballs|wormhole|rainbow/iu.test(text) || catalog.some((entry) => text.includes(entry.id));
     });
     expect(named).toEqual([]);
   });

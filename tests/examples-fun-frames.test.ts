@@ -2,8 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { renderFrameText } from '../scripts/frame-assertions.js';
-import { demos } from '../examples/fun/registry.js';
-import { feed, frameScript, funContext, mountEntry } from './helpers/fun-demos.js';
+import { demos, feed, frameScript, funContext, mountEntry } from './helpers/fun-demos.js';
 
 const DIR = join(import.meta.dirname, 'fixtures', 'examples-fun', 'frames');
 

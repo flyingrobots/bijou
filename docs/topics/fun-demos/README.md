@@ -1,8 +1,9 @@
 # bijou-fun demos
 
-Reference for `examples/fun/`: the demo contract, the shell, and the demos the registry lists. Origin:
+Reference for `examples/fun/`: the demo contract, the catalog, the shell, the single-demo app and the demos. Origin:
 flyingrobots/bijou#888, for the two font demos flyingrobots/bijou#891, for the two fluid demos
-flyingrobots/bijou#889, and for the three 3D demos flyingrobots/bijou#890.
+flyingrobots/bijou#889, for the three 3D demos flyingrobots/bijou#890, and for the catalog and the single-demo app
+flyingrobots/bijou#902.
 
 ## Contract
 
@@ -21,13 +22,37 @@ A demo is a `Demo<S>` (`examples/fun/contract.ts`): `init(seed)`, `update(msg, s
 - Demos and shell modules import only public package entries and reach no Node API, no `Math.random`, no wall clock.
   Only `examples/fun/main.ts` does. Particles and blob speeds come from a seed.
 
+## Catalog
+
+`registry.ts` exports `catalog`: one entry per demo, in the order every host lists them. An entry has the demo's `id`,
+`name` and one-line `description`, and `load(host)`, which imports that demo's module and returns its `DemoEntry`. The
+catalog imports no demo module statically, so a list of demos can be shown before any demo's code has loaded, and a
+bundler gives each demo a chunk of its own. The id, name and description repeat the demo's own; a test holds them equal.
+
+`host` is `{ font }`, the font port. Only the two font demos use it. `loadDemos(host, entries = catalog)` loads every
+entry in order and asks the host for the font once. It rejects if a module fails to load.
+
+Adding a demo is one entry in `catalog`. The terminal shell then lists it, and the showcase gallery gives it a card
+and a page.
+
 ## Shell
 
+`npm run fun` loads every demo of the catalog with `loadDemos` and hands them to the shell.
 `createFunApp({ ctx, entries, seed })` returns an `App`. Row 0 lists the demos, the last row describes the active
 demo and its keys, and the rows between are the demo's pane. `tab`, `right` and `left` switch (and wrap), a digit
 jumps, `q` and `ctrl+c` quit, and other keys go to the demo. Each demo keeps its state while another is shown. A mouse
 move or press inside the pane becomes a `pointer` message offset by the header row; outside it, a `pointer-leave`.
 Other mouse actions are dropped.
+
+## One demo alone
+
+`createSoloApp({ ctx, entry, seed })` in `solo.ts` returns an `App` that runs one demo with nothing beside it, for a
+page that shows a single demo. The demo's pane is every row but the last. The last row names the demo and its keys,
+and shows `PAUSED` while it is paused. There is no list of demos and no key of the host's own: `tab`, the arrows, the
+digits and `q` all reach the demo, and `ctrl+c` does nothing, since the page is how a person leaves. A mouse move or
+press inside the pane becomes a `pointer` message in the pane's own cells, from row 0; on the last row or outside the
+screen it is a `pointer-leave`. A resize tells the demo its new pane. A demo that throws in `view` is painted as
+`<name> failed: <reason>` in the pane, and the last row stays.
 
 ## Demos
 
@@ -81,9 +106,9 @@ dependency of the repository and of no published package.
 
 The font arrives through a port, never from a path the demo reads. `FontPort` is `() => Promise<ArrayBuffer | Uint8Array>`;
 `loadTypeface(port)` parses it and returns a `Typeface` that is either ready or `missing` with a reason, and never
-throws. `fontDemos(face, message)` builds the two demos, and `demosWithFonts(face)` in `registry.ts` lists them after
-`demos`. The terminal entry reads the file by a path from `main.ts`'s own module; the browser entry's `loadFunBuild`
-fetches it by a URL from `browser.ts`'s own module. With a missing or unparseable font each demo paints
+throws. `loadFontRenderer(port)` and `loadTextCylinder(port)` load the face and build each demo; the catalog's last
+two entries call them. The terminal entry reads the file by a path from `main.ts`'s own module; the browser entry's
+`fetchFont` fetches it by a URL from `browser.ts`'s own module. With a missing or unparseable font each demo paints
 `Error: TTF Font file missing or failed to parse.` and the reason in its pane; the shell and the other demos work.
 
 Typing, in the demo's own `update`: `i` or `enter` starts, printable keys and `space` add (at most 24 characters,
@@ -92,11 +117,15 @@ card. The cylinder uses default words when the message has none. The HUD shows c
 
 ## In the browser
 
-`examples/fun/browser.ts` exports `funBuild(seed, entries = demos)`, which builds the shell for a page that hosts it,
-and `loadFunBuild(seed, port = fetchFont)`, which first loads the font and lists the font demos too. The showcase
-gallery's `fun` entry uses `loadFunBuild`, so a demo added to `registry.ts` appears there with no showcase change.
-If a demo's `view` throws, the shell paints `<name> failed: <reason>` in the pane (`shell-chrome.ts`), keeps the
-header and footer, and the other demos keep running.
+`examples/fun/browser.ts` exports `loadSolo(item, seed, font = fetchFont)`. It loads one catalog entry's demo and
+returns how to build the single-demo app around it. It imports no demo itself. The showcase gallery makes one entry
+per catalog entry, at `?app=fun-<id>`, and each calls `loadSolo`, so a demo added to `catalog` gets a card and a page
+with no showcase change, and opening one downloads that demo's chunk and no other demo's. The browser does not host
+the shell: the gallery is the list of demos there. See the
+[showcase reference](../web-gpu-showcase/README.md#demo-gallery).
+
+If a demo's `view` throws, the shell and the single-demo app paint `<name> failed: <reason>` in the pane
+(`shell-chrome.ts`). The shell keeps its header and footer, and its other demos keep running.
 
 ## Pointer limits
 

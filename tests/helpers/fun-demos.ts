@@ -2,9 +2,19 @@ import { createHash } from 'node:crypto';
 import { createTestContext, type TestContext } from '@flyingrobots/bijou/adapters/test';
 import type { Cell, Surface } from '@flyingrobots/bijou';
 import type { DemoEntry, DemoMsg, Session } from '../../examples/fun/contract.js';
-import { demos } from '../../examples/fun/registry.js';
+import { catalog, loadDemos } from '../../examples/fun/registry.js';
 import { fluidScript } from './fun-fluid.js';
 import { threeDMiddle } from './fun-3d.js';
+
+/** The demos that draw a font. They need the font's bytes and have helpers and tests of their own (`fun-font.ts`). */
+export const FONT_IDS = ['font-renderer', 'text-cylinder'] as const;
+const drawsFont = (id: string): boolean => FONT_IDS.some((font) => font === id);
+
+/** The demos that need no font, loaded from the catalog once for every test file that lists them. */
+export const demos: readonly DemoEntry[] = await loadDemos(
+  { font: () => Promise.reject(new Error('these tests supply no font')) },
+  catalog.filter((entry) => !drawsFont(entry.id)),
+);
 
 export const SEED = 1888;
 export const DT = 1 / 30;

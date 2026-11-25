@@ -1,6 +1,7 @@
 // Licensed under the Apache License, Version 2.0, like the rest of this repository.
 import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
-import type { DemoEntry } from './contract.js';
+import type { KeyMsg } from '@flyingrobots/bijou-tui';
+import type { DemoEntry, Session } from './contract.js';
 
 interface Run {
   readonly text: string;
@@ -30,12 +31,17 @@ export function headerRow(ctx: BijouContext, entries: readonly DemoEntry[], inde
   return writeRuns(width, ctx, runs);
 }
 
-/** One row: what the demo is, the keys it answers to, and the shell keys. */
-export function footerRow(ctx: BijouContext, entry: DemoEntry, paused: boolean, width: number): Surface {
+/** One row: what the demo is, the keys it answers to, and the host's own keys when it has any. */
+export function footerRow(ctx: BijouContext, entry: DemoEntry, paused: boolean, width: number, hostKeys = ''): Surface {
   return writeRuns(width, ctx, [
     { text: entry.description, fg: ctx.semantic('primary').hex },
-    { text: `  ·  ${entry.keys}  ·  tab or arrows switch, q quits${paused ? '  ·  PAUSED' : ''}` },
+    { text: `  ·  ${entry.keys}${hostKeys === '' ? '' : `  ·  ${hostKeys}`}${paused ? '  ·  PAUSED' : ''}` },
   ]);
+}
+
+/** The key a demo hears while it takes text: a shifted letter keeps its shift, so `B` is not `b`. */
+export function typed(msg: KeyMsg): string {
+  return msg.shift && /^[a-z]$/u.test(msg.key) ? `shift+${msg.key}` : msg.key;
 }
 
 /** The pane of a demo whose `view` threw: the demo's name and what it said, so the header and footer stay usable. */
@@ -44,4 +50,13 @@ export function failurePane(ctx: BijouContext, entry: DemoEntry, error: unknown,
   const pane = createSurface(width, height);
   pane.blit(writeRuns(width, ctx, [{ text: `${entry.name} failed: ${reason}`, fg: ctx.semantic('error').hex, bold: true }]), 0, 0);
   return pane;
+}
+
+/** The demo's frame, or the failure that stopped it: a demo that throws does not take its host down. */
+export function paintPane(ctx: BijouContext, entry: DemoEntry, session: Session, width: number, height: number): Surface {
+  try {
+    return session.view(width, height, ctx);
+  } catch (error) {
+    return failurePane(ctx, entry, error, width, height);
+  }
 }

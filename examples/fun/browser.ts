@@ -1,23 +1,15 @@
 // Licensed under the Apache License, Version 2.0, like the rest of this repository.
-// The browser entry: what a page that hosts the shell loads. It reaches no Node API, like the shell.
+// The browser entry: what a page that hosts one demo loads. It reaches no Node API, and it imports no demo: the
+// catalog entry it is given loads its own.
 import type { BijouContext } from '@flyingrobots/bijou';
 import type { App } from '@flyingrobots/bijou-tui';
-import type { DemoEntry } from './contract.js';
-import { loadTypeface, type FontPort } from './demos/typeface.js';
-import { demos, demosWithFonts } from './registry.js';
-import { createFunApp, type ShellModel } from './shell.js';
+import type { FontPort } from './demos/typeface.js';
+import type { CatalogEntry } from './registry.js';
+import { createSoloApp, type SoloModel } from './solo.js';
 
-/** What a page needs to mount the shell: how to build the app from the run's context. */
+/** What a page needs to mount a demo: how to build the app from the run's context. */
 export interface FunBuild {
-  readonly build: (ctx: BijouContext) => App<ShellModel>;
-}
-
-/**
- * The shell with the registry's demos, so a demo added to `registry.ts` appears in every page that hosts it.
- * `entries` replaces the registry, for a host that lists other demos. The page chooses the seed: demos never read the clock.
- */
-export function funBuild(seed: number, entries: readonly DemoEntry[] = demos): FunBuild {
-  return { build: (ctx) => createFunApp({ ctx, entries, seed }) };
+  readonly build: (ctx: BijouContext) => App<SoloModel>;
 }
 
 /** The browser's font port: fetch the file the bundler emits beside the page, by a URL from this module. */
@@ -28,9 +20,11 @@ export const fetchFont: FontPort = async () => {
 };
 
 /**
- * The shell with every demo of the registry and the demos that draw a font, once the port has given the font's bytes.
- * A port that rejects, or bytes that are no font, leave the font demos showing a message; the shell and the rest work.
+ * One demo of the catalog, alone on the page: load its module, then build the solo app around it. The page chooses the
+ * seed, since demos never read the clock. A demo that draws the font asks `font` for its bytes; a port that rejects
+ * leaves that demo showing a message. A module that fails to load rejects, and the page reports it.
  */
-export async function loadFunBuild(seed: number, port: FontPort = fetchFont): Promise<FunBuild> {
-  return funBuild(seed, demosWithFonts(await loadTypeface(port)));
+export async function loadSolo(item: CatalogEntry, seed: number, font: FontPort = fetchFont): Promise<FunBuild> {
+  const entry = await item.load({ font });
+  return { build: (ctx) => createSoloApp({ ctx, entry, seed }) };
 }

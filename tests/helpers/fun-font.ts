@@ -1,18 +1,31 @@
 import { readFileSync } from 'node:fs';
 import type { DemoEntry, DemoMsg } from '../../examples/fun/contract.js';
-import { loadTypeface, type FontPort } from '../../examples/fun/demos/typeface.js';
-import { demosWithFonts } from '../../examples/fun/registry.js';
-import { pulses } from './fun-demos.js';
+import { fontRendererDemo } from '../../examples/fun/demos/font-renderer.js';
+import { GREETING } from '../../examples/fun/demos/font-typing.js';
+import { textCylinderDemo } from '../../examples/fun/demos/text-cylinder.js';
+import { loadTypeface, type FontPort, type Typeface } from '../../examples/fun/demos/typeface.js';
+import { demos, pulses } from './fun-demos.js';
 
-export const FONT_IDS = ['font-renderer', 'text-cylinder'] as const;
+export { FONT_IDS } from './fun-demos.js';
+
 export const FONT_FILE = new URL('../../assets/fonts/space-mono/SpaceMono-BoldItalic.ttf', import.meta.url);
 
 /** What a terminal host does: read the file, by a path that does not depend on the working directory. */
 export const fontPort: FontPort = () => Promise.resolve(readFileSync(FONT_FILE));
 export const face = await loadTypeface(fontPort);
 
+/** The two font demos drawing `typeface`, in the catalog's order. */
+export function fontDemos(typeface: Typeface, message: string = GREETING): DemoEntry[] {
+  return [fontRendererDemo(typeface, message), textCylinderDemo(typeface, message)];
+}
+
+/** Every demo, as a shell lists them: the ones that need no font, then the two that draw `typeface`. */
+export function demosWithFonts(typeface: Typeface): DemoEntry[] {
+  return [...demos, ...fontDemos(typeface)];
+}
+
 export function fontEntry(id: string, message?: string): DemoEntry {
-  const found = demosWithFonts(face, message).find((entry) => entry.id === id);
+  const found = fontDemos(face, message).find((entry) => entry.id === id);
   if (found === undefined) throw new Error(`no font demo named ${id}`);
   return found;
 }

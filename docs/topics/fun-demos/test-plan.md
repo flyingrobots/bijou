@@ -46,7 +46,7 @@ pulses of 1/30 s. Origin: flyingrobots/bijou#888.
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| FD-33 | `funBuild` builds the shell from the registry or from the entries it is given. | `shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu` | Implemented |
+| FD-33 | The gallery gives a demo registered in the catalog a card that opens it alone. | `gives a stub entry added to the catalog a card that opens it alone, with no change under examples/web-gpu` | Implemented |
 | FD-34 | A demo that throws in `view` is painted as a failure; header, footer and other demos work. | `paints the failure in the pane and keeps the header and footer`, `lets the reader switch to a demo that works` | Implemented |
 
 ## Font demos: `examples-fun-fonts.test.ts`, `examples-fun-fonts-edges.test.ts`
@@ -134,3 +134,34 @@ Origin: flyingrobots/bijou#890. The frame digests of the raymarcher, the raycast
 | FD-114 | A seeded walk of 2,000 steps never enters a wall. | `a seeded walk of 2,000 steps never enters a wall and never leaves the map` | Implemented |
 | FD-115 | A shot in the firing cone kills a monster in two hits; a shot at nothing hurts nobody; `r` restarts. | `shoots a monster in the firing cone dead in two shots and scores 150`, `a shot at nothing hurts nobody, and r restarts the level` | Implemented |
 | FD-116 | Treasure scores 250; a touching monster bites. | `collects treasure for 250 points and takes damage from a monster that touches the player` | Implemented |
+
+## Catalog: `examples-fun-catalog.test.ts`
+
+Origin: flyingrobots/bijou#902.
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-120 | The catalog lists the ten demos in order, each with an id that reads in an address, a name and a one-line description. | `lists the ten demos in order, each with an id that reads in an address, a name and a one-line description` | Implemented |
+| FD-121 | A catalog entry's id, name and description equal the loaded demo's. | `says of each demo what the loaded demo says of itself` | Implemented |
+| FD-122 | The catalog imports no demo module statically, and each entry imports a module of its own. | `imports no demo module statically, so each loads only when its entry is asked for` | Implemented |
+| FD-123 | `loadDemos` loads the entries it is given in order, a new entry included. | `loads the entries it is given, in their order, a new one included` | Implemented |
+| FD-124 | `loadDemos` asks the host for the font once. | `asks the host for the font once, however many demos draw it` | Implemented |
+| FD-125 | `loadDemos` rejects when a module fails to load. | `rejects when a demo module fails to load, naming nothing else as loaded` | Implemented |
+| FD-126 | With a font port that rejects, every demo still loads and the font demos show a message. | `shows the message in the font demos only, and the other demos still run` (`examples-fun-fonts-shell.test.ts`) | Implemented |
+
+## One demo alone: `examples-fun-solo.test.ts`
+
+Origin: flyingrobots/bijou#902.
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-130 | The demo's pane is every row but the last, which names the demo and its keys. | `gives the demo every row but the last, and names the demo and its keys there` | Implemented |
+| FD-131 | Nothing lists other demos or names a key that switches or quits. | `shows no list of demos and no key that switches or quits` | Implemented |
+| FD-132 | `tab`, the arrows, the digits and `q` reach the demo, and no command is given. | `sends tab, the arrows, the digits and q to the demo, and asks the runtime for nothing` | Implemented |
+| FD-133 | `ctrl+c` does nothing. | `does nothing on ctrl+c: the page is how a person leaves` | Implemented |
+| FD-134 | The pointer reaches the demo in its own cells from row 0, and leaves on the last row or outside. | `gives the pointer to the demo in its own cells, from the first row, and lets go on the footer row` | Implemented |
+| FD-135 | A resize tells the demo its new pane, down to one row. | `tells the demo its pane again when the screen changes` | Implemented |
+| FD-136 | Pulses advance the demo; `space` pauses and the last row says so. | `advances on pulses, and space pauses and says so` | Implemented |
+| FD-137 | A demo taking text gets every key, shifted letters with their shift. | `sends a demo that is taking text every key, a shifted letter with its shift and space as a key` | Implemented |
+| FD-138 | A demo that throws in `view` is painted as a failure, and the last row stays. | `paints a demo that throws in view as a failure in the pane, and keeps the footer` | Implemented |
+| FD-139 | Each demo that needs no font paints alone what its session paints in the pane. | `<id> alone paints what its session paints in a pane one row shorter than the screen` | Implemented |

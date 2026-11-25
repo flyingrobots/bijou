@@ -11,12 +11,35 @@ export async function hasWebGpu(page: Page): Promise<boolean> {
   });
 }
 
-/** The shell's active demo, read from the live model. */
-export async function activeIndex(page: Page): Promise<number> {
+/** The ids of the fun demos' cards, as the gallery page lists them. The page is the only source: no test imports the catalog. */
+export async function funCards(page: Page): Promise<string[]> {
+  const ids = await page.locator('[data-gallery-demo^="fun-"]').evaluateAll((cards) => cards.map((card) => card.getAttribute('data-gallery-demo') ?? ''));
+  expect(ids.length).toBeGreaterThan(0);
+  return ids;
+}
+
+/** What the open demo's page holds, read from the live model: its one session, and whether anything lists other demos. */
+export async function solo(page: Page): Promise<{ frame: number; paused: boolean; capturing: boolean; switcher: boolean }> {
   return page.evaluate(() => {
     const model = window.__bijouWebGpu?.model();
-    return typeof model === 'object' && model !== null && 'index' in model && typeof model.index === 'number' ? model.index : -1;
+    const session: unknown = typeof model === 'object' && model !== null ? Reflect.get(model, 'session') : undefined;
+    const read = (name: string): unknown => (typeof session === 'object' && session !== null ? Reflect.get(session, name) : undefined);
+    const frame = read('frame');
+    return {
+      frame: typeof frame === 'number' ? frame : -1,
+      paused: read('paused') === true,
+      capturing: read('capturing') === true,
+      switcher: typeof model === 'object' && model !== null && ('index' in model || 'sessions' in model),
+    };
   });
+}
+
+/** The chunk file the build manifest names for a module, by its path from the showcase's root. */
+export function chunkOf(manifest: unknown, module: string): string {
+  const item: unknown = typeof manifest === 'object' && manifest !== null ? Reflect.get(manifest, module) : undefined;
+  const file: unknown = typeof item === 'object' && item !== null ? Reflect.get(item, 'file') : undefined;
+  if (typeof file !== 'string') throw new Error(`the build manifest has no chunk for ${module}`);
+  return file;
 }
 
 /** Give the Surface the keyboard, as a person does: focus its hidden textarea. */

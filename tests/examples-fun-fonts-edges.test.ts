@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { demosWithFonts } from '../examples/fun/registry.js';
 import { loadTypeface } from '../examples/fun/demos/typeface.js';
 import { SEED, digest, feed, funContext, lcg, pulses, textOf } from './helpers/fun-demos.js';
-import { FONT_IDS, face, fontEntry, key } from './helpers/fun-font.js';
+import { FONT_IDS, face, fontDemos, fontEntry, key } from './helpers/fun-font.js';
 
 const MISSING = 'Error: TTF Font file missing or failed to parse.';
 
@@ -74,7 +73,7 @@ describe('the font demos when the font does not arrive', () => {
     it(`shows a message in the pane for ${label}, and never throws`, async () => {
       const missing = await loadTypeface(port);
       for (const id of FONT_IDS) {
-        const entry = demosWithFonts(missing).find((candidate) => candidate.id === id);
+        const entry = fontDemos(missing).find((candidate) => candidate.id === id);
         const pane = textOf((entry?.mount(SEED) ?? fontEntry(id).mount(SEED)).view(80, 24, funContext(80, 24)));
         expect(pane).toContain(MISSING);
         expect(entry?.mount(SEED).update(key('i')).update(key('a')).view(1, 1, funContext(1, 1)).width).toBe(1);
@@ -84,7 +83,7 @@ describe('the font demos when the font does not arrive', () => {
 
   it('says why in the pane when the port gave a reason', async () => {
     const missing = await loadTypeface(() => Promise.reject(new Error('offline')));
-    const entry = demosWithFonts(missing).find((candidate) => candidate.id === 'font-renderer');
+    const entry = fontDemos(missing).find((candidate) => candidate.id === 'font-renderer');
     expect(textOf((entry?.mount(SEED) ?? fontEntry('font-renderer').mount(SEED)).view(100, 24, funContext(100, 24)))).toContain('offline');
   });
 

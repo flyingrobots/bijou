@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Surface } from '@flyingrobots/bijou';
 import type { KeyMsg, MouseMsg, PulseMsg } from '@flyingrobots/bijou-tui';
 import { createFunApp } from '../examples/fun/shell.js';
-import { demos } from '../examples/fun/registry.js';
-import { SEED, cellsOf, digest, funContext } from './helpers/fun-demos.js';
+import { SEED, cellsOf, demos, digest, funContext } from './helpers/fun-demos.js';
 
 // Wide enough for the header to list every demo by name.
 const ctx = funContext(300, 30);

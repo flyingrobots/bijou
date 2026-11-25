@@ -4,13 +4,16 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'vite';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { catalog } from '../../examples/fun/registry.js';
 import { GALLERY_DEMOS } from '../../examples/web-gpu/src/gallery/demos.js';
 
 // A production build puts each demo in its own chunk, and the gallery's entry
 // chunk, with everything it imports statically, holds no demo's code.
 interface Item { readonly file: string; readonly isDynamicEntry?: boolean; readonly imports?: readonly string[] }
-/** Each demo's own module, as the manifest names it: a path from the showcase's root. */
-const DEMO_MODULES: Readonly<Record<string, string>> = { dogfood: '../docs/app.ts', soak: '../../bench/src/soak-browser.ts', fun: '../fun/browser.ts' };
+/** Each demo's own module, as the manifest names it: a path from the showcase's root. A fun demo's is the one its catalog entry imports. */
+const FUN_MODULES = new Map([...readFileSync(fileURLToPath(new URL('../../examples/fun/registry.ts', import.meta.url)), 'utf8')
+  .matchAll(/id: '([^']+)'[\s\S]*?import\('\.\/demos\/([^']+)\.js'\)/gu)].map((match) => [`fun-${match[1] ?? ''}`, `../fun/demos/${match[2] ?? ''}.ts`]));
+const DEMO_MODULES: Readonly<Record<string, string>> = { dogfood: '../docs/app.ts', soak: '../../bench/src/soak-browser.ts', ...Object.fromEntries(FUN_MODULES) };
 const config = fileURLToPath(new URL('../../examples/web-gpu/vite.config.ts', import.meta.url));
 const out = mkdtempSync(join(tmpdir(), 'bijou-gallery-chunks-'));
 let manifest: Record<string, Item> = {};
@@ -56,6 +59,18 @@ describe('the gallery build', () => {
     const files = GALLERY_DEMOS.map((demo) => manifest[DEMO_MODULES[demo.id] ?? '']);
     for (const item of files) expect(item?.isDynamicEntry).toBe(true);
     expect(new Set(files.map((item) => item?.file)).size).toBe(GALLERY_DEMOS.length);
+  });
+
+  it('gives each fun demo a chunk no other fun demo and no shared loader imports, so opening one downloads only its own', () => {
+    expect(FUN_MODULES.size).toBe(catalog.length);
+    const own = new Map([...FUN_MODULES].map(([id, module]) => [id, manifest[module]?.file ?? '']));
+    for (const [id, module] of FUN_MODULES) {
+      const others = [...own].filter(([other]) => other !== id).map(([, file]) => file);
+      const reached = eager(module);
+      for (const file of others) expect(reached.has(file), `${id} reaches ${file}`).toBe(false);
+    }
+    const loader = eager('../fun/browser.ts');
+    for (const file of own.values()) expect(loader.has(file)).toBe(false);
   });
 
   it('keeps every demo out of the gallery entry chunk and the chunks it imports', () => {

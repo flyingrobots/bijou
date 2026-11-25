@@ -1,3 +1,4 @@
+import { catalog, type CatalogEntry } from '../../../fun/registry.js';
 import type { ShowcaseBuild } from '../apps.js';
 import { createBrowserDogfoodLocalePort } from '../dogfood/browser-locale.js';
 import { SOAK_DEMO } from './soak-demo.js';
@@ -26,18 +27,21 @@ export const DOGFOOD_DEMO: GalleryDemo = {
 };
 
 /**
- * The bijou-fun shell and every demo in examples/fun/registry.ts, as one chunk. A demo added to that registry
- * appears here with no change to the showcase. The seed is the page's choice: demos never read the clock.
+ * One gallery entry per demo of the fun catalog, each at `fun-<id>` and alone on its page. The catalog holds a demo's
+ * name and description and how to load its module, so a demo added there appears here with no change to the showcase,
+ * and opening one loads that demo's chunk and no other's. The seed is the page's choice: demos never read the clock.
  */
-export const FUN_DEMO: GalleryDemo = {
-  id: 'fun',
-  title: 'Bijou Fun',
-  description: 'The bijou-fun demos in one shell: animated Surfaces that answer keys and follow the pointer.',
-  async load() {
-    const { loadFunBuild } = await import('../../../fun/browser.js');
-    return loadFunBuild(Date.now() % 1_000_000);
-  },
-};
+export function funGalleryDemos(entries: readonly CatalogEntry[] = catalog): GalleryDemo[] {
+  return entries.map((item) => ({
+    id: `fun-${item.id}`,
+    title: item.name,
+    description: item.description,
+    async load() {
+      const { loadSolo } = await import('../../../fun/browser.js');
+      return loadSolo(item, Date.now() % 1_000_000);
+    },
+  }));
+}
 
-/** Every demo the gallery lists, in the order it lists them. One entry here is all a new demo needs. */
-export const GALLERY_DEMOS: readonly GalleryDemo[] = [DOGFOOD_DEMO, SOAK_DEMO, FUN_DEMO];
+/** Every demo the gallery lists, in the order it lists them. */
+export const GALLERY_DEMOS: readonly GalleryDemo[] = [DOGFOOD_DEMO, SOAK_DEMO, ...funGalleryDemos()];

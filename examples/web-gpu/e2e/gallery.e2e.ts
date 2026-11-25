@@ -16,7 +16,8 @@ test('the gallery lists every registered demo, opens DOGFOOD at its URL, returns
   const errors = collectErrors(page);
   await openGallery(page, 'backend=canvas2d');
   await expectGalleryOnly(page);
-  await expect(page.locator('[data-gallery-demo]')).toHaveCount(3);
+  // DOGFOOD, the soak bench and one card for each of the ten fun demos.
+  await expect(page.locator('[data-gallery-demo]')).toHaveCount(12);
   await expect(demo(page, 'dogfood')).toContainText('DOGFOOD');
   await demo(page, 'dogfood').click();
   await expectDemoOpen(page, 'dogfood');

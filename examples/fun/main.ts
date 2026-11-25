@@ -3,13 +3,13 @@
 import { readFile } from 'node:fs/promises';
 import { initDefaultContext } from '@flyingrobots/bijou-node';
 import { run } from '@flyingrobots/bijou-tui';
-import { loadTypeface } from './demos/typeface.js';
-import { demosWithFonts } from './registry.js';
+import { loadDemos } from './registry.js';
 import { createFunApp } from './shell.js';
 
 const ctx = initDefaultContext();
 // A path from this module, never from the working directory. A missing file shows a message in the font demos.
 const font = new URL('../../assets/fonts/space-mono/SpaceMono-BoldItalic.ttf', import.meta.url);
-const face = await loadTypeface(() => readFile(font));
+// The shell lists every demo of the catalog, so it loads them all before it starts.
+const entries = await loadDemos({ font: () => readFile(font) });
 // Mouse mode 'any' reports pointer movement with no button held, which the metaballs follow.
-await run(createFunApp({ ctx, entries: demosWithFonts(face), seed: Date.now() % 1_000_000 }), { ctx, mouseMode: 'any' });
+await run(createFunApp({ ctx, entries, seed: Date.now() % 1_000_000 }), { ctx, mouseMode: 'any' });

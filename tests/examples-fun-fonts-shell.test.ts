@@ -2,10 +2,9 @@ import { describe, expect, it } from 'vitest';
 import type { Surface } from '@flyingrobots/bijou';
 import type { KeyMsg } from '@flyingrobots/bijou-tui';
 import { createFunApp } from '../examples/fun/shell.js';
-import { loadTypeface, NO_TYPEFACE } from '../examples/fun/demos/typeface.js';
-import { demosWithFonts } from '../examples/fun/registry.js';
+import { catalog, loadDemos } from '../examples/fun/registry.js';
 import { SEED, cellsOf, funContext } from './helpers/fun-demos.js';
-import { face } from './helpers/fun-font.js';
+import { demosWithFonts, face } from './helpers/fun-font.js';
 
 // Wide enough for the header to name every demo, the font demos last.
 const ctx = funContext(260, 30);
@@ -53,8 +52,8 @@ describe('the shell while a demo is taking text', () => {
 
 describe('the shell with no font', () => {
   it('shows the message in the font demos only, and the other demos still run', async () => {
-    const entries = demosWithFonts(await loadTypeface(() => Promise.reject(new Error('offline'))));
-    expect(entries.map((entry) => entry.id)).toEqual(demosWithFonts(NO_TYPEFACE).map((entry) => entry.id));
+    const entries = await loadDemos({ font: () => Promise.reject(new Error('offline')) });
+    expect(entries.map((entry) => entry.id)).toEqual(catalog.map((entry) => entry.id));
     const shown = play([], entries);
     expect(rowText(shown.view, 0)).toContain('TTF Font Vector Renderer');
     expect(Array.from({ length: 30 }, (_, row) => rowText(shown.view, row)).join('\n')).toContain('Error: TTF Font file missing or failed to parse.');

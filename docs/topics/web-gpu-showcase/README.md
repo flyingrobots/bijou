@@ -194,8 +194,8 @@ and opens every page, asserting no fault, no failure and no console error.
 `examples/web-gpu/gallery.html` is a fourth Rollup input. The registry,
 `src/gallery/demos.ts`, lists each demo with an id, a title, a one-line
 description and a `load()` that imports the app on demand, so no demo's code is
-in the entry chunk. DOGFOOD is the first entry, the soak bench the second, and the showcase page's app list
-(`src/apps.ts`) spreads the registry, so a new entry is one object there.
+in the entry chunk. DOGFOOD is the first entry, the soak bench the second, and the fun demos follow, one entry
+each. The showcase page's app list (`src/apps.ts`) spreads the registry, so a new entry is one object there.
 
 The address chooses the page (`src/gallery/route.ts`):
 
@@ -204,18 +204,25 @@ The address chooses the page (`src/gallery/route.ts`):
 | `gallery.html` | The gallery: one shadcn `Item` link per demo, with `Enter` and `l` hints. |
 | `gallery.html?app=<id>` | That demo, full-window, with a Back button hinted `Esc`. Reloading opens the same demo. |
 | `gallery.html?app=<unknown>` | The gallery with an Alert that names the unknown id, shown as text. |
+| `gallery.html?app=fun` | The gallery. The address is replaced by the gallery's, with no message. |
 
-The second entry is `fun` ("Bijou Fun"). It loads `examples/fun/browser.ts`, whose
-`funBuild(seed, entries)` builds the fun shell from `examples/fun/registry.ts`, so a
-demo registered there appears in the gallery with no change under `examples/web-gpu`
-(`src/` names no fun demo; a test checks it). The shell and its three demos are one
-on-demand chunk of about 10 KB (4.6 KB gzipped): a chunk per demo would need the
-registry to hold lazy entries, which is a change to `examples/fun`. The page picks the
-seed, since demos never read the clock. The canvas mount delivers pointer movement
-with no button held (`pointermove` becomes a `move` mouse message), in cells of the
-canvas's CSS box, so a scaled display lands on the right cell. It does not deliver a
-pointer leaving the canvas (`bijou-web` binds no `pointerleave`), so a blob stays at
-the last cell the pointer crossed until it enters the header or footer row.
+After the soak bench the registry holds one entry per demo of the fun catalog (`examples/fun/registry.ts`), made by
+`funGalleryDemos()`: its id is `fun-<id>`, and its title and description are the catalog entry's name and
+description. Each loads `examples/fun/browser.ts`, whose `loadSolo(item, seed)` imports that one demo's module and
+builds the single-demo app around it (see the [fun demos reference](../fun-demos/README.md#one-demo-alone)). So a
+demo added to the catalog gets a card and a page with no change under `examples/web-gpu` (`src/` names no fun demo; a
+test checks it), each demo is a chunk of its own, and opening one downloads no other demo's chunk. A demo's page
+shows that demo alone: its pane, and one row with its name and keys. There is no demo switcher, and every key goes to
+the demo while the Surface has focus. The page picks the seed, since demos never read the clock.
+
+`gallery.html?app=fun` was the address of one entry that held every fun demo in a shell. That entry is gone. The
+address now becomes the gallery's own (`retiredHref` and `redirect` in `src/gallery/route.ts`), with no message, and
+the replaced address leaves no visit in the history.
+
+The canvas mount delivers pointer movement with no button held (`pointermove` becomes a `move` mouse message), in
+cells of the canvas's CSS box, so a scaled display lands on the right cell. It does not deliver a pointer leaving the
+canvas (`bijou-web` binds no `pointerleave`), so a metaballs blob stays at the last cell the pointer crossed until it
+enters the last row.
 
 Visits use `pushState`, so back and forward walk them. Only `?backend=` carries
 from one address to the next. Leaving a demo stops its mount, disposes its atlas
