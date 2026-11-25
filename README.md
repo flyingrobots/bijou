@@ -32,6 +32,12 @@ Press **Enter** at the title screen. Explore with the arrow keys and **Tab**, op
 
 For a smaller first example, run `npm run hello` or `npm run counter`.
 
+To try Bijou without installing anything, open the
+[demo gallery](https://flyingrobots.github.io/bijou/gallery.html) in a browser:
+DOGFOOD, the soak bench and the [fun demos](https://flyingrobots.github.io/bijou/gallery.html?app=fun)
+run there on a canvas. GitHub Pages publishes it from `main` (see
+[`examples/web-gpu`](examples/web-gpu/README.md#published-site)).
+
 ## Build your own app
 
 Create a starter project with the published scaffolder:
