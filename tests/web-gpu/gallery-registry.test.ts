@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { GALLERY_DEMOS } from '../../examples/web-gpu/src/gallery/demos.js';
-import { parseRoute, routeHref } from '../../examples/web-gpu/src/gallery/route.js';
+import { parseRoute, retiredHref, routeHref } from '../../examples/web-gpu/src/gallery/route.js';
 
 describe('the showcase gallery registry', () => {
   it('lists DOGFOOD first and the soak bench second, each demo with an id, a title and a one-line description', () => {
-    expect(GALLERY_DEMOS.map((demo) => demo.id)).toEqual(['dogfood', 'soak', 'fun']);
+    expect(GALLERY_DEMOS.map((demo) => demo.id).slice(0, 2)).toEqual(['dogfood', 'soak']);
+    expect(GALLERY_DEMOS.length).toBeGreaterThan(2);
     for (const demo of GALLERY_DEMOS) {
       expect(demo.id).toMatch(/^[a-z][a-z0-9-]*$/u);
       expect(demo.title).not.toBe('');
@@ -35,6 +36,15 @@ describe('the gallery route', () => {
   it('is the gallery with the unknown id, which is only ever shown as text', () => {
     expect(parseRoute('?app=nope')).toEqual({ kind: 'gallery', unknown: 'nope' });
     expect(parseRoute('?app=%3Cb%3E')).toEqual({ kind: 'gallery', unknown: '<b>' });
+  });
+
+  it('sends the address of an entry the gallery no longer has to the gallery, keeping the backend choice', () => {
+    expect(retiredHref('?app=fun')).toBe('?');
+    expect(retiredHref('?backend=canvas2d&app=fun&x=1')).toBe('?backend=canvas2d');
+    expect(retiredHref('?app=fun-wormhole')).toBeNull();
+    expect(retiredHref('?app=dogfood')).toBeNull();
+    expect(retiredHref('?app=funny')).toBeNull();
+    expect(retiredHref('')).toBeNull();
   });
 
   it('makes an address for a demo or the gallery that keeps the backend choice and nothing else', () => {

@@ -3,8 +3,7 @@ import type { Surface } from '@flyingrobots/bijou';
 import type { PulseMsg } from '@flyingrobots/bijou-tui';
 import { defineDemo } from '../examples/fun/contract.js';
 import { createFunApp } from '../examples/fun/shell.js';
-import { demos } from '../examples/fun/registry.js';
-import { SEED, cellsOf, funContext } from './helpers/fun-demos.js';
+import { SEED, cellsOf, demos, funContext } from './helpers/fun-demos.js';
 
 const ctx = funContext(100, 30);
 const broken = defineDemo<null>({

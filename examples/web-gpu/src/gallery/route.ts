@@ -22,11 +22,26 @@ export function routeHref(id: string | null, search: string): string {
   return `?${next.toString()}`;
 }
 
+/** Ids the gallery once had and has no longer. Their addresses open the gallery, so an old link still works. */
+const RETIRED: readonly string[] = ['fun'];
+
+/** The gallery's address when `search` names a retired entry, with the backend choice kept; otherwise null. */
+export function retiredHref(search: string): string | null {
+  const id = new URLSearchParams(search).get('app');
+  return id !== null && RETIRED.includes(id) ? routeHref(null, search) : null;
+}
+
 const listeners = new Set<() => void>();
 
 /** Go to an address of this page, keeping the history, so the back and forward buttons walk the visits. */
 export function navigate(href: string): void {
   window.history.pushState(null, '', href);
+  for (const listener of listeners) listener();
+}
+
+/** Put `href` in place of the current address, adding no visit: the back button skips the address it replaced. */
+export function redirect(href: string): void {
+  window.history.replaceState(null, '', href);
   for (const listener of listeners) listener();
 }
 

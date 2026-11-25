@@ -4,9 +4,9 @@ import { defineDemo, type DemoEntry } from '../contract.js';
 import { brailleMask } from '../panel.js';
 import { boundsOf, fill, gridBounds } from './font-outline.js';
 import { paintGround, paintHud, paintMissing } from './font-hud.js';
-import { editMessage, startTyping, type Typing } from './font-typing.js';
+import { GREETING, editMessage, startTyping, type Typing } from './font-typing.js';
 import { hslToRgb } from './hsl.js';
-import type { Typeface } from './typeface.js';
+import { loadTypeface, type FontPort, type Typeface } from './typeface.js';
 
 const BASE_SIZE = 100;
 
@@ -62,4 +62,9 @@ export function fontRendererDemo(face: Typeface, message: string): DemoEntry {
       return surface;
     },
   });
+}
+
+/** The font renderer for a host: ask the port for the font, then build the demo. A font that fails shows a message in the pane. */
+export async function loadFontRenderer(port: FontPort, message: string = GREETING): Promise<DemoEntry> {
+  return fontRendererDemo(await loadTypeface(port), message);
 }

@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createSurface } from '@flyingrobots/bijou';
-import { demos } from '../examples/fun/registry.js';
 import { stampPanel } from '../examples/fun/panel.js';
-import { cellsOf, feed, frameScript, funContext, mountEntry } from './helpers/fun-demos.js';
+import { cellsOf, demos, feed, frameScript, funContext, mountEntry } from './helpers/fun-demos.js';
 
 function rows(surface: { readonly width: number; readonly height: number }, text: string): string[] {
   return Array.from({ length: surface.height }, (_, y) => text.slice(y * surface.width, (y + 1) * surface.width));

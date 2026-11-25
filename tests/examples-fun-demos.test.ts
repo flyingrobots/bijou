@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { demos } from '../examples/fun/registry.js';
 import { GOLDENS } from './fixtures/examples-fun-goldens.js';
-import { SEED, byId, digest, feed, frameScript, funContext, mountEntry, pulses } from './helpers/fun-demos.js';
+import { SEED, byId, demos, digest, feed, frameScript, funContext, mountEntry, pulses } from './helpers/fun-demos.js';
 
 const SIZES: readonly (readonly [number, number])[] = [[80, 24], [177, 53]];
 

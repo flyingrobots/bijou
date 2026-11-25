@@ -42,7 +42,9 @@ describe('examples/web-gpu bundle has no Node.js built-in', () => {
   });
 
   it('lists every example app it mounts and refuses none', () => {
-    expect(SHOWCASE_APPS.map((app) => app.id)).toEqual(['counter', 'components', 'hero', 'showcase', 'dogfood', 'soak', 'fun', 'dual']);
+    const ids = SHOWCASE_APPS.map((app) => app.id);
+    expect(ids.filter((id) => !id.startsWith('fun-'))).toEqual(['counter', 'components', 'hero', 'showcase', 'dogfood', 'soak', 'dual']);
+    expect(ids.filter((id) => id.startsWith('fun-'))).toHaveLength(10);
     expect(REFUSED_APPS).toEqual([]);
   });
 

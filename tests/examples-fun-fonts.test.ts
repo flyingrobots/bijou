@@ -2,17 +2,17 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { renderFrameText } from '../scripts/frame-assertions.js';
-import { demosWithFonts } from '../examples/fun/registry.js';
+import { catalog } from '../examples/fun/registry.js';
 import { FONT_GOLDENS } from './fixtures/examples-fun-font-goldens.js';
 import { SEED, digest, feed, funContext, pulses, textOf } from './helpers/fun-demos.js';
-import { FONT_IDS, face, fontEntry, fontScript, key } from './helpers/fun-font.js';
+import { FONT_IDS, fontEntry, fontScript, key } from './helpers/fun-font.js';
 
 const SIZES: readonly (readonly [number, number])[] = [[80, 24], [177, 53]];
 const FRAMES = join(import.meta.dirname, 'fixtures', 'examples-fun', 'frames');
 
 describe('the two font demos of bijou-fun', () => {
   it('the registry lists both after the demos that need no font', () => {
-    expect(demosWithFonts(face).slice(-2).map((entry) => entry.id)).toEqual([...FONT_IDS]);
+    expect(catalog.slice(-2).map((entry) => entry.id)).toEqual([...FONT_IDS]);
   });
 
   for (const id of FONT_IDS) {

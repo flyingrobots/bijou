@@ -1,9 +1,11 @@
 # bijou-fun demos
 
-The shell lists the demos the registry holds: a rainbow gradient, a wormhole, colour-blending metaballs, a particle fluid
-tank, a FLIP dam break, a raymarcher, a raycaster game, a raytracer, and, when a host supplies the font, an outline
-font renderer and a 3D text cylinder. They come
-from the owner's bijou-fun project, written against Bijou 7.1 and ported here.
+Ten animated Surface demos behind one typed contract: a rainbow gradient, a wormhole, colour-blending metaballs, a
+particle fluid tank, a FLIP dam break, a raymarcher, a raycaster game, a raytracer, an outline font renderer and a 3D
+text cylinder. They come from the owner's bijou-fun project, written against Bijou 7.1 and ported here.
+
+In a terminal one shell lists them all. In the browser the showcase gallery gives each demo a card and a page of its
+own, at `gallery.html?app=fun-<id>`, where it runs alone.
 
 ## Run
 
@@ -39,11 +41,13 @@ frame count and the pause, so every demo pauses the same way (a demo taking text
 ## Files
 
 - `contract.ts`, `random.ts`, `panel.ts` (card and braille helpers): the shared parts.
-- `shell.ts`, `shell-chrome.ts`: the header row, the footer row, input routing.
-- `registry.ts`: the list of demos; `demosWithFonts(face)` adds the two that draw a font.
+- `registry.ts`: the catalog. Each entry has a demo's id, name and description and loads its module on demand;
+  `loadDemos(host)` loads them all.
+- `shell.ts`, `shell-chrome.ts`: the terminal shell. The header row, the footer row, input routing.
+- `solo.ts`: one demo alone, with a row for its keys and no list of demos: what a page for a single demo mounts.
 - `demos/typeface.ts`: the font port and the parsed `Typeface`.
 - `demos/`: one file per demo, split where a demo needs more than one.
-- `browser.ts`: the browser entry, `funBuild(seed, entries)` and `loadFunBuild(seed)` (which fetches the font); the showcase gallery loads it.
+- `browser.ts`: the browser entry. `loadSolo(item, seed)` loads one catalog entry's demo and builds the single-demo app; `fetchFont` is the browser's font port. The showcase gallery loads it.
 - `main.ts`: the terminal entry. It is the only file that reaches Node (it reads the font file and hands the bytes to the demos), so the rest can run in a browser.
 
 ## The 3D demos
@@ -71,7 +75,8 @@ change can be compared; nothing gates on them.
 | `raycaster` | 8.6 ms | 8.2 ms | 12.4 ms |
 | `raytracer` | 76.6 ms | 75.3 ms | 89.4 ms |
 
-Adding a demo is a `Demo<S>` in `demos/` and one line in `registry.ts`.
+Adding a demo is a `Demo<S>` in `demos/` and one entry in the catalog in `registry.ts`. The shell then lists it and the
+gallery gives it a card and a page, with no other change.
 
 See the [reference](../../docs/topics/fun-demos/README.md) for behaviour and its [test plan](../../docs/topics/fun-demos/test-plan.md).
 

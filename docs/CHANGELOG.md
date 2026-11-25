@@ -8,6 +8,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- The showcase gallery gives each bijou-fun demo a card and a page of its own, at `gallery.html?app=fun-<id>`, where
+  it runs alone with one row for its keys and no demo switcher. The single "Bijou Fun" entry is gone, and its address,
+  `?app=fun`, now opens the gallery. `examples/fun/registry.ts` is a catalog: each entry has a demo's id, name and
+  description and imports its module on demand, so each demo is a chunk of its own and opening one downloads no
+  other's. `demos`, `demosWithFonts`, `funBuild` and `loadFunBuild` are replaced by `catalog`, `loadDemos`,
+  `createSoloApp` (`examples/fun/solo.ts`) and `loadSolo`. `npm run fun` lists and switches every demo as before.
+  Origin: flyingrobots/bijou#902.
+
 - The full test suite runs most files with Vitest's isolation off, so the files
   in a worker share the modules they load; loading them once per file was about
   three quarters of the suite's time. A file that changes shared state (a

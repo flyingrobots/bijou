@@ -1,78 +1,73 @@
 import { expect, test } from '@playwright/test';
-import { activeIndex, BACKENDS, focusSurface, hasWebGpu, nextFrame } from './gallery-fun-support.js';
-import { countListeners, expectDemoOpen, expectGalleryOnly, openGallery } from './gallery-support.js';
-import { collectErrors, mounted, state, waitFor } from './support.js';
+import { BACKENDS, focusSurface, funCards, hasWebGpu, nextFrame, solo } from './gallery-fun-support.js';
+import { expectDemoOpen, expectGalleryOnly, openGallery } from './gallery-support.js';
+import { collectErrors, mounted, state } from './support.js';
 
-// The fun shell in the gallery: three demos behind one entry, each answering keys and the pointer.
+// Each fun demo has a card and a page of its own, where it runs alone.
+const BACK = { name: 'Back to the gallery' } as const;
+
 for (const backend of BACKENDS) {
-  test(`on ${backend} each fun demo opens, advances with the clock and the keys, and the console stays clean`, async ({ page }) => {
+  test(`on ${backend} every fun demo opens from its card's address, advances with the clock, and the console stays clean`, async ({ page }) => {
+    test.setTimeout(240_000);
     const errors = collectErrors(page);
-    await page.goto('/gallery.html?backend=canvas2d');
+    await openGallery(page, 'backend=canvas2d');
     test.skip(backend === 'webgpu' && !(await hasWebGpu(page)), 'This browser exposes no WebGPU adapter (capability-refused).');
-    await openGallery(page, `app=fun&backend=${backend}`);
-    await expectDemoOpen(page, 'fun');
-    expect((await state(page)).backend).toBe(backend);
-    await focusSurface(page);
-    let frame = (await state(page)).frameRgbaSha256;
-    for (const [index, key] of ['1', '2', '3'].entries()) {
-      await page.keyboard.press(key);
-      await expect.poll(() => activeIndex(page)).toBe(index);
-      frame = await nextFrame(page, frame);
-      // Not paused: the pulse alone moves the picture on.
-      frame = await nextFrame(page, frame);
+    const ids = await funCards(page);
+    for (const id of ids) {
+      await openGallery(page, `app=${id}&backend=${backend}`);
+      await expectDemoOpen(page, id);
+      expect((await state(page)).backend, id).toBe(backend);
+      const { frame } = await solo(page);
+      // Not paused: the pulse alone moves the demo's clock on.
+      await expect.poll(async () => (await solo(page)).frame, { message: id }).toBeGreaterThan(frame);
+      expect(await page.evaluate(() => window.__bijouWebGpu?.failures()), id).toEqual([]);
+      expect(await mounted(page), id).toMatchObject({ canvases: 1, textareas: 1 });
     }
-    // The wormhole answers `m` with another render mode.
-    await page.keyboard.press('2');
-    await page.keyboard.press('m');
-    await nextFrame(page, frame);
-    expect(await page.evaluate(() => window.__bijouWebGpu?.failures())).toEqual([]);
     expect(errors).toEqual([]);
   });
 }
 
-test('the gallery lists the fun shell and opens it by click', async ({ page }) => {
+test('the gallery shows a card per fun demo with a name and a description, opens one by click, and a reload opens the same demo', async ({ page }) => {
   const errors = collectErrors(page);
   await openGallery(page, 'backend=canvas2d');
-  await expect(page.locator('[data-gallery-demo="fun"]')).toBeVisible();
-  await page.locator('[data-gallery-demo="fun"]').click();
-  await expectDemoOpen(page, 'fun');
-  expect(errors).toEqual([]);
-});
-
-test('a backend switch while a demo runs keeps the shell on the same demo, still advancing', async ({ page }) => {
-  const errors = collectErrors(page);
-  await openGallery(page, 'app=fun&backend=webgl2');
-  await expectDemoOpen(page, 'fun');
-  await focusSurface(page);
-  await page.keyboard.press('3');
-  await expect.poll(() => activeIndex(page)).toBe(2);
-  await page.evaluate(() => window.__bijouWebGpu?.switchBackend('canvas2d'));
-  await waitFor(page, (current) => current.backend === 'canvas2d' && current.presents > 0);
-  expect(await activeIndex(page)).toBe(2);
-  expect(await mounted(page)).toMatchObject({ canvases: 1, textareas: 1 });
-  await nextFrame(page, (await state(page)).frameRgbaSha256);
-  expect(errors).toEqual([]);
-});
-
-test('switching demos 100 times leaves one canvas and a stable listener count', async ({ page }) => {
-  const errors = collectErrors(page);
-  await countListeners(page);
-  await openGallery(page, 'app=fun&backend=canvas2d');
-  await expectDemoOpen(page, 'fun');
-  await focusSurface(page);
-  const listeners = () => page.evaluate(() => window.__listenerCount?.() ?? -1);
-  await page.keyboard.press('2');
-  const baseline = await listeners();
-  for (let visit = 0; visit < 100; visit += 1) await page.keyboard.press(String((visit % 3) + 1));
-  await expect.poll(async () => (await mounted(page)).canvases).toBe(1);
-  expect(await listeners()).toBe(baseline);
-  await expect.poll(() => activeIndex(page)).toBe(0);
-  expect(errors).toEqual([]);
-});
-
-test('leaving the fun shell returns to the gallery with no canvas left', async ({ page }) => {
-  await openGallery(page, 'app=fun&backend=canvas2d');
-  await expectDemoOpen(page, 'fun');
-  await page.getByRole('button', { name: 'Back to the gallery' }).click();
+  const ids = await funCards(page);
+  expect(new Set(ids).size).toBe(ids.length);
+  await expect(page.locator('[data-gallery-demo="fun"]')).toHaveCount(0);
+  for (const id of ids) {
+    const card = page.locator(`[data-gallery-demo="${id}"]`);
+    await expect(card.locator('[data-slot="item-title"]')).not.toBeEmpty();
+    await expect(card.locator('[data-slot="item-description"]')).not.toBeEmpty();
+  }
+  const last = ids.at(-1) ?? '';
+  await page.locator(`[data-gallery-demo="${last}"]`).click();
+  await expectDemoOpen(page, last);
+  await page.reload();
+  await expectDemoOpen(page, last);
+  await page.getByRole('button', BACK).click();
   await expectGalleryOnly(page);
+  expect(errors).toEqual([]);
+});
+
+test('a demo page has no demo switcher: the keys a shell would keep reach the demo, and the page stays on it', async ({ page }) => {
+  const errors = collectErrors(page);
+  await openGallery(page, 'app=fun-wormhole&backend=canvas2d');
+  await expectDemoOpen(page, 'fun-wormhole');
+  await focusSurface(page);
+  expect((await solo(page)).switcher).toBe(false);
+  for (const key of ['Tab', 'ArrowRight', 'ArrowLeft', '2', 'q']) await page.keyboard.press(key);
+  await focusSurface(page);
+  expect(new URL(page.url()).searchParams.get('app')).toBe('fun-wormhole');
+  // Space reaches the session and pauses it; while paused only the demo's own key, `m`, changes the picture.
+  await page.keyboard.press('Space');
+  await expect.poll(async () => (await solo(page)).paused).toBe(true);
+  const { frame } = await solo(page);
+  const still = (await state(page)).frameRgbaSha256;
+  await page.keyboard.press('m');
+  await nextFrame(page, still);
+  expect((await solo(page)).frame).toBe(frame);
+  // `q` did not stop it: it runs on when resumed.
+  await page.keyboard.press('Space');
+  await expect.poll(async () => (await solo(page)).frame).toBeGreaterThan(frame);
+  expect(await mounted(page)).toMatchObject({ canvases: 1, textareas: 1 });
+  expect(errors).toEqual([]);
 });

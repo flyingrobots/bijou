@@ -79,7 +79,13 @@ test('counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2
 test('the HUD lists no example app as refused: every one bundles for the browser', async ({ page }) => {
   const errors = collectErrors(page);
   await open(page, 'app=counter&backend=canvas2d');
-  await expect(page.locator('[data-app]')).toHaveText(['Counter', 'Components library', 'Hero', 'Component showcase', 'DOGFOOD', 'Soak bench', 'Bijou Fun', 'Dual-host counter']);
+  // The gallery's entries are spread into this list, so each fun demo is an app of its own here too.
+  await expect(page.locator('[data-app]')).toHaveText([
+    'Counter', 'Components library', 'Hero', 'Component showcase', 'DOGFOOD', 'Soak bench',
+    'Rainbow Gradient', 'Retro Wormhole', 'Color-Blending Metaballs', 'Fluid Dynamics Tank', 'FLIP Dam Break',
+    '3D Raymarching Engine', 'Retro 3D Raycaster', '3D Raytracer (The Works)', 'TTF Font Vector Renderer', '3D Text Cylinder Ticker',
+    'Dual-host counter',
+  ]);
   // With nothing refused the page renders no refusal card at all.
   await expect(page.locator('[data-region="refused"]')).toHaveCount(0);
   await expect(page.locator('[data-refused]')).toHaveCount(0);

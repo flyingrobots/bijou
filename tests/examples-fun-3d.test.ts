@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { demos } from '../examples/fun/registry.js';
 import { raymarcher } from '../examples/fun/demos/raymarcher.js';
 import { raytracer } from '../examples/fun/demos/raytracer.js';
-import { byId, digest, feed, funContext, mountEntry, pulses, textOf } from './helpers/fun-demos.js';
+import { byId, demos, digest, feed, funContext, mountEntry, pulses, textOf } from './helpers/fun-demos.js';
 import { repeatKey } from './helpers/fun-3d.js';
 
 const IDS = ['raymarcher', 'raycaster', 'raytracer'];

@@ -5,9 +5,9 @@ import { brailleMask } from '../panel.js';
 import { layoutLine, roll, tickerLines } from './cylinder-geometry.js';
 import { paintGround, paintHud, paintMissing } from './font-hud.js';
 import { fill, gridBounds } from './font-outline.js';
-import { editMessage, startTyping, type Typing } from './font-typing.js';
+import { GREETING, editMessage, startTyping, type Typing } from './font-typing.js';
 import { hslToRgb } from './hsl.js';
-import type { Typeface } from './typeface.js';
+import { loadTypeface, type FontPort, type Typeface } from './typeface.js';
 
 /** Four words rolling over a cylinder under perspective, each letter staggered, lit by how near the front it is. */
 function paintCylinder(surface: Surface, face: Extract<Typeface, { status: 'ready' }>, lines: readonly string[], time: number): void {
@@ -68,4 +68,9 @@ export function textCylinderDemo(face: Typeface, message: string): DemoEntry {
       return surface;
     },
   });
+}
+
+/** The text cylinder for a host: ask the port for the font, then build the demo. A font that fails shows a message in the pane. */
+export async function loadTextCylinder(port: FontPort, message: string = GREETING): Promise<DemoEntry> {
+  return textCylinderDemo(await loadTypeface(port), message);
 }

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { demos } from '../examples/fun/registry.js';
-import { byId, digest, textOf, feed, funContext, lcg, mountEntry, pulses } from './helpers/fun-demos.js';
+import { byId, demos, digest, feed, funContext, lcg, mountEntry, pulses, textOf } from './helpers/fun-demos.js';
 
 describe('the bijou-fun demos at the edges', () => {
   for (const entry of demos) {
