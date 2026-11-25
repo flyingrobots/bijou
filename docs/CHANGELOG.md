@@ -8,6 +8,58 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- The full test suite runs most files with Vitest's isolation off, so the files
+  in a worker share the modules they load; loading them once per file was about
+  three quarters of the suite's time. A file that changes shared state (a
+  module mock, a stub, fake timers, a spy, `process.env`, `globalThis`, the
+  working directory or the Node host package), or that is measured at two
+  seconds or more, keeps a module graph of its own. `scripts/vitest-setup.ts`
+  clears the default context before every test file, so one file cannot hand
+  it to the next. A file can ask for isolation with a
+  `// vitest: isolate` comment, and `BIJOU_VITEST_ISOLATE=all` isolates every
+  file. In the sealed runner the whole suite passed three times in a row in
+  171 to 215 s on two workers; fully isolated, a quarter of it took 120 s. See `docs/guides/sealed-tests.md`. Origin:
+  flyingrobots/bijou#907.
+- CI no longer runs the native Windows lane ("Focused Unit Tests (windows,
+  Node 22)"). Its sealed worker ran out of storage before any test started, so
+  it was red on every run (flyingrobots/bijou#788). `README.md` has a
+  "Platform support" section that says Windows is not supported at present and
+  why. The Windows launcher, its tests and the policy check that a Windows lane
+  must use the native runner all remain, so the lane can be restored by adding
+  its matrix entry back.
+- CI's full-suite shards are dealt by measured weight and there are eight of
+  them for each Node version. With shards cut by position the four took 156 to
+  341 s, because ten test files were 46% of the suite's time. Now the heaviest
+  file goes first, each to the shard that is lightest so far, using the
+  per-file times in `scripts/vitest-weights.json` (measured by
+  `scripts/measure-vitest-weights.mjs`). A stale weight only makes the shards
+  less even: every file is still in exactly one shard. Origin:
+  flyingrobots/bijou#907.
+- CI runs the full test suite as four parallel shards for each Node version
+  (job `suite`), where one job ran its 25 chunks in series in 13 to 15 minutes.
+  `BIJOU_VITEST_SHARD=k/n` makes `scripts/run-vitest.mjs` run the k-th of n
+  shares of the chunks; unset, the whole suite runs as before. The interactive
+  smoke, test type-check, canary smoke and showcase build move from the Node 22
+  `test` job into a job of their own (`smoke_gates`) that runs beside it.
+  `scripts/ci-workflow-policy.ts` refuses a workflow whose shard list is not 1
+  to N or whose command names another N. See `docs/guides/sealed-tests.md`.
+  Origin: flyingrobots/bijou#907.
+- The whole-tree ESLint ratchet (`npm run lint:eslint`) lints one target per
+  process and merges the results, where it ran one process over every target.
+  That one process held the typed program for the whole tree and ran out of V8
+  heap, at about 2,000 MB, in hosted CI (job "Verify TypeScript doctrine") and
+  in the sealed worker. Each target has a cache file of its own under
+  `.cache/eslint/`. The findings counted are the same; a file two targets match
+  is counted once.
+- Test-only: the slowest test files run faster, with every case kept. Measured
+  alone in the sealed runner: `tests/web-gpu/app-cell-widths.test.ts` 22.8 s
+  to 11.0 s (library slides split into four parts, part k takes every fourth
+  slide, and one assertion proves the parts cover the deck),
+  `tests/dogfood-book-theme-localization.test.ts` 47.7 s to 14.6 s (one file
+  per locale), `bench/src/soak-host.test.ts` 16.6 s to 9.4 s (two files), and
+  the two Markdown CLI resize cases now run side by side. Refs
+  flyingrobots/bijou#907.
+
 - The soak bench (`npm run soak`) takes its options, memory readings and log
   through host ports (`bench/src/soak-ports.ts`) instead of reading
   `process.argv`, `process.memoryUsage()` and `node:fs`, so its app module
@@ -147,6 +199,21 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- The sealed runner admits a worker on Docker Desktop, whose kernel lists
+  fallback tunnel devices (`tunl0`, `sit0`, `gre0` and their relatives) and the
+  `bonding_masters` control file under `/sys/class/net` even with
+  `--network none`. Every run there was refused with `network interface beyond
+  loopback`, which also stopped the `pre-commit` hook. The seal now reads each
+  entry (`scripts/docker-seal/network-entries.mjs`) and admits loopback, that
+  control file, and a named fallback tunnel device that is down. Any other
+  device, and a fallback tunnel device that is up, is still refused (#910).
+- Workspace installs resolve `minimatch` 11.0.1 or later through a root
+  override, which clears the moderate denial-of-service advisory
+  GHSA-g3hv-75wg-m249 reached through `eslint`, `typescript-eslint` and
+  `shadcn`. `npm audit` reports no findings. The root manifest also approves
+  the install scripts of `esbuild@0.28.1` and `fsevents@2.3.3` in
+  `allowScripts`, so `npm install` no longer warns about them. Development
+  tooling only; no published package changes.
 - The sealed runner's local launchers (`scripts/docker-seal/run.mjs` and
   `bootstrap.mjs`) no longer wrap each run in `git locks with`, so `npm test`,
   `npm run soak` and every other local command run on a machine without
