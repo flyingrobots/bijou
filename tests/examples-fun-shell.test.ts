@@ -5,9 +5,9 @@ import { createFunApp } from '../examples/fun/shell.js';
 import { demos } from '../examples/fun/registry.js';
 import { SEED, cellsOf, digest, funContext } from './helpers/fun-demos.js';
 
-const ctx = funContext(100, 30);
+// Wide enough for the header to list every demo by name.
+const ctx = funContext(300, 30);
 const app = createFunApp({ ctx, entries: demos, seed: SEED });
-const wide = createFunApp({ ctx: funContext(400, 30), entries: demos, seed: SEED });
 const key = (name: string): KeyMsg => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false });
 const mouse = (col: number, row: number, action: MouseMsg['action'] = 'move'): MouseMsg =>
   ({ type: 'mouse', button: 'none', action, col, row, shift: false, alt: false, ctrl: false });
@@ -28,11 +28,8 @@ function rowText(surface: Surface, row: number): string {
 
 describe('the bijou-fun shell', () => {
   it('lists every demo in the header and starts on the first', () => {
-    // The header is one row: with six or more demos it needs a wide pane to list every name.
-    const [model] = wide.init();
-    const view = wide.view(model);
-    if (!('cells' in view)) throw new Error('the shell must return a Surface');
-    for (const entry of demos) expect(rowText(view, 0)).toContain(entry.name);
+    const header = rowText(send([]), 0);
+    for (const entry of demos) expect(header).toContain(entry.name);
     expect(rowText(send([]), 29)).toContain(demos[0]?.description ?? 'missing');
   });
 
@@ -40,8 +37,8 @@ describe('the bijou-fun shell', () => {
     const second = rowText(send([key('tab')]), 29);
     expect(second).toContain(demos[1]?.description ?? 'missing');
     expect(rowText(send([key('3')]), 29)).toContain(demos[2]?.description ?? 'missing');
-    expect(rowText(send([key('left')]), 29)).toContain(demos.at(-1)?.description ?? 'missing');
-    expect(rowText(send([key('left'), key('right')]), 29)).toContain(demos[0]?.description ?? 'missing');
+    expect(rowText(send([key('left')]), 29)).toContain(demos[demos.length - 1]?.description ?? 'missing');
+    expect(rowText(send([key(String(demos.length)), key('right')]), 29)).toContain(demos[0]?.description ?? 'missing');
   });
 
   it('asks the runtime to quit on q', () => {
@@ -52,7 +49,7 @@ describe('the bijou-fun shell', () => {
 
   it('draws the demo into the body between the header and the footer', () => {
     const view = send([key('3'), pulse, pulse]);
-    expect([view.width, view.height]).toEqual([100, 30]);
+    expect([view.width, view.height]).toEqual([300, 30]);
   });
 
   it('turns mouse moves in the body into pointer messages offset by the header, and moves outside into a leave', () => {

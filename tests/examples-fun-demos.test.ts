@@ -7,7 +7,7 @@ const SIZES: readonly (readonly [number, number])[] = [[80, 24], [177, 53]];
 
 describe('the bijou-fun demos at a fixed size, seed and frame', () => {
   it('the registry lists the three ported demos in order', () => {
-    expect(demos.slice(0, 3).map((entry) => entry.id)).toEqual(['rainbow-gradient', 'wormhole', 'metaballs']);
+    expect(demos.map((entry) => entry.id).slice(0, 3)).toEqual(['rainbow-gradient', 'wormhole', 'metaballs']);
   });
 
   for (const entry of demos) {

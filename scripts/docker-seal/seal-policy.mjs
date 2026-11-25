@@ -4,7 +4,7 @@ export function verifyKernelSeal(facts) {
   if (!facts.dockerFile) refuse('missing /.dockerenv');
   if (facts.marker !== 'bijou-test-seal-v1\n') refuse('missing or invalid image seal');
   if (facts.sockets.length !== 0) refuse('Docker socket present');
-  if (facts.interfaces.some((name) => name !== 'lo')) refuse('network interface beyond loopback');
+  if (!facts.interfaces.every(idleEntry)) refuse('network interface beyond loopback');
   const mounts = facts.mountInfo.trim().split('\n').map(parseMount);
   const root = mounts.find((mount) => mount.path === '/');
   if (root?.type !== 'overlay' || !root.options.includes('ro')) refuse('root must be read-only overlay');
@@ -15,6 +15,26 @@ export function verifyKernelSeal(facts) {
   for (const mount of mounts) {
     if (!allowedMount(mount)) refuse(`unexpected mount at ${mount.path}`);
   }
+}
+
+/**
+ * Devices the tunnel drivers create in every network namespace, whether or not
+ * the namespace has a network. Docker Desktop's kernel lists them in a worker
+ * started with `--network none`.
+ */
+const FALLBACK_TUNNELS = new Set([
+  'erspan0', 'gre0', 'gretap0', 'ip6_vti0', 'ip6gre0', 'ip6tnl0', 'ip_vti0', 'sit0', 'tunl0',
+]);
+
+/**
+ * Loopback, a fallback tunnel device that is down, or the bonding driver's
+ * control file. A down device carries no traffic, and the worker has no
+ * capability to bring one up.
+ */
+function idleEntry(entry) {
+  if (!entry.device) return entry.name === 'bonding_masters';
+  if (entry.name === 'lo') return true;
+  return FALLBACK_TUNNELS.has(entry.name) && !entry.up;
 }
 
 function parseMount(line) {

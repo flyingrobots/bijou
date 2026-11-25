@@ -38,5 +38,5 @@ function paintSprite(surface: Surface, cam: Camera, zBuffer: Float32Array, s: Sp
 /** Draw the live sprites far to near, each stripe only where it is nearer than the wall. */
 export function paintSprites(surface: Surface, cam: Camera, zBuffer: Float32Array, sprites: readonly Sprite[]): void {
   const far = (s: Sprite): number => (cam.x - s.x) ** 2 + (cam.y - s.y) ** 2;
-  [...sprites].filter((s) => s.alive).sort((a, b) => far(b) - far(a)).forEach((s) => paintSprite(surface, cam, zBuffer, s));
+  [...sprites].filter((s) => s.alive).sort((a, b) => far(b) - far(a)).forEach((s) => { paintSprite(surface, cam, zBuffer, s); });
 }

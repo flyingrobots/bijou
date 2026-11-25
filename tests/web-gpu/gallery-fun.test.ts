@@ -9,7 +9,8 @@ import { funBuild } from '../../examples/fun/browser.js';
 import { GALLERY_DEMOS } from '../../examples/web-gpu/src/gallery/demos.js';
 import { cellsOf, funContext } from '../helpers/fun-demos.js';
 
-const ctx = funContext(100, 30);
+// Wide enough for the header to list every demo by name.
+const ctx = funContext(400, 30);
 const key = (name: string): KeyMsg => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false });
 const move = (col: number, row: number): MouseMsg =>
   ({ type: 'mouse', button: 'none', action: 'move', col, row, shift: false, alt: false, ctrl: false });
@@ -49,16 +50,17 @@ describe('the gallery entry for the fun shell', () => {
   it('loads the shell on demand, and its header lists every demo of the fun registry', async () => {
     const built = await GALLERY_DEMOS.find((demo) => demo.id === 'fun')?.load();
     if (built === undefined) throw new Error('the gallery has no fun entry');
-    const header = rowText(frameOf(built.build(funContext(400, 30)), []), 0);
+    const header = rowText(frameOf(built.build(ctx), []), 0);
     for (const entry of demos) expect(header).toContain(entry.name);
   });
 
   it('shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu', () => {
     const app = funBuild(1888, [...demos, stub]).build(ctx);
-    const toStub = Array.from({ length: demos.length }, () => key('tab'));
-    expect(rowText(frameOf(funBuild(1888, [...demos, stub]).build(funContext(400, 30)), []), 0)).toContain('Stub Demo');
-    expect(rowText(frameOf(app, toStub), 29)).toContain('A demo only the test registers');
-    expect(rowText(frameOf(app, [...toStub, move(5, 3), move(6, 3)]), 1)).toContain('moves 2');
+    expect(rowText(frameOf(app, []), 0)).toContain('Stub Demo');
+    // `left` from the first demo wraps to the last, which is the stub whatever the registry holds.
+    const last = key('left');
+    expect(rowText(frameOf(app, [last]), 29)).toContain('A demo only the test registers');
+    expect(rowText(frameOf(app, [last, move(5, 3), move(6, 3)]), 1)).toContain('moves 2');
   });
 
   it('names no fun demo anywhere in the showcase source', () => {

@@ -17,7 +17,7 @@ const MUZZLE = ['      *  *  ^  *  *      ', '    *   \\  |  /   *    ', '   * -
 
 function stamp(surface: Surface, lines: readonly string[], x: number, y: number, colour: (char: string) => readonly [number, number, number]): void {
   lines.forEach((row, dy) => {
-    [...row].forEach((char, dx) => {
+    Array.from(row).forEach((char, dx) => {
       const tx = x + dx;
       const ty = y + dy;
       if (char === ' ' || tx < 0 || tx >= surface.width || ty < 0 || ty >= surface.height) return;
@@ -34,8 +34,8 @@ export function flashRed(surface: Surface): void {
       const cell = surface.get(x, y);
       const fg = cell.fgRGB ?? [0, 0, 0];
       const bg = cell.bgRGB ?? [0, 0, 0];
-      surface.setRGB(x, y, cell.char, Math.min(255, (fg[0] ?? 0) + 100), Math.max(0, (fg[1] ?? 0) - 50), Math.max(0, (fg[2] ?? 0) - 50),
-        Math.min(255, (bg[0] ?? 0) + 40), Math.max(0, (bg[1] ?? 0) - 20), Math.max(0, (bg[2] ?? 0) - 20));
+      surface.setRGB(x, y, cell.char, Math.min(255, fg[0] + 100), Math.max(0, fg[1] - 50), Math.max(0, fg[2] - 50),
+        Math.min(255, bg[0] + 40), Math.max(0, bg[1] - 20), Math.max(0, bg[2] - 20));
     }
   }
 }
