@@ -52,7 +52,7 @@ describe('createFramedApp', () => {
     });
     const [initialModel, initCmds] = app.init();
     let model = initialModel;
-    expect(initCmds).toHaveLength(0);
+    expect(initCmds).toHaveLength(2);
     let update = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
     model = update[0];
     expect(update[1]).toHaveLength(1);

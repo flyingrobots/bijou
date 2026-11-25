@@ -100,7 +100,7 @@ describe('createFramedApp', () => {
     });
     const [initialModel, initCmds] = app.init();
     let model = initialModel;
-    expect(initCmds).toHaveLength(0);
+    expect(initCmds).toHaveLength(1);
     const [nextModel, cmds] = app.update({ type: 'key', key: '?', ctrl: false, alt: false, shift: false }, model);
     model = nextModel;
     expect(model.helpOpen).toBe(true);

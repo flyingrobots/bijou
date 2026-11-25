@@ -370,6 +370,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- A framed app reports key combos that its frame and a page both bind (and
+  duplicates inside one page) once at start, as `runtime-issue` warnings
+  through the frame notification stack, naming the combo, both claimants and
+  which one `keyPriority` checks first. It runs from `init()`, so it fires
+  once per start, not per press; two pages reusing a key stay silent. It
+  follows the existing `runtimeNotifications` switch and adds no option (#507).
+
+### Added
+
 - `ui-scene-ir/1` nodes can declare an optional `state.checked` boolean,
   validated by `validateUiSceneIr()` (`invalid-node-state`). The browser seam
   lowers it as `data-bijou-checked`, and `mountBijouDom()` writes
