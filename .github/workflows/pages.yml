@@ -41,6 +41,10 @@ jobs:
           test -f "${exported[0]}/gallery.html"
           mkdir -p "$RUNNER_TEMP/pages"
           cp -R "${exported[0]}/." "$RUNNER_TEMP/pages/"
+          # The front page is the landing app; the showcase page moves to showcase.html.
+          test -f "$RUNNER_TEMP/pages/landing.html"
+          mv "$RUNNER_TEMP/pages/index.html" "$RUNNER_TEMP/pages/showcase.html"
+          cp "$RUNNER_TEMP/pages/landing.html" "$RUNNER_TEMP/pages/index.html"
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

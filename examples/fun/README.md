@@ -24,6 +24,10 @@ npm run fun
 | `p`, `t`, `r`, `h` | fluids: pour (hold it), switch the source side, reset, hide the card |
 | `z`, `x`, `c` | fluids: shake the tank left, up, right (the digits switch demos here) |
 | `w` `a` `s` `d`, `up`, `down` | FLIP dam break: move the obstacle |
+| pointer, `+` `-`, `h` | star field: steer the vanishing point, warp speed, hide the card |
+| `r`, `+` `-`, `h` | directional tiles: new composition, cells, hide the card |
+| `[` `]`, `,` `.`, `h` | Doyle spiral: arms (p), steps (q), hide the card |
+| `r`, `+` `-`, `s`, `a`, `h` | deformed rectangles: recompose, levels, stroke, auto-recompose, hide the card |
 | `q`, `ctrl+c` | quit |
 
 ## The contract
@@ -44,6 +48,8 @@ frame count and the pause, so every demo pauses the same way (a demo taking text
 - `registry.ts`: the catalog. Each entry has a demo's id, name and description and loads its module on demand;
   `loadDemos(host)` loads them all.
 - `shell.ts`, `shell-chrome.ts`: the terminal shell. The header row, the footer row, input routing.
+- `demos/pixels.ts`, `demos/noise.ts`, `demos/palettes.ts`: half-block pixel painting, seeded 3D noise and embedded colour lists for the generative demos (after Mike Bostock, Saneef Ansari, Robin Houston and Okazz; credits in each file).
+- `landing.ts`, `landing-cards.ts`: the published site's front page as a Bijou app: a fun demo picked at random behind the Bijou wordmark in Jacquard 12, and one card per demo.
 - `solo.ts`: one demo alone, with a row for its keys and no list of demos: what a page for a single demo mounts.
 - `demos/typeface.ts`: the font port and the parsed `Typeface`.
 - `demos/`: one file per demo, split where a demo needs more than one.

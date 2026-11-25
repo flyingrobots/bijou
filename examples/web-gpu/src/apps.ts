@@ -23,6 +23,24 @@ export interface ShowcaseApp {
 
 export const SHOWCASE_APPS: readonly ShowcaseApp[] = [
   {
+    id: 'landing',
+    title: 'Landing',
+    // The published site's front page: a fun demo chosen at random runs behind the wordmark and one card per demo.
+    // The two font demos are left out of the draw: they wait on a font download before they can paint.
+    async load() {
+      const [{ createLandingApp }, { catalog }, { fetchFont }] = await Promise.all([
+        import('../../fun/landing.js'), import('../../fun/registry.js'), import('../../fun/browser.js'),
+      ]);
+      const backgrounds = catalog.filter((item) => item.id !== 'font-renderer' && item.id !== 'text-cylinder');
+      const pick = backgrounds[Math.floor(Math.random() * backgrounds.length)] ?? catalog[0];
+      if (pick === undefined) throw new Error('BIJOU_WEB_GPU_NO_FUN_DEMOS');
+      const background = await pick.load({ font: fetchFont });
+      const cards = catalog.map(({ id, name, description }) => ({ id, name, description }));
+      const open = (id: string): void => { window.location.assign(`./gallery.html?app=fun-${id}`); };
+      return { build: (ctx) => createLandingApp({ ctx, cards, background, open, seed: Date.now() % 1_000_000 }) };
+    },
+  },
+  {
     id: 'counter',
     title: 'Counter',
     // examples/counter/main.ts runs as it is; its startApp() call hands the app over.

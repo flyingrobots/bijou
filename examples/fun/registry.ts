@@ -64,6 +64,26 @@ export const catalog: readonly CatalogEntry[] = [
     load: async ({ font }) => (await import('./demos/font-renderer.js')).loadFontRenderer(font),
   },
   {
+    id: 'starfield', name: 'Star Field',
+    description: 'Stars rush past the viewer and leave fading trails, after Mike Bostock\'s d3 star field',
+    load: async () => (await import('./demos/starfield.js')).starfieldDemo,
+  },
+  {
+    id: 'directional-tiles', name: 'Directional Tiles',
+    description: 'Fans of ink-to-paper wedges in a grid, turned by a drifting noise field, after Saneef Ansari',
+    load: async () => (await import('./demos/tiles.js')).tilesDemo,
+  },
+  {
+    id: 'doyle-spiral', name: 'Doyle Spiral',
+    description: 'A Möbius-mapped Doyle spiral of touching circles, one hue per arm, after Robin Houston',
+    load: async () => (await import('./demos/doyle.js')).doyleDemo,
+  },
+  {
+    id: 'deformed-rectangles', name: 'Deformed Rectangles',
+    description: 'A square split again and again at uneven ratios into skewed quads, after Saneef Ansari and Okazz',
+    load: async () => (await import('./demos/rects.js')).rectsDemo,
+  },
+  {
     id: 'text-cylinder', name: '3D Text Cylinder Ticker', description: 'Letters rolling over a 3D text cylinder',
     load: async ({ font }) => (await import('./demos/text-cylinder.js')).loadTextCylinder(font),
   },

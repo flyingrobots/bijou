@@ -63,6 +63,8 @@ export default defineConfig({
         dogfood: fileURLToPath(new URL('dogfood.html', import.meta.url)),
         // The demo gallery, and each demo full-window at ?app=<id>.
         gallery: fileURLToPath(new URL('gallery.html', import.meta.url)),
+        // The published site's front page, a Bijou app full-window.
+        landing: fileURLToPath(new URL('landing.html', import.meta.url)),
       },
     },
     // Which chunk holds what: the gallery's browser suite and build test read it.

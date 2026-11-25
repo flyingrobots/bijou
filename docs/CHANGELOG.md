@@ -102,6 +102,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- The published site's front page is a Bijou app (`examples/fun/landing.ts`): a
+  fun demo picked at random runs behind the Bijou wordmark in Jacquard 12 and
+  one card per demo; arrows or the pointer choose, Enter or a click opens it.
+  `examples/web-gpu/landing.html` mounts it, and the Pages deploy publishes it
+  as `index.html` (the showcase page moves to `showcase.html`).
+- `npm run fun` has four generative demos: Star Field (after Mike Bostock),
+  Directional Tiles and Deformed Rectangles (after Saneef Ansari; the second
+  after Okazz) and Doyle Spiral (after Robin Houston), with shared half-block
+  pixel painting, seeded 3D noise and embedded palettes.
+
 - GitHub Pages publishes the web GPU showcase from `main`
   (`.github/workflows/pages.yml`): the showcase, the demo gallery with the
   bijou-fun demos (`gallery.html?app=fun`), DOGFOOD full-window and the DOM host
