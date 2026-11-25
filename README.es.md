@@ -34,6 +34,12 @@ Pulsa **Enter** en la pantalla de título. Explora con las teclas de flecha y **
 
 Para un primer ejemplo más pequeño, ejecuta `npm run hello` o `npm run counter`.
 
+Para probar Bijou sin instalar nada, abre la
+[galería de demos](https://flyingrobots.github.io/bijou/gallery.html) en el navegador:
+DOGFOOD, el banco de resistencia y las [demos fun](https://flyingrobots.github.io/bijou/gallery.html?app=fun)
+se ejecutan allí sobre un canvas. GitHub Pages la publica desde `main` (consulta
+[`examples/web-gpu`](examples/web-gpu/README.md#published-site)).
+
 ## Crea tu propia aplicación
 
 Crea un proyecto inicial con el generador publicado:

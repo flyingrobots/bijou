@@ -40,6 +40,22 @@ The first mount is chosen in the address: `?app=counter`, `?app=components`,
 `?app=hero`, `?app=showcase`, `?app=dogfood` or `?app=dual`,
 and `&backend=auto` (the default), `webgpu`, `webgl2` or `canvas2d`.
 
+### Published site
+
+`.github/workflows/pages.yml` publishes the production bundle to GitHub Pages
+on every push to `main`: it builds in the sealed runner, exports
+`examples/web-gpu/dist` and deploys it unchanged.
+
+- Showcase: <https://flyingrobots.github.io/bijou/>
+- Demo gallery: <https://flyingrobots.github.io/bijou/gallery.html>
+- Fun demos: <https://flyingrobots.github.io/bijou/gallery.html?app=fun>
+- DOGFOOD full-window: <https://flyingrobots.github.io/bijou/dogfood.html>
+
+The bundle uses relative paths, so it works under the `/bijou/` subpath and on
+any other static host. Pages serves HTTPS, so browsers with WebGPU use it; the
+others fall back to WebGL2 or canvas 2D. Opening `dist/` from disk does not
+work: browsers refuse module scripts and `fetch()` on `file://`.
+
 ## The page chrome
 
 Everything around the two Bijou mounts is a Vite + React app built only from

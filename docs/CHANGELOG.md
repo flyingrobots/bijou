@@ -102,6 +102,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- GitHub Pages publishes the web GPU showcase from `main`
+  (`.github/workflows/pages.yml`): the showcase, the demo gallery with the
+  bijou-fun demos (`gallery.html?app=fun`), DOGFOOD full-window and the DOM host
+  page, at <https://flyingrobots.github.io/bijou/>. The bundle is built in the
+  sealed runner and deployed unchanged; the README links the gallery in all four
+  languages.
+
 - The showcase gallery lists a second entry, `fun` ("Bijou Fun"), at
   `gallery.html?app=fun`: the `examples/fun` shell with its three demos, in
   the browser, answering keys and the pointer (the metaballs follow it with no
