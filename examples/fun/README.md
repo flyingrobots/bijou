@@ -28,6 +28,17 @@ npm run fun
 | `r`, `+` `-`, `h` | directional tiles: new composition, cells, hide the card |
 | `[` `]`, `,` `.`, `h` | Doyle spiral: arms (p), steps (q), hide the card |
 | `r`, `+` `-`, `s`, `a`, `h` | deformed rectangles: recompose, levels, stroke, auto-recompose, hide the card |
+| `r`, `+` `-`, `[` `]`, `h` | seamless squares: new colours, square size, speed, hide the card |
+| `r`, `+` `-`, `[` `]`, `c`, `s`, `a`, `h` | Truchet tiles: retile, grid, bias, colour scheme, stroke, auto re-toss, hide the card |
+| `r`, `+` `-`, `[` `]`, `c`, `a`, `h` | some triangles: new composition, vertices, proportion, colour scheme, breathe, hide the card |
+| `r`, `+` `-`, `l`, `s` `g` `p`, `a`, `h` | shapes on a quadtree: recompose, points, max levels, shapes / quads / points, auto-recompose, hide the card |
+| `r`, `+` `-`, `g`, `c` `m`, `h` | dancing to the noise: new noise field, bars, group size, random colours / monochrome, hide the card |
+| `r`, `+` `-`, `h` | seeded needles: new seed, rows, hide the card |
+| `r`, `+` `-`, `[` `]`, `h` | x ^ y mod n: new composition, n, cells in a row, hide the card |
+| `r`, `+` `-`, `h` | tumbling box grid: jump to a new moment, orbit speed, hide the card |
+| pointer, `r`, `+` `-`, `v`, `m`, `s`, `[` `]`, `h` | lenses: move the source, new lenses, focal length, view, mirrors, smooth wave fronts, ray length, hide the card |
+| `r`, `+` `-`, `s`, `h` | noise plane partition: new composition, levels, lines, hide the card |
+| `r`, `+` `-`, `a`, `s`, `h` | partition peel: new composition, levels, peel direction, lines, hide the card |
 | `q`, `ctrl+c` | quit |
 
 ## The contract

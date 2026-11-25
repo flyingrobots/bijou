@@ -102,6 +102,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `npm run fun` and the published site have eleven more generative demos, ported
+  from Observable sketches: Seamless Squares (after cdr6934), Truchet Tiles,
+  Some Triangles, Shapes on a QuadTree, Dancing to the Noise, Seeded Needles and
+  x ^ y mod n (after Saneef Ansari), and Tumbling Box Grid, Lenses, Noise Plane
+  Partition and Partition Peel (after Claudio Esperança). Each credits its
+  original in its file header.
+
 - The published site's front page is a Bijou app (`examples/fun/landing.ts`): a
   fun demo picked at random runs behind the Bijou wordmark in Jacquard 12 and
   one card per demo; arrows or the pointer choose, Enter or a click opens it.

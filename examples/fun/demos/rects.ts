@@ -4,7 +4,7 @@ import { defineDemo, type Demo } from '../contract.js';
 import { stampPanel } from '../panel.js';
 import { nextRandom } from '../random.js';
 import { QUAD_PALETTES } from './palettes.js';
-import { hex, paintPixels, type Rgb } from './pixels.js';
+import { hex, mix, paintPixels, type Rgb } from './pixels.js';
 import { divide, insideDepth, type Quad } from './rects-geometry.js';
 
 export interface RectsState {
@@ -24,6 +24,17 @@ const AUTO_SECONDS = 5;
 const MIN_PASSES = 1;
 const MAX_PASSES = 10;
 const SUPERSAMPLE = 2;
+const WHITE: Rgb = [255, 255, 255];
+/** A soft band of light sweeps across the picture, one pass every this many seconds. */
+const SHINE_SECONDS = 4;
+
+/** How much light the sweeping band adds at picture pixel (x, y) of a w by h picture at time t: 0 to 0.22. */
+function shine(x: number, y: number, w: number, h: number, t: number): number {
+  const span = w + h;
+  const at = (((t / SHINE_SECONDS) % 1) * span * 1.6) - span * 0.3;
+  const d = Math.abs(x + y - at) / (span * 0.06);
+  return d >= 1 ? 0 : 0.22 * (1 - d * d);
+}
 
 function rebuild(state: Omit<RectsState, 'quads'>): RectsState {
   const fills = QUAD_PALETTES[state.palette]?.colors.length ?? 1;
@@ -93,7 +104,7 @@ export const rects: Demo<RectsState> = {
     if (msg.key === 'a') return { ...state, auto: !state.auto, sinceRoll: 0 };
     return msg.key === 'h' ? { ...state, hideUI: !state.hideUI } : state;
   },
-  view(state, { width, height, ctx }) {
+  view(state, { width, height, elapsed, ctx }) {
     const surface = createSurface(width, height);
     const palette = QUAD_PALETTES[state.palette] ?? QUAD_PALETTES[0];
     const ground: Rgb = hex(palette?.background ?? '#000000');
@@ -104,7 +115,9 @@ export const rects: Demo<RectsState> = {
     const raster = rasterize(state, w, h);
     paintPixels(surface, (x, y) => {
       const at = raster[Math.floor(y * SUPERSAMPLE) * w + Math.floor(x * SUPERSAMPLE)] ?? -1;
-      return at === -1 ? ground : at === -2 ? stroke : (fills[at] ?? ground);
+      const base = at === -1 ? ground : at === -2 ? stroke : (fills[at] ?? ground);
+      const light = shine(x, y, width, height * 2, elapsed);
+      return light === 0 ? base : mix(base, WHITE, light);
     }, SUPERSAMPLE);
     if (!state.hideUI) {
       stampPanel(surface, [

@@ -84,6 +84,61 @@ export const catalog: readonly CatalogEntry[] = [
     load: async () => (await import('./demos/rects.js')).rectsDemo,
   },
   {
+    id: 'seamless-squares', name: 'Seamless Squares',
+    description: 'Rows of squares in two colour ramps, turning and rocking on a sine wave, after cdr6934',
+    load: async () => (await import('./demos/seamless.js')).seamlessDemo,
+  },
+  {
+    id: 'truchet-tiles', name: 'Truchet Tiles',
+    description: 'Quarter-circle Truchet tiles turned by a biased coin, re-tossed one by one, after Saneef Ansari',
+    load: async () => (await import('./demos/truchet.js')).truchetDemo,
+  },
+  {
+    id: 'some-triangles', name: 'Some Triangles',
+    description: 'Triangles on one base, peaks crowding along a circle, after Saneef Ansari and Manfred Mohr',
+    load: async () => (await import('./demos/triangles.js')).trianglesDemo,
+  },
+  {
+    id: 'quadtree-shapes', name: 'Shapes on a QuadTree',
+    description: 'Quadtree quadrants of circles, squares and slashes in a chromotome palette, after Saneef Ansari',
+    load: async () => (await import('./demos/quadtree.js')).quadtreeDemo,
+  },
+  {
+    id: 'dancing-noise', name: 'Dancing to the Noise',
+    description: 'Bars broken by blocks that rise, fall and swell with a drifting noise field, after Saneef Ansari',
+    load: async () => (await import('./demos/dancing.js')).dancingDemo,
+  },
+  {
+    id: 'seeded-needles', name: 'Seeded Needles',
+    description: 'A grid of needles turned by a seeded, slowly drifting noise field, after Saneef Ansari',
+    load: async () => (await import('./demos/needles.js')).needlesDemo,
+  },
+  {
+    id: 'xor-mod-n', name: 'x ^ y mod n',
+    description: 'Cells lit where (x XOR y) mod n is zero, drifting across the plane, after Saneef Ansari',
+    load: async () => (await import('./demos/xor-mod.js')).xorModDemo,
+  },
+  {
+    id: 'box-grid', name: 'Tumbling Box Grid',
+    description: 'An orbiting camera over 121 lit cubes, each tumbling at its own angle, after Claudio Esperança',
+    load: async () => (await import('./demos/box-grid.js')).boxGridDemo,
+  },
+  {
+    id: 'lenses', name: 'Lenses',
+    description: 'Rays and wave fronts from a point source through two thin lenses, after Claudio Esperança',
+    load: async () => (await import('./demos/lenses.js')).lensesDemo,
+  },
+  {
+    id: 'noise-plane-partition', name: 'Noise Plane Partition',
+    description: 'The plane cut again and again along noise flow lines, level by level, after Claudio Esperança',
+    load: async () => (await import('./demos/noise-partition.js')).noisePartitionDemo,
+  },
+  {
+    id: 'partition-peel', name: 'Partition Peel',
+    description: 'A noise-cut plane peels away piece by piece, tumbling, then reassembles, after Claudio Esperança',
+    load: async () => (await import('./demos/noise-partition-peel.js')).partitionPeelDemo,
+  },
+  {
     id: 'text-cylinder', name: '3D Text Cylinder Ticker', description: 'Letters rolling over a 3D text cylinder',
     load: async ({ font }) => (await import('./demos/text-cylinder.js')).loadTextCylinder(font),
   },

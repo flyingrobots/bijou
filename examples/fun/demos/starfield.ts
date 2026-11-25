@@ -69,7 +69,8 @@ export const starfield: Demo<StarfieldState> = {
   keys: 'move the pointer to steer, + and - warp speed, h hides the panel, space pause',
   init(seed) {
     const [stars, next] = seedStars(STAR_COUNT, seed);
-    return { stars, trail: emptyTrail(0, 0), seed: next, warp: 1, pointer: null, hideUI: false };
+    // An 80 by 24 trail until the host says how big the pane is; the view scales the trail to whatever it paints.
+    return { stars, trail: emptyTrail(80, 24), seed: next, warp: 1, pointer: null, hideUI: false };
   },
   update(msg, state) {
     if (msg.type === 'resize') return { ...state, trail: emptyTrail(msg.width, msg.height) };
