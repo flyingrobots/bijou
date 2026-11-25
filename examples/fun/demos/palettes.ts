@@ -32,3 +32,10 @@ export const QUAD_PALETTES: readonly QuadPalette[] = [
   { name: 'dt09', colors: ['#000000', '#a10000', '#bfb9ad', '#e3d6b5'], background: '#ffffff', stroke: '#000000' },
   { name: 'ducci', colors: ['#f7c873', '#2e56a3', '#e8a24c', '#29303b', '#e0d5bf'], background: '#efe5d1', stroke: '#2a2a2a' },
 ];
+
+/** The colour list of "(Day 8 of 30) Seamless Patterns in P5.js" by cdr6934 (Observable), as published. */
+export const SEAMLESS_COLORS: readonly string[] = [
+  '#6cb59d', '#7bc6b3', '#a9d5c8', '#d5e1ce', '#77bcb4', '#7cb1d0', '#507b96', '#8ec4db', '#8fb8c2', '#565c65',
+  '#e7c558', '#e48d4d', '#c6a896', '#e2cdc0', '#e1ccbf', '#f5e8da', '#f9f9f5', '#b1b7b9', '#ccdac6', '#68514b',
+  '#dd5c4e', '#e67047', '#d07060', '#db7169', '#689b9b', '#f19f9d', '#365a5e', '#f6cfc4', '#516d67', '#3d485d',
+];

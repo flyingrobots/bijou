@@ -70,7 +70,11 @@ export function frameScript(id: string, width: number, height: number): DemoMsg[
   if (id === 'starfield') {
     return [{ type: 'resize', width, height }, ...pulses(30), { type: 'pointer', col: Math.floor(width / 3), row: Math.floor(height / 2) }, ...pulses(30)];
   }
-  const generative: Readonly<Record<string, string>> = { 'directional-tiles': '+', 'doyle-spiral': ']', 'deformed-rectangles': 's' };
+  const generative: Readonly<Record<string, string>> = {
+    'directional-tiles': '+', 'doyle-spiral': ']', 'deformed-rectangles': 's', 'seamless-squares': 'r', 'truchet-tiles': 'r',
+    'some-triangles': 'r', 'quadtree-shapes': 'r', 'dancing-noise': 'c', 'seeded-needles': 'r', 'xor-mod-n': '+', 'box-grid': '+',
+    'lenses': 'v', 'noise-plane-partition': 'r', 'partition-peel': 'a',
+  };
   const generativeKey = generative[id];
   if (generativeKey !== undefined) return [...pulses(30), { type: 'key', key: generativeKey }, ...pulses(30)];
   const middle: DemoMsg[] = id === 'wormhole'
