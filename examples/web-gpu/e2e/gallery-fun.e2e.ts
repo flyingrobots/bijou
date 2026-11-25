@@ -53,7 +53,7 @@ test('a demo page has no demo switcher: the keys a shell would keep reach the de
   await openGallery(page, 'app=fun-wormhole&backend=canvas2d');
   await expectDemoOpen(page, 'fun-wormhole');
   await focusSurface(page);
-  expect((await solo(page)).switcher).toBe(false);
+  expect((await solo(page)).holdsOtherDemos).toBe(false);
   for (const key of ['Tab', 'ArrowRight', 'ArrowLeft', '2', 'q']) await page.keyboard.press(key);
   await focusSurface(page);
   expect(new URL(page.url()).searchParams.get('app')).toBe('fun-wormhole');

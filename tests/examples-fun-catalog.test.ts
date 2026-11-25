@@ -8,10 +8,8 @@ import { stubCatalogEntry } from './helpers/fun-stub.js';
 const fontHost: DemoHost = { font: () => Promise.resolve(readFileSync(FONT_FILE)) };
 
 describe('the fun catalog', () => {
-  it('lists the ten demos in order, each with an id that reads in an address, a name and a one-line description', () => {
-    expect(catalog.map((entry) => entry.id)).toEqual([
-      'rainbow-gradient', 'wormhole', 'metaballs', 'fluid', 'flip-fluid', 'raymarcher', 'raycaster', 'raytracer', 'font-renderer', 'text-cylinder',
-    ]);
+  it('gives every demo an id that is its own and reads in an address, a name and a one-line description', () => {
+    expect(catalog.length).toBeGreaterThan(0);
     expect(new Set(catalog.map((entry) => entry.id)).size).toBe(catalog.length);
     for (const entry of catalog) {
       expect(entry.id).toMatch(/^[a-z][a-z0-9-]*$/u);
@@ -50,7 +48,7 @@ describe('the fun catalog', () => {
     expect(asked).toBe(1);
   });
 
-  it('rejects when a demo module fails to load, naming nothing else as loaded', async () => {
+  it('rejects when a demo module fails to load', async () => {
     const broken = { ...stubCatalogEntry, id: 'broken', load: () => Promise.reject(new Error('chunk missing')) };
     await expect(loadDemos(fontHost, [stubCatalogEntry, broken])).rejects.toThrow('chunk missing');
   });

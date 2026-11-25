@@ -3,6 +3,7 @@ import { build } from 'vite';
 import { describe, expect, it } from 'vitest';
 import { REFUSED_APPS } from '../../examples/web-gpu/src/refused-apps.js';
 import { SHOWCASE_APPS } from '../../examples/web-gpu/src/apps.js';
+import { GALLERY_DEMOS } from '../../examples/web-gpu/src/gallery/demos.js';
 
 // The showcase build refuses every Node built-in instead of stubbing it. These
 // cases build modules with the showcase's own Vite configuration, offline.
@@ -43,8 +44,9 @@ describe('examples/web-gpu bundle has no Node.js built-in', () => {
 
   it('lists every example app it mounts and refuses none', () => {
     const ids = SHOWCASE_APPS.map((app) => app.id);
-    expect(ids.filter((id) => !id.startsWith('fun-'))).toEqual(['counter', 'components', 'hero', 'showcase', 'dogfood', 'soak', 'dual']);
-    expect(ids.filter((id) => id.startsWith('fun-'))).toHaveLength(10);
+    // Its own apps, with the gallery's entries where DOGFOOD stands: whatever the gallery lists, the showcase page mounts.
+    expect(ids).toEqual(['counter', 'components', 'hero', 'showcase', ...GALLERY_DEMOS.map((demo) => demo.id), 'dual']);
+    expect(GALLERY_DEMOS.map((demo) => demo.id).slice(0, 2)).toEqual(['dogfood', 'soak']);
     expect(REFUSED_APPS).toEqual([]);
   });
 

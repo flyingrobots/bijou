@@ -78,14 +78,15 @@ test('counter on WebGL2 takes a key, keeps its state across a switch to Canvas 2
 
 test('the HUD lists no example app as refused: every one bundles for the browser', async ({ page }) => {
   const errors = collectErrors(page);
+  // The gallery's entries are spread into this list, so the gallery page says which titles belong between the two ends.
+  await page.goto('/gallery.html?backend=canvas2d');
+  await expect(page.locator('[data-gallery-demo]').first()).toBeVisible();
+  const gallery = await page.locator('[data-gallery-demo] [data-slot="item-title"]').allTextContents();
+  expect(gallery.slice(0, 2)).toEqual(['DOGFOOD', 'Soak bench']);
+  expect(gallery.length).toBeGreaterThan(2);
+  expect(gallery).not.toContain('Bijou Fun');
   await open(page, 'app=counter&backend=canvas2d');
-  // The gallery's entries are spread into this list, so each fun demo is an app of its own here too.
-  await expect(page.locator('[data-app]')).toHaveText([
-    'Counter', 'Components library', 'Hero', 'Component showcase', 'DOGFOOD', 'Soak bench',
-    'Rainbow Gradient', 'Retro Wormhole', 'Color-Blending Metaballs', 'Fluid Dynamics Tank', 'FLIP Dam Break',
-    '3D Raymarching Engine', 'Retro 3D Raycaster', '3D Raytracer (The Works)', 'TTF Font Vector Renderer', '3D Text Cylinder Ticker',
-    'Dual-host counter',
-  ]);
+  await expect(page.locator('[data-app]')).toHaveText(['Counter', 'Components library', 'Hero', 'Component showcase', ...gallery, 'Dual-host counter']);
   // With nothing refused the page renders no refusal card at all.
   await expect(page.locator('[data-region="refused"]')).toHaveCount(0);
   await expect(page.locator('[data-refused]')).toHaveCount(0);

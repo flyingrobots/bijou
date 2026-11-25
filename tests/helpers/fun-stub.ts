@@ -3,9 +3,12 @@ import { defineDemo, type DemoEntry } from '../../examples/fun/contract.js';
 import type { CatalogEntry } from '../../examples/fun/registry.js';
 import { cellsOf } from './fun-demos.js';
 
+interface Heard { readonly keys: readonly string[]; readonly pointer: string; readonly pane: string; readonly pulses: number }
+
 /** A demo no catalog holds. It paints what it has heard: row 0 its keys, row 1 its last pointer, row 2 its pane and pulses. */
-export const stubDemo: DemoEntry = defineDemo<{ readonly keys: readonly string[]; readonly pointer: string; readonly pane: string; readonly pulses: number }>({
-  id: 'stub', name: 'Stub Demo', description: 'A demo only the test registers', keys: 'k does nothing',
+export function recordingDemo(id: string, name: string, description: string): DemoEntry {
+  return defineDemo<Heard>({
+  id, name, description, keys: 'k does nothing',
   captures: (state) => state.keys.at(-1) === 'i',
   init: () => ({ keys: [], pointer: 'none', pane: 'unsized', pulses: 0 }),
   update(msg, state) {
@@ -23,7 +26,10 @@ export const stubDemo: DemoEntry = defineDemo<{ readonly keys: readonly string[]
     });
     return surface;
   },
-});
+  });
+}
+
+export const stubDemo: DemoEntry = recordingDemo('stub', 'Stub Demo', 'A demo only the test registers');
 
 /** The stub as a catalog entry, as a new demo would be registered. */
 export const stubCatalogEntry: CatalogEntry = {

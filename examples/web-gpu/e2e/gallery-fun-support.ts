@@ -19,7 +19,7 @@ export async function funCards(page: Page): Promise<string[]> {
 }
 
 /** What the open demo's page holds, read from the live model: its one session, and whether anything lists other demos. */
-export async function solo(page: Page): Promise<{ frame: number; paused: boolean; capturing: boolean; switcher: boolean }> {
+export async function solo(page: Page): Promise<{ frame: number; paused: boolean; capturing: boolean; holdsOtherDemos: boolean }> {
   return page.evaluate(() => {
     const model = window.__bijouWebGpu?.model();
     const session: unknown = typeof model === 'object' && model !== null ? Reflect.get(model, 'session') : undefined;
@@ -29,7 +29,8 @@ export async function solo(page: Page): Promise<{ frame: number; paused: boolean
       frame: typeof frame === 'number' ? frame : -1,
       paused: read('paused') === true,
       capturing: read('capturing') === true,
-      switcher: typeof model === 'object' && model !== null && ('index' in model || 'sessions' in model),
+      // A shell's model holds an index and a list of sessions; a page for one demo holds one session.
+      holdsOtherDemos: typeof model === 'object' && model !== null && ('index' in model || 'sessions' in model),
     };
   });
 }

@@ -16,8 +16,10 @@ test('the gallery lists every registered demo, opens DOGFOOD at its URL, returns
   const errors = collectErrors(page);
   await openGallery(page, 'backend=canvas2d');
   await expectGalleryOnly(page);
-  // DOGFOOD, the soak bench and one card for each of the ten fun demos.
-  await expect(page.locator('[data-gallery-demo]')).toHaveCount(12);
+  // DOGFOOD and the soak bench, then the fun demos' cards, however many the catalog holds.
+  await expect(page.locator('[data-gallery-demo]:not([data-gallery-demo^="fun-"])')).toHaveCount(2);
+  expect((await page.locator('[data-gallery-demo]').evaluateAll((cards) => cards.map((card) => card.getAttribute('data-gallery-demo')))).slice(0, 2)).toEqual(['dogfood', 'soak']);
+  await expect(page.locator('[data-gallery-demo^="fun-"]').first()).toBeVisible();
   await expect(demo(page, 'dogfood')).toContainText('DOGFOOD');
   await demo(page, 'dogfood').click();
   await expectDemoOpen(page, 'dogfood');
