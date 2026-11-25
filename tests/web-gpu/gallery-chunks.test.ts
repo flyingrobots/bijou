@@ -96,6 +96,8 @@ describe('the gallery build', () => {
 
   it('loads no other demo\'s code when a demo is opened, nor when the shared loader of the fun demos is', () => {
     for (const [id, module] of DEMO_MODULES) expect(reaches(module, id), `${id} also loads`).toEqual([]);
+    // The loader must be a build entry, or the walk below would start nowhere and find nothing.
+    expect(manifest[LOADER]?.file, 'the loader is a build entry').toBeTypeOf('string');
     expect(reaches(LOADER), 'the loader loads').toEqual([]);
   });
 

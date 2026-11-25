@@ -33,9 +33,16 @@ bundler gives each demo a chunk of its own. The id, name and description repeat 
 entry in order and asks the host for the font once. It rejects if a module fails to load.
 
 Adding a demo is its module, one entry in `catalog`, and that demo's own recorded frames (digests and a text frame
-under `tests/fixtures/`). The id becomes the address `gallery.html?app=fun-<id>`, so it is lower case letters, digits
-and hyphens. The terminal shell then lists the demo, and the showcase gallery gives it a card and a page. No other
-file changes: the tests of the shell, the gallery and the showcase run on fakes, or read the catalog or the page.
+under `tests/fixtures/`). The id becomes the address `gallery.html?app=fun-<id>`, so it begins with a lower case
+letter and holds only lower case letters, digits and hyphens. The terminal shell then lists the demo, and the showcase
+gallery gives it a card and a page. For a demo that needs no font, no other file changes: the tests of the shell, the
+gallery and the showcase run on fakes, or read the catalog or the page.
+
+A demo that draws the font takes three more edits, because the tests load every other demo with a font port that
+rejects and give the font demos the real font apart: its id joins `FONT_IDS` in `tests/helpers/fun-demos.ts`, its
+factory joins `fontDemos` in `tests/helpers/fun-font.ts`, and its digests go in
+`tests/fixtures/examples-fun-font-goldens.ts`, not in `examples-fun-goldens.ts`. Without them the demo is tested
+painting its missing-font message.
 
 ## Shell
 

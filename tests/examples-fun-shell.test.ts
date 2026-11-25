@@ -68,4 +68,10 @@ describe('the bijou-fun shell', () => {
     expect(rowText(away, PULSES)).toContain('pulses 2');
     expect(rowText(send([key('3'), pulse, pulse, key('1')]), PULSES)).toContain('pulses 0');
   });
+
+  it('keeps each demo state when switching with tab and the arrows, as with the digits', () => {
+    expect(rowText(send([key('3'), pulse, pulse, key('tab'), key('left')]), PULSES)).toContain('pulses 2');
+    expect(rowText(send([key('3'), pulse, pulse, key('left'), key('right')]), PULSES)).toContain('pulses 2');
+    expect(rowText(send([key('3'), pulse, key('k'), key('right'), key('left')]), KEYS)).toContain('keys k');
+  });
 });

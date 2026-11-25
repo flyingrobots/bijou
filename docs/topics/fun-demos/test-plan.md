@@ -32,7 +32,7 @@ pulses of 1/30 s. Origin: flyingrobots/bijou#888.
 | FD-22 | `q` quits. | `asks the runtime to quit on q` | Implemented |
 | FD-23 | The demo fills the screen between the header and footer, and is told that pane. | `draws the demo into the body between the header and the footer, and tells it that pane` | Implemented |
 | FD-24 | Moves in the pane become pointer messages; outside, header, footer and the wheel do not. | `turns mouse moves in the body into pointer messages offset by the header, and moves outside into a leave` | Implemented |
-| FD-25 | Only the demo that is showing is pulsed, and a demo keeps its state across a switch. | `pulses only the demo that is showing, and keeps each demo state when switching away and back` | Implemented |
+| FD-25 | Only the demo that is showing is pulsed, and a demo keeps its state across a switch by digit, tab or arrow. | `pulses only the demo that is showing, and keeps each demo state when switching away and back`, `keeps each demo state when switching with tab and the arrows, as with the digits` | Implemented |
 
 ## Reach: `examples-fun-reach.test.ts`
 

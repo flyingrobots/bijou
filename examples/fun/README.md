@@ -79,6 +79,8 @@ Adding a demo takes three things: a `Demo<S>` in `demos/`, one entry in the cata
 own recorded frames (its digests in `tests/fixtures/examples-fun-goldens.ts` and its text frame under
 `tests/fixtures/examples-fun/frames/`). The shell then lists it and the gallery gives it a card and a page. Nothing in
 the shell, the gallery, the showcase or their tests changes: those tests run on fakes, or read the catalog or the page.
+A demo that draws the font takes three more edits in the test helpers; the
+[reference](../../docs/topics/fun-demos/README.md#catalog) lists them.
 
 See the [reference](../../docs/topics/fun-demos/README.md) for behaviour and its [test plan](../../docs/topics/fun-demos/test-plan.md).
 
