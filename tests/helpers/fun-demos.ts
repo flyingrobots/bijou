@@ -3,6 +3,7 @@ import { createTestContext, type TestContext } from '@flyingrobots/bijou/adapter
 import type { Cell, Surface } from '@flyingrobots/bijou';
 import type { DemoEntry, DemoMsg, Session } from '../../examples/fun/contract.js';
 import { demos } from '../../examples/fun/registry.js';
+import { fluidScript } from './fun-fluid.js';
 
 export const SEED = 1888;
 export const DT = 1 / 30;
@@ -53,6 +54,8 @@ export function byId(id: string): DemoEntry {
 
 /** The messages the recorded frames are made from: 30 pulses, the demo's own input, 30 more pulses. */
 export function frameScript(id: string, width: number, height: number): DemoMsg[] {
+  const own = fluidScript(id, { width, height });
+  if (own !== undefined) return own;
   const middle: DemoMsg[] = id === 'wormhole'
     ? [{ type: 'key', key: 'm' }]
     : id === 'metaballs' ? [{ type: 'pointer', col: Math.floor(width / 3), row: Math.floor(height / 2) }] : [];

@@ -40,8 +40,42 @@ async function expectInk(page: Page, readable: boolean, atLeast: number, previou
   return nextFrame(page, previous);
 }
 
-// The font demos come last in the shell, so `left` from the first demo wraps to the last one.
-const FONT_DEMOS = [{ id: 'font-renderer', lefts: 2 }, { id: 'text-cylinder', lefts: 1 }] as const;
+/** Whether the active session is taking text: only the font demos ever do. */
+async function capturing(page: Page): Promise<boolean> {
+  return page.evaluate(() => {
+    const model = window.__bijouWebGpu?.model();
+    const sessions: unknown = typeof model === 'object' && model !== null ? Reflect.get(model, 'sessions') : undefined;
+    const index: unknown = typeof model === 'object' && model !== null ? Reflect.get(model, 'index') : undefined;
+    const session: unknown = Array.isArray(sessions) && typeof index === 'number' ? sessions[index] : undefined;
+    return typeof session === 'object' && session !== null && Reflect.get(session, 'capturing') === true;
+  });
+}
+
+/**
+ * Where the font demos are, read from the running shell: step through every demo, press `i`, and note the ones that
+ * then take text. The page is the only source, so the test names no module of the demos.
+ */
+async function fontPlaces(page: Page, count: number): Promise<number[]> {
+  const places: number[] = [];
+  for (let at = 0; at < count; at += 1) {
+    await expect.poll(() => activeIndex(page)).toBe(at);
+    await page.keyboard.press('i');
+    if (await capturing(page)) {
+      places.push(at);
+      await page.keyboard.press('Escape');
+    }
+    if (at < count - 1) await page.keyboard.press('ArrowRight');
+  }
+  return places;
+}
+
+/** Walk right, wrapping, until the shell shows the demo at `target`. */
+async function walkTo(page: Page, target: number, count: number): Promise<void> {
+  for (let step = 0; step < count && (await activeIndex(page)) !== target; step += 1) await page.keyboard.press('ArrowRight');
+  await expect.poll(() => activeIndex(page)).toBe(target);
+}
+
+const FONT_DEMOS = [{ id: 'font-renderer', nth: 0 }, { id: 'text-cylinder', nth: 1 }] as const;
 
 for (const backend of BACKENDS) {
   for (const demo of FONT_DEMOS) {
@@ -53,8 +87,10 @@ for (const backend of BACKENDS) {
       await expectDemoOpen(page, 'fun');
       await focusSurface(page);
       const count = await sessionCount(page);
-      for (let left = 0; left < demo.lefts; left += 1) await page.keyboard.press('ArrowLeft');
-      await expect.poll(() => activeIndex(page)).toBe(count - demo.lefts);
+      const places = await fontPlaces(page, count);
+      expect(places).toHaveLength(FONT_DEMOS.length);
+      const place = places[demo.nth] ?? -1;
+      await walkTo(page, place, count);
       // Hide the HUD card, so that colour in the pane can only be the font's outlines.
       await page.keyboard.press('h');
       const readable = backend === 'canvas2d';
@@ -65,7 +101,7 @@ for (const backend of BACKENDS) {
       await page.keyboard.press('2');
       await page.keyboard.press('q');
       await page.keyboard.press('w');
-      expect(await activeIndex(page)).toBe(count - demo.lefts);
+      expect(await activeIndex(page)).toBe(place);
       await expectInk(page, readable, 1, frame);
       await page.keyboard.press('Escape');
       await page.keyboard.press('1');

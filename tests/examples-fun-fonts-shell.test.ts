@@ -7,7 +7,8 @@ import { demosWithFonts } from '../examples/fun/registry.js';
 import { SEED, cellsOf, funContext } from './helpers/fun-demos.js';
 import { face } from './helpers/fun-font.js';
 
-const ctx = funContext(100, 30);
+// Wide enough for the header to name every demo, the font demos last.
+const ctx = funContext(260, 30);
 const keyMsg = (name: string, extra: Partial<KeyMsg> = {}): KeyMsg => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false, ...extra });
 
 function rowText(surface: Surface, row: number): string {

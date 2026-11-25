@@ -1,14 +1,18 @@
 # bijou-fun demos
 
-Reference for `examples/fun/`: the demo contract, the shell, and the five demos that exist today. Origin:
-flyingrobots/bijou#888 and, for the two font demos, flyingrobots/bijou#891.
+Reference for `examples/fun/`: the demo contract, the shell, and the demos the registry lists. Origin:
+flyingrobots/bijou#888, for the two font demos flyingrobots/bijou#891, and for the two fluid demos
+flyingrobots/bijou#889.
 
 ## Contract
 
 A demo is a `Demo<S>` (`examples/fun/contract.ts`): `init(seed)`, `update(msg, state)` and `view(state, frame)`, where
 `view` returns a Surface. `defineDemo` turns it into a `DemoEntry`; `entry.mount(seed)` starts an immutable `Session`.
 
-- Messages are `key`, `pointer` (column and row in the demo's own cells), `pointer-leave` and `pulse` (`dt` seconds).
+- Messages are `key`, `pointer` (column and row in the demo's own cells), `pointer-leave`, `pulse` (`dt` seconds) and
+  `resize` (`width` and `height`, the pane in cells). The shell sends `resize` to every demo before the first pulse and
+  again whenever the screen changes, so a demo that sizes a simulation from the pane keeps the size in its state; the
+  others ignore it. A host that mounts a session itself sends the size the same way.
 - A frame is the pane `width` and `height`, the `frame` count, the `elapsed` seconds and the context. The session
   advances `frame` and `elapsed` on each pulse that it forwards.
 - `space` pauses and resumes any demo. While paused, pulses are dropped; keys and the pointer still reach the demo.
@@ -32,8 +36,29 @@ Other mouse actions are dropped.
 | `rainbow-gradient` | none | `space` |
 | `wormhole` | 45 seeded particles and the render mode | `m` toggles braille and ascii |
 | `metaballs` | five blobs bouncing in the unit square, and the pointer | pointer steers a sixth blob |
+| `fluid` | up to 1,500 seeded particles in a fixed tank, the source side, the pour, a pending shake | `p` pour, `t` source side, `z` `x` `c` shake, `r` reset, `h` card |
+| `flip-fluid` | a FLIP fluid (grid and up to 8,000 particles) in the same tank, and the obstacle | the fluid keys, and `w` `a` `s` `d` or `up` `down` move the obstacle |
 | `font-renderer` | the message, whether it is taking text, whether the HUD shows | `i` types, `r` clears, `h` hides the HUD |
 | `text-cylinder` | the same | the same; the message's words become four rolling lines |
+
+### The fluid demos
+
+Both keep their whole simulation in their state and replace it on every pulse, so a session never changes under another
+(`FlipFluid.clone()` copies the grid and particles before a step). A pulse is one fixed step whatever its `dt`.
+Pouring takes randomness from the seed (`random.ts`) in the state. State after N steps is a pure function of the seed,
+the messages and the sizes.
+
+The tank is the pane: a `resize` sets its width and height (never under 8 by 6), and an 80 by 22 tank stands in until
+the first one arrives. As in the original, the particle fluid keeps its particles on a resize, since its walls only move
+and the next step holds the particles inside them; the dam break starts again at the new size, as the original
+rebuilt its grid whenever the pane no longer matched it, keeping the source side, the obstacle's position and the card.
+A `view` painted in a pane of another size than the tank centres or crops it and never changes the state. The dam
+break's buffer holds 8,000 particles, so a very large pane starts with fewer than a full block of water.
+
+`p` pours for the next five pulses, so holding it, as key repeat does, keeps pouring. A shake waits for the next
+pulse. The shell takes the digits and the left and right arrows, so the shake keys are `z`, `x`, `c` and the obstacle
+moves with `w a s d` and `up` `down`; the particle cap of 1,500, the five-pulse pour and these keys are choices of the
+port. Space pauses; the footer shows it.
 
 ## The font demos
 

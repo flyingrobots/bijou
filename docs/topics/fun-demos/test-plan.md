@@ -88,3 +88,28 @@ Origin: flyingrobots/bijou#891. The frame digests are in `tests/fixtures/example
 | FD-72 | `opentype.js` is an exactly pinned root development dependency and in no published package's manifest. | `is a development dependency of the repository, pinned exactly, and of no published package` | Implemented |
 | FD-73 | The font is read by a path from the reading module, never from the working directory, and no demo reads a file. | `reads the font by a path from its own module, never by one relative to the working directory` | Implemented |
 | FD-74 | In a real browser each font demo draws text from the fetched font, takes typing and leaves the console clean. | `on <backend> the <id> demo draws its text from the fetched font, takes typing, and the console stays clean` (`examples/web-gpu/e2e/gallery-fun-fonts.e2e.ts`) | Implemented |
+
+## Fluid demos: `examples-fun-fluid.test.ts`, `examples-fun-fluid-edges.test.ts`, `examples-fun-resize.test.ts`
+
+The state hash is sha256 of the particle positions and velocities (the FLIP demo adds its grid velocities) after 300
+pulses from seed 1888: 60 pulses with a pour key each, a shake, and 240 more. Origin: flyingrobots/bijou#889.
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-80 | Both fluid demos are registered, with their names. | `the registry lists both fluid demos after the first three` | Implemented |
+| FD-81 | From a fixed seed and a scripted input the state after 300 steps has the recorded hash, on every run. | `<id> reaches the recorded state hash after 300 steps, and the same one on every run` | Implemented |
+| FD-82 | Two instances share no state. | `<id> gives two instances no shared state` | Implemented |
+| FD-83 | The step is fixed: the pulse `dt` changes nothing. | `<id> ignores the pulse dt: the step is fixed` | Implemented |
+| FD-84 | The seed drives the randomness; the same inputs give the same state. | `<id> reads its randomness from the seed`, `<id> follows a seeded input list to the same state twice` | Implemented |
+| FD-85 | `r` returns the fluid to its start. | `<id> resets to its start on r` | Implemented |
+| FD-86 | `p` pours from the side `t` picks; `w a s d` move the dam break's obstacle. | `pouring adds fluid, from the side that t picks`, `the dam break pours and moves its obstacle` | Implemented |
+| FD-87 | A paused session keeps its fluid and takes keys. | `a session paused by space keeps its fluid and still takes keys` | Implemented |
+| FD-90 | Zero particles stay finite and paint. | `the particle fluid starts empty, paints, and steps with nothing to move`, `a dam break with zero particles stays finite and paints` | Implemented |
+| FD-91 | A shake on the first pulse is safe. | `shaking an empty tank does nothing`, `shaking the dam break on its first pulse gives finite positions that differ from the unshaken run` | Implemented |
+| FD-92 | A pane resized mid-run paints at every size and leaves the fluid as it was. | `<id> paints every size and keeps its fluid as it was` | Implemented |
+| FD-93 | A long pour stops at the particle cap. | `stops the particle fluid at its cap`, `stops the dam break at its buffer` | Implemented |
+| FD-94 | 5,000 steps of seeded input keep positions finite and the particle count bounded (the dam break in a 24 by 8 tank, to stay quick). | `the particle fluid keeps finite positions and a bounded particle count`, `the dam break keeps finite positions and a bounded particle count` | Implemented |
+
+The recorded frames are made after a `resize` to the frame's size. The fluid demos also fall under FD-02 (digests at 80x24 and 177x53), FD-03, FD-10, FD-11 and FD-14, and their 80x24
+text frames are `tests/fixtures/examples-fun/frames/fluid-80x24.txt` and `flip-fluid-80x24.txt`.
+
