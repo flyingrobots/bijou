@@ -29,6 +29,14 @@ describe('sealed runner scripts and the lock tool', () => {
     expect(offenders.map((path) => path.slice(scripts.length))).toEqual([]);
   });
 
+  it('invokes git-locks from no CI workflow or action', () => {
+    const github = fileURLToPath(new URL('../../.github', import.meta.url));
+    const files = sources(github).filter((path) => /\.ya?ml$/u.test(path));
+    expect(files.length).toBeGreaterThan(0);
+    const offenders = files.filter((path) => invocation.test(readFileSync(path, 'utf8')));
+    expect(offenders.map((path) => path.slice(github.length))).toEqual([]);
+  });
+
   it('recognises an invocation when it sees one', () => {
     expect(invocation.test(`spawnSync('git', ['${word}', 'with'])`)).toBe(true);
     expect(invocation.test(`git ${word} with --job x`)).toBe(true);

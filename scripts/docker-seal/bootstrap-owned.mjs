@@ -1,7 +1,8 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { LIMITS, MARKER, imageName } from './constants.mjs';
+import { LIMITS, imageName } from './constants.mjs';
+import { writeToolchainContext } from './toolchain-context.mjs';
 import { nodeImages } from './toolchains.mjs';
 import { execute, requireFree } from './process.mjs';
 import { startWorker, stopWorker } from './worker.mjs';
@@ -59,8 +60,7 @@ try {
     limits: 'no RUN, no pull, 1 KiB context files, 16 MiB output, bounded read-only probe',
     probe, lockKeys: [] };
   console.log(JSON.stringify(evidence));
-  writeFileSync(join(context, 'Dockerfile'), `FROM ${base}\nCOPY marker /etc/bijou-test-seal\nUSER 1000:1000\nWORKDIR /work/source\nENV HOME=/home/test TMPDIR=/tmp LANG=C.UTF-8 GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null\nCMD ["sleep", "infinity"]\n`);
-  writeFileSync(join(context, 'marker'), MARKER);
+  writeToolchainContext(context, base);
   await execute(['docker', 'build', '--pull=false', '--network=none', '--tag', imageName(version), context], {
     timeout: 120_000, signal: controller.signal, onData: (chunk) => process.stdout.write(chunk),
     monitor: async () => {
