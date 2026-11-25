@@ -75,8 +75,10 @@ change can be compared; nothing gates on them.
 | `raycaster` | 8.6 ms | 8.2 ms | 12.4 ms |
 | `raytracer` | 76.6 ms | 75.3 ms | 89.4 ms |
 
-Adding a demo is a `Demo<S>` in `demos/` and one entry in the catalog in `registry.ts`. The shell then lists it and the
-gallery gives it a card and a page, with no other change.
+Adding a demo takes three things: a `Demo<S>` in `demos/`, one entry in the catalog in `registry.ts`, and that demo's
+own recorded frames (its digests in `tests/fixtures/examples-fun-goldens.ts` and its text frame under
+`tests/fixtures/examples-fun/frames/`). The shell then lists it and the gallery gives it a card and a page. Nothing in
+the shell, the gallery, the showcase or their tests changes: those tests run on fakes, or read the catalog or the page.
 
 See the [reference](../../docs/topics/fun-demos/README.md) for behaviour and its [test plan](../../docs/topics/fun-demos/test-plan.md).
 

@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- The tests of the fun shell, the gallery entries and the browser entry run on a fixture catalog of fakes
+  (`tests/helpers/fun-fixture.ts`), and no test holds the number, the list or the order of the real fun demos; the
+  browser tests read the cards from the page. Adding a demo is now its module, one catalog entry and its own recorded
+  frames, as `examples/fun/README.md` says. The build test finds each demo's code by the chunk that holds its module,
+  so it fails when a demo, or the fun demos' loader, loads another demo's code. Tests and docs only; no behaviour
+  changes. Origin: flyingrobots/bijou#920, from the review of flyingrobots/bijou#919.
+
 - The showcase gallery gives each bijou-fun demo a card and a page of its own, at `gallery.html?app=fun-<id>`, where
   it runs alone with one row for its keys and no demo switcher. The single "Bijou Fun" entry is gone, and its address,
   `?app=fun`, now opens the gallery. `examples/fun/registry.ts` is a catalog: each entry has a demo's id, name and

@@ -32,8 +32,10 @@ bundler gives each demo a chunk of its own. The id, name and description repeat 
 `host` is `{ font }`, the font port. Only the two font demos use it. `loadDemos(host, entries = catalog)` loads every
 entry in order and asks the host for the font once. It rejects if a module fails to load.
 
-Adding a demo is one entry in `catalog`. The terminal shell then lists it, and the showcase gallery gives it a card
-and a page.
+Adding a demo is its module, one entry in `catalog`, and that demo's own recorded frames (digests and a text frame
+under `tests/fixtures/`). The id becomes the address `gallery.html?app=fun-<id>`, so it is lower case letters, digits
+and hyphens. The terminal shell then lists the demo, and the showcase gallery gives it a card and a page. No other
+file changes: the tests of the shell, the gallery and the showcase run on fakes, or read the catalog or the page.
 
 ## Shell
 

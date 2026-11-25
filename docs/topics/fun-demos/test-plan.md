@@ -8,7 +8,7 @@ pulses of 1/30 s. Origin: flyingrobots/bijou#888.
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| FD-01 | The registry lists the three demos in order. | `the registry lists the three ported demos in order` | Implemented |
+| FD-01 | The registry lists the three demos ported first. | `the registry lists the three demos ported first` | Implemented |
 | FD-02 | Each demo's frames at 80x24 and 177x53 match the recorded digests. | `<id> paints its recorded frames at 80x24`, `<id> paints its recorded frames at 177x53` | Implemented |
 | FD-03 | The same seed and messages give the same frame. | `<id> repeats itself: the same seed and messages give the same frame` | Implemented |
 | FD-04 | The wormhole particles depend on the seed. | `the wormhole particles depend on the seed` | Implemented |
@@ -27,12 +27,12 @@ pulses of 1/30 s. Origin: flyingrobots/bijou#888.
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| FD-20 | The header lists every demo; the footer describes the active one. | `lists every demo in the header and starts on the first` | Implemented |
-| FD-21 | Tab, the arrows and digits switch and wrap. | `switches demos with tab, shift-less arrows and digits, and wraps` | Implemented |
+| FD-20 | The header lists every demo; the footer describes the active one. Run on fakes, as are FD-21 to FD-25. | `lists every demo in the header and starts on the first` | Implemented |
+| FD-21 | Tab, the arrows and digits switch and wrap; a digit past the last demo goes to the demo. | `switches demos with tab, shift-less arrows and digits, and wraps` | Implemented |
 | FD-22 | `q` quits. | `asks the runtime to quit on q` | Implemented |
-| FD-23 | The demo fills the screen between the header and footer. | `draws the demo into the body between the header and the footer` | Implemented |
+| FD-23 | The demo fills the screen between the header and footer, and is told that pane. | `draws the demo into the body between the header and the footer, and tells it that pane` | Implemented |
 | FD-24 | Moves in the pane become pointer messages; outside, header, footer and the wheel do not. | `turns mouse moves in the body into pointer messages offset by the header, and moves outside into a leave` | Implemented |
-| FD-25 | A demo keeps its state across a switch. | `keeps each demo state when switching away and back` | Implemented |
+| FD-25 | Only the demo that is showing is pulsed, and a demo keeps its state across a switch. | `pulses only the demo that is showing, and keeps each demo state when switching away and back` | Implemented |
 
 ## Reach: `examples-fun-reach.test.ts`
 
@@ -56,7 +56,7 @@ Origin: flyingrobots/bijou#891. The frame digests are in `tests/fixtures/example
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| FD-40 | The registry lists the two font demos after the demos that need no font. | `the registry lists both after the demos that need no font` | Implemented |
+| FD-40 | The catalog lists the two font demos. | `the catalog lists both font demos` | Implemented |
 | FD-41 | Each font demo's frames at 80x24 and 177x53 match the recorded digests. | `<id> paints its recorded frames at 80x24`, `<id> paints its recorded frames at 177x53` | Implemented |
 | FD-42 | Each font demo has a readable 80x24 text frame. | `<id> at 80x24 matches tests/fixtures/examples-fun/frames/<id>-80x24.txt` | Implemented |
 | FD-43 | The same seed and messages give the same frame. | `<id> repeats itself: the same seed and messages give the same frame` | Implemented |
@@ -141,13 +141,24 @@ Origin: flyingrobots/bijou#902.
 
 | ID | Requirement | Test | Status |
 | --- | --- | --- | --- |
-| FD-120 | The catalog lists the ten demos in order, each with an id that reads in an address, a name and a one-line description. | `lists the ten demos in order, each with an id that reads in an address, a name and a one-line description` | Implemented |
+| FD-120 | Every catalog entry has an id that is its own and reads in an address, a name and a one-line description. No test holds the number, the list or the order of the real demos. | `gives every demo an id that is its own and reads in an address, a name and a one-line description` | Implemented |
 | FD-121 | A catalog entry's id, name and description equal the loaded demo's. | `says of each demo what the loaded demo says of itself` | Implemented |
 | FD-122 | The catalog imports no demo module statically, and each entry imports a module of its own. | `imports no demo module statically, so each loads only when its entry is asked for` | Implemented |
 | FD-123 | `loadDemos` loads the entries it is given in order, a new entry included. | `loads the entries it is given, in their order, a new one included` | Implemented |
 | FD-124 | `loadDemos` asks the host for the font once. | `asks the host for the font once, however many demos draw it` | Implemented |
-| FD-125 | `loadDemos` rejects when a module fails to load. | `rejects when a demo module fails to load, naming nothing else as loaded` | Implemented |
+| FD-125 | `loadDemos` rejects when a module fails to load. | `rejects when a demo module fails to load` | Implemented |
 | FD-126 | With a font port that rejects, every demo still loads and the font demos show a message. | `shows the message in the font demos only, and the other demos still run` (`examples-fun-fonts-shell.test.ts`) | Implemented |
+
+## The browser entry: `examples-fun-browser.test.ts`
+
+Origin: flyingrobots/bijou#920. Run on a fixture catalog of fakes (`tests/helpers/fun-fixture.ts`) that record their load, their host and their seed.
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-127 | `loadSolo` loads the entry it is given and no other. | `loads the entry it is given, and no other` | Implemented |
+| FD-128 | The demo is mounted with the seed the page chose. | `mounts the demo with the seed the page chose` | Implemented |
+| FD-129 | The demo is handed the font port `loadSolo` was given. | `hands the demo the font port it was given` | Implemented |
+| FD-140 | `loadSolo` rejects when the demo module fails to load. | `rejects when the demo module fails to load` | Implemented |
 
 ## One demo alone: `examples-fun-solo.test.ts`
 

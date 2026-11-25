@@ -217,7 +217,8 @@ the demo while the Surface has focus. The page picks the seed, since demos never
 
 `gallery.html?app=fun` was the address of one entry that held every fun demo in a shell. That entry is gone. The
 address now becomes the gallery's own (`retiredHref` and `redirect` in `src/gallery/route.ts`), with no message, and
-the replaced address leaves no visit in the history.
+the replaced address leaves no visit in the history. The showcase page has no such redirect: `index.html?app=fun`
+mounts nothing.
 
 The canvas mount delivers pointer movement with no button held (`pointermove` becomes a `move` mouse message), in
 cells of the canvas's CSS box, so a scaled display lands on the right cell. It does not deliver a pointer leaving the
