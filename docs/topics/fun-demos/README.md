@@ -1,7 +1,7 @@
 # bijou-fun demos
 
-Reference for `examples/fun/`: the demo contract, the shell, and the three demos that exist today. Origin:
-flyingrobots/bijou#888.
+Reference for `examples/fun/`: the demo contract, the shell, and the demos that exist today. Origin:
+flyingrobots/bijou#888, and flyingrobots/bijou#890 for the 3D demos.
 
 ## Contract
 
@@ -30,6 +30,16 @@ Other mouse actions are dropped.
 | `rainbow-gradient` | none | `space` |
 | `wormhole` | 45 seeded particles and the render mode | `m` toggles braille and ascii |
 | `metaballs` | five blobs bouncing in the unit square, and the pointer | pointer steers a sixth blob |
+| `raymarcher` | the light's place in the unit square | `w` `a` `s` `d` (or `up` and `down`) move the light |
+| `raycaster` | the player, nine sprites, health, score, flash and shot counters, a pulse count | `w` `s` walk, `a` `d` turn, `f` or `p` shoot, `r` restarts |
+| `raytracer` | the seed, the camera distance (1.5 to 10) and the pointer | pointer tilts the camera, `+` and `-` zoom |
+
+Every 3D demo also answers `h`, which hides its heads-up panel. The raycaster's walking, its wall collision
+(`canMoveTo`), the monsters and the shooting run in its own `update`, so they hold with no frame painted. The
+raytracer draws lens jitter and soft-shadow samples from `random.ts`, seeded by the model's seed, the sub-pixel and
+the frame; a frame is a pure function of the model. A paused session drops pulses, so the monsters and the
+animation stop but a key still walks the player. The wheel is not a demo message, so the raytracer zooms on keys.
+Frame cost at 177 by 53 is in [`examples/fun/README.md`](../../../examples/fun/README.md).
 
 ## In the browser
 

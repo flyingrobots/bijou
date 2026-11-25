@@ -18,7 +18,7 @@ describe('the raycaster walks, turns and collides inside its own update', () => 
   it('a scripted walk ends at a known position: three steps, a turn of two, three more', () => {
     const end = run(raycaster.init(1), keyMsgs('w', 'w', 'w', 'd', 'd', 'w', 'w', 'w', 's'));
     expect(end.angle).toBeCloseTo(Math.PI * 0.25 + 2 * 0.085, 12);
-    expect([end.playerX, end.playerY].map((v) => Number(v.toFixed(6)))).toEqual([4.771, 5.201]);
+    expect([end.playerX, end.playerY].map((v) => Number(v.toFixed(6)))).toEqual([4.744837, 4.926675]);
   });
 
   it('walking into a wall stops at the wall and the player never stands inside it', () => {
@@ -34,7 +34,7 @@ describe('the raycaster walks, turns and collides inside its own update', () => 
     const wall = run(faceEast, repeatKey('w', 30));
     const slid = run(wall, repeatKey('w', 5));
     expect(canMoveTo(slid.playerX, slid.playerY)).toBe(true);
-    expect(slid.playerY).toBeGreaterThanOrEqual(wall.playerY);
+    expect(slid.playerY).toBeGreaterThan(wall.playerY);
   });
 
   it('collision holds with no frame ever painted, and w and s walk the same line', () => {

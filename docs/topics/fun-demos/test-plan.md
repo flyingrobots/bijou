@@ -48,3 +48,26 @@ pulses of 1/30 s. Origin: flyingrobots/bijou#888.
 | --- | --- | --- | --- |
 | FD-33 | `funBuild` builds the shell from the registry or from the entries it is given. | `shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu` | Implemented |
 | FD-34 | A demo that throws in `view` is painted as a failure; header, footer and other demos work. | `paints the failure in the pane and keeps the header and footer`, `lets the reader switch to a demo that works` | Implemented |
+
+## 3D demos: `examples-fun-3d.test.ts`, `examples-fun-raycaster.test.ts`
+
+Origin: flyingrobots/bijou#890. The frame digests of the raymarcher, the raycaster and the raytracer are in the same fixture, and their 80x24 text frames are `tests/fixtures/examples-fun/frames/<id>-80x24.txt` (FD-02 and the frames test cover them).
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| FD-40 | The registry lists the three 3D demos. | `the registry lists the raymarcher, the raycaster and the raytracer` | Implemented |
+| FD-41 | A one-row pane paints at several widths. | `<id> paints a one-row pane at several widths` | Implemented |
+| FD-42 | A frame is a pure function of the model: painting twice gives the same cells. | `<id> paints the same frame twice from the same state` | Implemented |
+| FD-43 | `h` hides the heads-up panel and a second `h` restores it. | `<id> h hides the heads-up panel and a second h brings it back` | Implemented |
+| FD-44 | The raymarcher light follows `w`, `s`, `a`, `d` and stops at the edge of the unit square. | `the raymarcher light follows w, s, a and d and stops at the edge of the unit square`, `the raymarcher paints a different frame once the light has moved` | Implemented |
+| FD-45 | The raytracer camera distance stops at 1.5 and 10, on keys. | `the raytracer camera distance stops at both limits, on keys` | Implemented |
+| FD-46 | The raytracer's dithering depends on the seed and on nothing else. | `the raytracer dithering depends on the seed and on nothing else` | Implemented |
+| FD-47 | The raytracer tilts with the pointer and keeps the tilt on leave. | `the raytracer tilts with the pointer and keeps the tilt when the pointer leaves` | Implemented |
+| FD-50 | The raycaster starts where the original did. | `starts at 3.5, 3.5 facing a quarter pi with full health` | Implemented |
+| FD-51 | A scripted walk ends at a known position. | `a scripted walk ends at a known position: three steps, a turn of two, three more` | Implemented |
+| FD-52 | Walking into a wall stops at the wall; walking along one slides. | `walking into a wall stops at the wall and the player never stands inside it`, `walking along a wall slides instead of stopping dead` | Implemented |
+| FD-53 | Collision lives in `update`: it holds with no frame painted. | `collision holds with no frame ever painted, and w and s walk the same line` | Implemented |
+| FD-54 | A seeded walk of 2,000 steps never enters a wall. | `a seeded walk of 2,000 steps never enters a wall and never leaves the map` | Implemented |
+| FD-55 | A shot in the firing cone kills a monster in two hits; a shot at nothing hurts nobody; `r` restarts. | `shoots a monster in the firing cone dead in two shots and scores 150`, `a shot at nothing hurts nobody, and r restarts the level` | Implemented |
+| FD-56 | Treasure scores 250; a touching monster bites. | `collects treasure for 250 points and takes damage from a monster that touches the player` | Implemented |
+

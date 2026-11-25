@@ -120,6 +120,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   not wired into CI, hooks or any gate, and no baseline or verdict changed
   (#369).
 
+- The fun demos gain the raymarcher, the raycaster game and the raytracer, ported from the owner's bijou-fun
+  project to the demo contract (`examples/fun/demos/`) and registered in `examples/fun/registry.ts`, so the browser
+  gallery lists them with no change under `examples/web-gpu`. The raycaster owns its player, movement, wall
+  collision, monsters and shooting in its own `update`; the raytracer owns its camera distance and pointer tilt, and
+  draws its lens jitter and soft-shadow samples from the seeded generator, so a frame is a pure function of the
+  model. The shell has no scroll-wheel message, so the raytracer zooms on `+` and `-`. Frame digests, text frames and
+  the raycaster's walking, collision and shooting are held by `tests/examples-fun-3d.test.ts` and
+  `tests/examples-fun-raycaster.test.ts`; each demo's frame cost at 177 by 53 is in `examples/fun/README.md`.
+
 ### Fixed
 
 - The sealed runner's local launchers (`scripts/docker-seal/run.mjs` and

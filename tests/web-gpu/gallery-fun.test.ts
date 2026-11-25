@@ -49,15 +49,16 @@ describe('the gallery entry for the fun shell', () => {
   it('loads the shell on demand, and its header lists every demo of the fun registry', async () => {
     const built = await GALLERY_DEMOS.find((demo) => demo.id === 'fun')?.load();
     if (built === undefined) throw new Error('the gallery has no fun entry');
-    const header = rowText(frameOf(built.build(ctx), []), 0);
+    const header = rowText(frameOf(built.build(funContext(400, 30)), []), 0);
     for (const entry of demos) expect(header).toContain(entry.name);
   });
 
   it('shows a demo registered in the fun registry, reached by key and pointer, with no change under examples/web-gpu', () => {
     const app = funBuild(1888, [...demos, stub]).build(ctx);
-    expect(rowText(frameOf(app, []), 0)).toContain('Stub Demo');
-    expect(rowText(frameOf(app, [key('4')]), 29)).toContain('A demo only the test registers');
-    expect(rowText(frameOf(app, [key('4'), move(5, 3), move(6, 3)]), 1)).toContain('moves 2');
+    const toStub = Array.from({ length: demos.length }, () => key('tab'));
+    expect(rowText(frameOf(funBuild(1888, [...demos, stub]).build(funContext(400, 30)), []), 0)).toContain('Stub Demo');
+    expect(rowText(frameOf(app, toStub), 29)).toContain('A demo only the test registers');
+    expect(rowText(frameOf(app, [...toStub, move(5, 3), move(6, 3)]), 1)).toContain('moves 2');
   });
 
   it('names no fun demo anywhere in the showcase source', () => {

@@ -7,6 +7,7 @@ import { SEED, cellsOf, digest, funContext } from './helpers/fun-demos.js';
 
 const ctx = funContext(100, 30);
 const app = createFunApp({ ctx, entries: demos, seed: SEED });
+const wide = createFunApp({ ctx: funContext(400, 30), entries: demos, seed: SEED });
 const key = (name: string): KeyMsg => ({ type: 'key', key: name, ctrl: false, alt: false, shift: false });
 const mouse = (col: number, row: number, action: MouseMsg['action'] = 'move'): MouseMsg =>
   ({ type: 'mouse', button: 'none', action, col, row, shift: false, alt: false, ctrl: false });
@@ -27,8 +28,11 @@ function rowText(surface: Surface, row: number): string {
 
 describe('the bijou-fun shell', () => {
   it('lists every demo in the header and starts on the first', () => {
-    const header = rowText(send([]), 0);
-    for (const entry of demos) expect(header).toContain(entry.name);
+    // The header is one row: with six or more demos it needs a wide pane to list every name.
+    const [model] = wide.init();
+    const view = wide.view(model);
+    if (!('cells' in view)) throw new Error('the shell must return a Surface');
+    for (const entry of demos) expect(rowText(view, 0)).toContain(entry.name);
     expect(rowText(send([]), 29)).toContain(demos[0]?.description ?? 'missing');
   });
 
@@ -36,8 +40,8 @@ describe('the bijou-fun shell', () => {
     const second = rowText(send([key('tab')]), 29);
     expect(second).toContain(demos[1]?.description ?? 'missing');
     expect(rowText(send([key('3')]), 29)).toContain(demos[2]?.description ?? 'missing');
-    expect(rowText(send([key('left')]), 29)).toContain(demos[2]?.description ?? 'missing');
-    expect(rowText(send([key('3'), key('right')]), 29)).toContain(demos[0]?.description ?? 'missing');
+    expect(rowText(send([key('left')]), 29)).toContain(demos.at(-1)?.description ?? 'missing');
+    expect(rowText(send([key('left'), key('right')]), 29)).toContain(demos[0]?.description ?? 'missing');
   });
 
   it('asks the runtime to quit on q', () => {
