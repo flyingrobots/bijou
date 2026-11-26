@@ -1,9 +1,13 @@
 /**
  * Grapheme cluster utilities for correct Unicode text measurement.
  *
- * Uses `Intl.Segmenter` for proper grapheme cluster iteration and a compact
- * lookup for East Asian Wide / emoji display widths.
+ * Uses `Intl.Segmenter` for proper grapheme cluster iteration and a table
+ * generated from UAX #11 East_Asian_Width for display widths.
  */
+import {
+  EAST_ASIAN_HALFWIDTH_RANGES,
+  EAST_ASIAN_WIDE_RANGES,
+} from './generated/east-asian-wide.js';
 
 // ---------------------------------------------------------------------------
 // Segmenter (lazy singleton)
@@ -27,71 +31,46 @@ export function segmenter(): Intl.Segmenter {
 /**
  * Determine whether a Unicode code point occupies two terminal columns.
  *
- * Covers:
- * - CJK Unified Ideographs (U+4E00–U+9FFF)
- * - CJK Extension A (U+3400–U+4DBF)
- * - CJK Extension B–I (U+20000–U+3FFFF)
- * - CJK Compatibility Ideographs (U+F900–U+FAFF)
- * - Fullwidth Forms (U+FF01–U+FF60, U+FFE0–U+FFE6)
- * - CJK Radicals / Kangxi (U+2E80–U+2FDF)
- * - CJK Symbols and Punctuation (U+3000–U+303F)
- * - Enclosed CJK Letters (U+3200–U+33FF)
- * - CJK Compatibility (U+FE30–U+FE4F)
- * - Hangul Syllables (U+AC00–U+D7A3)
- * - Emoji (most U+1F000+)
+ * A code point is wide when its UAX #11 East_Asian_Width is W (Wide) or
+ * F (Fullwidth), from the table generated from the Unicode Character Database
+ * (`EAST_ASIAN_WIDE_UNICODE_VERSION`; regenerate with
+ * `npm run unicode:wide-table`). East Asian Ambiguous (A) is narrow by policy.
+ * The Hangul leading consonant jamo U+1100–U+115F and U+A960–U+A97C are W, so
+ * a syllable written as conjoining jamo takes the two cells of its leading
+ * jamo; vowel and final jamo are N.
+ *
+ * One addition is Bijou policy, not UAX #11: the regional indicators
+ * U+1F1E6..U+1F1FF are N in the UCD but wide here, so a flag (a pair of
+ * them) measures two cells.
  *
  * @param cp - Unicode code point to test.
  * @returns `true` if the code point renders as two columns wide.
  */
 export function isWideChar(cp: number): boolean {
-  // Fullwidth Forms
-  if (cp >= 0xff01 && cp <= 0xff60) return true;
-  if (cp >= 0xffe0 && cp <= 0xffe6) return true;
+  if (cp >= 0x1f1e6 && cp <= 0x1f1ff) return true;
+  return inRanges(EAST_ASIAN_WIDE_RANGES, cp);
+}
 
-  // CJK Radicals, Kangxi Radicals
-  if (cp >= 0x2e80 && cp <= 0x2fdf) return true;
+/**
+ * Whether a code point's UAX #11 East_Asian_Width is H (Halfwidth), from the
+ * same generated table as {@link isWideChar}. Internal: the cluster rule
+ * counts a halfwidth extender, such as the sound marks U+FF9E and U+FF9F, as
+ * a cell of its own.
+ */
+export function isHalfwidthChar(cp: number): boolean {
+  return inRanges(EAST_ASIAN_HALFWIDTH_RANGES, cp);
+}
 
-  // CJK Symbols and Punctuation, Hiragana, Katakana
-  if (cp >= 0x3000 && cp <= 0x33ff) return true;
-
-  // CJK Extension A
-  if (cp >= 0x3400 && cp <= 0x4dbf) return true;
-
-  // CJK Unified Ideographs
-  if (cp >= 0x4e00 && cp <= 0x9fff) return true;
-
-  // Hangul Syllables (U+AC00–U+D7A3; excludes Jamo Extended-B which are narrow)
-  if (cp >= 0xac00 && cp <= 0xd7a3) return true;
-
-  // CJK Compatibility Ideographs
-  if (cp >= 0xf900 && cp <= 0xfaff) return true;
-
-  // CJK Compatibility Forms
-  if (cp >= 0xfe30 && cp <= 0xfe4f) return true;
-
-  // CJK Extension B–I and beyond
-  if (cp >= 0x20000 && cp <= 0x3ffff) return true;
-
-  // Emoji blocks (most render as 2 columns)
-  // Miscellaneous Symbols and Pictographs
-  if (cp >= 0x1f300 && cp <= 0x1f9ff) return true;
-  // Supplemental Symbols and Pictographs
-  if (cp >= 0x1fa00 && cp <= 0x1fa6f) return true;
-  // Symbols and Pictographs Extended-A
-  if (cp >= 0x1fa70 && cp <= 0x1faff) return true;
-  // Emoticons
-  if (cp >= 0x1f600 && cp <= 0x1f64f) return true;
-  // Transport and Map Symbols
-  if (cp >= 0x1f680 && cp <= 0x1f6ff) return true;
-  // Dingbats (U+2702–U+27B0) are NOT uniformly wide per Unicode
-  // East Asian Width. Most are Narrow text characters (✓ ✗ ✌).
-  // They only become wide with emoji presentation (U+FE0F), which
-  // is handled by graphemeClusterWidth checking for the variation
-  // selector in the grapheme cluster.
-  // Regional indicators (flags)
-  if (cp >= 0x1f1e0 && cp <= 0x1f1ff) return true;
-  // Playing Cards, Mahjong Tiles
-  if (cp >= 0x1f000 && cp <= 0x1f02f) return true;
-
+function inRanges(ranges: readonly (readonly [number, number])[], cp: number): boolean {
+  let low = 0;
+  let high = ranges.length - 1;
+  while (low <= high) {
+    const middle = (low + high) >>> 1;
+    const range = ranges[middle];
+    if (range === undefined) return false;
+    if (cp < range[0]) high = middle - 1;
+    else if (cp > range[1]) low = middle + 1;
+    else return true;
+  }
   return false;
 }

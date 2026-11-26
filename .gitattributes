@@ -24,3 +24,7 @@ examples/components/generated/*.json text eol=lf
 examples/web-gpu/src/vendor/** -text
 examples/web-gpu/src/components/theme-provider.tsx -text
 examples/web-gpu/src/components/theme-switch.tsx -text
+
+# Vendored Unicode Character Database files: the generated width table records their SHA-256.
+scripts/unicode/ucd/** -text
+packages/bijou/src/core/text/generated/*.ts text eol=lf
