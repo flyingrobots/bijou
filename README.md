@@ -32,6 +32,12 @@ Press **Enter** at the title screen. Explore with the arrow keys and **Tab**, op
 
 For a smaller first example, run `npm run hello` or `npm run counter`.
 
+To try Bijou without installing anything, open the
+[demo gallery](https://flyingrobots.github.io/bijou/gallery.html) in a browser:
+DOGFOOD, the soak bench and the [fun demos](https://flyingrobots.github.io/bijou/gallery.html?app=fun)
+run there on a canvas. GitHub Pages publishes it from `main` (see
+[`examples/web-gpu`](examples/web-gpu/README.md#published-site)).
+
 ## Build your own app
 
 Create a starter project with the published scaffolder:
@@ -63,6 +69,20 @@ npm run markdown-font -- examples/markdown-font/sample.md --configure
 ```
 
 See the [changelog](docs/CHANGELOG.md) for release details and compatibility changes.
+
+## Platform support
+
+Bijou is developed and verified on macOS and Linux, on Node.js 20 and 22. CI runs
+the full test suite on Linux for both.
+
+> [!NOTE]
+> **Windows is not supported at present.** Nothing verifies Bijou on Windows:
+> the CI job that ran a focused set of tests in native Windows containers was
+> switched off on 2026-11-24, because its worker ran out of storage before any
+> test started, so it failed on every run and proved nothing
+> ([flyingrobots/bijou#788](https://github.com/flyingrobots/bijou/issues/788)).
+> Bijou may well work on Windows, in Windows Terminal or under WSL, but that is
+> untested. Windows support returns when that job does.
 
 ## Keep going
 

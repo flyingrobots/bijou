@@ -21,7 +21,7 @@ describe('git hooks', () => {
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:debt -- --base HEAD^');
     expect(policy.testJob.i18nPolicyGateRun).toContain('npm run dogfood:i18n:check');
     expect(workflow).toContain('docs/*)');
-    expect(policy.testJob.testRunCommand).toBe("node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && npm run test:run'");
+    expect(policy.testJob.testRunCommand).toBe("node scripts/docker-seal/run.mjs --isolated-ci --node-version ${{ matrix.node-version }} -- bash -lc 'npm run build && BIJOU_VITEST_SHARD=${{ matrix.shard }}/8 npm run test:run'");
   });
 
   it('focused CI unit-test filters point at existing split docs-preview tests', () => {
@@ -54,11 +54,12 @@ describe('git hooks', () => {
     expect(policy.focusedUnitTestsJob.permissionsContents).toBe('read');
   });
 
-  it('sealed CI retains both Node versions and native Windows coverage', () => {
+  it('sealed CI retains both Node versions, and Linux coverage while the Windows lane is off', () => {
     const policy = readCiWorkflowPolicy(resolve(ROOT, '.github/workflows/ci.yml'));
 
     expect(policy.nodeVersions).toEqual([20, 22]);
-    expect(policy.focusedPlatforms).toEqual(['ubuntu-latest', 'windows-2022']);
+    // The native Windows lane is switched off until flyingrobots/bijou#788 is fixed; README.md states it.
+    expect(policy.focusedPlatforms).toEqual(['ubuntu-latest']);
   });
 
 

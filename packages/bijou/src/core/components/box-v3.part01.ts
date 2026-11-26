@@ -1,5 +1,6 @@
 import { isPackedSurface, type Surface } from '../../ports/surface.js';
 import { colorHex, colorRgb, type ColorRef } from '../theme/color.js';
+import { mirrorsLayout } from '../direction/direction.js';
 import { encodeModifiers, CELL_STRIDE, OFF_FLAGS, OFF_ALPHA, FLAG_EMPTY, FLAG_BG_SET } from '../render/packed-cell.js';
 
 /** Pre-parse a CellTextStyle into numeric RGB + flags for setRGB. Returns undefined if not parseable. */
@@ -35,6 +36,11 @@ function normalizeFixedWidth(width: number | undefined): number | undefined {
   if (width == null) return undefined;
   if (!Number.isFinite(width)) return undefined;
   return Math.max(2, Math.floor(width));
+}
+
+/** First column of a top-border title: left of the border at the logical start, mirrored to the right edge under rtl. */
+function titleStartX(outerWidth: number, titleLength: number, mirrored: boolean): number {
+  return mirrored ? outerWidth - 2 - titleLength : 2;
 }
 
 function withInheritedBackground(surface: Surface, background: ColorRef | undefined): Surface {
@@ -73,4 +79,4 @@ function withInheritedBackground(surface: Surface, background: ColorRef | undefi
   return next;
 }
 
-export { BORDER, normalizeFixedWidth, parseStyleRGB, withInheritedBackground };
+export { BORDER, mirrorsLayout, titleStartX, normalizeFixedWidth, parseStyleRGB, withInheritedBackground };

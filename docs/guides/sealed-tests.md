@@ -12,15 +12,27 @@ Implementation and validation evidence are recorded in
 
 ## Prepare the toolchain
 
-Use a supported Node.js version and a running Docker daemon. Local shared
-workers require `git-locks` and the workstation's registered Docker resource
-keys. The initial Linux toolchain uses a pinned Node 22 Bookworm image.
+Use a supported Node.js version and a running Docker daemon. Nothing else is
+required: the scripts invoke no lock tool. The initial Linux toolchain uses a
+pinned Node 22 Bookworm image.
+
+One sealed run uses the local worker at a time. The worker container has a
+fixed name, and a second run started while it is active is refused at once
+with `Worker already active`; it does not wait. Run it again when the first
+finishes. A caller that wants runs to queue, such as several agents sharing a
+workstation, wraps its own command in a lock of its choosing, for example
+`git locks with --job "seal-$$" --holder "${USER:-me}" --wait 600 <key> -- npm test` where
+[git-locks](https://github.com/git-stunts/locks) is installed. That is the
+caller's choice and never the repository's requirement.
 Bootstrap refuses an absent base image instead of downloading it without
 resource admission.
 
 Local execution uses Linux containers, including on macOS through Docker.
 The native Windows lane uses disposable Windows containers on GitHub-hosted
 Windows runners; the Windows launcher currently requires that CI environment.
+That lane is switched off in CI as of 2026-11-24, because its worker runs out
+of storage before any test starts (flyingrobots/bijou#788). Nothing verifies
+Bijou on Windows until it returns; the launcher and its tests remain.
 
 ```sh
 node scripts/docker-seal/bootstrap.mjs --node-version 22
@@ -60,6 +72,75 @@ there. Tests and lifecycle execution run afterward with networking disabled.
 Missing offline dependencies fail the run; the launcher does not restore
 network access as a fallback.
 
+### Run one shard of the full suite
+
+`npm run test:run` with no file runs every test file, in chunks of 48 files,
+one chunk after another. `BIJOU_VITEST_SHARD=k/n` runs the k-th of n shares of
+the files. The files are dealt by measured weight
+(`scripts/vitest-weights.json`): heaviest first, each to the shard that is
+lightest so far, so the shards take similar time and together run every file
+once. CI runs the suite as shards on separate runners, for each Node version;
+the workflow names how many.
+
+```bash
+node scripts/docker-seal/run.mjs -- sh -c 'npm run build && BIJOU_VITEST_SHARD=2/8 npm run test:run'
+```
+
+The run's first line names the share, in the form `vitest shard 2/8: 150 of
+1159 files, about 110 s of measured test time` (illustrative counts). A value
+that is not `k/n` with `1 <= k <= n` is refused with exit status 2. With the
+variable unset the whole suite runs, as before.
+
+The weights are measurements, not rules. A file the weights do not list counts
+a default, and a stale weight only makes the shards less even: it cannot drop
+or repeat a test. Measure again after adding or speeding up slow test files:
+
+```bash
+node scripts/docker-seal/run.mjs --export scripts/vitest-weights.json -- \
+  sh -c 'npm run build && node scripts/measure-vitest-weights.mjs'
+```
+
+The measured file is written under the run's evidence directory, in
+`exports/scripts/vitest-weights.json`; copy it over the checked-in one.
+
+### Shared modules and isolated files
+
+Loading modules once for every test file was about three quarters of the
+suite's time. `scripts/run-vitest.mjs` therefore runs the full suite in two
+groups. A file that cannot change what other files see runs with isolation off,
+so the files in a worker share the modules they load. A file that changes
+shared state keeps a module graph of its own, as before.
+
+A file is isolated when its source uses a module mock, a global or environment
+stub, fake timers, a spy, a module-registry reset, a write to `process.env` or
+`globalThis`, `process.chdir`, or an import of the Node host package. The rule
+is `needsIsolation` in `scripts/vitest-shards.mjs`. A file measured at two
+seconds or more in `scripts/vitest-weights.json` is isolated as well: a worker
+that shares modules keeps what every file loaded, and a run of heavy files in
+one worker ended with `Worker exited unexpectedly`.
+
+Setting or resetting the default context does not isolate a file. Instead
+`scripts/vitest-setup.ts` runs before every test file and clears the default
+context, so a file starts as it would alone. Without it a pipe-mode context
+left by one file made another file's app quit on `q` without asking
+(flyingrobots/bijou#917). A file that changes shared state in a way the rule
+does not see asks for isolation with a comment line of its own:
+
+```ts
+// vitest: isolate (patches Date for the whole file)
+```
+
+A test that passes alone and fails in the full suite is the sign of such a
+file. Run the suite with every file isolated to tell the two apart:
+
+```bash
+node scripts/docker-seal/run.mjs -- sh -c 'npm run build && BIJOU_VITEST_ISOLATE=all npm run test:run'
+```
+
+If it passes that way, some file in the failing chunk changes shared state:
+find it and give it the comment line. Running named files
+(`npm run test:run -- path/to/file.test.ts`) is always isolated.
+
 ## Inspect results
 
 The launcher prints the path to its evidence directory. Admission and completion
@@ -87,6 +168,14 @@ The `@git-stunts/docker-guard` package is paired with actual container checks.
 Linux workers use a read-only root, bounded temporary filesystems, private
 processes and networking, and no Docker socket or host mounts. CPU, memory,
 process, output and runtime limits remain active while commands execute.
+
+A worker has no network. Inside it, the seal reads `/sys/class/net` and admits
+only loopback, the bonding driver's `bonding_masters` control file, and the
+fallback tunnel devices that some kernels create in every network namespace
+(`tunl0`, `sit0`, `gre0` and their relatives), and those only while they are
+down. Docker Desktop's kernel lists them in a worker started with
+`--network none`. Any other device, or a fallback tunnel device that is up, is
+refused as `network interface beyond loopback`.
 
 Windows workers run as `ContainerUser` with process isolation, no host mounts,
 and no network while tests execute. Their storage limits differ from the Linux

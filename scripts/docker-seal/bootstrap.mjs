@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // Build only the immutable toolchain marker layer. No source or dependencies enter it.
 import { spawnSync } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { isAbsolute } from 'node:path';
@@ -21,12 +20,9 @@ if (isolated) {
     await import('./bootstrap-owned.mjs');
   }
 } else {
-const result = spawnSync('git', ['locks', 'with',
-  '--job', `bijou-sealed-bootstrap-${randomUUID()}`,
-  '--holder', process.env.AGENT_SESSION_ID || randomUUID(),
-  '--ttl', '600', '--wait', '30', '--note', 'Bounded sealed toolchain bootstrap',
-  'host/docker/bijou-sealed-probe/', 'host/docker/bijou-sealed-tests/', '--',
-  process.execPath, 'scripts/docker-seal/bootstrap-owned.mjs', ...args], {
+// Spawned directly, with no lock tool: a caller that wants admission control
+// wraps this command itself.
+const result = spawnSync(process.execPath, ['scripts/docker-seal/bootstrap-owned.mjs', ...args], {
   cwd: root, stdio: 'inherit',
   env: Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_'))),
 });

@@ -11,8 +11,10 @@ import { MountHost } from './mount-host.js';
 function Status({ view }: { view: ShowcaseView }) {
   const hud = view.hud;
   if (hud === null) return <Skeleton className="h-6 w-32" />;
-  const waiting = view.busy > 0 || (hud.app !== null && hud.presents === 0 && hud.problem === null);
+  // The DOM host presents no frames, so it is never waiting for a first one.
+  const waiting = view.busy > 0 || (hud.host !== 'dom' && hud.app !== null && hud.presents === 0 && hud.problem === null);
   if (waiting) return <Badge variant="secondary"><Spinner data-icon="inline-start" />Negotiating</Badge>;
+  if (hud.host === 'dom') return <Badge variant="outline" data-status="dom">DOM · native elements</Badge>;
   if (hud.backend === null) return <Badge variant="outline">Nothing mounted</Badge>;
   return <Badge variant="outline">{BACKEND_LABELS[hud.backend]} · {hud.evidenceLevel ?? 'no receipt'}</Badge>;
 }
@@ -40,7 +42,9 @@ export function SurfaceCard({ view, onHost }: { view: ShowcaseView; onHost: (hos
       <CardHeader>
         <CardTitle>Bijou Surface</CardTitle>
         <CardDescription>
-          Example apps mounted with mountBijouCanvas() on Geordi's presenters. Click the Surface, then type: every key goes to the app.
+          {view.hud?.host === 'dom'
+            ? 'The same app, mounted with mountBijouDom() as native elements. Its state came from the canvas host.'
+            : "Example apps mounted with mountBijouCanvas() on Geordi's presenters. Click the Surface, then type: every key goes to the app."}
         </CardDescription>
         <CardAction><Status view={view} /></CardAction>
       </CardHeader>

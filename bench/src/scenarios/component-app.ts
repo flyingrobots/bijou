@@ -22,7 +22,6 @@
  */
 
 import { createSurface, type BijouContext } from '@flyingrobots/bijou';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import type { Scenario } from './types.js';
 import {
   paintComponentApp,
@@ -40,8 +39,7 @@ export const componentApp: Scenario<ComponentAppState> = {
   defaultWarmupFrames: 30,
   defaultMeasureFrames: 120,
 
-  setup(benchCtx?: BijouContext, columns = 220, rows = 58) {
-    const ctx = benchCtx ?? createTestContext({ mode: 'interactive' });
+  setup(ctx: BijouContext, columns = 220, rows = 58) {
     return {
       surface: createSurface(columns, rows),
       cols: columns,

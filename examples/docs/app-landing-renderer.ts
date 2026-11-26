@@ -1,6 +1,6 @@
-import { readFileSync } from 'node:fs';
 import { compositeSurface, renderFramePerfHudOverlay, toast } from '../../packages/bijou-tui/src/index.js';
 import type { Surface } from '../../packages/bijou/src/index.js';
+import LOGO_TEXT from './generated/flyingrobotslogo.json' with { type: 'json' };
 import { paintLandingBackground, prepareLandingSurface } from './app-landing-background.js';
 import {
   createLandingPromptSurface,
@@ -33,10 +33,7 @@ import type {
   LandingRendererOptions,
 } from './app-landing-types-internal.js';
 
-const FLYING_ROBOTS_LOGO_LINES = splitGlyphLines(readFileSync(
-  new URL('../../assets/flyingrobotslogo.txt', import.meta.url),
-  'utf8',
-).trimEnd());
+const FLYING_ROBOTS_LOGO_LINES = splitGlyphLines(LOGO_TEXT.trimEnd());
 
 export function createLandingRenderer(options: LandingRendererOptions): (model: LandingModel) => Surface {
   const cache: LandingFrameCache = {};
