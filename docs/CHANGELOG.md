@@ -248,6 +248,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- `main` is green again after the showcase and fun-demo merges
+  (flyingrobots/bijou#926). The lens demo's wave-front fallback typechecks; the
+  fun catalog's types live in `examples/fun/catalog-entry.ts`, under the
+  150-line Code Dojo threshold; a catalog entry says `needsFont`, so the
+  showcase's landing page leaves the font demos out of its random background
+  without naming them; the fourteen newest demos draw the separator row under
+  their panel title; and the showcase's tests count the `Landing` app.
 - The sealed runner admits a worker on Docker Desktop, whose kernel lists
   fallback tunnel devices (`tunl0`, `sit0`, `gre0` and their relatives) and the
   `bonding_masters` control file under `/sys/class/net` even with
