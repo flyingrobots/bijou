@@ -25,6 +25,9 @@ export function createFrameKeyMap(
         .bind('`', t('key.togglePerfHud', 'Toggle perf HUD'), {
           type: 'toggle-perf-hud',
         })
+        .bind('f9', t('key.toggleKeyInspector', 'Toggle key inspector'), {
+          type: 'toggle-key-inspector',
+        })
         .bind('[', t('key.prevTab', 'Previous tab'), { type: 'prev-tab' })
         .bind(']', t('key.nextTab', 'Next tab'), { type: 'next-tab' })
         .bind('tab', t('key.nextPane', 'Next pane'), { type: 'next-pane' })

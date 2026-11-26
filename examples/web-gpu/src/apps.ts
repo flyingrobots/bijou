@@ -25,16 +25,16 @@ export const SHOWCASE_APPS: readonly ShowcaseApp[] = [
   {
     id: 'landing',
     title: 'Landing',
-    // The published site's front page: the 3D wave surface turns behind the centred wordmark; Enter opens the gallery.
+    // The published site's front page: the fun app, one framed Bijou app holding every demo. Home shows the 3D wave
+    // surface behind the wordmark; Demos lists every demo and plays it in the same app.
     async load() {
-      const [{ createLandingApp }, { catalog }, { fetchFont }] = await Promise.all([
-        import('../../fun/landing.js'), import('../../fun/registry.js'), import('../../fun/browser.js'),
+      const [{ createFunApp }, { loadDemos }, { fetchFont }] = await Promise.all([
+        import('../../fun/fun-app.js'), import('../../fun/registry.js'), import('../../fun/browser.js'),
       ]);
-      const pick = catalog.find((item) => item.id === 'wave-surface');
-      if (pick === undefined) throw new Error('BIJOU_WEB_GPU_NO_WAVE_SURFACE');
-      const background = await pick.load({ font: fetchFont });
-      const open = (): void => { window.location.assign('./gallery.html'); };
-      return { build: (ctx) => createLandingApp({ ctx, background, open, seed: Date.now() % 1_000_000 }) };
+      const entries = await loadDemos({ font: fetchFont });
+      // ?debug turns on the frame's debug mode: it halts with a dialog on shadowed key bindings.
+      const debug = new URLSearchParams(window.location.search).has('debug');
+      return { build: (ctx) => createFunApp({ ctx, entries, seed: Date.now() % 1_000_000, debug }) };
     },
   },
   {

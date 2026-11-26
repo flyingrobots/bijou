@@ -39,3 +39,22 @@ export const SEAMLESS_COLORS: readonly string[] = [
   '#e7c558', '#e48d4d', '#c6a896', '#e2cdc0', '#e1ccbf', '#f5e8da', '#f9f9f5', '#b1b7b9', '#ccdac6', '#68514b',
   '#dd5c4e', '#e67047', '#d07060', '#db7169', '#689b9b', '#f19f9d', '#365a5e', '#f6cfc4', '#516d67', '#3d485d',
 ];
+
+/** The palette list of "Generative Painting" by Karim Douieb (Observable), after nice-color-palettes, as published. */
+export const NICE_PALETTES: readonly (readonly string[])[] = [
+  ['#69d2e7', '#a7dbd8', '#e0e4cc', '#f38630', '#fa6900'],
+  ['#99b898', '#fecea8', '#ff847c', '#e84a5f', '#2a363b'],
+  ['#ffe181', '#eee9e5', '#fad3b2', '#ffba7f', '#ff9c97'],
+  ['#f8b195', '#f67280', '#c06c84', '#6c5b7b', '#355c7d'],
+  ['#5e9fa3', '#dcd1b4', '#fab87f', '#f87e7b', '#b05574'],
+  ['#b9d3b0', '#81bda4', '#b28774', '#f88f79', '#f6aa93'],
+  ['#3a111c', '#574951', '#83988e', '#bcdea5', '#e6f9bc'],
+  ['#fc354c', '#29221f', '#13747d', '#0abfbc', '#fcf7c5'],
+  ['#fe4365', '#fc9d9a', '#f9cdad', '#c8c8a9', '#83af9b'],
+  ['#aab3ab', '#c4cbb7', '#ebefc9', '#eee0b7', '#e8caaf'],
+  ['#e8ddcb', '#cdb380', '#036564', '#033649', '#031634'],
+  ['#a7c5bd', '#e5ddcb', '#eb7b59', '#cf4647', '#524656'],
+  ['#3fb8af', '#7fc7af', '#dad8a7', '#ff9e9d', '#ff3d7f'],
+  ['#a1dbb2', '#fee5ad', '#faca66', '#f7a541', '#f45d4c'],
+  ['#99b898', '#fecea8', '#ff847c', '#e84a5f', '#2a363b'],
+];

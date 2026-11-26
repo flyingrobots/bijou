@@ -33,13 +33,15 @@ describe('sealed toolchain build context', () => {
     expect(readFileSync(join(dir, 'marker'), 'utf8')).toBe(MARKER);
   });
 
-  it('writes a Dockerfile with no RUN step that copies the marker read-only', () => {
+  it('writes a Dockerfile with no RUN step that either builder can build', () => {
     const dir = context();
     writeToolchainContext(dir, BASE);
     const dockerfile = readFileSync(join(dir, 'Dockerfile'), 'utf8');
 
     expect(dockerfile.startsWith(`FROM ${BASE}\n`)).toBe(true);
-    expect(dockerfile).toContain('COPY --chmod=0444 marker /etc/bijou-test-seal\n');
+    expect(dockerfile).toContain('COPY marker /etc/bijou-test-seal\n');
+    // --chmod needs BuildKit; the legacy builder refuses it.
+    expect(dockerfile).not.toContain('--chmod');
     expect(dockerfile).toContain('USER 1000:1000\n');
     expect(dockerfile).not.toMatch(/^RUN\b/mu);
   });

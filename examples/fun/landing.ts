@@ -5,26 +5,17 @@
 // help, `F2` settings, and `q` to quit with confirmation.
 import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import {
-  compositeSurface, createFramedApp, createKeyMap, isPulseMsg, placeSurface, rasterTextSurface,
-  type Cmd, type FramePage, type FrameSettings,
+  compositeSurface, createKeyMap, isPulseMsg, placeSurface, rasterTextSurface, wrapFrameMsg,
+  type Cmd, type FramePage, type FrameScopedMsg, type FrameSettings,
 } from '@flyingrobots/bijou-tui';
 import { CYLINDER_FONT } from '../docs/app-cylinder-font.js';
-import type { DemoEntry, Session } from './contract.js';
-
-export interface LandingModel {
-  /** The background demo. It hears pulses, never the pointer or the keys. */
-  readonly background: Session;
-  readonly wordmark: boolean;
-}
-
-export type LandingMsg = { readonly type: 'open' } | { readonly type: 'toggle-wordmark' } | { readonly type: 'toggle-motion' };
+import type { DemoEntry } from './contract.js';
+import type { FunModel, FunMsg, LandingModel } from './fun-app-types.js';
 
 export interface LandingOptions {
   readonly ctx: BijouContext;
-  /** The demo that runs behind the page; the page picks it. */
+  /** The demo that runs behind the page; the host picks it. */
   readonly background: DemoEntry;
-  /** Go on from the landing page: the page decides where (a browser opens the gallery). */
-  readonly open: () => void;
   readonly seed: number;
 }
 
@@ -62,14 +53,16 @@ export function landingPicture(model: LandingModel, width: number, height: numbe
 }
 
 /** The one page of the landing app. */
-export function landingPage({ ctx, background, open, seed }: LandingOptions): FramePage<LandingModel, LandingMsg> {
-  const going: Cmd<LandingMsg>[] = [() => { open(); return undefined; }];
+export function landingPage({ ctx, background, seed }: LandingOptions): FramePage<FunModel, FunMsg> {
+  // The Demos page is the next tab: the frame's own tab action takes the app there.
+  const going: Cmd<FunMsg | FrameScopedMsg>[] = [(emit) => { emit(wrapFrameMsg({ type: 'next-tab' })); return undefined; }];
   return {
     id: 'home',
-    title: 'Bijou',
+    title: 'Home',
     // `h` hides a demo's own card or panel, so the page shows the picture alone.
-    init: () => [{ background: background.mount(seed).update({ type: 'key', key: 'h' }), wordmark: true }, []],
+    init: () => [{ kind: 'home', background: background.mount(seed).update({ type: 'key', key: 'h' }), wordmark: true }, []],
     update(msg, model) {
+      if (model.kind !== 'home') return [model, []];
       if (isPulseMsg(msg)) return [{ ...model, background: model.background.update({ type: 'pulse', dt: msg.dt }) }, []];
       if (msg.type === 'open') return [model, going];
       if (msg.type === 'toggle-wordmark') return [{ ...model, wordmark: !model.wordmark }, []];
@@ -77,16 +70,19 @@ export function landingPage({ ctx, background, open, seed }: LandingOptions): Fr
       if (msg.type === 'toggle-motion') return [{ ...model, background: model.background.update({ type: 'key', key: 'space' }) }, []];
       return [model, []];
     },
-    keyMap: createKeyMap<LandingMsg>()
+    keyMap: createKeyMap<FunMsg>()
       .bind('enter', 'Open the demos', { type: 'open' })
       .bind('w', 'Show or hide the wordmark', { type: 'toggle-wordmark' })
       .bind('m', 'Pause or resume the motion', { type: 'toggle-motion' }),
-    layout: (model) => ({ kind: 'pane', paneId: 'home', render: (width, height) => landingPicture(model, width, height, ctx) }),
+    layout: (model) => ({
+      kind: 'pane', paneId: 'home',
+      render: (width, height) => (model.kind === 'home' ? landingPicture(model, width, height, ctx) : createSurface(width, height)),
+    }),
   };
 }
 
 /** The F2 settings: show the wordmark, run the motion, open the demos. */
-export function landingSettings({ pageModel }: { readonly pageModel: LandingModel }): FrameSettings<LandingMsg> {
+export function landingSettings({ pageModel }: { readonly pageModel: LandingModel }): FrameSettings<FunMsg> {
   return {
     title: 'Settings',
     sections: [{
@@ -101,7 +97,3 @@ export function landingSettings({ pageModel }: { readonly pageModel: LandingMode
   };
 }
 
-/** The landing app: the page in the Bijou app frame. */
-export function createLandingApp(options: LandingOptions) {
-  return createFramedApp<LandingModel, LandingMsg>({ ctx: options.ctx, title: 'Bijou', pages: [landingPage(options)], settings: landingSettings });
-}

@@ -73,7 +73,9 @@ export function frameScript(id: string, width: number, height: number): DemoMsg[
   const generative: Readonly<Record<string, string>> = {
     'directional-tiles': '+', 'doyle-spiral': ']', 'deformed-rectangles': 's', 'seamless-squares': 'r', 'truchet-tiles': 'r',
     'some-triangles': 'r', 'quadtree-shapes': 'r', 'dancing-noise': 'c', 'seeded-needles': 'r', 'xor-mod-n': '+', 'box-grid': '+',
-    'lenses': 'v', 'wave-surface': 'h', 'noise-plane-partition': 'r', 'partition-peel': 'a',
+    'lenses': 'v', 'adaptive-contours': ']', 'endless-loop': 'r',
+    'bitmap-generator': 'r', 'voronoi-incircles': 't', 'line-integral-convolution': 'f', 'generative-painting': 'r',
+    'noise-trails': 'r', 'dashed-rings': 'r', 'oil-brushstrokes': 'c', 'periodic-tilings': ']', 'noise-plane-partition': 'r', 'partition-peel': 'a',
   };
   const generativeKey = generative[id];
   if (generativeKey !== undefined) return [...pulses(30), { type: 'key', key: generativeKey }, ...pulses(30)];

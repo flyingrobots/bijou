@@ -16,6 +16,7 @@ import {
   type FrameTimingSnapshot,
 } from './app-frame-performance.js';
 import type { FrameThemeRuntime } from './app-frame-theme-runtime.js';
+import type { RuntimeLifecycleHooks } from './runtime-contract.js';
 
 const isInternalFrameModel = <PageModel, Msg>(
   model: FrameModel<PageModel>,
@@ -29,6 +30,27 @@ const requireInternalFrameModel = <PageModel, Msg>(
   throw new Error('createFramedApp: framed runtime received a non-frame model');
 };
 
+/**
+ * Render hooks that carry the runtime's measured frame timings into the frame model, where the perf HUD reads them.
+ * One set per run: the first render after start asks for a second, so the HUD shows real numbers straight away.
+ */
+function frameTimingHooks<PageModel>(frameBudgetMs: number | undefined): RuntimeLifecycleHooks<FrameModel<PageModel>> {
+  let pendingTimingSnapshot: FrameTimingSnapshot | undefined;
+  let needsTimingHydrationRender = true;
+  return {
+    beforeRender(model) {
+      if (pendingTimingSnapshot == null) return model;
+      return applyFrameTimingSnapshot(requireInternalFrameModel<PageModel, unknown>(model), pendingTimingSnapshot);
+    },
+    afterRender({ timings }) {
+      pendingTimingSnapshot = summarizeFrameTimings(timings, frameBudgetMs);
+      if (!needsTimingHydrationRender) return undefined;
+      needsTimingHydrationRender = false;
+      return { requestRender: true };
+    },
+  };
+}
+
 export function createHostedFrameApp<PageModel, Msg>(
   app: App<InternalFrameModel<PageModel, Msg>, FramedAppMsg<Msg>>,
   themeRuntime: FrameThemeRuntime<PageModel, Msg>,
@@ -41,6 +63,8 @@ export function createHostedFrameApp<PageModel, Msg>(
     view: (model) =>
       app.view(requireInternalFrameModel<PageModel, Msg>(model)),
     routeRuntimeIssue: (issue) => app.routeRuntimeIssue?.(issue),
+    // A host that drives the app through run() (a browser canvas) gets the same timing hooks as app.run().
+    runtimeHooks: (ctx) => frameTimingHooks<PageModel>(resolveFrameBudgetMs(undefined, ctx)),
     run: runHostedFramedApp,
   };
   async function runHostedFramedApp(
@@ -57,30 +81,11 @@ export function createHostedFrameApp<PageModel, Msg>(
       options,
       themeRuntime.resolveContext(),
     );
-    let pendingTimingSnapshot: FrameTimingSnapshot | undefined;
-    let needsTimingHydrationRender = true;
     try {
       await runWithLifecycleHooks(
         framedApp,
         { ...options, mouse: options?.mouse ?? true },
-        {
-          beforeRender(model) {
-            if (pendingTimingSnapshot == null) return model;
-            return applyFrameTimingSnapshot(
-              requireInternalFrameModel<PageModel, Msg>(model),
-              pendingTimingSnapshot,
-            );
-          },
-          afterRender({ timings }) {
-            pendingTimingSnapshot = summarizeFrameTimings(
-              timings,
-              frameBudgetMs,
-            );
-            if (!needsTimingHydrationRender) return;
-            needsTimingHydrationRender = false;
-            return { requestRender: true };
-          },
-        },
+        frameTimingHooks<PageModel>(frameBudgetMs),
       );
     } finally {
       hostedRunActive = false;

@@ -15,7 +15,7 @@ export function routeQuitConfirmKey<PageModel, Msg>(
 ): FrameKeyCommands<Msg> {
   const observed = { type: 'observed-key', msg, route: 'frame' } as const;
   const action = dependencies.frameKeys.handle(msg);
-  if (action?.type === 'toggle-perf-hud') {
+  if (action?.type === 'toggle-perf-hud' || action?.type === 'toggle-key-inspector') {
     return [observed, { type: 'apply-frame-action', action }];
   }
   if (isShellQuitConfirmAccept(msg)) {
@@ -39,7 +39,7 @@ export function routePageModalKey<PageModel, Msg>(
 ): FrameKeyCommands<Msg> {
   const observed = { type: 'observed-key', msg, route: 'page' } as const;
   const action = dependencies.frameKeys.handle(msg);
-  if (action?.type === 'toggle-perf-hud') {
+  if (action?.type === 'toggle-perf-hud' || action?.type === 'toggle-key-inspector') {
     return [observed, { type: 'apply-frame-action', action }];
   }
   const modalAction = context.modalKeyMap?.handle(msg);

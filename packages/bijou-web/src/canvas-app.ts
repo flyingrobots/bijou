@@ -77,6 +77,8 @@ export function controlApp<Model, M>(app: App<Model, M>, channel: ControlChannel
     },
     view: (model) => guard(() => app.view(model)),
     routeRuntimeIssue: (issue) => app.routeRuntimeIssue?.(issue),
+    // The app's render hooks pass through, so a framed app's perf HUD gets the run's frame timings here too.
+    runtimeHooks: (ctx) => app.runtimeHooks?.(ctx),
   };
   return {
     app: wrapped,

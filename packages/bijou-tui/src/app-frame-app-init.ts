@@ -51,6 +51,8 @@ export function initializeFrameApp<PageModel, Msg>(
     frameBudgetMs: undefined,
     frameOverBudget: false,
     perfHudOpen: false,
+    keyInspectorOpen: false,
+    keyLog: [],
     helpOpen: false,
     footerVisible: true,
     footerTranslateY: 0,

@@ -4,11 +4,11 @@ import { MARKER } from './constants.mjs';
 
 /**
  * The toolchain Dockerfile: the pinned Node base plus the seal marker, no RUN.
- * `--chmod` keeps the marker readable by the 1000:1000 worker whatever mode the
- * build context gave it.
+ * COPY keeps the mode the build context gives the marker (0444, see below) with
+ * both the legacy builder and BuildKit, so no `--chmod` (BuildKit only) is needed.
  */
 export function toolchainDockerfile(base) {
-  return `FROM ${base}\nCOPY --chmod=0444 marker /etc/bijou-test-seal\nUSER 1000:1000\nWORKDIR /work/source\nENV HOME=/home/test TMPDIR=/tmp LANG=C.UTF-8 GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null\nCMD ["sleep", "infinity"]\n`;
+  return `FROM ${base}\nCOPY marker /etc/bijou-test-seal\nUSER 1000:1000\nWORKDIR /work/source\nENV HOME=/home/test TMPDIR=/tmp LANG=C.UTF-8 GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null\nCMD ["sleep", "infinity"]\n`;
 }
 
 /**

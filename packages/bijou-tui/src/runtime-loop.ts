@@ -25,7 +25,7 @@ export async function run<Model, M>(
   app: App<Model, M>,
   options?: RunOptions<M>,
 ): Promise<void> {
-  await runWithLifecycleHooks(app, options);
+  await runWithLifecycleHooks(app, options, app.runtimeHooks?.(options?.ctx ?? getDefaultContext()));
 }
 
 export async function runWithLifecycleHooks<Model, M>(

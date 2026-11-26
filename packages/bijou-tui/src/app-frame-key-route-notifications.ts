@@ -33,7 +33,8 @@ export function routeNotificationCenterKey<PageModel, Msg>(
   }
   if (
     action?.type === 'toggle-notifications' ||
-    action?.type === 'toggle-perf-hud'
+    action?.type === 'toggle-perf-hud' ||
+    action?.type === 'toggle-key-inspector'
   ) {
     return [observed, { type: 'apply-frame-action', action }];
   }

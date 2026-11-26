@@ -13,6 +13,20 @@ own, at `gallery.html?app=fun-<id>`, where it runs alone.
 npm run fun
 ```
 
+The framed fun app, the one the published site runs, has two entries. It is a
+`createFramedApp`: Home shows the 3D wave surface behind the Bijou wordmark, and
+Demos lists every demo beside the selected one. On Demos, the arrows or `j`/`k`
+choose, Enter plays full-pane (Escape comes back), and Tab focuses the demo pane
+so the demo gets its own keys. F9 opens the key inspector.
+
+```sh
+npm run fun:app            # in the terminal; add -- --debug for debug mode
+npm run fun:web            # in the browser (Vite dev server); add ?debug to the address
+```
+
+In debug mode the frame halts with a dialog when a page has key bindings that can
+never fire, naming what takes each key and how to fix it.
+
 | Key | Does |
 | --- | --- |
 | `tab`, `right`, `left`, `1` to the last demo | switch demo (not while typing) |
