@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "bijou-replay-event.v1",
+  "title": "bijou-replay-event/1 line",
+  "description": "One line of a bijou-replay-event/1 JSONL stream, as decided in docs/design/DL-033-replay-event-envelope.md. Payloads allow unknown fields because readers ignore them within /1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "seq", "tick", "atMs", "kind", "payload"],
+  "properties": {
+    "schema": { "const": "bijou-replay-event/1" },
+    "seq": { "$ref": "#/definitions/count" },
+    "tick": { "$ref": "#/definitions/count" },
+    "atMs": { "$ref": "#/definitions/count" },
+    "kind": { "enum": ["session", "input", "resize", "pulse", "command", "debug-fact", "frame", "end"] },
+    "payload": { "type": "object" }
+  },
+  "allOf": [
+    { "if": { "properties": { "kind": { "const": "session" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/session" } } } },
+    { "if": { "properties": { "kind": { "const": "input" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/input" } } } },
+    { "if": { "properties": { "kind": { "const": "resize" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/resize" } } } },
+    { "if": { "properties": { "kind": { "const": "pulse" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/pulse" } } } },
+    { "if": { "properties": { "kind": { "const": "command" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/command" } } } },
+    { "if": { "properties": { "kind": { "const": "debug-fact" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/debugFact" } } } },
+    { "if": { "properties": { "kind": { "const": "frame" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/frame" } } } },
+    { "if": { "properties": { "kind": { "const": "end" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/end" } } } }
+  ],
+  "definitions": {
+    "count": { "type": "integer", "minimum": 0 },
+    "delivery": {
+      "type": "object",
+      "required": ["origin"],
+      "properties": { "origin": { "enum": ["script", "command", "timer"] }, "cmd": { "$ref": "#/definitions/count" } },
+      "oneOf": [
+        { "type": "object", "required": ["origin", "cmd"], "properties": { "origin": { "const": "command" }, "cmd": true } },
+        {
+          "type": "object",
+          "properties": { "origin": { "enum": ["script", "timer"] } },
+          "not": { "type": "object", "required": ["cmd"], "properties": { "cmd": true } }
+        }
+      ]
+    },
+    "session": {
+      "type": "object",
+      "required": ["source", "label", "claim", "viewport", "context", "clock", "pulses"],
+      "properties": {
+        "source": { "enum": ["script", "test", "dogfood"] },
+        "label": { "type": "string" },
+        "claim": { "const": "frame-playback" },
+        "viewport": {
+          "type": "object",
+          "required": ["columns", "rows"],
+          "properties": { "columns": { "$ref": "#/definitions/count" }, "rows": { "$ref": "#/definitions/count" } }
+        },
+        "context": {
+          "type": "object",
+          "required": ["mode", "theme", "colorLevel"],
+          "properties": {
+            "mode": { "enum": ["interactive", "static", "pipe", "accessible"] },
+            "theme": { "type": ["string", "null"] },
+            "colorLevel": { "type": ["string", "number", "null"] }
+          }
+        },
+        "clock": { "enum": ["mock", "system"] },
+        "pulses": {
+          "oneOf": [
+            { "const": "script" },
+            { "type": "object", "required": ["timerFps"], "properties": { "timerFps": { "type": "number", "exclusiveMinimum": 0 } } }
+          ]
+        }
+      }
+    },
+    "input": { "allOf": [{ "$ref": "#/definitions/delivery" }, { "type": "object", "required": ["msg"], "properties": { "msg": true } }] },
+    "resize": {
+      "allOf": [
+        { "$ref": "#/definitions/delivery" },
+        {
+          "type": "object",
+          "required": ["columns", "rows"],
+          "properties": { "columns": { "$ref": "#/definitions/count" }, "rows": { "$ref": "#/definitions/count" } }
+        }
+      ]
+    },
+    "pulse": {
+      "allOf": [
+        { "$ref": "#/definitions/delivery" },
+        { "type": "object", "required": ["dt"], "properties": { "dt": { "type": "number" } } }
+      ]
+    },
+    "command": {
+      "type": "object",
+      "required": ["cmd", "phase"],
+      "properties": {
+        "cmd": { "$ref": "#/definitions/count" },
+        "phase": { "enum": ["start", "settle"] },
+        "outcome": { "enum": ["message", "quit", "cleanup", "empty", "error"] }
+      }
+    },
+    "debugFact": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": { "name": { "type": "string", "minLength": 1 }, "value": true }
+    },
+    "rgb": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "integer", "minimum": 0, "maximum": 255 } },
+    "frame": {
+      "type": "object",
+      "required": ["index", "width", "height", "hash", "styles", "cells"],
+      "properties": {
+        "index": { "$ref": "#/definitions/count" },
+        "width": { "$ref": "#/definitions/count" },
+        "height": { "$ref": "#/definitions/count" },
+        "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "styles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fg": { "$ref": "#/definitions/rgb" },
+              "bg": { "$ref": "#/definitions/rgb" },
+              "modifiers": { "type": "array", "items": { "type": "string" } },
+              "empty": { "type": "boolean" },
+              "opacity": { "type": "number" }
+            }
+          }
+        },
+        "cells": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "additionalItems": false,
+            "items": [{ "type": "string" }, { "$ref": "#/definitions/count" }]
+          }
+        }
+      }
+    },
+    "end": {
+      "type": "object",
+      "required": ["frames", "pendingCommands", "reason"],
+      "properties": {
+        "frames": { "$ref": "#/definitions/count" },
+        "pendingCommands": { "$ref": "#/definitions/count" },
+        "reason": { "enum": ["steps-complete", "quit", "error"] }
+      }
+    }
+  }
+}

@@ -31,6 +31,8 @@ coverage/
 # Logs
 *.log
 *.jsonl
+# Checked-in replay goldens are fixtures, not logs.
+!*.golden.jsonl
 npm-debug.log*
 
 # Build

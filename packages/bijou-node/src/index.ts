@@ -46,6 +46,29 @@ export {
   type SurfaceGifOptions,
 } from './recorder.js';
 
+/** Replay event stream (`bijou-replay-event/1`, DL-033): file-backed outbox plus the shared core API. */
+export {
+  createReplayFileOutbox,
+  type ReplayFileOutbox,
+  type ReplayFileOutboxOptions,
+} from './replay-file-outbox.js';
+export {
+  REPLAY_EVENT_KINDS,
+  REPLAY_EVENT_SCHEMA,
+  ReplayOutboxError,
+  canonicalJson,
+  createMemoryReplayOutbox,
+  createReplayOutbox,
+  surfaceFrameHash,
+  type MemoryReplayOutbox,
+  type ReplayEvent,
+  type ReplayEventInput,
+  type ReplayEventKind,
+  type ReplayLineSinkPort,
+  type ReplayOutbox,
+  type ReplayOutboxErrorCode,
+} from '@flyingrobots/bijou';
+
 export { BijouBootstrapError } from './bootstrap-error.js';
 export { initDefaultContext, _resetInitializedForTesting } from './node-default-context.js';
 export { startApp, _registerDefaultContextInitializerForTesting };
