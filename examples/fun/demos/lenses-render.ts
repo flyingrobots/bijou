@@ -82,7 +82,7 @@ export function drawWaveFronts(dots: Dots, trajectories: readonly (readonly Leg[
   const edgeRatio = smooth ? 0.33 : 0;
   for (let i = 0; i < count; i += 1) {
     if (range[0] + i * step <= 0) continue;
-    const pts = samples.map((s) => s[i] ?? [0, 0]);
+    const pts = samples.map((s): Vec => s[i] ?? [0, 0]);
     const controls = smoothControlPoints(pts, edgeRatio);
     pts.forEach((p, j) => {
       const q = pts[(j + 1) % pts.length] ?? p;

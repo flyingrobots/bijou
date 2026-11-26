@@ -54,7 +54,7 @@ on every push to `main`: it builds in the sealed runner, exports
 The bundle uses relative paths, so it works under the `/bijou/` subpath and on
 any other static host. Pages serves HTTPS, so browsers with WebGPU use it; the
 others fall back to WebGL2 or canvas 2D. Opening `dist/` from disk does not
-work: browsers refuse module scripts and `fetch()` on `file://`.
+work: browsers refuse module scripts and `fetch()` on a `file:` URL.
 
 ## The page chrome
 
