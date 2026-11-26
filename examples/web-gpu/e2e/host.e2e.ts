@@ -23,7 +23,15 @@ test('the dual-host counter set to 5 on the canvas shows 5 on the DOM host, take
   await expect(hud(page, 'host')).toHaveText('DOM');
   // The DOM host is not "negotiating": it shows its own status, and every app is reachable in the controls.
   await expect(page.locator('[data-status="dom"]')).toHaveText('DOM · native elements');
-  for (const app of await page.locator('[data-app]').all()) await expect(app).toBeInViewport();
+  // The app buttons wrap inside the controls card (59c5b282): none is pushed out past its edge. The card is taller
+  // than the viewport, so the check is the card's horizontal bounds, not the viewport.
+  const card = await page.locator('[data-region="controls"]').boundingBox();
+  expect(card).not.toBeNull();
+  for (const app of await page.locator('[data-app]').all()) {
+    await expect(app).toBeVisible();
+    const box = await app.boundingBox();
+    expect(box !== null && card !== null && box.x >= card.x && box.x + box.width <= card.x + card.width).toBe(true);
+  }
   await expect(hostItem(page, 'dom')).toHaveAttribute('data-state', 'on');
   await expectOnly(page, 'dom');
   await clickInDom(page, 'app.increment');
