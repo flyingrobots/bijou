@@ -38,7 +38,9 @@ letter and holds only lower case letters, digits and hyphens. The terminal shell
 gallery gives it a card and a page. For a demo that needs no font, no other file changes: the tests of the shell, the
 gallery and the showcase run on fakes, or read the catalog or the page.
 
-A demo that draws the font takes three more edits, because the tests load every other demo with a font port that
+A demo that draws the font says so in its entry with `needsFont: true`, so that a host that must paint at once (the
+showcase's landing page, which runs a random demo behind its wordmark) leaves it out. It also takes three more edits,
+because the tests load every other demo with a font port that
 rejects and give the font demos the real font apart: its id joins `FONT_IDS` in `tests/helpers/fun-demos.ts`, its
 factory joins `fontDemos` in `tests/helpers/fun-font.ts`, and its digests go in
 `tests/fixtures/examples-fun-font-goldens.ts`, not in `examples-fun-goldens.ts`. Without them the demo is tested
