@@ -1,0 +1,65 @@
+name: Pages
+
+# Publishes the web GPU showcase (examples/web-gpu) to GitHub Pages: the
+# showcase page, the demo gallery with the bijou-fun demos (gallery.html?app=fun),
+# DOGFOOD full-window and the DOM host page. The bundle is static and needs no
+# server. It is built in the sealed runner like every other build.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; a newer push replaces a queued one, but a running
+# deployment is allowed to finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build the showcase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Prepare sealed toolchain
+        run: node scripts/docker-seal/bootstrap.mjs --isolated-ci --node-version 22
+      - name: Build in the sealed runner
+        run: node scripts/docker-seal/run.mjs --isolated-ci --export examples/web-gpu/dist -- bash -lc 'npm run web-gpu:build'
+      - name: Collect the exported bundle
+        run: |
+          set -euo pipefail
+          exported=("$RUNNER_TEMP"/bijou-sealed-evidence/*/exports/examples/web-gpu/dist)
+          test "${#exported[@]}" -eq 1
+          test -f "${exported[0]}/index.html"
+          test -f "${exported[0]}/gallery.html"
+          mkdir -p "$RUNNER_TEMP/pages"
+          cp -R "${exported[0]}/." "$RUNNER_TEMP/pages/"
+          # The front page is the landing app; the showcase page moves to showcase.html.
+          test -f "$RUNNER_TEMP/pages/landing.html"
+          mv "$RUNNER_TEMP/pages/index.html" "$RUNNER_TEMP/pages/showcase.html"
+          cp "$RUNNER_TEMP/pages/landing.html" "$RUNNER_TEMP/pages/index.html"
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: ${{ runner.temp }}/pages
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

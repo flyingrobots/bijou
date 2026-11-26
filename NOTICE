@@ -1,0 +1,13 @@
+Bijou
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This repository includes the following third-party material, each under its own licence.
+
+Space Mono Bold Italic (assets/fonts/space-mono)
+  Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono)
+  Licensed under the SIL Open Font License, Version 1.1.
+  The licence text is checked in at assets/fonts/space-mono/OFL.txt. The font is unmodified.
+
+opentype.js 2.0.0 (development dependency of the examples, not shipped in any published package)
+  Copyright (c) 2020 Frederik De Bleser
+  Licensed under the MIT License.

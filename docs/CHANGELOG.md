@@ -6,7 +6,171 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Changed
+
+- The tests of the fun shell, the gallery entries and the browser entry run on a fixture catalog of fakes
+  (`tests/helpers/fun-fixture.ts`), and no test holds the number, the list or the order of the real fun demos; the
+  browser tests read the cards from the page. Adding a demo is now its module, one catalog entry and its own recorded
+  frames, as `examples/fun/README.md` says. The build test finds each demo's code by the chunk that holds its module,
+  so it fails when a demo, or the fun demos' loader, loads another demo's code. Tests and docs only; no behaviour
+  changes. Origin: flyingrobots/bijou#920, from the review of flyingrobots/bijou#919.
+
+- The showcase gallery gives each bijou-fun demo a card and a page of its own, at `gallery.html?app=fun-<id>`, where
+  it runs alone with one row for its keys and no demo switcher. The single "Bijou Fun" entry is gone, and its address,
+  `?app=fun`, now opens the gallery. `examples/fun/registry.ts` is a catalog: each entry has a demo's id, name and
+  description and imports its module on demand, so each demo is a chunk of its own and opening one downloads no
+  other's. `demos`, `demosWithFonts`, `funBuild` and `loadFunBuild` are replaced by `catalog`, `loadDemos`,
+  `createSoloApp` (`examples/fun/solo.ts`) and `loadSolo`. `npm run fun` lists and switches every demo as before.
+  Origin: flyingrobots/bijou#902.
+
+- The full test suite runs most files with Vitest's isolation off, so the files
+  in a worker share the modules they load; loading them once per file was about
+  three quarters of the suite's time. A file that changes shared state (a
+  module mock, a stub, fake timers, a spy, `process.env`, `globalThis`, the
+  working directory or the Node host package), or that is measured at two
+  seconds or more, keeps a module graph of its own. `scripts/vitest-setup.ts`
+  clears the default context before every test file, so one file cannot hand
+  it to the next. A file can ask for isolation with a
+  `// vitest: isolate` comment, and `BIJOU_VITEST_ISOLATE=all` isolates every
+  file. In the sealed runner the whole suite passed three times in a row in
+  171 to 215 s on two workers; fully isolated, a quarter of it took 120 s. See `docs/guides/sealed-tests.md`. Origin:
+  flyingrobots/bijou#907.
+- CI no longer runs the native Windows lane ("Focused Unit Tests (windows,
+  Node 22)"). Its sealed worker ran out of storage before any test started, so
+  it was red on every run (flyingrobots/bijou#788). `README.md` has a
+  "Platform support" section that says Windows is not supported at present and
+  why. The Windows launcher, its tests and the policy check that a Windows lane
+  must use the native runner all remain, so the lane can be restored by adding
+  its matrix entry back.
+- CI's full-suite shards are dealt by measured weight and there are eight of
+  them for each Node version. With shards cut by position the four took 156 to
+  341 s, because ten test files were 46% of the suite's time. Now the heaviest
+  file goes first, each to the shard that is lightest so far, using the
+  per-file times in `scripts/vitest-weights.json` (measured by
+  `scripts/measure-vitest-weights.mjs`). A stale weight only makes the shards
+  less even: every file is still in exactly one shard. Origin:
+  flyingrobots/bijou#907.
+- CI runs the full test suite as four parallel shards for each Node version
+  (job `suite`), where one job ran its 25 chunks in series in 13 to 15 minutes.
+  `BIJOU_VITEST_SHARD=k/n` makes `scripts/run-vitest.mjs` run the k-th of n
+  shares of the chunks; unset, the whole suite runs as before. The interactive
+  smoke, test type-check, canary smoke and showcase build move from the Node 22
+  `test` job into a job of their own (`smoke_gates`) that runs beside it.
+  `scripts/ci-workflow-policy.ts` refuses a workflow whose shard list is not 1
+  to N or whose command names another N. See `docs/guides/sealed-tests.md`.
+  Origin: flyingrobots/bijou#907.
+- The whole-tree ESLint ratchet (`npm run lint:eslint`) lints one target per
+  process and merges the results, where it ran one process over every target.
+  That one process held the typed program for the whole tree and ran out of V8
+  heap, at about 2,000 MB, in hosted CI (job "Verify TypeScript doctrine") and
+  in the sealed worker. Each target has a cache file of its own under
+  `.cache/eslint/`. The findings counted are the same; a file two targets match
+  is counted once.
+- Test-only: the slowest test files run faster, with every case kept. Measured
+  alone in the sealed runner: `tests/web-gpu/app-cell-widths.test.ts` 22.8 s
+  to 11.0 s (library slides split into four parts, part k takes every fourth
+  slide, and one assertion proves the parts cover the deck),
+  `tests/dogfood-book-theme-localization.test.ts` 47.7 s to 14.6 s (one file
+  per locale), `bench/src/soak-host.test.ts` 16.6 s to 9.4 s (two files), and
+  the two Markdown CLI resize cases now run side by side. Refs
+  flyingrobots/bijou#907.
+
+- The soak bench (`npm run soak`) takes its options, memory readings and log
+  through host ports (`bench/src/soak-ports.ts`) instead of reading
+  `process.argv`, `process.memoryUsage()` and `node:fs`, so its app module
+  reaches no Node API. `bench/src/soak-node.ts` is the Node adapter and keeps
+  the arguments, log lines and frames of `npm run soak`. A host that cannot
+  measure memory gets no heap or resident row and no such field in the log,
+  never a zero. The context the scenarios render with is a further host
+  port, `scenarioContext`: the Node adapter supplies the interactive test
+  context each scenario's `setup` used to build for itself, one per `setup`
+  call, so the scenarios render as before. `Scenario.setup(ctx)` now requires
+  its context and `component-app` builds none; the wall-time harness child
+  creates the same context. A log sink that throws still ends the run with its error,
+  as a failed append always did.
+- Four DOGFOOD modules no longer read Node files: `app-ids.ts` and
+  `app-prompt-font.ts` import their JSON, and the landing logo and the
+  translated guides are generated JSON copies (`examples/docs/generated/`,
+  written by `npm run components:data`, held to their files by
+  `tests/dogfood-browser-data.test.ts`). Terminal output is unchanged.
+- DOGFOOD reads its Markdown documents through one seam,
+  `examples/_shared/documents.ts` (the live file, then the verified corpus,
+  as before). The web GPU showcase's build resolves it to a browser adapter
+  that serves a table of exactly the documents the app reads, made from the
+  files at build time and never committed, so `examples/docs/app.ts` reaches
+  no Node API.
+
 ### Added
+
+- `npm run fun` and the published site have eleven more generative demos, ported
+  from Observable sketches: Seamless Squares (after cdr6934), Truchet Tiles,
+  Some Triangles, Shapes on a QuadTree, Dancing to the Noise, Seeded Needles and
+  x ^ y mod n (after Saneef Ansari), and Tumbling Box Grid, Lenses, Noise Plane
+  Partition and Partition Peel (after Claudio Esperança). Each credits its
+  original in its file header.
+
+- The published site's front page is a Bijou app (`examples/fun/landing.ts`): a
+  fun demo picked at random runs behind the Bijou wordmark in Jacquard 12 and
+  one card per demo; arrows or the pointer choose, Enter or a click opens it.
+  `examples/web-gpu/landing.html` mounts it, and the Pages deploy publishes it
+  as `index.html` (the showcase page moves to `showcase.html`).
+- `npm run fun` has four generative demos: Star Field (after Mike Bostock),
+  Directional Tiles and Deformed Rectangles (after Saneef Ansari; the second
+  after Okazz) and Doyle Spiral (after Robin Houston), with shared half-block
+  pixel painting, seeded 3D noise and embedded palettes.
+
+- GitHub Pages publishes the web GPU showcase from `main`
+  (`.github/workflows/pages.yml`): the showcase, the demo gallery with the
+  bijou-fun demos (`gallery.html?app=fun`), DOGFOOD full-window and the DOM host
+  page, at <https://flyingrobots.github.io/bijou/>. The bundle is built in the
+  sealed runner and deployed unchanged; the README links the gallery in all four
+  languages.
+
+- The showcase gallery lists a second entry, `fun` ("Bijou Fun"), at
+  `gallery.html?app=fun`: the `examples/fun` shell with its three demos, in
+  the browser, answering keys and the pointer (the metaballs follow it with no
+  button held). `examples/fun/browser.ts` is the seam: `funBuild(seed, entries)`
+  builds the shell from the registry, so a demo added to
+  `examples/fun/registry.ts` appears in the gallery with no change under
+  `examples/web-gpu`, which `tests/web-gpu/gallery-fun.test.ts` shows with a
+  stub demo. The shell and its demos are one on-demand chunk (about 10 KB), not
+  one chunk per demo. A demo that throws in `view` now paints
+  `<name> failed: <reason>` in its pane and leaves the header, footer and the
+  other demos working. Origin: flyingrobots/bijou#892.
+- `examples/fun/` brings three demos from the owner's bijou-fun project (a
+  rainbow gradient, a wormhole and colour-blending metaballs) into the
+  repository, ported from Bijou 7.1. Each demo is a typed `Demo<S>` that owns
+  its state, its `update` for keys, pointer and pulses, and a `view` that
+  returns a Surface; there is no shared options bag. A small shell lists and
+  switches demos and routes pointer input. Run it with `npm run fun`. Frames
+  are driven by frame and elapsed arguments and a seed, and no demo or shell
+  module reaches a Node API, so a later browser host can mount them. The
+  terminal entry asks for `mouseMode: 'any'`, so the metaballs follow the
+  pointer with no button held (flyingrobots/bijou#888).
+- The web GPU showcase gallery lists the soak bench (`?app=soak`), loaded in
+  its own on-demand chunk through a browser adapter of the bench's host ports
+  (`bench/src/soak-browser.ts`): options from the address (`cycles`, `fps`,
+  `dwell`, `scenario`; an invalid value is refused with a message), a heap
+  reading only where Chrome measures one and never a resident figure, and a
+  log sink that keeps the last lines in memory. Scenarios render with
+  `createWebContext()`, not the test adapter. The panel's FPS is still the
+  inverse of CPU frame cost (flyingrobots/bijou#885).
+- The web GPU showcase has a demo gallery: `/gallery.html` lists a registry of
+  demos (`examples/web-gpu/src/gallery/demos.ts`, DOGFOOD first), each loaded
+  on demand into its own chunk and opened full-window at `?app=<id>`. A Back
+  button and `Esc` return; an unknown id shows the gallery with a message; a
+  demo that fails to load shows its error and leaves the gallery usable.
+
+- The web GPU showcase mounts DOGFOOD, the documentation app: `?app=dogfood`
+  on the showcase page, and `/dogfood.html`, a page with no chrome whose
+  Surface fills the window and resizes with it. The app and its document table
+  load on demand, so the page's entry chunk does not carry them. The browser's
+  language picks DOGFOOD's locale, and the choice stays in the page.
+- The web GPU showcase can present one app on either host and keep its state.
+  A Host switch beside the backend switch (`Space` then `m`) stops the canvas
+  mount and starts `mountBijouDom()` with the same model, and back again. The
+  new dual-host counter example has both projections; apps with no scene
+  projection keep the DOM choice disabled and say why (flyingrobots/bijou#869).
 
 - The `bijou-tui` raytrace vector helpers (`raytraceAdd`, `raytraceSub`,
   `raytraceScale`, `raytraceCross`, `raytraceNormalize`, `raytraceReflect`)
@@ -14,12 +178,73 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   result is written into it and returned, so CPU-bound loops allocate nothing
   per call; the target may alias any input, and results equal the allocating
   form bit for bit. Calls without a target are unchanged (#348).
+- Regression tests prove East Asian wide-character layout in `wrapToWidth()`,
+  `constrain()` truncation and `table()` in `interactive` and `static` modes,
+  for Han, kana, halfwidth katakana, precomposed Hangul, fullwidth forms and
+  emoji between ideographs, with a property test over widths 2..120. The
+  narrow East Asian Ambiguous policy is now stated and pinned. The reference is
+  `docs/topics/text-width/`. The tests found five defects, filed as #851,
+  #852, #853, #854 and #855 (#678).
+
+- `npm run code-dojo:cycles` holds the repository's runtime import cycles to a
+  checked-in inventory, `scripts/code-dojo/baselines/runtime-scc.json`: the
+  strongly connected components of the runtime import graph, built from
+  TypeScript's syntax tree with type-only imports and re-exports left out. A
+  new, grown or merged component, or a new edge inside one, fails; a component
+  that shrinks or disappears fails as stale until `npm run
+  code-dojo:cycles:write` records it. The check is a step of `code-dojo:verify`
+  and `code-dojo:ci`. Today's inventory holds 16 components and 49 modules.
+  Output is JSON Lines with schemas in `schemas/` (#638).
+
 - `npm run code-dojo:report` writes the Code Dojo debt aggregate, next goalpost
   target, per-source counts, top ESLint rules and optional live ESLint data to
   `docs/code-dojo/debt-report.json` as a `code-dojo.debt-report.v1` document,
   with `--check` for drift and `--live-input`/`--out` for a live artifact. The
   numbers come from the same `summarizeCodeDojoDebt()` the `code-dojo:debt`
   gate uses, which is unchanged. JSON Schemas are in `schemas/` (#603).
+- `npm run code-dojo:live` runs the ESLint ratchet's own analysis and writes a
+  `code-dojo.eslint-live.v1` file (default `.cache/code-dojo/eslint-live.json`)
+  for `code-dojo:report --live-input`. It prints one JSON Lines event with the
+  stored ESLint ceiling, the live count, the signed slack and the next legal
+  ceiling (`--human` for prose, `--schema` and `--help` for the contract). The
+  total uses `summarizeEslintResults`, the function `lint:eslint` uses. It is
+  not wired into CI, hooks or any gate, and no baseline or verdict changed
+  (#369).
+- `examples/fun` gains two fluid demos ported from the owner's bijou-fun
+  project: `fluid` (a particle fluid tank around a hidden well) and
+  `flip-fluid` (a FLIP dam break with a movable obstacle). Their simulation
+  state lives in the demo's model and advances one fixed step per pulse,
+  pouring draws from the seeded generator, and the pour, source side, obstacle,
+  shake and reset keys are handled in each demo's own `update`. The shell's
+  digits and left and right arrows switch demos, so the shake keys are `z`,
+  `x`, `c` and the obstacle moves with `w a s d`. Both appear in the browser
+  gallery through the registry alone. The fluid tank follows the pane: the
+  demo contract gains a `resize` message (`width`, `height`) that the shell
+  sends to every demo before its first pulse and whenever the screen changes;
+  existing demos ignore it. See `docs/topics/fun-demos/README.md`.
+  Origin: flyingrobots/bijou#889.
+- `npm run fun` has two more demos: the outline font renderer and the 3D text
+  cylinder, ported from bijou-fun. Both draw Space Mono Bold Italic
+  (`assets/fonts/space-mono`, SIL Open Font License 1.1, with its licence text,
+  listed in the new `NOTICE`) parsed with `opentype.js`, which was already a
+  development dependency and is in no published package. The font reaches the
+  demos through a port: the terminal entry reads the file by a path from its own
+  module and the gallery's `fun` entry fetches it (`loadFunBuild`), so a demo
+  module reads no file and nothing is read at import. A missing or unparseable
+  font shows a message in the demo's pane and leaves the shell and the other
+  demos working. A demo may take text (`captures` in the contract): the shell
+  then sends it every key but `ctrl+c`, and the font demos type, delete, clear
+  and hide the HUD in their own `update`.
+
+- The fun demos gain the raymarcher, the raycaster game and the raytracer, ported from the owner's bijou-fun
+  project to the demo contract (`examples/fun/demos/`) and registered in `examples/fun/registry.ts`, so the browser
+  gallery lists them with no change under `examples/web-gpu`. The raycaster owns its player, movement, wall
+  collision, monsters and shooting in its own `update`; the raytracer owns its camera distance and pointer tilt, and
+  draws its lens jitter and soft-shadow samples from the seeded generator, so a frame is a pure function of the
+  model. The shell has no scroll-wheel message, so the raytracer zooms on `+` and `-`. Frame digests, text frames and
+  the raycaster's walking, collision and shooting are held by `tests/examples-fun-3d.test.ts` and
+  `tests/examples-fun-raycaster.test.ts`; each demo's frame cost at 177 by 53 is in `examples/fun/README.md`.
+  Origin: flyingrobots/bijou#890.
 
 ### Fixed
 
@@ -32,6 +257,40 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   sound mark `ﾞ` or `ﾟ` (`ｶﾞ`) is now two cells, one per halfwidth character.
   Emoji ZWJ, flag, skin-tone, keycap, VS16 and tag sequences keep two cells
   (flyingrobots/bijou#854, flyingrobots/bijou#855).
+
+- `main` is green again after the showcase and fun-demo merges
+  (flyingrobots/bijou#926). The lens demo's wave-front fallback typechecks; the
+  fun catalog's types live in `examples/fun/catalog-entry.ts`, under the
+  150-line Code Dojo threshold; a catalog entry says `needsFont`, so the
+  showcase's landing page leaves the font demos out of its random background
+  without naming them; the fourteen newest demos draw the separator row under
+  their panel title; and the showcase's tests count the `Landing` app.
+- The sealed runner admits a worker on Docker Desktop, whose kernel lists
+  fallback tunnel devices (`tunl0`, `sit0`, `gre0` and their relatives) and the
+  `bonding_masters` control file under `/sys/class/net` even with
+  `--network none`. Every run there was refused with `network interface beyond
+  loopback`, which also stopped the `pre-commit` hook. The seal now reads each
+  entry (`scripts/docker-seal/network-entries.mjs`) and admits loopback, that
+  control file, and a named fallback tunnel device that is down. Any other
+  device, and a fallback tunnel device that is up, is still refused (#910).
+- Workspace installs resolve `minimatch` 11.0.1 or later through a root
+  override, which clears the moderate denial-of-service advisory
+  GHSA-g3hv-75wg-m249 reached through `eslint`, `typescript-eslint` and
+  `shadcn`. `npm audit` reports no findings. The root manifest also approves
+  the install scripts of `esbuild@0.28.1` and `fsevents@2.3.3` in
+  `allowScripts`, so `npm install` no longer warns about them. Development
+  tooling only; no published package changes.
+- The sealed runner's local launchers (`scripts/docker-seal/run.mjs` and
+  `bootstrap.mjs`) no longer wrap each run in `git locks with`, so `npm test`,
+  `npm run soak` and every other local command run on a machine without
+  `git-locks`. A second concurrent local run is refused at once with a message
+  saying another run holds the worker; callers that want queueing wrap their
+  own command (flyingrobots/bijou#865).
+
+- `mountBijouCanvas()` paints the last frame again after a container resize
+  that leaves the grid unchanged. Resizing the presenter clears the canvas, and
+  with no change of columns or rows the app rendered nothing, so the canvas
+  stayed blank until the next key (flyingrobots/bijou#867).
 
 - `npm run dogfood:i18n:debt` prints each logical surface once. The inventory's
   per-surface rows are now aggregated from the entries by surface through
@@ -65,6 +324,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   draws, dim or not, and dim text drawn without a dimming compositor are still
   measured. The baseline shrinks from 48 to 32 errors: the 16 `modal/*`
   entries were each its 158-cell dimmed backdrop (#581).
+- `wrapToWidth()` no longer returns a line one cell wider than the width when
+  a line starts with a one-cell whitespace (space, tab or no-break space), a
+  run fills the width, and the next grapheme is two cells:
+  `wrapToWidth(' aaa。', 4)` is now `['aaa', '。']` instead of `['aaa。']`.
+  The wide grapheme moves to the next line. Output that already fit the width
+  is unchanged (flyingrobots/bijou#853).
 
 ### Added
 

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "code-dojo.eslint-live.v1",
+  "title": "Code Dojo live ESLint measurement",
+  "description": "Document written by npm run code-dojo:live and read by npm run code-dojo:report --live-input. eslintViolations is the ratchet's total; eslintFiles holds the top ten files by count.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "eslintViolations", "eslintFiles"],
+  "definitions": {
+    "count": { "type": "integer", "minimum": 0 }
+  },
+  "properties": {
+    "schema": { "const": "code-dojo.eslint-live.v1" },
+    "eslintViolations": { "$ref": "#/definitions/count" },
+    "eslintFiles": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "count"],
+        "properties": { "path": { "type": "string" }, "count": { "$ref": "#/definitions/count" } }
+      }
+    }
+  }
+}

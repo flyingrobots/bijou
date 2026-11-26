@@ -1,17 +1,22 @@
-import { setDefaultContext } from '@flyingrobots/bijou';
-import { mountBijouCanvas, type BijouCanvasBackend, type BijouCanvasBackendChoice, type MountedBijouCanvas } from '@flyingrobots/bijou-web';
-import { SHOWCASE_APPS } from './apps.js';
+import type { BijouCanvasBackend, BijouCanvasBackendChoice, MountedBijouCanvas } from '@flyingrobots/bijou-web';
+import { SHOWCASE_APPS, type ShowcaseBuild } from './apps.js';
 import type { ShowcaseAtlas } from './atlas.js';
-import { receiptFields, type HudState } from './hud.js';
+import type { ShowcaseHost } from './handoff.js';
+import { mountInDom, mountOnCanvas, type Carried, type LiveMount } from './host-mounts.js';
+import { hostNote, type HudState } from './hud.js';
 import { describeProblem, until } from './problems.js';
-import type { ShowcasePresenters, TrackedPresenter } from './presenters.js';
-import type { EndpointReceipt } from '@flyingrobots/geordi-bijou-gpu';
+import type { ShowcasePresenters } from './presenters.js';
+import { readState } from './session-state.js';
 
 /** One mounted app at a time, and every operation the HUD controls run on it. */
 export interface ShowcaseSession {
   state(): Promise<HudState>;
   mountApp(id: string, backend?: BijouCanvasBackendChoice): Promise<void>;
   switchBackend(next: BijouCanvasBackend): Promise<void>;
+  /** Stop the mount and present the same app, with its model, on the other host. */
+  switchHost(next: ShowcaseHost): Promise<void>;
+  /** Switch to the other host; does nothing for an app with no scene projection. */
+  toggleHost(): Promise<void>;
   /** Lose the WebGL2 context with `WEBGL_lose_context`, then restore it. */
   loseContext(): Promise<void>;
   resetAtlas(): Promise<void>;
@@ -28,23 +33,13 @@ export interface ShowcaseSession {
   readonly handle: () => MountedBijouCanvas<unknown, HTMLCanvasElement> | undefined;
 }
 
-/**
- * The tracked presenter's newest receipt. A WebGPU readback rejects when a
- * switch disposes the presenter during it: that presenter is gone, so it has
- * no receipt to show. A failure of the presenter still presenting is thrown.
- */
-async function readReceipt(tracked: TrackedPresenter | undefined, presenters: ShowcasePresenters): Promise<EndpointReceipt | null> {
-  if (tracked === undefined) return null;
-  try {
-    return await tracked.receipt();
-  } catch (error: unknown) {
-    if (presenters.presenterFor(tracked.canvas) !== tracked) return null;
-    throw error;
-  }
-}
-
 export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtlas, presenters: ShowcasePresenters): ShowcaseSession {
-  let handle: MountedBijouCanvas<unknown, HTMLCanvasElement> | undefined;
+  let live: LiveMount | undefined;
+  let built: ShowcaseBuild | undefined;
+  let title: string | null = null;
+  // The backend the canvas host last presented on, so a round trip through the DOM host returns to it.
+  let lastBackend: BijouCanvasBackendChoice = 'auto';
+  const handle = (): MountedBijouCanvas<unknown, HTMLCanvasElement> | undefined => live?.canvas;
   // The cell size and ratio the mount was made with: the atlas may already have newer ones.
   let metrics = { cellPx: atlas.cellPx(), dpr: atlas.dpr() };
   let appId: string | null = null;
@@ -60,45 +55,72 @@ export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtl
     queue = step;
     return step;
   };
-  const webgl2 = () => presenters.webgl2(handle?.canvas ?? null);
+  const webgl2 = () => presenters.webgl2(handle()?.canvas ?? null);
+
+  /** Start `host` for the loaded app; one mount at a time, so the caller has stopped the last one. */
+  async function start(host: ShowcaseHost, backend: BijouCanvasBackendChoice, carried?: Carried): Promise<void> {
+    if (built === undefined) throw new Error('BIJOU_WEB_GPU_NOT_MOUNTED: no app is mounted');
+    if (host === 'dom') {
+      live = mountInDom(container, built, carried);
+      return;
+    }
+    const made = { cellPx: atlas.cellPx(), dpr: atlas.dpr() };
+    const next = await mountOnCanvas(container, atlas, presenters, built, backend, carried);
+    live = next;
+    metrics = made;
+    next.canvas?.done.catch((error: unknown) => { if (live === next) problem = describeProblem(error); });
+  }
 
   async function mount(id: string, backend: BijouCanvasBackendChoice): Promise<void> {
-    await handle?.stop();
-    handle = undefined;
+    await live?.stop();
+    live = undefined;
     appId = id;
     problem = null;
     const entry = SHOWCASE_APPS.find((app) => app.id === id);
     if (entry === undefined) throw new Error(`BIJOU_WEB_GPU_UNKNOWN_APP: ${id}`);
-    const { build, css } = await entry.load();
-    const made = { cellPx: atlas.cellPx(), dpr: atlas.dpr() };
-    const mounted = await mountBijouCanvas((ctx) => {
-      // The browser counterpart of what startApp() does on Node.
-      setDefaultContext(ctx);
-      return build(ctx);
-    }, container, {
-      presenters: presenters.factories,
-      createCanvas: () => document.createElement('canvas'),
-      cellPx: made.cellPx,
-      backend,
-      ...(css === undefined ? {} : { css }),
-    });
-    handle = mounted;
-    metrics = made;
-    mounted.done.catch((error: unknown) => { if (handle === mounted) problem = describeProblem(error); });
+    title = entry.title;
+    built = await entry.load();
+    await start('canvas', backend);
+  }
+
+  async function toHost(next: ShowcaseHost): Promise<void> {
+    const from = live;
+    if (from === undefined || built === undefined) throw new Error('BIJOU_WEB_GPU_NOT_MOUNTED: no app is mounted');
+    if (next === from.host) return;
+    if (next === 'dom' && built.scene === undefined) throw new Error(`BIJOU_WEB_GPU_NO_SCENE: ${hostNote({ appTitle: title, sceneApp: false }) ?? ''}`);
+    if (from.canvas?.backend != null) lastBackend = from.canvas.backend;
+    await from.stop();
+    // Read after the stop settles, so a message that landed while stopping is in the carried model.
+    const carried: Carried = { model: from.model() };
+    live = undefined;
+    try {
+      await start(next, lastBackend, carried);
+    } catch (error: unknown) {
+      // The new host could not start: bring the previous one back with the same model.
+      await start(from.host, lastBackend, carried);
+      throw error;
+    }
   }
 
   return {
-    handle: () => handle,
-    model: () => handle?.model(),
+    handle,
+    model: () => live?.model(),
     failures: () => [...failures],
     cellPx: () => metrics.cellPx,
     mountApp: (id, backend = 'auto') => enqueue(() => mount(id, backend)),
     switchBackend: (next) => enqueue(async () => {
-      if (handle === undefined) throw new Error('BIJOU_WEB_GPU_NOT_MOUNTED: no app is mounted');
-      await handle.switchBackend(next);
+      const canvas = handle();
+      if (canvas === undefined) throw new Error('BIJOU_WEB_GPU_NOT_ON_CANVAS: no app is mounted on the canvas host');
+      await canvas.switchBackend(next);
+    }),
+    switchHost: (next) => enqueue(() => toHost(next)),
+    toggleHost: () => enqueue(async () => {
+      // The target is chosen here, on the queue, from the live mount: never from a polled reading.
+      if (live === undefined || built?.scene === undefined) return;
+      await toHost(live.host === 'dom' ? 'canvas' : 'dom');
     }),
     loseContext: () => enqueue(async () => {
-      const gl = handle?.canvas?.getContext('webgl2');
+      const gl = handle()?.canvas?.getContext('webgl2');
       const lose = gl?.getExtension('WEBGL_lose_context');
       if (lose == null) throw new Error('BIJOU_WEB_GPU_NO_CONTEXT_LOSS: the current backend is not WebGL2');
       lose.loseContext();
@@ -106,32 +128,19 @@ export function createShowcaseSession(container: HTMLElement, atlas: ShowcaseAtl
       lose.restoreContext();
       await until(() => webgl2()?.getDiagnostics().contextLost === false);
     }),
-    remount: () => enqueue(() => (appId === null ? Promise.resolve() : mount(appId, handle?.backend ?? 'auto'))),
+    // The DOM host has no cell size, so a new device pixel ratio does not concern it.
+    remount: () => enqueue(() => (appId === null || live?.host !== 'canvas' ? Promise.resolve() : mount(appId, handle()?.backend ?? 'auto'))),
     unmount: () => enqueue(async () => {
-      await handle?.stop();
-      handle = undefined;
+      await live?.stop();
+      live = undefined;
+      built = undefined;
       appId = null;
+      title = null;
     }),
     resetAtlas: () => enqueue(() => { atlas.reset(); return Promise.resolve(); }),
-    async state() {
-      const tracked = presenters.presenterFor(handle?.canvas ?? null);
-      const runtime = handle?.ctx.runtime;
-      const { cellPx, dpr } = metrics;
-      const receipt = await readReceipt(tracked, presenters);
-      return {
-        app: appId,
-        backend: handle?.backend ?? null,
-        fallbackReasons: handle?.fallbackReasons ?? [],
-        grid: runtime === undefined ? null : { cols: runtime.columns, rows: runtime.rows },
-        cellPx,
-        dpr,
-        frameMs: tracked?.lastPresentMs ?? null,
-        presents: tracked?.presents ?? 0,
-        ...receiptFields(receipt),
-        contextLost: webgl2()?.getDiagnostics().contextLost ?? false,
-        problem,
-        canvases: container.querySelectorAll('canvas').length,
-      };
-    },
+    state: () => readState({
+      container, presenters, live, metrics, problem, app: appId, appTitle: title,
+      sceneApp: built?.scene !== undefined, contextLost: webgl2()?.getDiagnostics().contextLost ?? false,
+    }),
   };
 }

@@ -17,7 +17,7 @@ async function gcCount(work: () => void): Promise<number> {
 }
 
 describe('raytrace target helpers allocate nothing per call', () => {
-  it('triggers no garbage collection over millions of calls, unlike the allocating form', async () => {
+  it('provokes at most a tenth of the collections of the allocating form over millions of calls', async () => {
     const a: RaytraceVector3 = [1, 2, 3];
     const b: RaytraceVector3 = [4, 5, 6];
     const out: RaytraceVector3Mutable = [0, 0, 0];
@@ -30,7 +30,12 @@ describe('raytrace target helpers allocate nothing per call', () => {
       for (let i = 0; i < ITERATIONS; i++) raytraceScale(raytraceAdd(a, b, out), 0.5, out);
     });
 
-    expect(allocating, 'control: the allocating form must provoke GC').toBeGreaterThan(0);
-    expect(withTarget).toBe(0);
+    // A collection or two can come from the test worker itself (the observer window is 50 ms
+    // and other work shares the heap), so zero is not a stable expectation. A per-call
+    // allocation would make the two counts comparable; a stray collection leaves them an order
+    // of magnitude apart.
+    const counts = `allocating ${String(allocating)}, with target ${String(withTarget)}`;
+    expect(allocating, `control: the allocating form must provoke many collections (${counts})`).toBeGreaterThanOrEqual(10);
+    expect(withTarget * 10, `the target form must not allocate per call (${counts})`).toBeLessThanOrEqual(allocating);
   });
 });

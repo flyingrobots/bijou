@@ -1,12 +1,14 @@
 import { useCallback, useRef } from 'react';
 
 /** Sizes a mount host may take; layout only, so the library's elements inside it keep their own styles. */
-export type MountHostSize = 'surface' | 'dom';
+export type MountHostSize = 'surface' | 'dom' | 'window';
 
 const SIZES: Record<MountHostSize, string> = {
   // The canvas fills its container's content box, so the host's height sets the Surface's rows.
   surface: 'relative h-96 w-full lg:h-144',
   dom: 'relative w-full',
+  // The window itself, for a page with no chrome around the Surface.
+  window: 'relative h-dvh w-screen',
 };
 
 /**

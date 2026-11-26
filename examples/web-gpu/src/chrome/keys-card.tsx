@@ -36,5 +36,6 @@ export const SHARED_KEYS: readonly KeyHintRow[] = [
   { label: 'Previous or next region', keys: [['h', 'l'], ['←', '→']] },
   { label: 'GPU showcase', keys: [['Space', 'g']] },
   { label: 'DOM check', keys: [['Space', 'd']] },
+  { label: 'Demo gallery', keys: [['Space', 'a']] },
   { label: 'Theme', keys: [['Space', 't']] },
 ];

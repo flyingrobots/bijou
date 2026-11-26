@@ -1,6 +1,9 @@
-import { readDocumentationFile as readFileSync } from '../../scripts/documentation-corpus.js';
+import { readExampleDocsDocument } from '../_shared/documents.js';
+import { stripMarkdownFrontmatter } from './app-markdown-text.js';
+export { countMarkdownHeadings, stripMarkdownFrontmatter } from './app-markdown-text.js';
+
 export function readMarkdownDoc(path: string): string {
-  return stripMarkdownFrontmatter(readFileSync(new URL(path, import.meta.url), 'utf8')).trim();
+  return stripMarkdownFrontmatter(readExampleDocsDocument(path)).trim();
 }
 
 export function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly string[]): string {
@@ -8,22 +11,4 @@ export function readMarkdownDocExcerpt(path: string, stopAtHeadings: readonly st
   const lines = content.split('\n');
   const stopIndex = lines.findIndex((line) => stopAtHeadings.includes(line.trim()));
   return (stopIndex === -1 ? lines : lines.slice(0, stopIndex)).join('\n').trim();
-}
-
-export function stripMarkdownFrontmatter(markdownText: string): string {
-  const withoutBom = markdownText.replace(/^\uFEFF/, '');
-  const opening = /^---\r?\n/.exec(withoutBom);
-  if (opening == null) return markdownText;
-  const bodyStart = opening[0].length;
-  const body = withoutBom.slice(bodyStart);
-  const closingMatch = /\r?\n---[ \t]*(?:\r?\n|$)/.exec(body);
-  if (closingMatch?.index == null) return markdownText;
-  return body.slice(closingMatch.index + closingMatch[0].length);
-}
-
-export function countMarkdownHeadings(markdownText: string): number {
-  return markdownText
-    .split('\n')
-    .filter((lineText) => /^#{1,6}\s+\S/.test(lineText.trim()))
-    .length;
 }
