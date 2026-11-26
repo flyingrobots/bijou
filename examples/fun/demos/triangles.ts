@@ -77,6 +77,7 @@ export const triangles: Demo<TrianglesState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  SOME TRIANGLES  ***  ',
+        '─',
         `  1:${ratio.toFixed(3)} (set 1:${state.ratio.toFixed(3)}), ${String(state.divisions)} vertices`,
         `  ${scheme.name}, breathe ${state.breathe ? 'on' : 'off'}`,
         '  - R : New         - + / - : Vertices',

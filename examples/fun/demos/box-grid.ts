@@ -61,6 +61,7 @@ export const boxGrid: Demo<BoxGridState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  TUMBLING BOX GRID  ***  ',
+        '─',
         `  11 x 11 cubes, speed ${String(state.speed)}x`,
         '  - R     : New moment',
         '  - + / - : Speed',

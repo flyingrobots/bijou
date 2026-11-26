@@ -116,6 +116,7 @@ export const dancing: Demo<DancingState> = {
       const shown = Math.max(1, Math.min(state.lines, Math.floor(width / MIN_SLOT)));
       stampPanel(surface, [
         '  ***  DANCING TO THE NOISE  ***  ',
+        '─',
         `  ${String(state.lines)} bars${shown < state.lines ? ` (${String(shown)} fit)` : ''}, groups of ${String(state.group)}`,
         state.colored ? `  ink ${state.ink} on ${state.paper}` : '  monochrome',
         '  - R : New field    - + / - : Bars',

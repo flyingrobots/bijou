@@ -76,6 +76,7 @@ export const seamless: Demo<SeamlessState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  SEAMLESS SQUARES  ***  ',
+        '─',
         `  size ${String(state.size)}, speed ${state.osc.toFixed(2)}`,
         `  ${state.colours.slice(1).join(' ')}`,
         `  on ${state.colours[0]}`,

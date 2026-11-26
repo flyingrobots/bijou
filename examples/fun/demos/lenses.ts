@@ -113,6 +113,7 @@ export const lenses: Demo<LensesState> = {
       const lensText = (i: 0 | 1): string => `${state.mirror[i] ? 'mirror' : 'lens'} f ${String(state.focal[i])}`;
       stampPanel(surface, [
         '  ***  LENSES  ***  ',
+        '─',
         `  blue ${lensText(0)}, red ${lensText(1)}`,
         `  ${view}${state.smooth ? ', smooth' : ''}, ray length ${String(state.tMax)}`,
         '  - POINTER : Move source   - V : View',
