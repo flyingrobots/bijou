@@ -80,6 +80,7 @@ export const doyleSpiral: Demo<DoyleState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  DOYLE SPIRAL  ***  ',
+        '─',
         `  p = ${String(state.p)} arms, q = ${String(state.q)}`,
         '  - [ / ] : Arms (p)',
         '  - , / . : Steps (q)',

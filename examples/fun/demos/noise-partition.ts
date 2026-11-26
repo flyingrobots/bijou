@@ -112,6 +112,7 @@ export const noisePartition: Demo<PartitionState> = {
       const pieces = state.layers[Math.min(state.levels, step + 1)]?.length ?? 0;
       stampPanel(surface, [
         '  ***  NOISE PLANE PARTITION  ***  ',
+        '─',
         `  level ${String(Math.min(state.levels, step + 1))} of ${String(state.levels)}, ${String(pieces)} pieces`,
         '  - R     : New composition',
         '  - + / - : Levels',

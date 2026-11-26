@@ -104,6 +104,7 @@ export const xorMod: Demo<XorModState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  X ^ Y MOD N  ***  ',
+        '─',
         `  n ${String(state.base)}, ${String(state.cells)} cells in a row`,
         '  - R     : New composition',
         '  - + / - : n',

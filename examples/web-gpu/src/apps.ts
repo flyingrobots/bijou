@@ -26,12 +26,12 @@ export const SHOWCASE_APPS: readonly ShowcaseApp[] = [
     id: 'landing',
     title: 'Landing',
     // The published site's front page: a fun demo chosen at random runs behind the wordmark and one card per demo.
-    // The two font demos are left out of the draw: they wait on a font download before they can paint.
+    // Demos that need a font are left out of the draw: they wait on a font download before they can paint.
     async load() {
       const [{ createLandingApp }, { catalog }, { fetchFont }] = await Promise.all([
         import('../../fun/landing.js'), import('../../fun/registry.js'), import('../../fun/browser.js'),
       ]);
-      const backgrounds = catalog.filter((item) => item.id !== 'font-renderer' && item.id !== 'text-cylinder');
+      const backgrounds = catalog.filter((item) => item.needsFont !== true);
       const pick = backgrounds[Math.floor(Math.random() * backgrounds.length)] ?? catalog[0];
       if (pick === undefined) throw new Error('BIJOU_WEB_GPU_NO_FUN_DEMOS');
       const background = await pick.load({ font: fetchFont });

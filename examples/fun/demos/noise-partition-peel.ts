@@ -93,6 +93,7 @@ export const partitionPeel: Demo<PeelState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  PARTITION PEEL  ***  ',
+        '─',
         `  ${String(state.flights.length)} pieces, ${String(state.levels)} levels`,
         `  peeling ${STYLE_NAMES[state.style]}`,
         '  - R     : New composition',

@@ -122,6 +122,7 @@ export const rects: Demo<RectsState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  DEFORMED RECTANGLES  ***  ',
+        '─',
         `  ${String(state.quads.length)} quads, ${String(state.passes)} levels, palette ${palette?.name ?? ''}`,
         `  auto ${state.auto ? 'on' : 'off'}, stroke ${state.stroke ? 'on' : 'off'}`,
         '  - R : Recompose   - + / - : Levels',

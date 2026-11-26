@@ -91,6 +91,7 @@ export const needles: Demo<NeedlesState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  SEEDED NEEDLES  ***  ',
+        '─',
         `  Seed: ${String(state.field)}`,
         `  ${String(state.rows)} x ${String(state.rows)} needles`,
         '  - R     : New seed',

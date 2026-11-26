@@ -116,6 +116,7 @@ export const quadtree: Demo<QuadtreeState> = {
       const on = (flag: boolean): string => (flag ? 'on' : 'off');
       stampPanel(surface, [
         '  ***  SHAPES ON A QUADTREE  ***  ',
+        '─',
         `  ${String(state.layout.leaves.length)} quads, ${String(state.points)} points, ${String(state.maxLevels)} levels`,
         `  palette ${palette.name}, auto ${on(state.auto)}`,
         `  shapes ${on(state.layers.shapes)}, quads ${on(state.layers.quads)}, points ${on(state.layers.points)}`,

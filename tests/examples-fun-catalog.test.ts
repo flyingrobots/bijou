@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { catalog, loadDemos, type DemoHost } from '../examples/fun/registry.js';
+import { FONT_IDS } from './helpers/fun-demos.js';
 import { FONT_FILE } from './helpers/fun-font.js';
 import { stubCatalogEntry } from './helpers/fun-stub.js';
 
@@ -46,6 +47,11 @@ describe('the fun catalog', () => {
     const loaded = await loadDemos({ font: () => { asked += 1; return Promise.resolve(readFileSync(FONT_FILE)); } });
     expect(loaded).toHaveLength(catalog.length);
     expect(asked).toBe(1);
+  });
+
+  it('marks exactly the demos that draw the font as needing it', () => {
+    const needing = catalog.filter((entry) => entry.needsFont === true).map((entry) => entry.id);
+    expect([...needing].sort()).toEqual([...FONT_IDS].sort());
   });
 
   it('rejects when a demo module fails to load', async () => {

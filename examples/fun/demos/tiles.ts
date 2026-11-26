@@ -91,6 +91,7 @@ export const tiles: Demo<TilesState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  DIRECTIONAL TILES  ***  ',
+        '─',
         `  ${String(state.cells)} x ${String(state.cells)} tiles, ${String(state.segments)} segments`,
         `  ink ${state.ink} on ${state.paper}`,
         '  - R     : New composition',

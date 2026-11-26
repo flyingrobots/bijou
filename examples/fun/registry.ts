@@ -1,21 +1,9 @@
 // Licensed under the Apache License, Version 2.0, like the rest of this repository.
 import type { DemoEntry } from './contract.js';
 import type { FontPort } from './demos/typeface.js';
+import type { CatalogEntry, DemoHost } from './catalog-entry.js';
 
-/** What a host hands a demo that needs something from outside the program: the bytes of the font, through a port. */
-export interface DemoHost {
-  readonly font: FontPort;
-}
-
-/** One demo of the catalog: what a list shows before any demo's code has loaded, and how to load that code. */
-export interface CatalogEntry {
-  readonly id: string;
-  readonly name: string;
-  /** One line. */
-  readonly description: string;
-  /** Import this demo's module, which no other entry imports, and build the demo. */
-  load(host: DemoHost): Promise<DemoEntry>;
-}
+export type { CatalogEntry, DemoHost } from './catalog-entry.js';
 
 /**
  * The demos, in the order every host lists them. Adding a demo is one entry here: the terminal shell lists it and the
@@ -61,6 +49,7 @@ export const catalog: readonly CatalogEntry[] = [
   },
   {
     id: 'font-renderer', name: 'TTF Font Vector Renderer', description: 'Typed text as outlines in animated braille',
+    needsFont: true,
     load: async ({ font }) => (await import('./demos/font-renderer.js')).loadFontRenderer(font),
   },
   {
@@ -140,6 +129,7 @@ export const catalog: readonly CatalogEntry[] = [
   },
   {
     id: 'text-cylinder', name: '3D Text Cylinder Ticker', description: 'Letters rolling over a 3D text cylinder',
+    needsFont: true,
     load: async ({ font }) => (await import('./demos/text-cylinder.js')).loadTextCylinder(font),
   },
 ];

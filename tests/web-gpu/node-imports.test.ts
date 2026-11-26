@@ -45,7 +45,7 @@ describe('examples/web-gpu bundle has no Node.js built-in', () => {
   it('lists every example app it mounts and refuses none', () => {
     const ids = SHOWCASE_APPS.map((app) => app.id);
     // Its own apps, with the gallery's entries where DOGFOOD stands: whatever the gallery lists, the showcase page mounts.
-    expect(ids).toEqual(['counter', 'components', 'hero', 'showcase', ...GALLERY_DEMOS.map((demo) => demo.id), 'dual']);
+    expect(ids).toEqual(['landing', 'counter', 'components', 'hero', 'showcase', ...GALLERY_DEMOS.map((demo) => demo.id), 'dual']);
     expect(GALLERY_DEMOS.map((demo) => demo.id).slice(0, 2)).toEqual(['dogfood', 'soak']);
     expect(REFUSED_APPS).toEqual([]);
   });

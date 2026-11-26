@@ -97,6 +97,7 @@ export const truchet: Demo<TruchetState> = {
     if (!state.hideUI) {
       stampPanel(surface, [
         '  ***  TRUCHET TILES  ***  ',
+        '─',
         `  ${String(state.grid)} x ${String(state.grid)}, bias ${state.bias.toFixed(2)}, stroke ${String(state.stroke)}`,
         `  scheme ${scheme.name}, auto ${state.auto ? 'on' : 'off'}`,
         '  - R : Retile    - + / - : Grid',

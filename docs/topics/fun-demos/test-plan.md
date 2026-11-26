@@ -148,6 +148,7 @@ Origin: flyingrobots/bijou#902.
 | FD-124 | `loadDemos` asks the host for the font once. | `asks the host for the font once, however many demos draw it` | Implemented |
 | FD-125 | `loadDemos` rejects when a module fails to load. | `rejects when a demo module fails to load` | Implemented |
 | FD-126 | With a font port that rejects, every demo still loads and the font demos show a message. | `shows the message in the font demos only, and the other demos still run` (`examples-fun-fonts-shell.test.ts`) | Implemented |
+| FD-141 | A catalog entry says `needsFont` exactly when its demo draws the font, so a host can leave those demos out of a list that must paint at once. Origin: flyingrobots/bijou#926. | `marks exactly the demos that draw the font as needing it` | Implemented |
 
 ## The browser entry: `examples-fun-browser.test.ts`
 
