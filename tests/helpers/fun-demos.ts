@@ -75,7 +75,8 @@ export function frameScript(id: string, width: number, height: number): DemoMsg[
     'some-triangles': 'r', 'quadtree-shapes': 'r', 'dancing-noise': 'c', 'seeded-needles': 'r', 'xor-mod-n': '+', 'box-grid': '+',
     'lenses': 'v', 'adaptive-contours': ']', 'endless-loop': 'r',
     'bitmap-generator': 'r', 'voronoi-incircles': 't', 'line-integral-convolution': 'f', 'generative-painting': 'r',
-    'noise-trails': 'r', 'dashed-rings': 'r', 'oil-brushstrokes': 'c', 'periodic-tilings': ']', 'noise-plane-partition': 'r', 'partition-peel': 'a',
+    'noise-trails': 'r', 'dashed-rings': 'r', 'oil-brushstrokes': 'c', 'periodic-tilings': ']',
+    'gargantua': '+', 'shatter': 's', 'butterfly': '.', 'lenia': 'c', 'four-ways': '+', 'noise-plane-partition': 'r', 'partition-peel': 'a',
   };
   const generativeKey = generative[id];
   if (generativeKey !== undefined) return [...pulses(30), { type: 'key', key: generativeKey }, ...pulses(30)];

@@ -54,6 +54,11 @@ never fire, naming what takes each key and how to fix it.
 | `r`, `+` `-`, `s`, `h` | noise plane partition: new composition, levels, lines, hide the card |
 | `r`, `+` `-`, `a`, `s`, `h` | partition peel: new composition, levels, peel direction, lines, hide the card |
 | pointer, `h` | 3D wave surface: orbit the camera, hide the card |
+| pointer, `+` `-`, `d`, `h` | Gargantua: orbit the camera, closer / farther, Doppler beaming, hide the card |
+| `s`, `r`, pointer, `a`, `h` | Shatter: shatter, rewind, shove debris, auto-loop, hide the card |
+| `[` `]`, `,` `.`, `f`, `r`, `h` | Butterfly Effect: scrub 1 s, scrub 8 s, fork C from A, restart, hide the card |
+| pointer, `[` `]`, `,` `.`, `s`, `r`, `c`, `+` `-`, `h` | Lenia: drop an Orbium, mutate mu, mutate sigma, next scene, reseed, colour ramp, speed, hide the card |
+| `+` `-`, `r`, `h` | Four Ways to See: time speed, new comet, hide the card |
 | `q`, `ctrl+c` | quit |
 
 ## The contract

@@ -109,6 +109,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- Five original fun demos, in the Demos menu, the gallery and `npm run fun`:
+  Gargantua (a geodesic-raytraced Schwarzschild black hole with a lensed
+  accretion disk, photon ring and Doppler beaming); Shatter (a live dashboard of
+  real Bijou Components breaks into glyph physics and rewinds exactly into
+  place); Butterfly Effect (three universes of double pendulums, 1e-12 and 1e-9
+  apart, diverging, with a time scrubber and forking); Lenia (Bert Chan's
+  continuous cellular automaton, Orbium creatures on a torus); and Four Ways to
+  See (one comet simulation lowered live into all four output modes).
+
 - The fun demos are one framed Bijou app (`examples/fun/fun-app.ts`): Home shows
   the 3D wave surface behind the Bijou wordmark, and Demos lists every demo beside
   the selected one running. On Demos, the arrows or `j`/`k` choose, Enter plays

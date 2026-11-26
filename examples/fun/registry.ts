@@ -115,6 +115,21 @@ export const catalog: readonly CatalogEntry[] = [
   { id: 'periodic-tilings', name: 'Periodic Tilings',
     description: 'Periodic tilings of regular polygons synthesized from seeds and translations, after Claudio Esperança',
     load: async () => (await import('./demos/periodic-tilings.js')).periodicTilingsDemo },
+  { id: 'gargantua', name: 'Gargantua',
+    description: 'A raytraced Schwarzschild black hole: lensed accretion disk, photon ring, shadow and bent stars',
+    load: async () => (await import('./demos/gargantua.js')).gargantuaDemo },
+  { id: 'shatter', name: 'Shatter',
+    description: 'Your UI is made of matter: a live dashboard breaks into glyph debris, then rewinds itself',
+    load: async () => (await import('./demos/shatter.js')).shatterDemo },
+  { id: 'butterfly', name: 'Butterfly Effect',
+    description: 'Three universes of 180 double pendulums, one 1e-12 apart: lockstep for seconds, then three futures',
+    load: async () => (await import('./demos/butterfly.js')).butterflyDemo },
+  { id: 'lenia', name: 'Lenia',
+    description: 'Bert Chan\'s continuous cellular automaton: Orbium creatures glide, pulse and divide on a torus',
+    load: async () => (await import('./demos/lenia.js')).leniaDemo },
+  { id: 'four-ways', name: 'Four Ways to See',
+    description: 'One comet simulation lowered live into all four output modes: interactive, static, pipe, accessible',
+    load: async () => (await import('./demos/four-ways.js')).fourWaysDemo },
 ];
 
 /** Load every demo of `entries`, in order, for a host that lists them all. The font is asked for once, however many demos draw it. */
