@@ -15,6 +15,8 @@ at a time:
 | Han ideographs, hiragana, katakana, precomposed Hangul syllables | W | 2 |
 | Fullwidth Latin and punctuation (`Ａ`, `，`, `！`), CJK punctuation (`。`, `「`) | F or W | 2 |
 | Halfwidth katakana (`ｶ`, `ｰ`) | H | 1 |
+| Halfwidth sound marks `ﾞ` and `ﾟ`, attached to the letter before them (`ｶﾞ`) | H | 1 each, so `ｶﾞ` is 2 |
+| Hangul written as conjoining jamo (`U+1112 U+1161 U+11AB`), and a lone leading jamo | leading jamo W, vowel and final jamo N | 2 |
 | Combining marks (U+0301, U+3099) | not a cell of its own | 0 |
 | Emoji in the ranges `isWideChar()` documents | W | 2 |
 
@@ -59,7 +61,3 @@ than in the suite.
   character: flyingrobots/bijou#852.
 - A line that starts with a space can wrap one cell too wide:
   flyingrobots/bijou#853.
-- Hangul written as conjoining jamo measures one cell instead of two:
-  flyingrobots/bijou#854.
-- The halfwidth voiced marks `ﾞ` and `ﾟ` measure zero cells instead of one:
-  flyingrobots/bijou#855.

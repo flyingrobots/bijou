@@ -3,8 +3,9 @@
 This ledger lists each requirement of the [text width reference](./README.md)
 and the test that holds it. Text tests are in `packages/bijou/src/core/text/`
 and component tests in `packages/bijou/src/core/components/`, in the file named
-in each group heading. Every expected value is written by hand in the test,
-counted on the UAX #11 cell grid. Origin: flyingrobots/bijou#678.
+in each group heading unless the Test cell names another file. Every expected
+value is written by hand in the test, counted on the UAX #11 cell grid.
+Origin: flyingrobots/bijou#678.
 
 ## Cell widths: `width-policy-wide.test.ts`
 
@@ -15,8 +16,8 @@ counted on the UAX #11 cell grid. Origin: flyingrobots/bijou#678.
 | TW-03 | Combining marks take no cell. | `gives combining marks no cell of their own` | Implemented |
 | TW-04 | East Asian Ambiguous characters are one cell. | `measures every listed Ambiguous character as one cell` | Implemented |
 | TW-05 | Ambiguous characters wrap as one cell beside wide ones. | `wraps Ambiguous characters as one cell beside wide ones` | Implemented |
-| TW-06 | Conjoining jamo syllables are two cells. | none: flyingrobots/bijou#854 | Defect |
-| TW-07 | Halfwidth voiced marks are one cell each. | none: flyingrobots/bijou#855 | Defect |
+| TW-06 | Conjoining jamo syllables are two cells. | `grapheme-spacing-units.test.ts`: `measures a leading + vowel + final jamo syllable as two cells`, `measures leading + vowel and Old Hangul syllables as two cells`, `measures a lone leading jamo as two cells` | Implemented |
+| TW-07 | Halfwidth voiced marks are one cell each. | `grapheme-spacing-units.test.ts`: `keeps ｶﾞ one cluster and measures it as two cells`, `counts each attached halfwidth mark as its own cell`, `wraps ｶﾞｷﾞ at width 2 into two-cell lines` | Implemented |
 
 ## Wrapping: `wrap-wide.test.ts` and `wrap-wide-paragraph.test.ts`
 
@@ -56,4 +57,4 @@ counted on the UAX #11 cell grid. Origin: flyingrobots/bijou#678.
 | TW-36 | An odd-width column of only wide characters pads one cell. | `pads an odd-width column of only wide characters` | Implemented |
 | TW-37 | Grapheme wrapping moves a wide character whole. | `wraps by grapheme the same way when wrap is "grapheme"` | Implemented |
 | TW-38 | A truncating width-1 column holds one space. | `pads a width-1 column instead of placing half a wide character` | Implemented |
-| TW-39 | Conjoining jamo rows align. | none: flyingrobots/bijou#854 | Defect |
+| TW-39 | Conjoining jamo rows align. | `grapheme-spacing-units.test.ts`: `aligns a table row of jamo syllables with precomposed Hangul` | Implemented |
