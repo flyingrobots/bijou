@@ -102,6 +102,16 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Added
 
+- `npm run verify:lane` classifies changed paths into the fast or full
+  verification lane of DL-030, with the rule that decided each path. The diff
+  is the merge base with `origin/main` to `HEAD`, or a `--paths-from` list.
+  Unknown paths, empty change sets, invalid paths, deletions, renames and every
+  error classify full; the sealed runner, gate scripts, schemas and nested
+  manifests are full in addition to the DL-030 table. Output is JSON Lines
+  against `schemas/bijou.verify-lane.event.v1.schema.json`, with `--human`
+  prose. Nothing reads the lane yet, so no required check changes
+  (flyingrobots/bijou#610).
+
 - `npm run fun` and the published site have eleven more generative demos, ported
   from Observable sketches: Seamless Squares (after cdr6934), Truchet Tiles,
   Some Triangles, Shapes on a QuadTree, Dancing to the Noise, Seeded Needles and

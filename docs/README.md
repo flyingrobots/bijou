@@ -71,6 +71,7 @@ The glossary and topic finder support practical lookup.
 - [Browser host adapter](./topics/bijou-web/README.md): the `@flyingrobots/bijou-web` port contracts, refusals, and [test plan](./topics/bijou-web/test-plan.md)
 - [Web GPU showcase](./topics/web-gpu-showcase/README.md): example apps on Geordi's WebGPU, WebGL2 and Canvas 2D presenters in a browser, the HUD, the pinned Geordi packages, and [test plan](./topics/web-gpu-showcase/test-plan.md)
 - [DOM host](./topics/bijou-web-dom/README.md): `mountBijouDom()` element mapping, keyed patching, events, focus fallback, theme sync, and [test plan](./topics/bijou-web-dom/test-plan.md)
+- [Verification lane classifier](./topics/verification-lanes/README.md): `npm run verify:lane`, the fast and full path rules, fail-closed cases, and [test plan](./topics/verification-lanes/test-plan.md)
 - [East Asian text width](./topics/text-width/README.md): cell widths, the narrow Ambiguous policy, wrapping, truncation, tables, known defects, and [test plan](./topics/text-width/test-plan.md)
 - [bijou-fun demos](./topics/fun-demos/README.md): the typed demo contract, the shell, the first three demos, and [test plan](./topics/fun-demos/test-plan.md)
 - Translation glossaries ([French](./topics/glossary.fr.md), [Spanish](./topics/glossary.es.md), [German](./topics/glossary.de.md)): one rendering per Bijou term, address form, and typography; decision in [DL-035](./design/DL-035-translation-glossary.md)

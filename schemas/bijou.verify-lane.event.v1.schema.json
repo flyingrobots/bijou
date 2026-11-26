@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "bijou.verify-lane.event.v1",
+  "title": "Verification lane classifier command line",
+  "description": "One JSON Lines object on stdout (lane-decision, help, schema) or stderr (error) from npm run verify:lane.",
+  "type": "object",
+  "required": ["_schema", "kind"],
+  "properties": {
+    "_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "bijou.verify-lane.event" },
+        "version": { "const": "1.0.0" }
+      }
+    }
+  },
+  "definitions": {
+    "lane": { "enum": ["fast", "full"] },
+    "reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "status", "lane", "reason", "pattern", "escalation"],
+      "properties": {
+        "path": { "type": "string" },
+        "status": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+        "lane": { "$ref": "#/definitions/lane" },
+        "reason": {
+          "enum": [
+            "core-runtime",
+            "generated-asset",
+            "dogfood-source",
+            "release-doc",
+            "ratchet-baseline",
+            "gate-definition",
+            "toolchain",
+            "unknown",
+            "test-only",
+            "docs-only",
+            "script-tooling"
+          ]
+        },
+        "pattern": { "type": "string" },
+        "escalation": {
+          "enum": [
+            null,
+            "deleted",
+            "renamed",
+            "copied",
+            "type-changed",
+            "unmerged",
+            "unrecognized-status",
+            "invalid-path",
+            "empty-change-set"
+          ]
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "lane", "dogfood", "reasons", "requiredPolicy", "base"],
+      "properties": {
+        "_schema": true,
+        "kind": { "const": "lane-decision" },
+        "lane": { "$ref": "#/definitions/lane" },
+        "dogfood": { "type": "boolean" },
+        "reasons": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/reason" } },
+        "requiredPolicy": { "enum": ["bijou.verify.fast.v1", "bijou.verify.full.v1"] },
+        "base": { "anyOf": [{ "type": "string" }, { "type": "null" }] }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "command", "description", "options", "schema"],
+      "properties": {
+        "_schema": true,
+        "kind": { "const": "help" },
+        "command": { "const": "verify:lane" },
+        "description": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["flag", "description"],
+            "properties": { "flag": { "type": "string" }, "description": { "type": "string" } }
+          }
+        },
+        "schema": { "type": "string" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "schema"],
+      "properties": { "_schema": true, "kind": { "const": "schema" }, "schema": { "type": "object" } }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "code", "message", "lane", "dogfood"],
+      "properties": {
+        "_schema": true,
+        "kind": { "const": "error" },
+        "code": { "enum": ["bad-arguments", "git-failed", "unparseable-diff", "unreadable-paths", "classification-failed"] },
+        "message": { "type": "string" },
+        "lane": { "const": "full" },
+        "dogfood": { "const": true }
+      }
+    }
+  ]
+}
