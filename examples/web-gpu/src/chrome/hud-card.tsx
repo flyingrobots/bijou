@@ -5,7 +5,7 @@ import { hudRows } from '../hud.js';
 import type { ShowcaseView } from '../showcase-store.js';
 
 // The rows the HUD shows; while the first state is read, each value is a Skeleton.
-const LABELS = ['App', 'Backend', 'Fallback reasons', 'Grid', 'Cell', 'Device pixel ratio', 'Frame time', 'Evidence', 'Adapter', 'Atlas generation', 'Shader', 'Frame', 'WebGL2 context', 'Refusal or fault'];
+const LABELS = ['App', 'Host', 'Model', 'Backend', 'Fallback reasons', 'Grid', 'Cell', 'Device pixel ratio', 'Frame time', 'Evidence', 'Adapter', 'Atlas generation', 'Shader', 'Frame', 'WebGL2 context', 'Refusal or fault'];
 
 /** What the mount and each presenter's receipt report, refreshed five times a second. */
 export function HudCard({ view }: { view: ShowcaseView }) {

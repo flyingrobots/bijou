@@ -65,7 +65,9 @@ Components that animate open on their animated variant. Interactive mode plays i
 
 ## Right-to-left layout
 
-`r` switches the reading direction. The library passes it to the app frame through an i18n runtime and mirrors its own body: the breadcrumb flow, the mode row, the carousel's slide direction, and the alignment of prose and slides. In right-to-left layout, `h`, `[`, and the left arrow move toward the end of the list. Code, function names, and the components themselves are not mirrored.
+`r` switches the reading direction. The library passes it to the app frame through an i18n runtime and mirrors its own body: the breadcrumb flow, the mode row, the carousel's slide direction, and the alignment of prose and slides. In right-to-left layout, `h`, `[`, and the left arrow move toward the end of the list.
+
+The library also passes the direction to every story preview as the preview context's `direction`. A component that reads it (through `mirrorsLayout()`) mirrors its layout in the `interactive` and `static` modes; `pipe` and `accessible` output keep logical order. A story that passes its own `direction` to a component keeps it. Code, function names, and components that do not read the direction yet are not mirrored.
 
 The app frame mirrors only what it supports today: the settings drawer and notifications open from the other side. The header, footer, and pane chrome do not mirror yet; issues #571 to #575 track the remaining right-to-left work.
 

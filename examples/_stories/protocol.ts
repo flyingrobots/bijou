@@ -2,7 +2,7 @@ import {
   installRuntimeViewportOverlay,
   updateRuntimeViewport,
 } from '@flyingrobots/bijou';
-import type { BijouContext, Surface } from '@flyingrobots/bijou';
+import type { BijouContext, InlineDirection, Surface } from '@flyingrobots/bijou';
 import { contentSurface } from '../_shared/example-surfaces.js';
 import type {
   StoryMode,
@@ -66,23 +66,28 @@ export function findStoryProfileIndex(
   return match >= 0 ? match : 0;
 }
 
+/**
+ * Build the context one story preview renders with: the preset's output mode, its own viewport and,
+ * when given, the host's layout direction. Without `direction` the base context's direction is kept.
+ */
 export function createStoryProfileContext(
   baseCtx: BijouContext,
   preset: StoryProfilePreset,
-  viewport?: { readonly width?: number; readonly height?: number },
+  options?: { readonly width?: number; readonly height?: number; readonly direction?: InlineDirection },
 ): BijouContext {
   const host = { runtime: baseCtx.runtime };
   const runtime = installRuntimeViewportOverlay(host);
   updateRuntimeViewport(
     runtime,
-    Math.max(1, viewport?.width ?? preset.width),
-    Math.max(1, viewport?.height ?? baseCtx.runtime.rows),
+    Math.max(1, options?.width ?? preset.width),
+    Math.max(1, options?.height ?? baseCtx.runtime.rows),
   );
 
   return {
     ...baseCtx,
     mode: preset.mode,
     runtime,
+    ...(options?.direction === undefined ? {} : { direction: options.direction }),
   };
 }
 

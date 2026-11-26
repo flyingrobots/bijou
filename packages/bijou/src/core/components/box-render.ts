@@ -28,6 +28,7 @@ export function drawBox(
   fillCharacter = ' ',
   title?: string,
   overflow: OverflowBehavior = 'wrap',
+  mirrorTitle = false,
 ): string {
   const rawContentLines = content.split('\n');
   let innerWidth: number;
@@ -74,16 +75,12 @@ export function drawBox(
   if (title && innerWidth >= 4) {
     const label = ` ${title} `;
     const labelWidth = graphemeWidth(label);
-    if (labelWidth <= innerWidth - 2) {
-      topBorder =
-        BORDER.h + label + BORDER.h.repeat(innerWidth - 1 - labelWidth);
-    } else {
-      const clipped = clipToWidth(label, innerWidth - 2);
-      topBorder =
-        BORDER.h +
-        clipped +
-        BORDER.h.repeat(innerWidth - 1 - graphemeWidth(clipped));
-    }
+    const shown =
+      labelWidth <= innerWidth - 2 ? label : clipToWidth(label, innerWidth - 2);
+    const lead = BORDER.h;
+    const trail = BORDER.h.repeat(innerWidth - 1 - graphemeWidth(shown));
+    // The title sits at the logical start edge: right under rtl.
+    topBorder = mirrorTitle ? trail + shown + lead : lead + shown + trail;
   }
 
   const top = borderColor(BORDER.tl + topBorder + BORDER.tr);

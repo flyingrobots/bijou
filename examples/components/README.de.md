@@ -65,7 +65,9 @@ Komponenten, die animiert sind, öffnen sich mit ihrer animierten Variante. Der 
 
 ## Rechts-nach-links-Layout
 
-`r` schaltet die Leserichtung um. Die Library reicht sie über eine i18n-Runtime an den App-Rahmen weiter und spiegelt ihren eigenen Körper: den Fluss der Brotkrumennavigation, die Modus-Zeile, die Folienrichtung des Karussells und die Ausrichtung von Prosa und Folien. Im Rechts-nach-links-Layout bewegen `h`, `[` und der Pfeil nach links sich zum Ende der Liste hin. Code, Funktionsnamen und die Komponenten selbst werden nicht gespiegelt.
+`r` schaltet die Leserichtung um. Die Library reicht sie über eine i18n-Runtime an den App-Rahmen weiter und spiegelt ihren eigenen Körper: den Fluss der Brotkrumennavigation, die Modus-Zeile, die Folienrichtung des Karussells und die Ausrichtung von Prosa und Folien. Im Rechts-nach-links-Layout bewegen `h`, `[` und der Pfeil nach links sich zum Ende der Liste hin.
+
+Die Library reicht die Leserichtung außerdem an jede Story-Vorschau weiter, als `direction` des Vorschaukontexts. Eine Komponente, die sie liest (über `mirrorsLayout()`), spiegelt ihr Layout in den Modi `interactive` und `static`; die Ausgaben `pipe` und `accessible` behalten die logische Reihenfolge. Eine Story, die einer Komponente ihre eigene `direction` übergibt, behält sie. Code, Funktionsnamen und Komponenten, die die Leserichtung noch nicht lesen, werden nicht gespiegelt.
 
 Der App-Rahmen spiegelt nur, was er heute unterstützt: Die Einstellungsschublade und Benachrichtigungen öffnen sich von der anderen Seite. Kopfzeile, Fußzeile und Bereichs-Chrome spiegeln noch nicht; die Issues #571 bis #575 verfolgen die verbleibende Rechts-nach-links-Arbeit.
 

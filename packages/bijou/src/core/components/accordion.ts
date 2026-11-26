@@ -3,6 +3,8 @@ import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
 import { makeBgFill } from '../bg-fill.js';
+import { mirrorsLayout, type InlineDirection } from '../direction/direction.js';
+import { renderAccordionRtl } from './accordion-rtl.js';
 
 /** Represent a single collapsible section within an accordion. */
 export interface AccordionSection {
@@ -24,6 +26,12 @@ export interface AccordionOptions {
   headerBgToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext | undefined;
+  /**
+   * Logical layout direction. Overrides `ctx.direction`; absent both, `'ltr'`.
+   * Under `'rtl'` in `interactive` and `static` output the disclosure glyph and
+   * content indent move to the right edge; `▶` mirrors to `◀`.
+   */
+  direction?: InlineDirection | undefined;
 }
 
 /**
@@ -33,6 +41,8 @@ export interface AccordionOptions {
  * - `pipe`: sections rendered as `# title` headings with content.
  * - `accessible`: sections tagged `[expanded]` or `[collapsed]`.
  * - `interactive`/`static`: styled `▼`/`▶` indicators with themed titles.
+ *   Under `rtl` the indicator follows the title on the right, `▶` becomes `◀`,
+ *   and content is indented from the right.
  *
  * @param sections - Array of accordion sections to render.
  * @param options - Rendering options including indicator/title tokens and context.
@@ -57,6 +67,9 @@ export function accordion(sections: AccordionSection[], options: AccordionOption
       const indicatorToken = options.indicatorToken ?? ctx.semantic('accent');
       const titleToken = options.titleToken ?? ctx.semantic('primary');
       const bgFill = makeBgFill(options.headerBgToken, ctx);
+      if (mirrorsLayout({ ...options, ctx })) {
+        return renderAccordionRtl(sections, { indicatorToken, titleToken, bgFill, ctx });
+      }
 
       return sections
         .map((s) => {

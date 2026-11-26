@@ -7,7 +7,7 @@ import { resolveFillChar, type BoxOptions } from './box.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
 import { createTextSurface, segmentSurfaceText, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
-import { BORDER, normalizeFixedWidth, parseStyleRGB, withInheritedBackground } from './box-v3.part01.js';
+import { BORDER, mirrorsLayout, titleStartX, normalizeFixedWidth, parseStyleRGB, withInheritedBackground } from './box-v3.part01.js';
 
 /**
  * Render a bordered box around a Surface.
@@ -21,6 +21,7 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   const bcss = ctx?.resolveBCSS({ type: 'Box', id: options.id, classes: options.class?.split(' ') }) ?? {};
   const overflow = resolveOverflowBehavior(options.overflow, bcss);
   const normalizedFixedWidth = normalizeFixedWidth(fixedWidth);
+  const mirrorTitle = mirrorsLayout({ direction: options.direction, ctx });
 
   const pt = padding.top ?? 0;
   const pb = padding.bottom ?? 0;
@@ -99,7 +100,7 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
       const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
       const titleLen = Math.min(titleGs.length, available);
       for (const [i, char] of titleGs.slice(0, titleLen).entries()) {
-        surface.setRGB(i + 2, 0, char, fgR, fgG, fgB, bgR, bgG, bgB, flags);
+        surface.setRGB(i + titleStartX(outerW, titleLen, mirrorTitle), 0, char, fgR, fgG, fgB, bgR, bgG, bgB, flags);
       }
     }
   } else {
@@ -128,7 +129,7 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
       const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
       const titleLen = Math.min(titleGs.length, available);
       for (const [i, char] of titleGs.slice(0, titleLen).entries()) {
-        surface.set(i + 2, 0, { ...borderCell, char });
+        surface.set(i + titleStartX(outerW, titleLen, mirrorTitle), 0, { ...borderCell, char });
       }
     }
   }

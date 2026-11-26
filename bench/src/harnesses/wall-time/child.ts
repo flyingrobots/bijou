@@ -28,6 +28,7 @@ import '../../../../scripts/docker-seal/require-docker.mjs';
  * through by the parent runner.
  */
 
+import { createTestContext } from '@flyingrobots/bijou/adapters/test';
 import { getScenario } from '../../scenarios/index.js';
 
 interface ChildArgs {
@@ -84,7 +85,7 @@ function main(): void {
   const scenario = getScenario(args.scenarioId);
 
   // Setup is outside the timing window.
-  const state = scenario.setup();
+  const state = scenario.setup(createTestContext({ mode: 'interactive' }));
 
   // Warmup is also outside the timing window.
   for (let i = 0; i < args.warmupFrames; i++) {

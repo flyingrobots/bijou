@@ -6,6 +6,8 @@ import {
   generatePipeListPrefix,
   renderEnumeratedItems,
 } from './enumerated-list-format.js';
+import { renderEnumeratedItemsRtl } from './enumerated-list-rtl.js';
+import { mirrorsLayout, type InlineDirection } from '../direction/direction.js';
 
 /**
  * Enumeration style for list item prefixes.
@@ -30,6 +32,12 @@ export interface EnumeratedListOptions {
   readonly start?: number | undefined;
   /** Bijou context for rendering mode and theme resolution. */
   readonly ctx?: BijouContext;
+  /**
+   * Logical layout direction. Overrides `ctx.direction`; absent both, `'ltr'`.
+   * Under `'rtl'` in `interactive` and `static` output (or with no context) the
+   * marker sits on the right edge and the indent follows it.
+   */
+  readonly direction?: InlineDirection | undefined;
 }
 
 /**
@@ -42,6 +50,8 @@ export interface EnumeratedListOptions {
  * - `accessible`: simple decimal numbering regardless of style.
  * - `pipe`: ASCII-safe prefixes (`*`, `-`).
  * - `interactive`/`static`/no context: Unicode prefixes (`\u2022`, `\u2013`).
+ *   Under `rtl` the marker keeps its text, moves to the right edge, and lines
+ *   are right-aligned to the widest line.
  *
  * @param items - List item strings to render (may contain newlines).
  * @param options - Rendering options including style, indent, start, and context.
@@ -61,6 +71,9 @@ export function enumeratedList(
   const indentStr = ' '.repeat(indent);
 
   if (!ctx) {
+    if (mirrorsLayout({ direction: options?.direction })) {
+      return renderEnumeratedItemsRtl(items, style, start, indent, generateListPrefix);
+    }
     return renderEnumeratedItems(
       items,
       style,
@@ -100,7 +113,9 @@ export function enumeratedList(
           generatePipeListPrefix,
         ),
       interactive: () =>
-        renderEnumeratedItems(
+        mirrorsLayout({ ...options, ctx })
+          ? renderEnumeratedItemsRtl(items, style, start, indent, generateListPrefix)
+          : renderEnumeratedItems(
           items,
           style,
           start,

@@ -34,6 +34,12 @@ Drücke auf dem Titelbildschirm **Enter**. Erkunde mit den Pfeiltasten und **Tab
 
 Für ein kleineres erstes Beispiel starte `npm run hello` oder `npm run counter`.
 
+Um Bijou ohne Installation auszuprobieren, öffne die
+[Demo-Galerie](https://flyingrobots.github.io/bijou/gallery.html) im Browser:
+DOGFOOD, der Soak-Bench und die [Fun-Demos](https://flyingrobots.github.io/bijou/gallery.html?app=fun)
+laufen dort auf einem Canvas. GitHub Pages veröffentlicht sie aus `main` (siehe
+[`examples/web-gpu`](examples/web-gpu/README.md#published-site)).
+
 ## Deine eigene App bauen
 
 Erstelle ein Starterprojekt mit dem veröffentlichten Scaffolder:

@@ -3,6 +3,7 @@ import { relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build, parseSync, type Plugin } from 'vite';
 import showcaseConfig from '../../examples/web-gpu/vite.config.js';
+import { dogfoodDocuments } from '../../examples/web-gpu/documents-plugin.js';
 import { hostGlobalsIn } from './host-reach-ast.js';
 
 const repository = fileURLToPath(new URL('../../', import.meta.url));
@@ -52,7 +53,7 @@ export async function hostReachOf(module: string): Promise<string[]> {
     ...showcaseConfig,
     configFile: false,
     logLevel: 'silent',
-    plugins: [hostReach(findings), hostGlobals(findings)],
+    plugins: [hostReach(findings), dogfoodDocuments(), hostGlobals(findings)],
     build: {
       ...showcaseConfig.build,
       write: false,

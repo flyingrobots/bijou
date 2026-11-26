@@ -17,6 +17,7 @@
     "hello": "node --import tsx examples/hello/hello.ts",
     "markdown-font": "node --import tsx examples/markdown-font/main.ts",
     "counter": "node --import tsx examples/counter/main.ts",
+    "fun": "node --import tsx examples/fun/main.ts",
     "data-viz": "node --import tsx examples/plot/showcase.ts",
     "plot": "node --import tsx examples/plot/showcase.ts",
     "btop": "node --import tsx examples/plot/main.ts",
@@ -56,14 +57,17 @@
     "code:size": "tsx scripts/code-size-gate.ts",
     "code-dojo:debt": "tsx scripts/code-dojo-debt.ts --max 0",
     "code-dojo:report": "tsx scripts/code-dojo-debt-report.ts",
+    "code-dojo:live": "tsx scripts/code-dojo-eslint-live.ts",
     "code-dojo:eslint:offenders": "node scripts/code-dojo/eslint-offenders.mjs",
     "code-dojo:fast": "node scripts/code-dojo/fast.mjs",
     "code-dojo:changed": "node scripts/code-dojo/changed.mjs",
     "code-dojo:slice": "node scripts/code-dojo/slice.mjs",
-    "code-dojo:verify": "npm run code-dojo:debt && npm run code-dojo:strict && npm run code:size && npm run lint:eslint",
+    "code-dojo:verify": "npm run code-dojo:debt && npm run code-dojo:strict && npm run code-dojo:cycles && npm run code:size && npm run lint:eslint",
+    "code-dojo:cycles": "tsx scripts/code-dojo-runtime-scc-gate.ts --check",
+    "code-dojo:cycles:write": "tsx scripts/code-dojo-runtime-scc-gate.ts --write",
     "code-dojo:precommit": "node scripts/code-dojo/check-staged-files.mjs && node scripts/code-dojo/check-core-purity.mjs && node scripts/code-dojo/check-no-mocks.mjs && node scripts/code-dojo/check-graft-receipts.mjs && npm run code:size && npm run typecheck && npm run lint && npm run lint:eslint",
     "code-dojo:prepush": "npm run code-dojo:debt && npm run code-dojo:strict && npm run lint && npm run lint:eslint",
-    "code-dojo:ci": "npm run code-dojo:debt && npm run code-dojo:strict && npm run code:size && npm run build && npm run web-gpu:build && npm run web-gpu:typecheck && npm run typecheck && npm run lint && npm run lint:eslint && npm run test:run",
+    "code-dojo:ci": "npm run code-dojo:debt && npm run code-dojo:strict && npm run code-dojo:cycles && npm run code:size && npm run build && npm run web-gpu:build && npm run web-gpu:typecheck && npm run typecheck && npm run lint && npm run lint:eslint && npm run test:run",
     "code-dojo:strict": "node scripts/code-dojo/check-staged-files.mjs --all && node scripts/code-dojo/check-core-purity.mjs --all && node scripts/code-dojo/check-no-mocks.mjs --all && node scripts/code-dojo/check-graft-receipts.mjs --all",
     "paths:guard": "node scripts/docker-seal/dispatch.mjs --build -- vitest run --config vitest.config.ts scripts/no-local-paths.test.ts",
     "docs:design-system:preflight": "tsx scripts/design-system-docs-preflight.ts",
@@ -109,6 +113,7 @@
     "fast-uri": "^3.1.9",
     "hono": "^4.13.11",
     "ip-address": "^10.7.4",
+    "minimatch": "^11.0.1",
     "picomatch": "^4.0.4",
     "proxy-addr": "^2.0.8",
     "qs": "^6.16.0",
@@ -154,5 +159,9 @@
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true
   }
 }

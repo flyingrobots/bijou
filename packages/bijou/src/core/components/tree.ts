@@ -2,6 +2,8 @@ import type { BijouContext } from '../../ports/context.js';
 import type { TokenValue } from '../theme/tokens.js';
 import { resolveCtx } from '../resolve-ctx.js';
 import { renderByMode } from '../mode-render.js';
+import { mirrorsLayout, type InlineDirection } from '../direction/direction.js';
+import { renderRichRtl } from './tree-rtl.js';
 
 /** Represent a single node in a tree hierarchy. */
 export interface TreeNode {
@@ -19,6 +21,12 @@ export interface TreeOptions {
   labelToken?: TokenValue;
   /** Bijou context for rendering mode and theme resolution. */
   ctx?: BijouContext;
+  /**
+   * Logical layout direction. Overrides `ctx.direction`; absent both, `'ltr'`.
+   * Under `'rtl'` in `interactive` and `static` output the tree indents from the
+   * right, with mirrored connectors, padded to its widest line.
+   */
+  direction?: InlineDirection | undefined;
 }
 
 /**
@@ -28,6 +36,7 @@ export interface TreeOptions {
  * - `pipe`: indented plain-text tree.
  * - `accessible`: indented tree with child-count annotations.
  * - `interactive`/`static`: styled Unicode connectors with themed guide lines.
+ *   Under `rtl` the tree indents from the right and its connectors are mirrored.
  *
  * @param nodes - Top-level tree nodes to render.
  * @param options - Rendering options including guide token and context.
@@ -42,6 +51,7 @@ export function tree(nodes: TreeNode[], options: TreeOptions = {}): string {
     interactive: () => {
       const guideToken = options.guideToken ?? ctx.border('muted');
       const labelToken = options.labelToken;
+      if (mirrorsLayout({ ...options, ctx })) return renderRichRtl(nodes, guideToken, labelToken, ctx);
       return renderRich(nodes, '', true, guideToken, labelToken, ctx);
     },
   }, options);
