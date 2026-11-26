@@ -1,4 +1,4 @@
-import { isWideChar } from './grapheme.part01.js';
+import { isHalfwidthChar, isWideChar } from './grapheme.part01.js';
 export function stashTerminalSequences(
   text: string,
   pattern: RegExp,
@@ -32,17 +32,6 @@ export function stripUnsafeControlChars(text: string): string {
 // Display width
 // ---------------------------------------------------------------------------
 
-/**
- * UAX #11 Halfwidth (H) code points: U+20A9 and the halfwidth forms
- * U+FF61–U+FFDC and U+FFE8–U+FFEE (EastAsianWidth.txt, Unicode 15.1 and 16.0).
- */
-function isHalfwidth(cp: number): boolean {
-  return (
-    cp === 0x20a9 ||
-    (cp >= 0xff61 && cp <= 0xffdc) ||
-    (cp >= 0xffe8 && cp <= 0xffee)
-  );
-}
 const GRAPHEME_EXTEND_RE = /^\p{Grapheme_Extend}$/u;
 
 /**
@@ -64,6 +53,18 @@ const GRAPHEME_EXTEND_RE = /^\p{Grapheme_Extend}$/u;
  * @returns Display width in terminal cells (at least 1).
  */
 export function graphemeClusterWidth(grapheme: string): number {
+  return measureGraphemeCluster(grapheme, isWideChar);
+}
+
+/**
+ * The cluster rule of {@link graphemeClusterWidth} over a given wide-code-point
+ * predicate. Internal: lets the width report compare two tables under one rule.
+ * The halfwidth extender cell always comes from the generated table.
+ */
+export function measureGraphemeCluster(
+  grapheme: string,
+  isWide: (cp: number) => boolean,
+): number {
   let baseWidth = 1;
   let hasEmojiPresentation = false;
   let spacingExtenders = 0;
@@ -71,7 +72,7 @@ export function graphemeClusterWidth(grapheme: string): number {
   for (const ch of grapheme) {
     const cp = ch.codePointAt(0);
     if (cp === undefined) continue;
-    if (!isFirst && isHalfwidth(cp) && GRAPHEME_EXTEND_RE.test(ch)) {
+    if (!isFirst && isHalfwidthChar(cp) && GRAPHEME_EXTEND_RE.test(ch)) {
       spacingExtenders++;
     }
     isFirst = false;
@@ -88,7 +89,7 @@ export function graphemeClusterWidth(grapheme: string): number {
     ) {
       continue;
     }
-    if (isWideChar(cp)) baseWidth = 2;
+    if (isWide(cp)) baseWidth = 2;
   }
   // Emoji presentation (U+FE0F) makes any base character 2-wide.
   // This handles Dingbats (✂️ ✈️) and other text chars presented as emoji.

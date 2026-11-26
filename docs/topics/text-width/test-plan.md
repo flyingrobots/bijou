@@ -19,6 +19,17 @@ Origin: flyingrobots/bijou#678.
 | TW-06 | Conjoining jamo syllables are two cells. | `grapheme-spacing-units.test.ts`: `measures a leading + vowel + final jamo syllable as two cells`, `measures leading + vowel and Old Hangul syllables as two cells`, `measures a lone leading jamo as two cells` | Implemented |
 | TW-07 | Halfwidth voiced marks are one cell each. | `grapheme-spacing-units.test.ts`: `keeps ｶﾞ one cluster and measures it as two cells`, `counts each attached halfwidth mark as its own cell`, `wraps ｶﾞｷﾞ at width 2 into two-cell lines` | Implemented |
 
+## UAX #11 table: `grapheme-uax11.test.ts` and `scripts/unicode/east-asian-wide-table.test.ts`
+
+| ID | Requirement | Test | Status |
+| --- | --- | --- | --- |
+| TW-40 | UAX #11 W and F code points outside the CJK blocks (watch, Yi, Tangut, Khitan, Nushu, kana supplements) are two cells. | `U+231A watch is wide` and the other 15 `<code point> <name> is wide` cases, `keeps a row of watch emoji two cells apiece` | Implemented |
+| TW-41 | Ambiguous U+3248..U+324F are one cell. | `measures the Ambiguous circled numbers U+3248..U+324F as one cell (narrow policy)` | Implemented |
+| TW-42 | Neutral emoji-block symbols are one cell, and two with U+FE0F. | `U+1F321 thermometer (N, text presentation) is narrow` and the other 4 `... is narrow` cases, `still measures a text-presentation emoji with VS16 as two cells` | Implemented |
+| TW-43 | Flags, ZWJ, skin-tone and keycap sequences stay two cells. | `keeps regional indicators wide so a flag is two cells`, `keeps ZWJ, skin-tone and keycap sequences two cells` | Implemented |
+| TW-44 | The checked-in table is exactly the generator's output from the vendored UCD 18.0.0 file, and names its version and input digest. | `is exactly what the generator produces from the vendored UCD files`, `names its Unicode version, its input digest and that it is generated` | Implemented |
+| TW-45 | The generated Halfwidth ranges hold exactly the H code points, which the cluster rule counts as a cell when they extend a cluster. | `keeps only H for the halfwidth ranges, merging adjacent ones`, `is exactly what the generator produces from the vendored UCD files` | Implemented |
+
 ## Wrapping: `wrap-wide.test.ts` and `wrap-wide-paragraph.test.ts`
 
 | ID | Requirement | Test | Status |
