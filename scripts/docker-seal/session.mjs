@@ -7,7 +7,7 @@ import { imageName, WORKER, LIMITS } from './constants.mjs';
 import { execute as perform, readInput, requireFree } from './process.mjs';
 import { snapshot } from './snapshot.mjs';
 import { prepareDependencies } from './prepare.mjs';
-import { startWorker, stopWorker, measureWorker } from './worker.mjs';
+import { assertWorkerFree, startWorker, stopWorker, measureWorker } from './worker.mjs';
 import { exportArtifacts, validateExportPath } from './export.mjs';
 const controller = new AbortController();
 for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => controller.abort());
@@ -56,6 +56,8 @@ if (retained > LIMITS.retained - LIMITS.log - exportReserve) throw new Error('Re
 const destination = join(evidenceRoot, randomUUID()); mkdirSync(destination, { recursive: true });
 let snap; let started = false;
 try {
+  // A busy worker refuses here, before a snapshot or a dependency install is spent on it.
+  await assertWorkerFree(`${worker}-dependencies`); await assertWorkerFree(worker);
   snap = await snapshot(root, argv.slice(split + 1), await readInput(), {
     generatedBudget: 128 * 1024 ** 2 - retained - exportReserve - 22 * 1024 ** 2,
     signal: controller.signal, sourceIndex, fullPush,

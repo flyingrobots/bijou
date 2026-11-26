@@ -27,6 +27,8 @@
       "@flyingrobots/bijou-tui": ["../../packages/bijou-tui/src/index.ts"],
       "@flyingrobots/bijou-web": ["../../packages/bijou-web/src/index.ts"],
       "@flyingrobots/bijou-node": ["./src/browser-start-app.ts"],
+      "@bijou-examples/docs": ["./src/dogfood/docs-app.d.ts"],
+      "@bijou-examples/soak": ["./src/gallery/soak-app.d.ts"],
       "@/*": ["./src/*"]
     }
   },

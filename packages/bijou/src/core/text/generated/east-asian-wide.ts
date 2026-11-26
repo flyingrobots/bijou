@@ -136,3 +136,15 @@ export const EAST_ASIAN_WIDE_RANGES: readonly (readonly [number, number])[] = [
   [0x20000, 0x2fffd],
   [0x30000, 0x3fffd],
 ];
+
+// Inclusive [first, last] ranges of code points whose East_Asian_Width is
+// H (Halfwidth), merged and sorted.
+export const EAST_ASIAN_HALFWIDTH_RANGES: readonly (readonly [number, number])[] = [
+  [0x20a9, 0x20a9],
+  [0xff61, 0xffbe],
+  [0xffc2, 0xffc7],
+  [0xffca, 0xffcf],
+  [0xffd2, 0xffd7],
+  [0xffda, 0xffdc],
+  [0xffe8, 0xffee],
+];

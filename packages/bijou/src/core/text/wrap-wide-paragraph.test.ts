@@ -61,23 +61,16 @@ const ALPHABET = [
   'Ａ', '，', '。', '±',
 ];
 
-// Two known defects bound this property, each filed with its failing case and
-// kept out of the suite because the repository has no expected-failure
-// mechanism: width 1 cannot hold a wide character and wrapToWidth emits it
-// anyway (flyingrobots/bijou#852), and a line that starts with a
-// space can overflow by one cell (flyingrobots/bijou#853). The
-// generator therefore uses widths 2..120 and drops leading spaces.
-function withoutLeadingSpaces(parts: readonly string[]): string[] {
-  const first = parts.findIndex((part) => part !== ' ');
-  return first < 0 ? [] : parts.slice(first);
-}
-
+// One known defect bounds this property, filed with its failing case and kept
+// out of the suite because the repository has no expected-failure mechanism:
+// width 1 cannot hold a wide character and wrapToWidth emits it anyway
+// (flyingrobots/bijou#852). The generator therefore uses widths 2..120.
+// Leading spaces are included: flyingrobots/bijou#853 is fixed.
 describe('wrapToWidth property over mixed CJK and Latin text', () => {
   it('keeps every line within widths 2..120 and loses no grapheme', () => {
     fc.assert(
       fc.property(
-        fc.array(fc.constantFrom(...ALPHABET), { maxLength: 300 })
-          .map(withoutLeadingSpaces),
+        fc.array(fc.constantFrom(...ALPHABET), { maxLength: 300 }),
         fc.integer({ min: 2, max: 120 }),
         (parts, width) => {
           const text = parts.join('');

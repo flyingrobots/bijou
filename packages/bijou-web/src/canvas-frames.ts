@@ -15,6 +15,12 @@ export interface FrameBridgeOptions {
 export interface FrameBridge extends SurfacePresenter {
   /** Present to `next` from now on, starting with a full refresh of the last frame. */
   setPresenter(next: BijouCanvasPresenter | null): void;
+  /**
+   * Present the last frame again, in full, on the next animation frame. A
+   * canvas loses its picture when its pixel size is set, and a resize that
+   * leaves the grid unchanged makes the app render nothing.
+   */
+  refresh(): void;
   /** Cancel the pending frame and present nothing more. */
   dispose(): void;
 }
@@ -92,6 +98,16 @@ export function createFrameBridge(options: FrameBridgeOptions): FrameBridge {
     return frame;
   };
 
+  // Queue the newest frame for a full refresh: the pending one, or the one last shown.
+  const requeue = (): void => {
+    force = true;
+    if (pending === null && shown !== null) {
+      pending = shown;
+      shown = null;
+    }
+    if (pending !== null) schedule();
+  };
+
   return {
     present(current, target) {
       const from = packed(current, 'current');
@@ -109,12 +125,10 @@ export function createFrameBridge(options: FrameBridgeOptions): FrameBridge {
     },
     setPresenter(next) {
       presenter = next;
-      force = true;
-      if (pending === null && shown !== null) {
-        pending = shown;
-        shown = null;
-      }
-      if (pending !== null) schedule();
+      requeue();
+    },
+    refresh() {
+      if (!disposed && presenter !== null) requeue();
     },
     dispose() {
       disposed = true;

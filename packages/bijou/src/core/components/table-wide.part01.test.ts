@@ -13,9 +13,8 @@ import { graphemeWidth } from '../text/grapheme.js';
 // cell: Key = "Key" (3), Label = ホーム (6), N = "N" (1). Each cell is padded
 // with spaces to that width, framed by one space on each side and │.
 //
-// Hangul written as conjoining jamo misaligns a column (known defect
-// flyingrobots/bijou#854); it is kept out of this suite because the repository
-// has no expected-failure mechanism.
+// A row of Hangul written as conjoining jamo aligns like precomposed Hangul;
+// grapheme-spacing-units.test.ts holds it (flyingrobots/bijou#854).
 
 const MODES = ['interactive', 'static'] as const;
 

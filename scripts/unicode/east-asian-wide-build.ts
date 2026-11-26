@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
+  parseEastAsianHalfwidth,
   parseEastAsianWide,
   renderEastAsianWideTable,
   sha256Hex,
@@ -31,5 +32,6 @@ export function buildEastAsianWideTable(root: string): string {
     license: UNICODE_LICENSE,
     inputs: [{ path: EAST_ASIAN_WIDTH_INPUT, sha256: sha256Hex(bytes) }],
     ranges: parseEastAsianWide(text),
+    halfwidthRanges: parseEastAsianHalfwidth(text),
   });
 }

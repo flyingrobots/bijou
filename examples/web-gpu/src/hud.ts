@@ -1,9 +1,17 @@
 import type { EndpointReceipt } from '@flyingrobots/geordi-bijou-gpu';
 import type { BijouCanvasBackend, BijouCanvasFallbackReason } from '@flyingrobots/bijou-web';
+import { HOST_LABELS, type ShowcaseHost } from './handoff.js';
 
 /** Everything the HUD reports. The browser suite reads the same object. */
 export interface HudState {
   readonly app: string | null;
+  /** The mounted app's title, and whether it has a scene projection the DOM host can mount. */
+  readonly appTitle: string | null;
+  readonly sceneApp: boolean;
+  /** Where the app is presented: cells on a canvas, or native elements. */
+  readonly host: ShowcaseHost | null;
+  /** The live model's own string, number and boolean fields, as `name value` pairs. */
+  readonly model: string;
   readonly backend: BijouCanvasBackend | null;
   readonly fallbackReasons: readonly BijouCanvasFallbackReason[];
   readonly grid: { readonly cols: number; readonly rows: number } | null;
@@ -33,6 +41,26 @@ export function receiptFields(receipt: EndpointReceipt | null): Pick<HudState, '
   };
 }
 
+/** Why the mounted app offers no DOM host, or null when it does. */
+export function hostNote(state: Pick<HudState, 'appTitle' | 'sceneApp'>): string | null {
+  return state.sceneApp || state.appTitle === null ? null : `${state.appTitle} has no scene projection, so it runs on the canvas only.`;
+}
+
+/** The model's scalar fields, short enough for one HUD row. */
+export function modelText(model: unknown): string {
+  if (typeof model !== 'object' || model === null) return 'none';
+  const fields = Object.entries(model).filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value));
+  const text = fields.map(([name, value]) => `${name} ${JSON.stringify(value)}`).join(' ');
+  if (text === '') return 'no scalar fields';
+  return text.length > 96 ? `${text.slice(0, 95)}…` : text;
+}
+
+function hostText(state: HudState): string {
+  if (state.host === null) return 'none';
+  const label = HOST_LABELS[state.host];
+  return state.host === 'canvas' && !state.sceneApp && state.appTitle !== null ? `${label} (no DOM: ${state.appTitle} has no scene projection)` : label;
+}
+
 const BACKEND_NAMES: Record<BijouCanvasBackend, string> = { webgpu: 'WebGPU', webgl2: 'WebGL2', canvas2d: 'Canvas 2D' };
 const short = (digest: string | null): string => (digest === null ? 'none' : `${digest.slice(0, 12)}…`);
 
@@ -41,6 +69,8 @@ export function hudRows(state: HudState): readonly (readonly [string, string, st
   const reasons = state.fallbackReasons.map((reason) => `${BACKEND_NAMES[reason.backend]}: ${reason.code} (${reason.reason})`);
   return [
     ['app', 'App', state.app ?? 'none'],
+    ['host', 'Host', hostText(state)],
+    ['model', 'Model', state.model],
     ['backend', 'Backend', state.backend === null ? 'none' : BACKEND_NAMES[state.backend]],
     ['fallback', 'Fallback reasons', reasons.length === 0 ? 'none' : reasons.join('; ')],
     ['grid', 'Grid', state.grid === null ? 'none' : `${String(state.grid.cols)} × ${String(state.grid.rows)}`],

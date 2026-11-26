@@ -10,7 +10,8 @@ export interface UcdInput {
 }
 
 const LAST_CODE_POINT = 0x10ffff;
-const WIDE_CLASSES = new Set(['W', 'F']);
+const WIDE_CLASSES: ReadonlySet<string> = new Set(['W', 'F']);
+const HALFWIDTH_CLASSES: ReadonlySet<string> = new Set(['H']);
 const LINE = /^([0-9A-F]{4,6})(?:\.\.([0-9A-F]{4,6}))?\s*;\s*(A|F|H|N|Na|W)\b/u;
 const MISSING = /^#\s*@missing:\s*([0-9A-F]{4,6})\.\.([0-9A-F]{4,6})\s*;\s*(A|F|H|N|Na|W)\b/u;
 
@@ -27,27 +28,40 @@ export function sha256Hex(bytes: Uint8Array | string): string {
  * order, as UAX #44 specifies; data lines then override them.
  */
 export function parseEastAsianWide(text: string): readonly CodePointRange[] {
-  const wide = new Uint8Array(LAST_CODE_POINT + 1);
+  return parseEastAsianClasses(text, WIDE_CLASSES);
+}
+
+/**
+ * Read `EastAsianWidth.txt` and return every code point whose
+ * East_Asian_Width is H (Halfwidth), as merged inclusive ranges in order.
+ */
+export function parseEastAsianHalfwidth(text: string): readonly CodePointRange[] {
+  return parseEastAsianClasses(text, HALFWIDTH_CLASSES);
+}
+
+function parseEastAsianClasses(text: string, classes: ReadonlySet<string>): readonly CodePointRange[] {
+  const member = new Uint8Array(LAST_CODE_POINT + 1);
   const lines = text.split('\n');
   for (const line of lines) {
     const missing = MISSING.exec(line);
-    if (missing !== null) mark(wide, missing[1], missing[2], missing[3]);
+    if (missing !== null) mark(member, classes, missing[1], missing[2], missing[3]);
   }
   for (const line of lines) {
     const data = LINE.exec(line);
-    if (data !== null) mark(wide, data[1], data[2] ?? data[1], data[3]);
+    if (data !== null) mark(member, classes, data[1], data[2] ?? data[1], data[3]);
   }
-  return toRanges(wide);
+  return toRanges(member);
 }
 
 function mark(
-  wide: Uint8Array,
+  member: Uint8Array,
+  classes: ReadonlySet<string>,
   first: string | undefined,
   last: string | undefined,
   value: string | undefined,
 ): void {
   if (first === undefined || last === undefined || value === undefined) return;
-  wide.fill(WIDE_CLASSES.has(value) ? 1 : 0, parseInt(first, 16), parseInt(last, 16) + 1);
+  member.fill(classes.has(value) ? 1 : 0, parseInt(first, 16), parseInt(last, 16) + 1);
 }
 
 function toRanges(wide: Uint8Array): readonly CodePointRange[] {
@@ -80,6 +94,7 @@ export function renderEastAsianWideTable(options: {
   readonly license: string;
   readonly inputs: readonly UcdInput[];
   readonly ranges: readonly CodePointRange[];
+  readonly halfwidthRanges: readonly CodePointRange[];
 }): string {
   const header = [
     '// generated, do not edit.',
@@ -94,6 +109,13 @@ export function renderEastAsianWideTable(options: {
     '',
     'export const EAST_ASIAN_WIDE_RANGES: readonly (readonly [number, number])[] = [',
   ];
-  const body = options.ranges.map(([first, last]) => `  [${hex(first)}, ${hex(last)}],`);
-  return [...header, ...body, '];', ''].join('\n');
+  const rows = (ranges: readonly CodePointRange[]): string[] =>
+    ranges.map(([first, last]) => `  [${hex(first)}, ${hex(last)}],`);
+  const halfwidth = [
+    '',
+    '// Inclusive [first, last] ranges of code points whose East_Asian_Width is',
+    '// H (Halfwidth), merged and sorted.',
+    'export const EAST_ASIAN_HALFWIDTH_RANGES: readonly (readonly [number, number])[] = [',
+  ];
+  return [...header, ...rows(options.ranges), '];', ...halfwidth, ...rows(options.halfwidthRanges), '];', ''].join('\n');
 }

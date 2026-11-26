@@ -20,9 +20,9 @@ describe('East Asian cell widths', () => {
     // U+FF61..U+FF9F are UAX #11 H (narrow): ｶﾀｶﾅ and the halfwidth ｰ and ﾞ.
     expect(graphemeWidth('ｶﾀｶﾅ')).toBe(4);
     expect(graphemeWidth('ｰ')).toBe(1);
-    // ｶ followed by the halfwidth voiced mark ﾞ (U+FF9E) is a known defect,
-    // flyingrobots/bijou#855: they form one grapheme cluster but
-    // occupy two cells, and Bijou measures one. Kept out of this suite.
+    // ｶ followed by the halfwidth voiced mark ﾞ (U+FF9E) is one grapheme
+    // cluster of two cells; grapheme-spacing-units.test.ts holds it
+    // (flyingrobots/bijou#855).
   });
 
   it('gives combining marks no cell of their own', () => {
@@ -32,8 +32,8 @@ describe('East Asian cell widths', () => {
   });
 });
 
-// Hangul written as conjoining jamo measures one cell instead of two: known
-// defect flyingrobots/bijou#854, kept out of this suite.
+// Hangul written as conjoining jamo is two cells; grapheme-spacing-units.test.ts
+// holds it (flyingrobots/bijou#854).
 
 describe('East Asian Ambiguous width policy: narrow', () => {
   // Policy: characters of UAX #11 class A (Ambiguous) take ONE cell. This is

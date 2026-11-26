@@ -15,6 +15,8 @@ at a time:
 | Han ideographs, hiragana, katakana, precomposed Hangul syllables | W | 2 |
 | Fullwidth Latin and punctuation (`Ａ`, `，`, `！`), CJK punctuation (`。`, `「`) | F or W | 2 |
 | Halfwidth katakana (`ｶ`, `ｰ`) | H | 1 |
+| Halfwidth sound marks `ﾞ` and `ﾟ`, attached to the letter before them (`ｶﾞ`) | H | 1 each, so `ｶﾞ` is 2 |
+| Hangul written as conjoining jamo (`U+1112 U+1161 U+11AB`), and a lone leading jamo | leading jamo W, vowel and final jamo N | 2 |
 | Combining marks (U+0301, U+3099) | not a cell of its own | 0 |
 | Yi, Tangut, Khitan, Nushu and the kana supplements | W | 2 |
 | Emoji-presentation symbols and pictographs (`⌚`, `☕`, `✅`, `😀`) | W | 2 |
@@ -29,13 +31,19 @@ cells, and every other code point is one. The only addition is the regional
 indicators U+1F1E6..U+1F1FF, which UAX #11 classes N: Bijou counts them wide so
 that a flag measures two cells.
 
+A cluster is as wide as its widest code point, plus one cell for each extender
+that UAX #11 classes H (Halfwidth). The same generated file lists the H ranges,
+so the halfwidth sound marks U+FF9E and U+FF9F come from the same Unicode
+version as the wide table.
+
 - Unicode version: 18.0.0, the latest release. Supported Node.js versions ship
   different `Intl.Segmenter` data (ICU 76.1, Unicode 16.0, in Node 20.19 and
   22.12; Unicode 17.0 in the sealed Node 22 image), and between 16.0 and 18.0
   the W and F sets only gained newly assigned code points.
 - Input: `scripts/unicode/ucd/18.0.0/EastAsianWidth.txt`, vendored with the
   Unicode License v3 in `scripts/unicode/ucd/UNICODE-LICENSE.txt`.
-- Output: `packages/bijou/src/core/text/generated/east-asian-wide.ts`. Do not
+- Output: `packages/bijou/src/core/text/generated/east-asian-wide.ts`, holding
+  the W and F ranges and the H ranges. Do not
   edit it. Regenerate it with `npm run unicode:wide-table`, and
   `npm run unicode:wide-table -- --check` reports drift.
 - `npm run unicode:width-report` lists every code point and cluster whose width
@@ -83,7 +91,3 @@ than in the suite.
   character: flyingrobots/bijou#852.
 - A line that starts with a space can wrap one cell too wide:
   flyingrobots/bijou#853.
-- Hangul written as conjoining jamo measures one cell instead of two:
-  flyingrobots/bijou#854.
-- The halfwidth voiced marks `ﾞ` and `ﾟ` measure zero cells instead of one:
-  flyingrobots/bijou#855.

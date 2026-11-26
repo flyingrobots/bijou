@@ -13,7 +13,7 @@ import {
   WIDE_TABLE_OUTPUT,
   buildEastAsianWideTable,
 } from './east-asian-wide-build.js';
-import { parseEastAsianWide, sha256Hex } from './east-asian-width.js';
+import { parseEastAsianHalfwidth, parseEastAsianWide, sha256Hex } from './east-asian-width.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const read = (path: string): string => readFileSync(resolve(ROOT, path), 'utf8');
@@ -56,6 +56,18 @@ describe('parseEastAsianWide', () => {
       'FF61       ; H  # Po',
     ].join('\n');
     expect(parseEastAsianWide(text)).toEqual([[0x1100, 0x115f], [0x3000, 0x3003]]);
+  });
+
+  it('keeps only H for the halfwidth ranges, merging adjacent ones', () => {
+    const text = [
+      '# EastAsianWidth-0.0.0.txt',
+      '20A9       ; H  # Sc',
+      'FF61       ; H  # Po',
+      'FF62..FF9F ; H  # Lo',
+      'FFA0       ; W  # Lo',
+      'FFE8       ; H  # So',
+    ].join('\n');
+    expect(parseEastAsianHalfwidth(text)).toEqual([[0x20a9, 0x20a9], [0xff61, 0xff9f], [0xffe8, 0xffe8]]);
   });
 
   it('applies @missing defaults before data lines override them', () => {
