@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- The published site's front page is a framed Bijou app (`createFramedApp`): the
+  new 3D Wave Surface demo (after laotzunami's Three.js graph) turns behind the
+  Bijou wordmark, centred with `placeSurface` and layered with `compositeSurface`.
+  The frame brings the usual chrome: key hints, `?` help, `F2` settings
+  (wordmark, motion, open the demos) and `q` to quit. Enter opens the demo
+  gallery. The card grid and the random background are gone.
+
 - The tests of the fun shell, the gallery entries and the browser entry run on a fixture catalog of fakes
   (`tests/helpers/fun-fixture.ts`), and no test holds the number, the list or the order of the real fun demos; the
   browser tests read the cards from the page. Adding a demo is now its module, one catalog entry and its own recorded

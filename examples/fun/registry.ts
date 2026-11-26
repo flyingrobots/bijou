@@ -127,6 +127,9 @@ export const catalog: readonly CatalogEntry[] = [
     description: 'A noise-cut plane peels away piece by piece, tumbling, then reassembles, after Claudio Esperança',
     load: async () => (await import('./demos/noise-partition-peel.js')).partitionPeelDemo,
   },
+  { id: 'wave-surface', name: '3D Wave Surface',
+    description: 'A lit 3D surface of ripple, spiral and chaotic waves cross-fading, after laotzunami\'s Three.js graph',
+    load: async () => (await import('./demos/surface.js')).surfaceDemo },
   {
     id: 'text-cylinder', name: '3D Text Cylinder Ticker', description: 'Letters rolling over a 3D text cylinder',
     needsFont: true,

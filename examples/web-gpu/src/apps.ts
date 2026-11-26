@@ -25,19 +25,16 @@ export const SHOWCASE_APPS: readonly ShowcaseApp[] = [
   {
     id: 'landing',
     title: 'Landing',
-    // The published site's front page: a fun demo chosen at random runs behind the wordmark and one card per demo.
-    // Demos that need a font are left out of the draw: they wait on a font download before they can paint.
+    // The published site's front page: the 3D wave surface turns behind the centred wordmark; Enter opens the gallery.
     async load() {
       const [{ createLandingApp }, { catalog }, { fetchFont }] = await Promise.all([
         import('../../fun/landing.js'), import('../../fun/registry.js'), import('../../fun/browser.js'),
       ]);
-      const backgrounds = catalog.filter((item) => item.needsFont !== true);
-      const pick = backgrounds[Math.floor(Math.random() * backgrounds.length)] ?? catalog[0];
-      if (pick === undefined) throw new Error('BIJOU_WEB_GPU_NO_FUN_DEMOS');
+      const pick = catalog.find((item) => item.id === 'wave-surface');
+      if (pick === undefined) throw new Error('BIJOU_WEB_GPU_NO_WAVE_SURFACE');
       const background = await pick.load({ font: fetchFont });
-      const cards = catalog.map(({ id, name, description }) => ({ id, name, description }));
-      const open = (id: string): void => { window.location.assign(`./gallery.html?app=fun-${id}`); };
-      return { build: (ctx) => createLandingApp({ ctx, cards, background, open, seed: Date.now() % 1_000_000 }) };
+      const open = (): void => { window.location.assign('./gallery.html'); };
+      return { build: (ctx) => createLandingApp({ ctx, background, open, seed: Date.now() % 1_000_000 }) };
     },
   },
   {

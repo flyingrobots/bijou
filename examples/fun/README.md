@@ -39,6 +39,7 @@ npm run fun
 | pointer, `r`, `+` `-`, `v`, `m`, `s`, `[` `]`, `h` | lenses: move the source, new lenses, focal length, view, mirrors, smooth wave fronts, ray length, hide the card |
 | `r`, `+` `-`, `s`, `h` | noise plane partition: new composition, levels, lines, hide the card |
 | `r`, `+` `-`, `a`, `s`, `h` | partition peel: new composition, levels, peel direction, lines, hide the card |
+| pointer, `h` | 3D wave surface: orbit the camera, hide the card |
 | `q`, `ctrl+c` | quit |
 
 ## The contract
@@ -60,7 +61,7 @@ frame count and the pause, so every demo pauses the same way (a demo taking text
   `loadDemos(host)` loads them all.
 - `shell.ts`, `shell-chrome.ts`: the terminal shell. The header row, the footer row, input routing.
 - `demos/pixels.ts`, `demos/noise.ts`, `demos/palettes.ts`: half-block pixel painting, seeded 3D noise and embedded colour lists for the generative demos (after Mike Bostock, Saneef Ansari, Robin Houston and Okazz; credits in each file).
-- `landing.ts`, `landing-cards.ts`: the published site's front page as a Bijou app: a fun demo picked at random behind the Bijou wordmark in Jacquard 12, and one card per demo.
+- `landing.ts`: the published site's front page, a framed Bijou app: the 3D wave surface behind the centred Bijou wordmark, with the frame's key hints, `?` help, `F2` settings and `q` to quit; Enter opens the gallery.
 - `solo.ts`: one demo alone, with a row for its keys and no list of demos: what a page for a single demo mounts.
 - `demos/typeface.ts`: the font port and the parsed `Typeface`.
 - `demos/`: one file per demo, split where a demo needs more than one.
