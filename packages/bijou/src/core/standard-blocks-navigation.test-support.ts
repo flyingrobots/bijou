@@ -82,7 +82,8 @@ function seededRandom(seed: number): (limit: number) => number {
   };
 }
 
-const HOSTILE = ['\x1b[31m', '\n', '\t', '\x07', ' ', '·'];
+/** Untrusted terminal input: an SGR escape (built so no raw escape sits in source), newline, tab, bell. */
+const HOSTILE = [`${String.fromCharCode(27)}[31m`, '\n', '\t', '\x07', ' ', '·'];
 
 /** Random terminal text: letters and spaces mixed with control bytes, up to 90 characters. */
 function randomText(next: (limit: number) => number): string {
