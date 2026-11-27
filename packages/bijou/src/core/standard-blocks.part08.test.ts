@@ -61,6 +61,12 @@ describe('DividerBlock interactive drawing (flyingrobots/bijou#935)', () => {
     expect(frame.rows[0]).toHaveLength(30);
   });
 
+  it('draws the same rule in static mode, which shows the interactive frame without motion', () => {
+    const staticFrame = drawnFrame(dividerBlock.render({ mode: 'static', slots: RELEASE_SLOTS, config: { width: 60 } }));
+
+    expect(staticFrame.rows).toEqual(drawDivider(RELEASE_SLOTS).rows);
+  });
+
   it('keeps pipe and accessible output as labelled slot lines', () => {
     const pipe = dividerBlock.render({ mode: 'pipe', slots: RELEASE_SLOTS });
     const accessible = dividerBlock.render({ mode: 'accessible', slots: RELEASE_SLOTS });
