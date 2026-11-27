@@ -16,6 +16,7 @@ import {
   toggleMinimized,
 } from './panel-state.js';
 import { collectPaneIds } from './app-frame-utils.js';
+import { logicalDockDirection } from './app-frame-split-direction.js';
 
 export function applyToggleMinimize<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
@@ -74,6 +75,7 @@ export function applyDockMove<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
   direction: DockDirection,
   pagesById: Map<string, FramePage<PageModel, Msg>>,
+  mirrored = false,
 ): InternalFrameModel<PageModel, Msg> {
   const pageId = model.activePageId;
   const focusedPaneId = model.focusedPaneByPage[pageId];
@@ -81,7 +83,8 @@ export function applyDockMove<PageModel, Msg>(
   const page = pagesById.get(pageId);
   const pageModel = model.pageModels[pageId];
   if (page == null || pageModel === undefined) return model;
-  const container = findPaneContainer(page.layout(pageModel), focusedPaneId);
+  const layout = page.layout(pageModel);
+  const container = findPaneContainer(layout, focusedPaneId);
   if (container == null) return model;
   const dockState =
     model.dockStateByPage[pageId] ?? createPanelDockState();
@@ -94,7 +97,7 @@ export function applyDockMove<PageModel, Msg>(
     dockState,
     container.containerId,
     focusedPaneId,
-    direction,
+    logicalDockDirection(layout, container.containerId, direction, mirrored),
     currentOrder,
   );
   return {

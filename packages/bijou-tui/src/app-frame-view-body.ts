@@ -9,6 +9,7 @@ import {
   renderPageContentInto,
   renderTransition,
 } from './app-frame-render.js';
+import { frameInlineDirection } from './app-frame-split-direction.js';
 
 interface FrameBodyResult {
   readonly bodySurface: Surface | undefined;
@@ -23,6 +24,7 @@ export function renderFrameBody<PageModel, Msg>(
   themedContext: BijouContext | undefined,
 ): FrameBodyResult {
   const { options, pagesById, paneScratchPool } = dependencies;
+  const direction = frameInlineDirection(options.i18n);
   const maximizedPaneId =
     model.maximizedPaneByPage[model.activePageId]?.maximizedPaneId;
   const transition = model.activeTransition ?? options.transition;
@@ -41,6 +43,7 @@ export function renderFrameBody<PageModel, Msg>(
           maximizedPaneId,
           paneScratchPool,
           themedContext,
+          direction,
         )
       : renderPageContent(
           model.activePageId,
@@ -48,6 +51,7 @@ export function renderFrameBody<PageModel, Msg>(
           bodyRect,
           pagesById,
           themedContext,
+          direction,
         );
     if (themedContext == null) {
       return { bodySurface: active.surface, paneRects: active.paneRects };
@@ -58,6 +62,7 @@ export function renderFrameBody<PageModel, Msg>(
       bodyRect,
       pagesById,
       themedContext,
+      direction,
     );
     return {
       bodySurface: renderTransition(
@@ -85,6 +90,7 @@ export function renderFrameBody<PageModel, Msg>(
         bodyRect.col,
         paneScratchPool,
         themedContext,
+        direction,
       )
     : renderPageContentInto(
         model.activePageId,
@@ -96,6 +102,7 @@ export function renderFrameBody<PageModel, Msg>(
         bodyRect.col,
         paneScratchPool,
         themedContext,
+        direction,
       );
   return { bodySurface: undefined, paneRects: active.paneRects };
 }

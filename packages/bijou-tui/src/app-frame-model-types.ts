@@ -1,4 +1,4 @@
-import type { BijouContext, TokenValue } from '@flyingrobots/bijou';
+import type { BijouContext, InlineDirection, TokenValue } from '@flyingrobots/bijou';
 import type {
   CommandPaletteItem,
   CommandPaletteState,
@@ -112,6 +112,8 @@ export interface RenderContext<PageModel, Msg> {
   readonly dockState: PanelDockState;
   readonly frameBackgroundToken: TokenValue | undefined;
   readonly ctx?: BijouContext | undefined;
+  /** The frame's explicit inline direction; absent, splits read `ctx.direction`. */
+  readonly direction?: InlineDirection | undefined;
 }
 
 export interface RenderResult {

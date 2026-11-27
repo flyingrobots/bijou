@@ -273,6 +273,7 @@ Mirrored Components:
   symmetric glyphs, including ASCII `#`, `-`, `>` and `<`, are unchanged, so an
   ASCII fallback needs no mapping. `pipe` (`Progress: 45%`) and `accessible`
   (`45 percent complete.`) output are identical in both directions.
+- **Framed app split panes (`@flyingrobots/bijou-tui`)**: under `'rtl'` each `row` split in a `createFramedApp()` layout puts pane A on the right with the `ltr` sizes, at every depth; `column` splits, `Tab` order and saved ratios keep their logical meaning (see the bijou-tui README).
 
 Components that read the direction today:
 

@@ -1,5 +1,6 @@
 import type {
   BijouContext,
+  InlineDirection,
   LayoutNode as SurfaceLayoutNode,
   Surface,
 } from '@flyingrobots/bijou';
@@ -18,6 +19,7 @@ import {
   buildWorkspaceLayoutTreeFromPaneRects,
   type FrameTabTarget,
 } from './app-frame-workspace-tree.js';
+import { frameInlineDirection } from './app-frame-split-direction.js';
 
 export interface WorkspaceLayoutSnapshot<PageModel> {
   readonly activePageId: string;
@@ -28,6 +30,8 @@ export interface WorkspaceLayoutSnapshot<PageModel> {
   readonly dockState: unknown;
   readonly splitRatioOverrides: unknown;
   readonly maximizedPaneId: string | undefined;
+  /** Frame inline direction the pane rectangles were placed for. */
+  readonly direction: InlineDirection | undefined;
   readonly paneRects: ReadonlyMap<string, LayoutRect>;
   readonly tree: SurfaceLayoutNode;
 }
@@ -95,6 +99,7 @@ export function createWorkspaceLayoutServices<PageModel, Msg>(
       splitRatioOverrides: model.splitRatioOverrides,
       maximizedPaneId:
         model.maximizedPaneByPage[model.activePageId]?.maximizedPaneId,
+      direction: frameInlineDirection(options.i18n),
       paneRects,
       tree: buildWorkspaceLayoutTreeFromPaneRects(
         model,
@@ -114,6 +119,7 @@ export function createWorkspaceLayoutServices<PageModel, Msg>(
     cache.visibilityState === model.minimizedByPage[model.activePageId] &&
     cache.dockState === model.dockStateByPage[model.activePageId] &&
     cache.splitRatioOverrides === model.splitRatioOverrides &&
+    cache.direction === frameInlineDirection(options.i18n) &&
       cache.maximizedPaneId ===
         model.maximizedPaneByPage[model.activePageId]?.maximizedPaneId;
   };
@@ -125,17 +131,11 @@ export function createWorkspaceLayoutServices<PageModel, Msg>(
     const maximizedPaneId =
       model.maximizedPaneByPage[model.activePageId]?.maximizedPaneId;
     const ctx = dependencies.resolveThemeContext(model.activeShellThemeId);
+    const direction = frameInlineDirection(options.i18n);
+    const id = model.activePageId;
     const rendered = maximizedPaneId
-      ? renderMaximizedPane(
-          model.activePageId,
-          model,
-          rect,
-          pagesById,
-          maximizedPaneId,
-          paneScratchPool,
-          ctx,
-        )
-      : renderPageContent(model.activePageId, model, rect, pagesById, ctx);
+      ? renderMaximizedPane(id, model, rect, pagesById, maximizedPaneId, paneScratchPool, ctx, direction)
+      : renderPageContent(id, model, rect, pagesById, ctx, direction);
     return remember(model, rendered.paneRects);
   };
   return {

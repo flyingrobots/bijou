@@ -10,7 +10,8 @@ import { paintDivider } from './app-frame-render-surface.js';
 import type { RenderContext } from './app-frame-types.js';
 import type { LayoutRect } from './layout-rect.js';
 import { getNodeId, resolveChildOrder } from './panel-dock.js';
-import { splitPaneLayout } from './split-pane.js';
+import { placeSplitPaneLayout } from './split-pane-direction.js';
+import { frameMirrorsRowSplits } from './app-frame-split-direction.js';
 import { mergeMaps, offsetRect } from './app-frame-utils.js';
 
 export function paintFrameSplit<PageModel, Msg>(
@@ -40,13 +41,14 @@ export function paintFrameSplit<PageModel, Msg>(
   } else if (bMinimized && !aMinimized) {
     splitState = { ...splitState, ratio: 1 - minimizedRatio };
   }
-  const layout = splitPaneLayout(splitState, {
+  const mirrored = frameMirrorsRowSplits(ctx.direction, ctx.ctx);
+  const layout = placeSplitPaneLayout(splitState, {
     direction,
     width: localRect.width,
     height: localRect.height,
     minA: node.minA,
     minB: node.minB,
-  });
+  }, mirrored);
   const localA = offsetRect(layout.paneA, localRect.row, localRect.col);
   const localB = offsetRect(layout.paneB, localRect.row, localRect.col);
   const absoluteA = offsetRect(
