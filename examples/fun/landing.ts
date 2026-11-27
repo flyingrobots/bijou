@@ -5,7 +5,7 @@
 // help, `F2` settings, and `q` to quit with confirmation.
 import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
 import {
-  compositeSurface, createKeyMap, isPulseMsg, placeSurface, rasterTextSurface, wrapFrameMsg,
+  createKeyMap, isPulseMsg, placeSurface, rasterTextSurface, wrapFrameMsg,
   type Cmd, type FramePage, type FrameScopedMsg, type FrameSettings,
 } from '@flyingrobots/bijou-tui';
 import { CYLINDER_FONT } from '../docs/app-cylinder-font.js';
@@ -27,29 +27,43 @@ function wordmarkRows(rows: number): number {
 }
 
 /**
- * The wordmark as a Surface layer over `picture`: Jacquard 12 glyphs in braille, centred by `placeSurface`. Only
- * glyph cells are copied onto a fresh surface, whose other cells stay empty so the picture shows through them, and
- * each glyph keeps the background of the picture cell under it.
+ * The wordmark stamped onto `picture`, which the background painted for this frame alone: Jacquard 12 glyphs in
+ * braille, centred by `placeSurface`. Only glyph cells are written, so the picture shows between them, and
+ * each glyph keeps the background of the picture cell under it. Rasterizing the glyphs is the slow part, so the placed
+ * glyph cells are kept for the last screen size and only their backgrounds are taken afresh each frame.
  */
-function wordmarkLayer(picture: Surface): Surface {
-  const { width, height } = picture;
+function stampWordmark(picture: Surface): Surface {
+  for (const { x, y, cell } of wordmarkGlyphs(picture.width, picture.height)) {
+    const under = picture.get(x, y);
+    picture.set(x, y, { ...cell, bg: under.bg, bgRGB: under.bgRGB, empty: false });
+  }
+  return picture;
+}
+
+interface GlyphCell { readonly x: number; readonly y: number; readonly cell: ReturnType<Surface['get']> }
+let glyphCache: { readonly key: string; readonly glyphs: readonly GlyphCell[] } | undefined;
+
+/** The wordmark's non-blank cells, centred in a `width` by `height` picture, rasterized once per size. */
+function wordmarkGlyphs(width: number, height: number): readonly GlyphCell[] {
+  const key = `${String(width)}x${String(height)}`;
+  if (glyphCache?.key === key) return glyphCache.glyphs;
   const mark = rasterTextSurface('Bijou', CYLINDER_FONT, { columns: width, rows: wordmarkRows(height), renderer: { kind: 'braille' }, fg: WORDMARK });
   const placed = placeSurface(mark, { width, height, hAlign: 'center', vAlign: 'middle' });
-  const layer = createSurface(width, height);
+  const glyphs: GlyphCell[] = [];
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
       const cell = placed.get(x, y);
-      if (cell.empty === true || cell.char === ' ' || cell.char === '⠀') continue;
-      layer.set(x, y, { ...cell, bg: picture.get(x, y).bg, empty: false });
+      if (cell.empty !== true && cell.char !== ' ' && cell.char !== '⠀') glyphs.push({ x, y, cell });
     }
   }
-  return layer;
+  glyphCache = { key, glyphs };
+  return glyphs;
 }
 
 /** The page's picture: the background demo at the pane's size, with the wordmark over it when it is on. */
 export function landingPicture(model: LandingModel, width: number, height: number, ctx: BijouContext): Surface {
   const picture = model.background.view(width, height, ctx);
-  return model.wordmark ? compositeSurface(picture, [{ content: '', surface: wordmarkLayer(picture), row: 0, col: 0 }]) : picture;
+  return model.wordmark ? stampWordmark(picture) : picture;
 }
 
 /** The one page of the landing app. */

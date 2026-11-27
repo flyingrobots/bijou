@@ -65,11 +65,3 @@ export function projector(orbit: Orbit, w: number, h: number): Projector {
     },
   };
 }
-
-/** The surface normal at (x, y) by central differences, in world space (y up). */
-export function surfaceNormal(x: number, y: number, t: number): Vec3 {
-  const e = 0.01;
-  const dx = (waveHeight(x + e, y, t) - waveHeight(x - e, y, t)) / (2 * e);
-  const dy = (waveHeight(x, y + e, t) - waveHeight(x, y - e, t)) / (2 * e);
-  return normalize([-dx, 1, -dy]);
-}

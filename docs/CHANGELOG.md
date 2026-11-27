@@ -8,9 +8,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- `createSurface` encodes its fill cell once and copies those bytes, instead of encoding every cell: a 210x50
+  Surface is created in about 0.6 ms instead of 8 ms, which makes every full-screen Surface and composite cheaper.
+  The landing page's frame drops from about 100 ms to 13 ms at 210x50. Its wordmark is rasterized once per screen
+  size and stamped onto the picture. The 3D Wave Surface evaluates its wave once per vertex, takes normals from
+  neighbouring heights, renders into one flat colour buffer and paints one sample per half-block pixel.
+
 - The published site's front page is a framed Bijou app (`createFramedApp`): the
   new 3D Wave Surface demo (after laotzunami's Three.js graph) turns behind the
-  Bijou wordmark, centred with `placeSurface` and layered with `compositeSurface`.
+  Bijou wordmark, centred with `placeSurface` and stamped onto the picture.
   The frame brings the usual chrome: key hints, `?` help, `F2` settings
   (wordmark, motion, open the demos) and `q` to quit. Enter opens the demo
   gallery. The card grid and the random background are gone.

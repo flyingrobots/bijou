@@ -2,9 +2,8 @@
 import { createSurface } from '@flyingrobots/bijou';
 import { defineDemo, type Demo } from '../contract.js';
 import { stampPanel } from '../panel.js';
-import { paintPixels } from './pixels.js';
 import { START_ORBIT, type Orbit } from './surface-math.js';
-import { BACKGROUND, renderSurface } from './surface-raster.js';
+import { renderSurface } from './surface-raster.js';
 
 export interface SurfaceState {
   /** Where the clock starts: the original reads the wall clock, a demo reads its seed. */
@@ -14,7 +13,6 @@ export interface SurfaceState {
   readonly hideUI: boolean;
 }
 
-const SUPERSAMPLE = 2;
 /** Radians per second the camera turns on its own. */
 const SPIN = 0.12;
 
@@ -44,11 +42,16 @@ export const surface: Demo<SurfaceState> = {
   },
   view(state, { width, height, elapsed, ctx }) {
     const out = createSurface(width, height);
-    const w = width * SUPERSAMPLE;
-    const h = height * 2 * SUPERSAMPLE;
-    const mesh = Math.max(41, Math.min(101, Math.round(w / 4)));
-    const colours = renderSurface(orbitAt(state, elapsed, width, height), state.start + elapsed, w, h, mesh);
-    paintPixels(out, (x, y) => colours[Math.floor(y * SUPERSAMPLE) * w + Math.floor(x * SUPERSAMPLE)] ?? BACKGROUND, SUPERSAMPLE);
+    // One sample per half-block pixel; the mesh keeps (mesh - 1) a multiple of 4 so grid lines sit on vertex rows.
+    const mesh = 4 * Math.max(8, Math.min(16, Math.round(width / 16))) + 1;
+    const rgb = renderSurface(orbitAt(state, elapsed, width, height), state.start + elapsed, width, height * 2, mesh);
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const top = (y * 2 * width + x) * 3;
+        const bottom = top + width * 3;
+        out.setRGB(x, y, '▀', rgb[top] ?? 0, rgb[top + 1] ?? 0, rgb[top + 2] ?? 0, rgb[bottom] ?? 0, rgb[bottom + 1] ?? 0, rgb[bottom + 2] ?? 0);
+      }
+    }
     if (!state.hideUI) {
       stampPanel(out, [
         '  ***  3D WAVE SURFACE  ***  ',
