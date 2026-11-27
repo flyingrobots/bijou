@@ -8,11 +8,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
-- `DividerBlock` draws a divider. In `interactive` mode it now draws one labelled rule at the requested width, instead
-  of one framed box per slot (flyingrobots/bijou#935). `style` picks the line (`rule`, `heavy`, `double` or `dashed`),
-  and `density: 'spacious'` adds a blank row above and below it. Its `pipe` and `accessible` output and its facts are
-  unchanged. `renderStandardSectionBlock` takes an optional `interactive` drawing function, which the other standard
-  blocks will use to draw themselves (flyingrobots/bijou#934).
+- `DividerBlock` draws a divider. In `interactive` and `static` mode it now draws one labelled rule at the requested
+  width, instead of one framed box per slot (flyingrobots/bijou#935). `style` picks the line (`rule`, `heavy`,
+  `double` or `dashed`), and `density: 'spacious'` adds a blank row above and below it. Its `pipe` and `accessible`
+  output and its facts are unchanged. `renderStandardSectionBlock` takes an optional drawing function for
+  `interactive` and `static` mode, which the other standard blocks will use to draw themselves
+  (flyingrobots/bijou#934).
 - Shatter's debris settles. A falling glyph now lands in its own cell when the cell under it is the floor or the
   pile, where it used to land one cell above. That jump made settling glyphs climb in a column forever, which looked
   like cells left behind. A glyph that the pile grew around, or whose cell was taken while it fell, moves to the
