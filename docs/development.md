@@ -16,8 +16,9 @@ CI. Newer Node.js versions are supported by policy; the repository enforces the
 same `^20.19.0 || >=22.12.0` floor before install because Vitest 4.1 and its
 Vite/Rolldown runtime require that range.
 
-Core build and unit-test coverage runs on Ubuntu for Node 20/22, with focused
-Ubuntu and Windows Node 22 lanes for portable path and bootstrap checks.
+Core build and unit-test coverage runs on Ubuntu for Node 20/22, with a focused
+Ubuntu Node 22 lane in the seal and the same focused tests on a Windows Node 22
+runner outside it (see `docs/guides/sealed-tests.md`).
 Contributor-facing root scripts such as `npm run clean` and
 `npm run version` are Node scripts so they do not require a Unix shell.
 Maintainers on macOS run the sealed Linux container locally; this does not

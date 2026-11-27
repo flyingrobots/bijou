@@ -4,11 +4,9 @@ import { resolve } from 'node:path';
 import { ensureDocker } from '@git-stunts/docker-guard';
 import { readNetworkEntries } from './network-entries.mjs';
 import { verifyKernelSeal } from './seal-policy.mjs';
-import { requireWindows } from './require-windows.mjs';
 
 /** Admit test execution only after independent kernel and repository checks. */
 export function requireDocker() {
-  if (process.platform === 'win32') return requireWindows();
   const refuse = (reason) => { throw new Error(`Docker test seal refused: ${reason}. Use the sealed Docker runner.`); };
   if (process.platform !== 'linux' || !existsSync('/.dockerenv')) refuse('host execution');
   const locators = [

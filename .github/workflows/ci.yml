@@ -269,10 +269,6 @@ jobs:
           scripts/docs-preview-theme.part04.test.ts
           scripts/ci-workflow-policy.test.ts
           scripts/docker-seal/require-docker.test.ts
-          scripts/docker-seal/windows-policy.test.ts
-          scripts/docker-seal/windows-usage.test.ts
-          scripts/docker-seal/windows-quarantine.test.ts
-          scripts/docker-seal/windows-extraction.test.ts
 
   # The one test job outside the seal besides the browser suite: see
   # "Windows, outside the seal" in docs/guides/sealed-tests.md. Each GitHub

@@ -57,8 +57,4 @@ export const WINDOWS_TESTS: readonly string[] = [
   'scripts/docs-preview-theme.part03.test.ts',
   'scripts/docs-preview-theme.part04.test.ts',
   'scripts/ci-workflow-policy.test.ts',
-  'scripts/docker-seal/windows-policy.test.ts',
-  'scripts/docker-seal/windows-usage.test.ts',
-  'scripts/docker-seal/windows-quarantine.test.ts',
-  'scripts/docker-seal/windows-extraction.test.ts',
 ];

@@ -15,8 +15,5 @@ function permitted(path: string, dockerSource: boolean): boolean {
   const normalized = windows ? path.replace(/\\+/gu, '/') : path;
   if (normalized.split('/').includes('..')) return false;
   // Linux's disposable HOME is fixed by the inspected container profile.
-  if (/^\/home\/test(?:\/|$)/u.test(normalized)) return true;
-  // Windows image/toolchain and disposable data roots are fixed, not user homes.
-  if (/^[Cc]:\/(?:work|temp|home|node|git|windows)(?:\/|$)/iu.test(normalized)) return true;
-  return /^[Cc]:\/bijou-test-seal$/iu.test(normalized);
+  return /^\/home\/test(?:\/|$)/u.test(normalized);
 }

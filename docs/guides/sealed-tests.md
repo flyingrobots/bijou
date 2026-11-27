@@ -28,11 +28,10 @@ Bootstrap refuses an absent base image instead of downloading it without
 resource admission.
 
 Local execution uses Linux containers, including on macOS through Docker.
-Windows tests do not use a sealed worker. The sealed Windows lane, which ran
-disposable Windows containers on GitHub-hosted Windows runners, ran out of
-storage before any test started (flyingrobots/bijou#788). Its CI job now runs
-outside the seal: see [Windows, outside the seal](#windows-outside-the-seal).
-The Windows launcher and its tests remain.
+There is no sealed Windows worker. The one Bijou had, a disposable Windows
+container on a GitHub-hosted runner, ran out of storage before any test started
+(flyingrobots/bijou#788), and it has been removed. Windows tests run outside the
+seal: see [Windows, outside the seal](#windows-outside-the-seal).
 
 ```sh
 node scripts/docker-seal/bootstrap.mjs --node-version 22
@@ -176,30 +175,6 @@ fallback tunnel devices that some kernels create in every network namespace
 down. Docker Desktop's kernel lists them in a worker started with
 `--network none`. Any other device, or a fallback tunnel device that is up, is
 refused as `network interface beyond loopback`.
-
-Windows workers run as `ContainerUser` with process isolation, no host mounts,
-and no network while tests execute. Their storage limits differ from the Linux
-limits, and each has a different strength:
-
-| Limit | Value | Kind |
-| --- | --- | --- |
-| Worker volume | at most 20 GiB | Hard. The volume refuses writes when it is full. The launcher measures the capacity in each worker and refuses a larger volume. |
-| Data budget | 4 GiB | Sampled. The launcher stops the run when it observes more growth than this since the worker started. |
-| Generated-data budget | 40 MiB | Sampled. The same observation, counted from the end of the offline dependency installation. |
-| Host free space | 50 GiB floor | Sampled. The launcher stops when the filesystem that holds Docker storage has less free space. |
-
-A sampled budget charges the larger of two observations: growth of used space
-on the worker volume, and decreases of free space on the host filesystem that
-holds Docker storage. It can miss use that happens between two samples, and the
-host figure also counts other activity on that filesystem. The receipts record
-these limits under `storage`.
-
-Windows workers have no per-account disk quota: GitHub-hosted Windows runners
-refuse to set or read quota entries for a container. The launcher requests a
-20 GB worker volume, which is the smallest that Docker gives a Windows worker,
-and refuses a worker with any other storage setting. On hosted runners a
-smaller request still gave a 21,339,549,696 byte volume (job 135323118345), and
-no request gave a 136,229,920,768 byte volume (job 135334072019).
 
 The Git copy intentionally retains repository history and staged blobs for
 base-sensitive and staged-file checks. Host Git configuration, credential

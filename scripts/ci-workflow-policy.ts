@@ -83,8 +83,8 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   }
   for (const platform of platforms) {
     const os = asString(platform['os'], 'focused.platform.os');
-    if (os.startsWith('windows-') && platform['sealed-runner'] !== 'windows.mjs') {
-      throw new Error('Windows coverage requires the native Windows sealed runner');
+    if (os.startsWith('windows-')) {
+      throw new Error('Windows runs in job unit_windows, outside the seal; the sealed Windows runner is gone');
     }
   }
 
