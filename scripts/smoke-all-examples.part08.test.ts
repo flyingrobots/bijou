@@ -50,7 +50,9 @@ describe('runSmokeAllExamples', () => {
       runScenarioImpl: async (_root, scenario) => {
         active += 1;
         peak = Math.max(peak, active);
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        // Yield one turn of the event loop, not a span of time: a runner that starts the next scenario before
+        // awaiting this one has it running by now.
+        await new Promise((resolve) => { setImmediate(resolve); });
         active -= 1;
         return {
           path: scenario.path,

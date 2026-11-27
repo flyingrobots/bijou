@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
 import { stringToSurface } from '@flyingrobots/bijou';
 import type { RunOptions } from '@flyingrobots/bijou-tui';
 import { runInWorker, startWorkerApp, type MainMessage, type RunWorkerOptions } from './worker.js';
@@ -68,7 +68,7 @@ describe('worker proxy runtime', () => {
         },
         createNodeContext() { return createTestContext({ mode: 'interactive' }); },
         runApp: () => Promise.resolve(),
-        scheduleTimeout(callback, ms) { return setTimeout(callback, ms); },
+        scheduleTimeout: (callback, ms) => mockClock().setTimeout(callback, ms),
       },
     );
 
@@ -133,7 +133,7 @@ describe('worker proxy runtime', () => {
       },
       createNodeContext() { return createTestContext({ mode: 'interactive' }); },
       runApp: run,
-      scheduleTimeout(callback, ms) { return setTimeout(callback, ms); },
+      scheduleTimeout: (callback, ms) => mockClock().setTimeout(callback, ms),
     });
 
     expect(runCalls).toBe(1);

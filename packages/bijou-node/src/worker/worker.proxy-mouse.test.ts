@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from '@flyingrobots/bijou/adapters/test';
+import { createTestContext, mockClock } from '@flyingrobots/bijou/adapters/test';
 import { stringToSurface } from '@flyingrobots/bijou';
 import type { RunOptions } from '@flyingrobots/bijou-tui';
 import { startWorkerApp } from './worker.js';
@@ -43,7 +43,7 @@ describe('worker proxy mouse runtime', () => {
       },
       createNodeContext() { return createTestContext({ mode: 'interactive' }); },
       runApp: run,
-      scheduleTimeout(callback, ms) { return setTimeout(callback, ms); },
+      scheduleTimeout: (callback, ms) => mockClock().setTimeout(callback, ms),
     });
 
     expect(runAltScreen).toBe(false);

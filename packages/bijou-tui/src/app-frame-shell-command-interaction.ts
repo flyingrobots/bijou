@@ -18,6 +18,8 @@ import {
   openSearchPalette,
 } from './app-frame-palette.js';
 import { focusPane } from './app-frame-model-helpers.js';
+import { appendFrameKeyLog } from './app-frame-key-inspector.js';
+import { formatKeyCombo } from './keybindings.js';
 import type {
   FrameShellCommandDependencies,
   FrameShellInteractionCommand,
@@ -134,7 +136,7 @@ export function applyFrameShellInteractionCommand<PageModel, Msg>(
       if (observed !== undefined) {
         teaCmds.push(emitMsgForPage(model.activePageId, observed));
       }
-      return model;
+      return { ...model, keyLog: appendFrameKeyLog(model.keyLog, { key: formatKeyCombo(command.msg), route: command.route }) };
     }
   }
 }

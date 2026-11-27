@@ -42,7 +42,7 @@ export function routePaletteKey<PageModel, Msg>(
       { type: 'apply-frame-action', action },
     ];
   }
-  if (action?.type === 'toggle-perf-hud') {
+  if (action?.type === 'toggle-perf-hud' || action?.type === 'toggle-key-inspector') {
     return [observed, { type: 'apply-frame-action', action }];
   }
   return [observed, { type: 'palette-key', msg }];
@@ -66,7 +66,7 @@ export function routeHelpKey<PageModel, Msg>(
   if (action?.type === 'toggle-shell-theme-mode') {
     return [observed, { type: 'toggle-shell-theme-mode' }];
   }
-  if (action?.type === 'toggle-perf-hud') {
+  if (action?.type === 'toggle-perf-hud' || action?.type === 'toggle-key-inspector') {
     return [observed, { type: 'apply-frame-action', action }];
   }
   if (action && isHelpScrollAction(action)) {

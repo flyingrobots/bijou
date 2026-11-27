@@ -13,6 +13,20 @@ own, at `gallery.html?app=fun-<id>`, where it runs alone.
 npm run fun
 ```
 
+The framed fun app, the one the published site runs, has two entries. It is a
+`createFramedApp`: Home shows the 3D wave surface behind the Bijou wordmark, and
+Demos lists every demo beside the selected one. On Demos, the arrows or `j`/`k`
+choose, Enter plays full-pane (Escape comes back), and Tab focuses the demo pane
+so the demo gets its own keys. F9 opens the key inspector.
+
+```sh
+npm run fun:app            # in the terminal; add -- --debug for debug mode
+npm run fun:web            # in the browser (Vite dev server); add ?debug to the address
+```
+
+In debug mode the frame halts with a dialog when a page has key bindings that can
+never fire, naming what takes each key and how to fix it.
+
 | Key | Does |
 | --- | --- |
 | `tab`, `right`, `left`, `1` to the last demo | switch demo (not while typing) |
@@ -39,6 +53,12 @@ npm run fun
 | pointer, `r`, `+` `-`, `v`, `m`, `s`, `[` `]`, `h` | lenses: move the source, new lenses, focal length, view, mirrors, smooth wave fronts, ray length, hide the card |
 | `r`, `+` `-`, `s`, `h` | noise plane partition: new composition, levels, lines, hide the card |
 | `r`, `+` `-`, `a`, `s`, `h` | partition peel: new composition, levels, peel direction, lines, hide the card |
+| pointer, `h` | 3D wave surface: orbit the camera, hide the card |
+| pointer, `+` `-`, `d`, `h` | Gargantua: orbit the camera, closer / farther, Doppler beaming, hide the card |
+| `s`, `r`, pointer, `a`, `h` | Shatter: shatter, rewind, shove debris, auto-loop, hide the card |
+| `[` `]`, `,` `.`, `f`, `r`, `h` | Butterfly Effect: scrub 1 s, scrub 8 s, fork C from A, restart, hide the card |
+| pointer, `[` `]`, `,` `.`, `s`, `r`, `c`, `+` `-`, `h` | Lenia: drop an Orbium, mutate mu, mutate sigma, next scene, reseed, colour ramp, speed, hide the card |
+| `+` `-`, `r`, `h` | Four Ways to See: time speed, new comet, hide the card |
 | `q`, `ctrl+c` | quit |
 
 ## The contract
@@ -60,7 +80,7 @@ frame count and the pause, so every demo pauses the same way (a demo taking text
   `loadDemos(host)` loads them all.
 - `shell.ts`, `shell-chrome.ts`: the terminal shell. The header row, the footer row, input routing.
 - `demos/pixels.ts`, `demos/noise.ts`, `demos/palettes.ts`: half-block pixel painting, seeded 3D noise and embedded colour lists for the generative demos (after Mike Bostock, Saneef Ansari, Robin Houston and Okazz; credits in each file).
-- `landing.ts`, `landing-cards.ts`: the published site's front page as a Bijou app: a fun demo picked at random behind the Bijou wordmark in Jacquard 12, and one card per demo.
+- `landing.ts`: the published site's front page, a framed Bijou app: the 3D wave surface behind the centred Bijou wordmark, with the frame's key hints, `?` help, `F2` settings and `q` to quit; Enter opens the gallery.
 - `solo.ts`: one demo alone, with a row for its keys and no list of demos: what a page for a single demo mounts.
 - `demos/typeface.ts`: the font port and the parsed `Typeface`.
 - `demos/`: one file per demo, split where a demo needs more than one.

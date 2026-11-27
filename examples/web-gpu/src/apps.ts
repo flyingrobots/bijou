@@ -25,19 +25,16 @@ export const SHOWCASE_APPS: readonly ShowcaseApp[] = [
   {
     id: 'landing',
     title: 'Landing',
-    // The published site's front page: a fun demo chosen at random runs behind the wordmark and one card per demo.
-    // Demos that need a font are left out of the draw: they wait on a font download before they can paint.
+    // The published site's front page: the fun app, one framed Bijou app holding every demo. Home shows the 3D wave
+    // surface behind the wordmark; Demos lists every demo and plays it in the same app.
     async load() {
-      const [{ createLandingApp }, { catalog }, { fetchFont }] = await Promise.all([
-        import('../../fun/landing.js'), import('../../fun/registry.js'), import('../../fun/browser.js'),
+      const [{ createFunApp }, { loadDemos }, { fetchFont }] = await Promise.all([
+        import('../../fun/fun-app.js'), import('../../fun/registry.js'), import('../../fun/browser.js'),
       ]);
-      const backgrounds = catalog.filter((item) => item.needsFont !== true);
-      const pick = backgrounds[Math.floor(Math.random() * backgrounds.length)] ?? catalog[0];
-      if (pick === undefined) throw new Error('BIJOU_WEB_GPU_NO_FUN_DEMOS');
-      const background = await pick.load({ font: fetchFont });
-      const cards = catalog.map(({ id, name, description }) => ({ id, name, description }));
-      const open = (id: string): void => { window.location.assign(`./gallery.html?app=fun-${id}`); };
-      return { build: (ctx) => createLandingApp({ ctx, cards, background, open, seed: Date.now() % 1_000_000 }) };
+      const entries = await loadDemos({ font: fetchFont });
+      // ?debug turns on the frame's debug mode: it halts with a dialog on shadowed key bindings.
+      const debug = new URLSearchParams(window.location.search).has('debug');
+      return { build: (ctx) => createFunApp({ ctx, entries, seed: Date.now() % 1_000_000, debug }) };
     },
   },
   {

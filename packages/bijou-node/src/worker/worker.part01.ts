@@ -4,7 +4,7 @@ import {
   parentPort,
   workerData,
 } from 'node:worker_threads';
-import { type BijouContext } from '@flyingrobots/bijou';
+import { type BijouContext, type TimerHandle } from '@flyingrobots/bijou';
 import type { App, RunOptions } from '@flyingrobots/bijou-tui';
 import { run } from '@flyingrobots/bijou-tui';
 import { createNodeContext } from '../node-context.js';
@@ -29,10 +29,8 @@ export interface WorkerThreadBindings {
   createWorker(entry: string, options: Record<string, unknown>): WorkerInstance;
   createNodeContext(): BijouContext;
   runApp<Model, M>(app: App<Model, M>, options: RunOptions<M>): Promise<void>;
-  scheduleTimeout(
-    callback: () => void,
-    ms: number,
-  ): ReturnType<typeof setTimeout>;
+  /** Schedules the quit grace timer; inject a fake clock's setTimeout to drive it in tests. */
+  scheduleTimeout(callback: () => void, ms: number): TimerHandle;
 }
 export function defaultWorkerThreadBindings(): WorkerThreadBindings {
   return {
@@ -45,7 +43,8 @@ export function defaultWorkerThreadBindings(): WorkerThreadBindings {
     createNodeContext,
     runApp: run,
     scheduleTimeout(callback, ms) {
-      return setTimeout(callback, ms);
+      const timer = setTimeout(callback, ms);
+      return { dispose: () => { clearTimeout(timer); } };
     },
   };
 }

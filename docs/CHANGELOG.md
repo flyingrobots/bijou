@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- Shatter's debris settles. A falling glyph now lands in its own cell when the cell under it is the floor or the
+  pile, where it used to land one cell above. That jump made settling glyphs climb in a column forever, which looked
+  like cells left behind. A glyph that the pile grew around, or whose cell was taken while it fell, moves to the
+  nearest free cell that has support under it, so no glyph is trapped or left resting on air.
+
 ### Changed
 
 - CI tests Windows again. The new job "Focused Unit Tests (windows, Node 22, outside the seal)" runs the Linux focused
@@ -14,6 +21,19 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   refuses to load anywhere else, and `tests/ci-windows-job.test.ts` holds the job to its install, build and test
   commands and its list to the Linux lane's. `docs/guides/sealed-tests.md` and `AGENTS.md` record it as the second
   exception to the seal. The suite's Vitest settings move to `scripts/vitest-shared-config.ts`, which both configs use.
+
+- `createSurface` encodes its fill cell once and copies those bytes, instead of encoding every cell: a 210x50
+  Surface is created in about 0.6 ms instead of 8 ms, which makes every full-screen Surface and composite cheaper.
+  The landing page's frame drops from about 100 ms to 13 ms at 210x50. Its wordmark is rasterized once per screen
+  size and stamped onto the picture. The 3D Wave Surface evaluates its wave once per vertex, takes normals from
+  neighbouring heights, renders into one flat colour buffer and paints one sample per half-block pixel.
+
+- The published site's front page is a framed Bijou app (`createFramedApp`): the
+  new 3D Wave Surface demo (after laotzunami's Three.js graph) turns behind the
+  Bijou wordmark, centred with `placeSurface` and stamped onto the picture.
+  The frame brings the usual chrome: key hints, `?` help, `F2` settings
+  (wordmark, motion, open the demos) and `q` to quit. Enter opens the demo
+  gallery. The card grid and the random background are gone.
 
 - The tests of the fun shell, the gallery entries and the browser entry run on a fixture catalog of fakes
   (`tests/helpers/fun-fixture.ts`), and no test holds the number, the list or the order of the real fun demos; the
@@ -108,6 +128,33 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   no Node API.
 
 ### Added
+
+- Five original fun demos, in the Demos menu, the gallery and `npm run fun`:
+  Gargantua (a geodesic-raytraced Schwarzschild black hole with a lensed
+  accretion disk, photon ring and Doppler beaming); Shatter (a live dashboard of
+  real Bijou Components breaks into glyph physics and rewinds exactly into
+  place); Butterfly Effect (three universes of double pendulums, 1e-12 and 1e-9
+  apart, diverging, with a time scrubber and forking); Lenia (Bert Chan's
+  continuous cellular automaton, Orbium creatures on a torus); and Four Ways to
+  See (one comet simulation lowered live into all four output modes).
+
+- The fun demos are one framed Bijou app (`examples/fun/fun-app.ts`): Home shows
+  the 3D wave surface behind the Bijou wordmark, and Demos lists every demo beside
+  the selected one running. On Demos, the arrows or `j`/`k` choose, Enter plays
+  full-pane (Escape comes back), and Tab focuses the demo pane, which then gets
+  the demo's own keys and the pointer. `npm run fun:app` runs it in the terminal
+  and `npm run fun:web` in the browser; the published site's front page is the
+  same app.
+- `createFramedApp` has a key inspector (F9): the active layer and key priority,
+  the last keys and the route each took, every binding that can never fire and
+  what takes its key, and each key source in routing order. `debug: true` halts
+  the app with a dialog when the active page has such bindings, naming the
+  binding that takes each key, why it wins, and a fix (including a free key).
+- Eleven more fun demos ported from Observable sketches: 3D Wave Surface
+  (laotzunami), Adaptive Contours (Ricky Reusser, seven steppable stages),
+  Endless Loop, Random Bitmap, Voronoi Incircles, Line Integral Convolution
+  (stwind), Generative Painting (Karim Douieb), Noise Trails and Dashed Rings
+  (makio135), Oil Brushstrokes (akngs) and Periodic Tilings (Claudio Esperança).
 
 - `npm run fun` and the published site have eleven more generative demos, ported
   from Observable sketches: Seamless Squares (after cdr6934), Truchet Tiles,
@@ -254,6 +301,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   Origin: flyingrobots/bijou#890.
 
 ### Fixed
+
+- A framed app run through `run()` (as the browser canvas host does) now feeds
+  measured frame timings to its perf HUD. `App` gains an optional
+  `runtimeHooks(ctx)`, which `run()` applies; `createFramedApp` supplies its
+  timing hooks that way, and `controlApp` in `@flyingrobots/bijou-web` passes
+  them through. The HUD's `frame`, `view` and `diff` had read 0.00 ms.
+- The sealed toolchain image builds with the legacy Docker builder as well as
+  BuildKit: the seal marker gets its read-only mode from the build context, not
+  `COPY --chmod`.
 
 - `main` is green again after the showcase and fun-demo merges
   (flyingrobots/bijou#926). The lens demo's wave-front fallback typechecks; the

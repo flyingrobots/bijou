@@ -52,6 +52,16 @@ export type {
   PageTransition,
 } from './app-frame-runtime.js';
 export {
+  appendFrameKeyLog,
+  frameKeyInspectorLines,
+  frameKeyInspectorReport,
+  renderFrameKeyInspectorOverlay,
+  type FrameKeyInspectorBinding,
+  type FrameKeyInspectorReport,
+  type FrameKeyLogEntry,
+  type FrameKeySource,
+} from './app-frame-key-inspector.js';
+export {
   FRAME_MSG_TOKEN,
   FRAME_SHELL_THEME_MODE_SUPPORT,
   PAGE_MSG_TOKEN,
