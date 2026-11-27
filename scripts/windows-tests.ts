@@ -8,6 +8,9 @@ export const SEAL_ONLY_TESTS: readonly string[] = [
   'scripts/docker-seal/require-docker.test.ts',
   // Runs scripts/release-product-witnesses.ts, which loads that guard.
   'scripts/release-product-witnesses.test.ts',
+  // Each runs the real pre-commit hook, which enters the seal.
+  'scripts/staged-workspace.test.ts',
+  'scripts/workspace-lock.test.ts',
 ];
 
 export const WINDOWS_TESTS: readonly string[] = [
@@ -50,8 +53,6 @@ export const WINDOWS_TESTS: readonly string[] = [
   'scripts/docs-preview-search.part02.test.ts',
   'scripts/docs-preview-search.part03.test.ts',
   'scripts/docs-preview-theme.part01.test.ts',
-  'scripts/workspace-lock.test.ts',
-  'scripts/staged-workspace.test.ts',
   'scripts/workspace-version-cli.test.ts',
   'scripts/docs-preview-theme.part02.test.ts',
   'scripts/docs-preview-theme.part03.test.ts',
