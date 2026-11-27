@@ -9,14 +9,9 @@ export function localPathViolations(pathname: string, text: string): readonly st
 }
 
 function permitted(path: string, dockerSource: boolean): boolean {
-  if (!dockerSource) return false;
-  const windows = /^[A-Za-z]:/u.test(path);
-  if (!windows && path.includes('\\')) return false;
-  const normalized = windows ? path.replace(/\\+/gu, '/') : path;
-  if (normalized.split('/').includes('..')) return false;
+  // No Windows path is fixed by any container profile, so none is permitted.
+  if (!dockerSource || path.includes('\\') || /^[A-Za-z]:/u.test(path)) return false;
+  if (path.split('/').includes('..')) return false;
   // Linux's disposable HOME is fixed by the inspected container profile.
-  if (/^\/home\/test(?:\/|$)/u.test(normalized)) return true;
-  // Windows image/toolchain and disposable data roots are fixed, not user homes.
-  if (/^[Cc]:\/(?:work|temp|home|node|git|windows)(?:\/|$)/iu.test(normalized)) return true;
-  return /^[Cc]:\/bijou-test-seal$/iu.test(normalized);
+  return /^\/home\/test(?:\/|$)/u.test(path);
 }

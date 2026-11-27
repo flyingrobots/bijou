@@ -14,23 +14,22 @@ describe('CI isolation policy', () => {
     expect(() => ciWorkflowPolicyFromYaml(unsealed)).toThrow('Full test suite must enter the sealed runner');
   });
 
-  it('rejects substituting a Linux container for Windows coverage', () => {
-    // The Windows lane is switched off (flyingrobots/bijou#788), so this adds one back with the wrong runner.
-    const wrongKernel = workflow.replace(
+  it('rejects a Windows entry in the sealed focused matrix', () => {
+    // Windows runs in job unit_windows, outside the seal (flyingrobots/bijou#932).
+    const sealedWindows = workflow.replace(
       '            sealed-runner: run.mjs --isolated-ci\n',
       '            sealed-runner: run.mjs --isolated-ci\n          - label: windows\n            os: windows-2022\n            sealed-runner: run.mjs --isolated-ci\n',
     );
-    expect(wrongKernel).not.toBe(workflow);
+    expect(sealedWindows).not.toBe(workflow);
 
-    expect(() => ciWorkflowPolicyFromYaml(wrongKernel)).toThrow('Windows coverage requires the native Windows sealed runner');
+    expect(() => ciWorkflowPolicyFromYaml(sealedWindows)).toThrow('Windows runs in job unit_windows');
   });
 
-  it('admits a Windows lane that uses the native Windows runner', () => {
-    const restored = workflow.replace(
-      '            sealed-runner: run.mjs --isolated-ci\n',
-      '            sealed-runner: run.mjs --isolated-ci\n          - label: windows\n            os: windows-2022\n            sealed-runner: windows.mjs\n',
-    );
-    expect(ciWorkflowPolicyFromYaml(restored).focusedPlatforms).toEqual(['ubuntu-latest', 'windows-2022']);
+  it('requires the Windows job', () => {
+    const withoutWindows = workflow.replace('  unit_windows:\n', '  unit_windows_removed:\n');
+    expect(withoutWindows).not.toBe(workflow);
+
+    expect(() => ciWorkflowPolicyFromYaml(withoutWindows)).toThrow('CI workflow must keep job unit_windows');
   });
 
   it('admits the maintained platform matrix', () => {

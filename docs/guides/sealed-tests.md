@@ -28,11 +28,10 @@ Bootstrap refuses an absent base image instead of downloading it without
 resource admission.
 
 Local execution uses Linux containers, including on macOS through Docker.
-The native Windows lane uses disposable Windows containers on GitHub-hosted
-Windows runners; the Windows launcher currently requires that CI environment.
-That lane is switched off in CI as of 2026-11-24, because its worker runs out
-of storage before any test starts (flyingrobots/bijou#788). Nothing verifies
-Bijou on Windows until it returns; the launcher and its tests remain.
+There is no sealed Windows worker. The one Bijou had, a disposable Windows
+container on a GitHub-hosted runner, ran out of storage before any test started
+(flyingrobots/bijou#788), and it has been removed. Windows tests run outside the
+seal: see [Windows, outside the seal](#windows-outside-the-seal).
 
 ```sh
 node scripts/docker-seal/bootstrap.mjs --node-version 22
@@ -177,30 +176,6 @@ down. Docker Desktop's kernel lists them in a worker started with
 `--network none`. Any other device, or a fallback tunnel device that is up, is
 refused as `network interface beyond loopback`.
 
-Windows workers run as `ContainerUser` with process isolation, no host mounts,
-and no network while tests execute. Their storage limits differ from the Linux
-limits, and each has a different strength:
-
-| Limit | Value | Kind |
-| --- | --- | --- |
-| Worker volume | at most 20 GiB | Hard. The volume refuses writes when it is full. The launcher measures the capacity in each worker and refuses a larger volume. |
-| Data budget | 4 GiB | Sampled. The launcher stops the run when it observes more growth than this since the worker started. |
-| Generated-data budget | 40 MiB | Sampled. The same observation, counted from the end of the offline dependency installation. |
-| Host free space | 50 GiB floor | Sampled. The launcher stops when the filesystem that holds Docker storage has less free space. |
-
-A sampled budget charges the larger of two observations: growth of used space
-on the worker volume, and decreases of free space on the host filesystem that
-holds Docker storage. It can miss use that happens between two samples, and the
-host figure also counts other activity on that filesystem. The receipts record
-these limits under `storage`.
-
-Windows workers have no per-account disk quota: GitHub-hosted Windows runners
-refuse to set or read quota entries for a container. The launcher requests a
-20 GB worker volume, which is the smallest that Docker gives a Windows worker,
-and refuses a worker with any other storage setting. On hosted runners a
-smaller request still gave a 21,339,549,696 byte volume (job 135323118345), and
-no request gave a 136,229,920,768 byte volume (job 135334072019).
-
 The Git copy intentionally retains repository history and staged blobs for
 base-sensitive and staged-file checks. Host Git configuration, credential
 stores and ignored local inputs are not copied. This is not a claim that
@@ -212,17 +187,54 @@ stopped before recovering it. Lease expiry alone does not establish that fact.
 Never bypass admission, attach the source checkout, or run the failed test on
 the host to obtain a passing result.
 
-## The one suite outside the seal
+## Two exceptions to the seal
+
+Two CI jobs run tests outside the sealed runner. Each is held to its commands by
+a test that runs sealed. Nothing else is an exception.
+
+### The browser suite
 
 The browser suite of `examples/web-gpu` (`npm run test:browser:web-gpu`) does not
 run in the sealed runner. The sealed workers have no browser and no GPU, and the
 suite's job is to show that the built showcase renders, takes input and recovers
 in a real Chrome. It runs on a developer machine and in the CI job "Browser Suite
-(web-gpu, Chrome)". It is the only exception to the rule that all tests run
-sealed, and `AGENTS.md` records it.
+(web-gpu, Chrome)". `AGENTS.md` records it.
 
 The showcase's build and typecheck, and every test that does not need a browser,
 still run in the seal. `tests/web-gpu/ci-browser-job.test.ts`, which runs sealed,
 holds the CI job to installing the locked dependencies and running the suite.
 See [`examples/web-gpu/README.md`](../../examples/web-gpu/README.md) for the
 commands and for what each run does and does not show.
+
+### Windows, outside the seal
+
+Windows is cursed. Handle it with extreme caution: never breathe near it, hold
+it at arm's length at all times, cross your fingers, and swear under your breath
+whenever it is the only build that fails.
+
+In practice, that means the following rules:
+
+- **It runs in CI only.** The CI job "Focused Unit Tests (windows, Node 22,
+  outside the seal)" (`unit_windows`) runs on a GitHub-hosted `windows-2022`
+  runner. Each job gets a fresh virtual machine, and GitHub discards it when the
+  job ends. That is the isolation the job gets in place of the seal.
+  `scripts/vitest-windows.config.ts` refuses to load anywhere except in a
+  GitHub-hosted Windows job (`scripts/docker-seal/github-hosted.mjs`, the same
+  check the seal's CI bootstrap uses). Never run tests on a developer's Windows
+  machine outside the seal.
+- **It runs four commands.** It installs the locked dependencies, builds,
+  typechecks the tests, and runs Vitest with `scripts/vitest-windows.config.ts`.
+  It stops after 30 minutes, the seal's own session limit.
+  `tests/ci-windows-job.test.ts` holds the job to those commands and holds that
+  config to this one job.
+- **It runs the Linux focused lane's tests.** The list is in
+  `scripts/windows-tests.ts`. It is the list of the Linux job
+  `unit_cross_platform`, less the tests in `SEAL_ONLY_TESTS`, which need the
+  seal itself. The same test fails when the two lists drift apart.
+- **It has no network or Git isolation.** The tests in the job can reach the
+  network, and the checkout keeps its remote. The checkout does not keep the
+  job's token (`persist-credentials: false`). A test that needs either
+  restriction belongs in the seal, not in the Windows list.
+- **A Windows-only failure is a real failure.** Do not retry it until it passes.
+  Do not skip it or mark the job optional. Reproduce it in the job, fix the
+  cause, and record what Windows did differently.

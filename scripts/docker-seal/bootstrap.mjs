@@ -2,23 +2,14 @@
 // Build only the immutable toolchain marker layer. No source or dependencies enter it.
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
-import { isAbsolute } from 'node:path';
+import { isGitHubHostedJob } from './github-hosted.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const args = process.argv.slice(2);
 const isolated = args.includes('--isolated-ci');
 if (isolated) {
-  if (process.env.GITHUB_ACTIONS !== 'true' || process.env.RUNNER_ENVIRONMENT !== 'github-hosted' ||
-      !isAbsolute(process.env.RUNNER_TEMP ?? '') || !existsSync(process.env.RUNNER_TEMP) ||
-      !/^\d+$/u.test(process.env.GITHUB_RUN_ID ?? '')) throw new Error('Bootstrap CI mode requires an exclusive GitHub-hosted job VM');
-  if (process.platform === 'win32') {
-    const index = args.indexOf('--node-version');
-    const { bootstrapWindows } = await import('./bootstrap-windows.mjs');
-    await bootstrapWindows(index < 0 ? '22' : args[index + 1]);
-  } else {
-    await import('./bootstrap-owned.mjs');
-  }
+  if (!isGitHubHostedJob()) throw new Error('Bootstrap CI mode requires an exclusive GitHub-hosted job VM');
+  await import('./bootstrap-owned.mjs');
 } else {
 // Spawned directly, with no lock tool: a caller that wants admission control
 // wraps this command itself.

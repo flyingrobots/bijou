@@ -1,3 +1,12 @@
+# Every text file checks out with LF on every platform, so a Windows checkout
+# reads the same bytes the seal does. Files below that must keep exact bytes say -text.
+* text=auto eol=lf
+
+# These licence texts were committed with CRLF; keep their bytes.
+assets/fonts/dm-sans/OFL.txt -text
+assets/fonts/space-grotesk/OFL.txt -text
+docs/book/fonts/IBMPlexMono-OFL.txt -text
+
 # Frozen publication evidence must retain exact bytes on every checkout.
 docs/book/source-corpus.json -text
 docs/book/build-report.json -text
@@ -11,7 +20,7 @@ fixtures/profunctor-page/project-keep/generated/* -text
 examples/docs/fixtures/graphql/navigation-list.graphql -text
 tests/fixtures/RE-036/packed-bijou-cells.v1.json -text
 
-# The image seal marker is compared byte for byte inside the Windows worker.
+# The image seal marker is compared byte for byte inside the worker.
 scripts/docker-seal/marker -text
 
 # The web-gpu showcase pins these Geordi files by SHA-256 (examples/web-gpu/geordi-pin.json).

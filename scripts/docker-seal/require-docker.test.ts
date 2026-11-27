@@ -5,9 +5,7 @@ import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-const guard = process.platform === 'win32'
-  ? 'C:\\work\\source\\scripts\\docker-seal\\require-docker.mjs'
-  : '/work/source/scripts/docker-seal/require-docker.mjs';
+const guard = '/work/source/scripts/docker-seal/require-docker.mjs';
 
 describe('test admission before runtime effects', () => {
   it.each(['child.ts', 'runner.ts'])('refuses a direct benchmark %s import before runtime effects', (file) => {

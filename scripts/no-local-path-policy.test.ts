@@ -15,10 +15,9 @@ describe('fixed container paths versus machine-local paths', () => {
     expect(localPathViolations(worker, `${home} ${home}/.npm`)).toEqual([]);
   });
 
-  it.each(['work', 'temp', 'home', 'node', 'Git', 'Windows'])('admits the fixed Windows %s root', (root) => {
+  it.each(['work', 'temp', 'home', 'node', 'Git', 'Windows', 'bijou-test-seal'])('rejects a Windows %s root, now that no sealed Windows worker exists', (root) => {
     const path = win32.join('C:', '/', root, 'child');
-    expect(localPathViolations(worker, path)).toEqual([]);
-    expect(localPathViolations(worker, JSON.stringify(path))).toEqual([]);
+    expect(localPathViolations(worker, path)).toEqual([path]);
   });
 
   it.each([`${home}er`, `${home}\\er`, `${home}/../alice`, alice, macAlice, win32.join('D:', '/', 'private'), win32.join('C:', '/', 'workstation')])('rejects a noncanonical or escaping path: %s', (path) => {
@@ -35,11 +34,6 @@ describe('fixed container paths versus machine-local paths', () => {
 
   it.each(['run.mjs', 'bootstrap.mjs', 'worker.mjs'])('rejects a hard-coded shared lock store in %s', (file) => {
     expect(localPathViolations(`scripts/docker-seal/${file}`, lock)).toEqual([lock]);
-  });
-
-  it.each(['windows-measure.ps1', 'windows.mjs'])('rejects the volume root in %s, now that no native quota program addresses it', (file) => {
-    const root = win32.join('C:', '/');
-    expect(localPathViolations(`scripts/docker-seal/${file}`, root)).toEqual([root]);
   });
 
   it('rejects file URLs even in Docker tooling', () => {

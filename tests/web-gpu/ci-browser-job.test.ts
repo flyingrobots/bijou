@@ -2,9 +2,10 @@ import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
 
-// Every CI test enters the sealed runner except the web-gpu browser suite,
-// which needs a browser and a GPU the seal does not have. These cases keep
-// that exception to the one script and keep the showcase build sealed.
+// Every CI test enters the sealed runner except the web-gpu browser suite
+// (which needs a browser and a GPU the seal does not have) and the Windows job
+// (tests/ci-windows-job.test.ts). These cases keep the browser exception to
+// its one script and keep the showcase build sealed.
 type Fields = Readonly<Record<string, unknown>>;
 function isFields(value: unknown): value is Fields {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

@@ -12,9 +12,6 @@ export function imageName(version) {
   return `bijou-sealed-node${version}:local`;
 }
 export function cleanEnvironment() {
-  const windows = Object.fromEntries(['SystemRoot', 'WINDIR', 'ComSpec', 'PATHEXT', 'TEMP', 'TMP']
-    .filter((key) => process.env[key]).map((key) => [key, process.env[key]]));
-  return { ...windows, PATH: process.env.PATH, HOME: process.env.HOME, LANG: 'C.UTF-8', COPYFILE_DISABLE: '1',
-    // Git maps /dev/null itself on Windows; the device path \\.\nul makes it exit 128.
+  return { PATH: process.env.PATH, HOME: process.env.HOME, LANG: 'C.UTF-8', COPYFILE_DISABLE: '1',
     GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null' };
 }

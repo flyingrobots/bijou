@@ -15,6 +15,15 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- CI tests Windows again. The new job "Focused Unit Tests (windows, Node 22, outside the seal)" runs the Linux focused
+  lane's tests on a fresh GitHub-hosted Windows runner, outside the sealed runner, because the sealed Windows worker
+  ran out of storage before any test started (flyingrobots/bijou#932, flyingrobots/bijou#788). Its config, `scripts/vitest-windows.config.ts`,
+  refuses to load anywhere else, and `tests/ci-windows-job.test.ts` holds the job to its install, build, typecheck and test
+  commands and its list to the Linux lane's. `docs/guides/sealed-tests.md` and `AGENTS.md` record it as the second
+  exception to the seal. The suite's Vitest settings move to `scripts/vitest-shared-config.ts`, which both configs use.
+  The sealed Windows launcher (`scripts/docker-seal/windows.mjs`, its worker, image and bootstrap, and their tests) is
+  removed. The guards now refuse any Windows execution, and the local-path policy no longer admits Windows paths.
+
 - `createSurface` encodes its fill cell once and copies those bytes, instead of encoding every cell: a 210x50
   Surface is created in about 0.6 ms instead of 8 ms, which makes every full-screen Surface and composite cheaper.
   The landing page's frame drops from about 100 ms to 13 ms at 210x50. Its wordmark is rasterized once per screen
