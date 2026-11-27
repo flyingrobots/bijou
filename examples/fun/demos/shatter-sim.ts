@@ -2,6 +2,7 @@
 // Glyph debris: each particle is one dashboard cell flying under gravity, bouncing off the walls and floor, and
 // coming to rest on a grid pile that slides like sand. Every step returns new arrays; the inputs are kept.
 import { nextRandom } from '../random.js';
+import { occupancy, resting, settle } from './shatter-pile.js';
 
 export interface Sim {
   readonly w: number;
@@ -58,14 +59,6 @@ export function blast(sim: Sim, col: number, row: number, seed: number): readonl
   return [next, rng];
 }
 
-function occupancy(sim: Sim): Int32Array {
-  const grid = new Int32Array(sim.w * sim.h).fill(-1);
-  for (let i = 0; i < sim.x.length; i += 1) {
-    if (sim.rest[i] === 1) grid[(sim.y[i] ?? 0) * sim.w + (sim.x[i] ?? 0)] = i;
-  }
-  return grid;
-}
-
 function shove(sim: Sim, i: number, push: Push): boolean {
   const dx = (sim.x[i] ?? 0) - push.col;
   const dy = ((sim.y[i] ?? 0) - push.row) * 2;
@@ -77,34 +70,6 @@ function shove(sim: Sim, i: number, push: Push): boolean {
   return true;
 }
 
-/** Snap particle i to the first free cell at or above (cx, cy). False when the column is full. */
-function settle(sim: Sim, grid: Int32Array, i: number, cx: number, cy: number): boolean {
-  for (let y = cy; y >= 0; y -= 1) {
-    if ((grid[y * sim.w + cx] ?? 0) >= 0) continue;
-    sim.x[i] = cx; sim.y[i] = y; sim.vx[i] = 0; sim.vy[i] = 0; sim.rest[i] = 1;
-    grid[y * sim.w + cx] = i;
-    return true;
-  }
-  return false;
-}
-
-function resting(sim: Sim, grid: Int32Array, i: number, frame: number): boolean {
-  const x = sim.x[i] ?? 0;
-  const y = sim.y[i] ?? 0;
-  if (y >= sim.h - 1) return false;
-  const free = (cx: number, cy: number): boolean => cx >= 0 && cx < sim.w && (grid[cy * sim.w + cx] ?? 0) < 0;
-  if (free(x, y + 1)) { sim.rest[i] = 0; grid[y * sim.w + x] = -1; return true; }
-  const side = (i + frame) % 2 === 0 ? 1 : -1;
-  for (const s of [side, -side]) {
-    if (!free(x + s, y + 1) || !free(x + s, y)) continue;
-    grid[y * sim.w + x] = -1;
-    sim.x[i] = x + s; sim.y[i] = y + 1;
-    grid[(y + 1) * sim.w + x + s] = i;
-    return true;
-  }
-  return false;
-}
-
 function fly(sim: Sim, grid: Int32Array, i: number, dt: number, gravity: number): void {
   const { w, h } = sim;
   const n = Math.min(MAX_SUBSTEPS, Math.max(1, Math.ceil((Math.max(Math.abs(sim.vx[i] ?? 0), Math.abs(sim.vy[i] ?? 0)) * dt) / 0.9)));
@@ -113,15 +78,18 @@ function fly(sim: Sim, grid: Int32Array, i: number, dt: number, gravity: number)
     let vx = sim.vx[i] ?? 0;
     let vy = (sim.vy[i] ?? 0) + gravity * sub;
     let nx = (sim.x[i] ?? 0) + vx * sub;
-    let ny = (sim.y[i] ?? 0) + vy * sub;
+    let ny = Math.min(h - 1, (sim.y[i] ?? 0) + vy * sub);
     if (nx < 0 || nx > w - 1) { nx = Math.max(0, Math.min(w - 1, nx)); vx = -vx * 0.55; }
     if (ny < 0) { ny = 0; vy = Math.abs(vy) * 0.3; }
+    const taken = (cx: number, cy: number): boolean => (grid[cy * w + cx] ?? -1) >= 0;
+    // Moving sideways into the pile is a wall: keep the old column and bounce back.
+    if (taken(Math.round(nx), Math.round(ny)) && Math.round(nx) !== Math.round(sim.x[i] ?? nx)) { nx = sim.x[i] ?? nx; vx = -vx * 0.4; }
     const cx = Math.round(nx);
-    const cy = Math.min(h - 1, Math.round(ny));
-    const hit = ny >= h - 1 || (grid[cy * w + cx] ?? -1) >= 0;
-    if (hit && vy > 0) {
-      if (vy > 14) { vy = -vy * 0.35; vx *= 0.75; ny = Math.min(ny, cy - 0.5); } else if (settle(sim, grid, i, cx, ny >= h - 1 ? h - 1 : cy - 1)) return;
-    } else if (hit) { nx = sim.x[i] ?? nx; vx = -vx * 0.4; }
+    const cy = Math.round(ny);
+    // A falling glyph lands in its own cell when the cell under it is the floor or the pile; never one above it.
+    if (vy > 0 && (cy >= h - 1 || taken(cx, cy + 1) || taken(cx, cy))) {
+      if (vy > 14) { vy = -vy * 0.35; vx *= 0.75; ny = Math.min(ny, cy); } else if (settle(sim, grid, i, cx, cy)) return;
+    }
     sim.x[i] = nx; sim.y[i] = ny; sim.vx[i] = vx; sim.vy[i] = vy;
   }
 }

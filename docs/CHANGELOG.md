@@ -6,6 +6,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ## [Unreleased]
 
+### Fixed
+
+- Shatter's debris settles. A falling glyph now lands in its own cell when the cell under it is the floor or the
+  pile, where it used to land one cell above. That jump made settling glyphs climb in a column forever, which looked
+  like cells left behind. A glyph that the pile grew around, or whose cell was taken while it fell, moves to the
+  nearest free cell that has support under it, so no glyph is trapped or left resting on air.
+
 ### Changed
 
 - `createSurface` encodes its fill cell once and copies those bytes, instead of encoding every cell: a 210x50
