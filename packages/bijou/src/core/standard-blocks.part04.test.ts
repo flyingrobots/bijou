@@ -95,8 +95,7 @@ describe('first-party standard block definitions', () => {
     expect(typeof pipe.output).toBe('string');
     expect(typeof accessible.output).toBe('string');
     expect(surfaceText(interactive.output)).toContain('AppShell');
-    expect(surfaceText(interactive.output)).toContain('Navigation');
-    expect(surfaceText(interactive.output)).toContain('Docs nav');
+    expect(surfaceText(interactive.output)).toMatch(/Docs nav +│ Blocks guide/u);
     expect(pipe.output).toContain('navigation: Docs nav');
     expect(accessible.output).toContain('Navigation: Docs nav');
   });

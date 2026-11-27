@@ -2,9 +2,10 @@ import type { BindingFact } from '../binding.js';
 import { isBlockDefinition, type BlockRenderInput, type BlockRenderResult } from '../block-metadata.js';
 import type { Surface } from '../../ports/surface.js';
 import { isPlainRecord } from './schema-utils.js';
-import { normalizeOutputMode, renderAccessibleSections, renderPipeSections, renderSurfaceBounds, renderVisualSectionsSurface } from './render.part01.js';
+import { normalizeOutputMode, renderAccessibleSections, renderPipeSections, renderSurfaceBounds } from './render.part01.js';
 import type { RenderSection } from './render.part01.js';
 import { isSurfaceSlotValue, renderFacts, surfaceSlotText } from './render.part02.js';
+import { drawAppShell } from './draw-app-shell.js';
 
 export function slotValueText(value: unknown): string | undefined {
   if (value == null) {
@@ -114,7 +115,7 @@ export function renderAppShellBlock(input: BlockRenderInput): BlockRenderResult<
       ? renderAccessibleSections('AppShell', sections)
       : mode === 'pipe'
         ? renderPipeSections('AppShell', sections)
-        : renderVisualSectionsSurface('AppShell', sections, renderSurfaceBounds(input)),
+        : drawAppShell({ sections, slots: input.slots, bounds: renderSurfaceBounds(input) }),
     facts: renderFacts('AppShell', sections, 'region', mode),
   });
 }

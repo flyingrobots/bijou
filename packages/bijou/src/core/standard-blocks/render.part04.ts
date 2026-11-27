@@ -6,6 +6,8 @@ import type { RenderSection } from './render.part01.js';
 import { renderFacts } from './render.part02.js';
 import { ownSlotValue, renderSection, renderedBlockResult } from './render.part03.js';
 import type { StandardInteractiveDrawer } from './draw-input.js';
+import { drawInspectorPanel } from './draw-inspector-panel.js';
+import { drawReaderSurface } from './draw-reader-surface.js';
 
 export function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderResult<string | Surface> {
   const mode = normalizeOutputMode(input.mode);
@@ -20,7 +22,7 @@ export function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderRe
       ? renderAccessibleSections('ReaderSurface', sections)
       : mode === 'pipe'
         ? renderPipeSections('ReaderSurface', sections)
-        : renderVisualSectionsSurface('ReaderSurface', sections, renderSurfaceBounds(input)),
+        : drawReaderSurface({ sections, slots: input.slots, bounds: renderSurfaceBounds(input) }),
     facts: renderFacts('ReaderSurface', sections, 'slot', mode),
   });
 }
@@ -38,7 +40,7 @@ export function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderR
       ? renderAccessibleSections('InspectorPanel', sections)
       : mode === 'pipe'
         ? renderPipeSections('InspectorPanel', sections)
-        : renderVisualSectionsSurface('InspectorPanel', sections, renderSurfaceBounds(input)),
+        : drawInspectorPanel({ sections, slots: input.slots, bounds: renderSurfaceBounds(input) }),
     facts: renderFacts('InspectorPanel', sections, 'slot', mode),
   });
 }
