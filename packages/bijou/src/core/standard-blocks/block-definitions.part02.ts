@@ -7,6 +7,7 @@ import { binaryDecisionMetadata, dividerMetadata, explainabilityWalkthroughMetad
 import { binaryDecisionData, binaryDecisionSections, dividerData, dividerSections, explainabilityWalkthroughData, explainabilityWalkthroughSections, formattedDocumentData, formattedDocumentSections, framedGroupData, framedGroupSections, linkDestinationData, linkDestinationSections, multipleChoiceData, multipleChoiceSections, singleChoiceData, singleChoiceSections, standardSectionCommands, textEntryData, textEntrySections } from './sections.js';
 
 import { renderStandardSectionBlock } from './render.js';
+import { drawDivider } from './draw-divider.js';
 export const framedGroupBlock: BlockDefinition = defineBlock({
   metadata: framedGroupMetadata(),
   data: framedGroupData,
@@ -55,6 +56,7 @@ export const dividerBlock: BlockDefinition = defineBlock({
     input,
     'DividerBlock',
     dividerSections,
+    drawDivider,
   ),
 });
 export const textEntryBlock: BlockDefinition = defineBlock({
