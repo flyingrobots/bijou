@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- CI tests Windows again. The new job "Focused Unit Tests (windows, Node 22, outside the seal)" runs the Linux focused
+  lane's tests on a fresh GitHub-hosted Windows runner, outside the sealed runner, because the sealed Windows worker
+  ran out of storage before any test started (flyingrobots/bijou#932, flyingrobots/bijou#788). Its config, `scripts/vitest-windows.config.ts`,
+  refuses to load anywhere else, and `tests/ci-windows-job.test.ts` holds the job to its install, build and test
+  commands and its list to the Linux lane's. `docs/guides/sealed-tests.md` and `AGENTS.md` record it as the second
+  exception to the seal. The suite's Vitest settings move to `scripts/vitest-shared-config.ts`, which both configs use.
+
 - The tests of the fun shell, the gallery entries and the browser entry run on a fixture catalog of fakes
   (`tests/helpers/fun-fixture.ts`), and no test holds the number, the list or the order of the real fun demos; the
   browser tests read the cards from the page. Adding a demo is now its module, one catalog entry and its own recorded

@@ -21,15 +21,25 @@ This guide is for AI agents and human operators recovering context in the Bijou 
   mounts, Docker-socket exposure and environment-only guard bypasses are forbidden.
   Report a refused run as blocked; preserve its evidence and fix the boundary.
 
-- **One suite runs outside the seal, on purpose: the browser suite of
+- **Two test jobs run outside the seal, on purpose. The first is the browser suite of
   `examples/web-gpu`** (`npm run test:browser:web-gpu`, CI job "Browser Suite
   (web-gpu, Chrome)"). The sealed workers have no browser and no GPU, and a
-  build-only check is not evidence that a page renders. This is the only
-  exception. It drives the built showcase in a real Chrome and nothing else: it
+  build-only check is not evidence that a page renders. It drives the built showcase in a real Chrome and nothing else: it
   is not a place for unit tests, and `tests/web-gpu/ci-browser-job.test.ts`
   holds its CI job to `npm ci` plus the suite. Everything that does not need a
   browser, including the showcase's build and typecheck, stays in the seal.
   Record which browser, adapter and evidence level produced a result.
+
+- **The second exception is the Windows CI job** ("Focused Unit Tests (windows,
+  Node 22, outside the seal)"). The sealed Windows worker ran out of storage
+  before any test started, so the job runs the focused tests directly on a fresh
+  GitHub-hosted Windows virtual machine. It runs only in CI:
+  `scripts/vitest-windows.config.ts` refuses to load anywhere else, and
+  `tests/ci-windows-job.test.ts` holds the job to its install, its build and
+  that config. Windows is cursed. Handle it with extreme caution: never breathe
+  near it, hold it at arm's length, cross your fingers, and swear under your
+  breath whenever it is the only build that fails. Then fix the failure; never
+  retry it until it passes. See `docs/guides/sealed-tests.md`.
 
 - The canonical standards artifact is
   **`docs/typescript-code-standards.editors-edition.md`**, copied verbatim from

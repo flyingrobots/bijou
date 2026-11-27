@@ -76,13 +76,11 @@ Bijou is developed and verified on macOS and Linux, on Node.js 20 and 22. CI run
 the full test suite on Linux for both.
 
 > [!NOTE]
-> **Windows is not supported at present.** Nothing verifies Bijou on Windows:
-> the CI job that ran a focused set of tests in native Windows containers was
-> switched off on 2026-11-24, because its worker ran out of storage before any
-> test started, so it failed on every run and proved nothing
-> ([flyingrobots/bijou#788](https://github.com/flyingrobots/bijou/issues/788)).
-> Bijou may well work on Windows, in Windows Terminal or under WSL, but that is
-> untested. Windows support returns when that job does.
+> **Windows is partly verified.** On every pull request, CI builds Bijou on a
+> GitHub-hosted Windows Server 2022 runner and runs a focused set of its tests
+> there: the event bus, the pipeline, the Node host and the MCP server, among
+> others. The rest of the suite runs only on Linux. Bijou in Windows Terminal is
+> not tested.
 
 ## Keep going
 

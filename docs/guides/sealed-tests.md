@@ -28,11 +28,11 @@ Bootstrap refuses an absent base image instead of downloading it without
 resource admission.
 
 Local execution uses Linux containers, including on macOS through Docker.
-The native Windows lane uses disposable Windows containers on GitHub-hosted
-Windows runners; the Windows launcher currently requires that CI environment.
-That lane is switched off in CI as of 2026-11-24, because its worker runs out
-of storage before any test starts (flyingrobots/bijou#788). Nothing verifies
-Bijou on Windows until it returns; the launcher and its tests remain.
+Windows tests do not use a sealed worker. The sealed Windows lane, which ran
+disposable Windows containers on GitHub-hosted Windows runners, ran out of
+storage before any test started (flyingrobots/bijou#788). Its CI job now runs
+outside the seal: see [Windows, outside the seal](#windows-outside-the-seal).
+The Windows launcher and its tests remain.
 
 ```sh
 node scripts/docker-seal/bootstrap.mjs --node-version 22
@@ -212,17 +212,51 @@ stopped before recovering it. Lease expiry alone does not establish that fact.
 Never bypass admission, attach the source checkout, or run the failed test on
 the host to obtain a passing result.
 
-## The one suite outside the seal
+## Two exceptions to the seal
+
+Two CI jobs run tests outside the sealed runner. Each is held to its commands by
+a test that runs sealed. Nothing else is an exception.
+
+### The browser suite
 
 The browser suite of `examples/web-gpu` (`npm run test:browser:web-gpu`) does not
 run in the sealed runner. The sealed workers have no browser and no GPU, and the
 suite's job is to show that the built showcase renders, takes input and recovers
 in a real Chrome. It runs on a developer machine and in the CI job "Browser Suite
-(web-gpu, Chrome)". It is the only exception to the rule that all tests run
-sealed, and `AGENTS.md` records it.
+(web-gpu, Chrome)". `AGENTS.md` records it.
 
 The showcase's build and typecheck, and every test that does not need a browser,
 still run in the seal. `tests/web-gpu/ci-browser-job.test.ts`, which runs sealed,
 holds the CI job to installing the locked dependencies and running the suite.
 See [`examples/web-gpu/README.md`](../../examples/web-gpu/README.md) for the
 commands and for what each run does and does not show.
+
+### Windows, outside the seal
+
+Windows is cursed. Handle it with extreme caution: never breathe near it, hold
+it at arm's length at all times, cross your fingers, and swear under your breath
+whenever it is the only build that fails.
+
+In practice, that means the following rules:
+
+- **It runs in CI only.** The CI job "Focused Unit Tests (windows, Node 22,
+  outside the seal)" (`unit_windows`) runs on a GitHub-hosted `windows-2022`
+  runner. Each job gets a fresh virtual machine, and GitHub discards it when the
+  job ends. That is the isolation the job gets in place of the seal.
+  `scripts/vitest-windows.config.ts` refuses to load anywhere except on a
+  Windows GitHub Actions runner. Never run tests on a developer's Windows
+  machine outside the seal.
+- **It runs three commands.** It installs the locked dependencies, builds, and
+  runs Vitest with `scripts/vitest-windows.config.ts`.
+  `tests/ci-windows-job.test.ts` holds the job to those commands and holds that
+  config to this one job.
+- **It runs the Linux focused lane's tests.** The list is in
+  `scripts/windows-tests.ts`. It is the list of the Linux job
+  `unit_cross_platform`, less the tests in `SEAL_ONLY_TESTS`, which need the
+  seal itself. The same test fails when the two lists drift apart.
+- **It has no network or Git isolation.** The tests in the job can reach the
+  network, and the checkout keeps its remote. A test that needs either
+  restriction belongs in the seal, not in the Windows list.
+- **A Windows-only failure is a real failure.** Do not retry it until it passes.
+  Do not skip it or mark the job optional. Reproduce it in the job, fix the
+  cause, and record what Windows did differently.

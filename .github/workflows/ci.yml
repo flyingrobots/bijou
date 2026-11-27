@@ -206,14 +206,9 @@ jobs:
           - label: ubuntu
             os: ubuntu-latest
             sealed-runner: run.mjs --isolated-ci
-          # The native Windows lane is switched off (2026-11-24): its sealed
-          # worker runs out of storage before any test starts
-          # (flyingrobots/bijou#788), so it was red on every run and proved
-          # nothing. Windows is not verified until it returns; README.md says
-          # so. To restore it, add back:
-          #   - label: windows
-          #     os: windows-2022
-          #     sealed-runner: windows.mjs
+          # Windows runs outside the seal, in job unit_windows below. Its sealed
+          # worker ran out of storage before any test started
+          # (flyingrobots/bijou#788).
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -279,6 +274,28 @@ jobs:
           scripts/docker-seal/windows-quarantine.test.ts
           scripts/docker-seal/windows-extraction.test.ts
 
+  # The one test job outside the seal besides the browser suite: see
+  # "Windows, outside the seal" in docs/guides/sealed-tests.md. Each GitHub
+  # Windows runner is a fresh virtual machine, so the job installs, builds and
+  # runs the Linux lane's focused tests there, and nothing else.
+  # tests/ci-windows-job.test.ts holds it to these steps and that list.
+  unit_windows:
+    name: Focused Unit Tests (windows, Node 22, outside the seal)
+    runs-on: windows-2022
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --fund=false
+      - name: Build
+        run: npm run build
+      - name: Focused portable unit tests
+        run: node node_modules/vitest/vitest.mjs run --config scripts/vitest-windows.config.ts
+
   smoke_dogfood:
     name: Smoke DOGFOOD (${{ matrix.lane.label }})
     runs-on: ubuntu-latest
@@ -343,7 +360,7 @@ jobs:
     name: Wall time summary
     if: always()
     continue-on-error: true
-    needs: [changes, test, suite, smoke_gates, browser_web_gpu, unit_cross_platform, smoke_dogfood, bench_gradient]
+    needs: [changes, test, suite, smoke_gates, browser_web_gpu, unit_cross_platform, unit_windows, smoke_dogfood, bench_gradient]
     runs-on: ubuntu-latest
     permissions:
       actions: read
