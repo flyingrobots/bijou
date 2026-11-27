@@ -2,8 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ciWorkflowPolicyFromYaml } from './ci-workflow-policy.js';
 
-// A Windows checkout has CRLF line endings; the edits below are written with LF.
-const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 
 describe('CI isolation policy', () => {
   it('rejects the old host full-suite command', () => {
