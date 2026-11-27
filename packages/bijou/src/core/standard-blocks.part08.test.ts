@@ -1,12 +1,14 @@
 import {
   blockRenderNode,
+  defineBlock,
   describe,
   dividerBlock,
   expect,
   it,
   renderBlockTree,
-  textEntryBlock,
+  spyMetadata,
 } from './standard-blocks.test-support.js';
+import { renderStandardSectionBlock } from './standard-blocks/render.js';
 import { drawnFrame, framedSlotTitles } from './standard-blocks-drawn.test-support.js';
 
 const RELEASE_SLOTS = Object.freeze({ label: 'Release Evidence', style: 'rule', density: 'compact' });
@@ -102,13 +104,27 @@ describe('DividerBlock interactive drawing (flyingrobots/bijou#935)', () => {
   });
 });
 
+/**
+ * A test-only block that keeps the generic framed-section renderer: it passes
+ * no drawer. Its metadata takes the name the generic renderer titles it with.
+ */
+const FRAMED_SECTIONS = [
+  { id: 'field', label: 'Field', required: true },
+  { id: 'value', label: 'Value', required: true },
+  { id: 'placeholder', label: 'Placeholder', required: false },
+] as const;
+const framedSectionBlock = defineBlock({
+  metadata: { ...spyMetadata, blockName: 'FramedGroupBlock', slots: FRAMED_SECTIONS },
+  render: (input) => renderStandardSectionBlock(input, 'FramedGroupBlock', FRAMED_SECTIONS),
+});
+
 describe('framedSlotTitles shared check', () => {
   it('reports the slot labels that the generic section renderer frames', () => {
-    const frame = drawnFrame(textEntryBlock.render({
+    const frame = drawnFrame(framedSectionBlock.render({
       mode: 'interactive',
       slots: { field: 'Search docs', value: 'table', placeholder: 'type a query' },
     }));
 
-    expect(framedSlotTitles(textEntryBlock, frame)).toEqual(['Field', 'Value', 'Placeholder']);
+    expect(framedSlotTitles(framedSectionBlock, frame)).toEqual(['Field', 'Value', 'Placeholder']);
   });
 });
