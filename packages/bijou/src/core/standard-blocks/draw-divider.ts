@@ -10,14 +10,18 @@ const STYLE_GLYPHS: ReadonlyMap<string, string> = new Map([
   ['dashed', '╌'],
 ]);
 
+/** Restyles the rule runs at each end of the row, leaving the label's own text alone. */
 function restyleRule(rule: Surface, glyph: string): void {
   if (glyph === RULE_GLYPH) return;
-  for (let x = 0; x < rule.width; x += 1) {
-    const cell = rule.get(x, 0);
-    if (cell.char === RULE_GLYPH) {
+  const restyleFrom = (start: number, step: number): void => {
+    for (let x = start; x >= 0 && x < rule.width; x += step) {
+      const cell = rule.get(x, 0);
+      if (cell.char !== RULE_GLYPH) return;
       rule.set(x, 0, { ...cell, char: glyph });
     }
-  }
+  };
+  restyleFrom(0, 1);
+  restyleFrom(rule.width - 1, -1);
 }
 
 /**

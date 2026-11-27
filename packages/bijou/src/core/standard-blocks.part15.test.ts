@@ -1,4 +1,4 @@
-import { describe, expect, it, standardBlocks } from './standard-blocks.test-support.js';
+import { describe, dividerBlock, expect, it, standardBlocks } from './standard-blocks.test-support.js';
 import { renderStandardSectionBlock } from './standard-blocks/render.js';
 import type { StandardBlockName } from './standard-blocks.js';
 import { drawnFrame, framedSlotTitles } from './standard-blocks-drawn.test-support.js';
@@ -41,5 +41,12 @@ describe('framedSlotTitles calibration (flyingrobots/bijou#935)', () => {
     });
 
     expect(missed).toEqual([]);
+  });
+
+  it('does not flag a drawn block whose own text looks like a slot title', () => {
+    const frame = drawnFrame(dividerBlock.render({ mode: 'interactive', slots: { label: 'Style' }, config: { width: 40 } }));
+
+    expect(frame.rows[0]).toContain('─ Style ─');
+    expect(framedSlotTitles(dividerBlock, frame)).toEqual([]);
   });
 });
