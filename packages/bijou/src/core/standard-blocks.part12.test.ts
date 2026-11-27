@@ -48,6 +48,10 @@ describe.each(DOCUMENT_BLOCK_CASES)('$name interactive drawing (flyingrobots/bij
     expect(framedSlotTitles(entry.block, frame)).toEqual([]);
   });
 
+  it('draws the same frame in static mode as in interactive mode', () => {
+    expect(drawBlock(entry.block, entry.slots, 60, 'static').rows).toEqual(drawBlock(entry.block, entry.slots).rows);
+  });
+
   it('keeps pipe and accessible output as labelled slot lines', () => {
     expect(entry.block.render({ mode: 'pipe', slots: entry.slots }).output).toBe(entry.pipe);
     expect(entry.block.render({ mode: 'accessible', slots: entry.slots }).output).toBe(entry.accessible);

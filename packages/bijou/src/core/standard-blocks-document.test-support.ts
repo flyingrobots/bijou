@@ -100,8 +100,13 @@ const DOCUMENT_BLOCK_CASES: readonly DocumentBlockCase[] = Object.freeze([
   },
 ]);
 
-function drawBlock(block: BlockDefinition, slots: Slots, width = 60): DrawnFrame {
-  return drawnFrame(renderBlockTree(blockRenderNode(block, { mode: 'interactive', slots, config: { width } })));
+function drawBlock(
+  block: BlockDefinition,
+  slots: Slots,
+  width = 60,
+  mode: 'interactive' | 'static' = 'interactive',
+): DrawnFrame {
+  return drawnFrame(renderBlockTree(blockRenderNode(block, { mode, slots, config: { width } })));
 }
 
 function withoutSlots(slots: Slots, ids: readonly string[]): Slots {
