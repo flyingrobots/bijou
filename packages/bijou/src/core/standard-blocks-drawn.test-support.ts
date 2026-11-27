@@ -22,18 +22,22 @@ function escapeForPattern(text: string): string {
 }
 
 /**
- * Slot labels of `block` that appear as a framed box title in `frame`.
+ * Slots of `block` whose label or id appears as a framed box title in `frame`.
  *
  * The generic section renderer draws one box per slot, titled with the slot's
- * label (`┌─ Label ───`). A drawn block shows none of those titles, so an empty
- * result is the oracle for "this block draws itself".
+ * label (`┌─ Label ───`). Slots without a metadata label (AppShell,
+ * ReaderSurface, InspectorPanel) are titled with their capitalised id, so the
+ * match takes the label and the id, ignoring case. A drawn block shows none of
+ * those titles, so an empty result is the oracle for "this block draws itself".
  */
 function framedSlotTitles(block: BlockDefinition, frame: DrawnFrame): readonly string[] {
-  const labels = block.metadata.slots.map((slot) => slot.label ?? slot.id);
-  return labels.filter((label) => {
-    const title = new RegExp(`─ ${escapeForPattern(label)} ─`, 'u');
-    return frame.rows.some((row) => title.test(row));
-  });
+  return block.metadata.slots
+    .filter((slot) => [slot.label, slot.id].some((name) => {
+      if (name === undefined) return false;
+      const title = new RegExp(`─ ${escapeForPattern(name)} ─`, 'iu');
+      return frame.rows.some((row) => title.test(row));
+    }))
+    .map((slot) => slot.label ?? slot.id);
 }
 
 export type { DrawnFrame };
