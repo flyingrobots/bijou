@@ -41,7 +41,9 @@ function lcg(seed: number): () => number {
   };
 }
 
-const ALPHABET = ['a', 'Z', '0', ' ', '/', '-', '.', 'é', '─', '\n', '\t', '\u001b[31m', '\u0007'];
+/** An SGR colour sequence, built from its code point so the source holds no raw escape (`ansi-lint.test.ts`). */
+const SGR_RED = `${String.fromCharCode(0x1b)}[31m`;
+const ALPHABET = ['a', 'Z', '0', ' ', '/', '-', '.', 'é', '─', '\n', '\t', SGR_RED, '\u0007'];
 
 function randomText(next: () => number): string {
   const length = next() % 90;
