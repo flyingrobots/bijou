@@ -47,6 +47,12 @@ describe('DividerBlock interactive drawing (flyingrobots/bijou#935)', () => {
     expect(row).toMatch(/^═+ Release Evidence ═+$/u);
   });
 
+  it('restyles only the rule, never a rule glyph inside the label', () => {
+    const row = drawDivider({ label: 'A ─ B', style: 'double' }).rows[0] ?? '';
+
+    expect(row).toMatch(/^═+ A ─ B ═+$/u);
+  });
+
   it('draws the missing-label text inside the rule when the required label is absent', () => {
     const frame = drawDivider({ style: 'rule' });
 
