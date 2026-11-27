@@ -8,6 +8,9 @@ import { binaryDecisionData, binaryDecisionSections, dividerData, dividerSection
 
 import { renderStandardSectionBlock } from './render.js';
 import { drawDivider } from './draw-divider.js';
+import { drawFormattedDocument } from './draw-document.js';
+import { drawFramedGroup } from './draw-framed-group.js';
+import { drawExplainabilityWalkthrough } from './draw-walkthrough.js';
 export const framedGroupBlock: BlockDefinition = defineBlock({
   metadata: framedGroupMetadata(),
   data: framedGroupData,
@@ -16,6 +19,7 @@ export const framedGroupBlock: BlockDefinition = defineBlock({
     input,
     'FramedGroupBlock',
     framedGroupSections,
+    drawFramedGroup,
   ),
 });
 export const explainabilityWalkthroughBlock: BlockDefinition = defineBlock({
@@ -26,6 +30,7 @@ export const explainabilityWalkthroughBlock: BlockDefinition = defineBlock({
     input,
     'ExplainabilityWalkthroughBlock',
     explainabilityWalkthroughSections,
+    drawExplainabilityWalkthrough,
   ),
 });
 export const formattedDocumentBlock: BlockDefinition = defineBlock({
@@ -36,6 +41,7 @@ export const formattedDocumentBlock: BlockDefinition = defineBlock({
     input,
     'FormattedDocumentBlock',
     formattedDocumentSections,
+    drawFormattedDocument,
   ),
 });
 export const linkDestinationBlock: BlockDefinition = defineBlock({

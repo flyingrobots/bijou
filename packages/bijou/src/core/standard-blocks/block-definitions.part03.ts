@@ -7,6 +7,7 @@ import { brandEmphasisMetadata, denseComparisonMetadata, explorationListMetadata
 import { brandEmphasisData, brandEmphasisSections, denseComparisonData, denseComparisonSections, explorationListData, explorationListSections, hierarchyData, hierarchySections, modeAwarePrimitiveData, modeAwarePrimitiveSections, pathProgressData, pathProgressSections, peerNavigationData, peerNavigationSections, progressiveDisclosureData, progressiveDisclosureSections, standardSectionCommands, temporalDependencyData, temporalDependencySections } from './sections.js';
 
 import { renderStandardSectionBlock } from './render.js';
+import { drawBrandEmphasis } from './draw-brand.js';
 export const peerNavigationBlock: BlockDefinition = defineBlock({
   metadata: peerNavigationMetadata(),
   data: peerNavigationData,
@@ -45,6 +46,7 @@ export const brandEmphasisBlock: BlockDefinition = defineBlock({
     input,
     'BrandEmphasisBlock',
     brandEmphasisSections,
+    drawBrandEmphasis,
   ),
 });
 export const modeAwarePrimitiveBlock: BlockDefinition = defineBlock({
