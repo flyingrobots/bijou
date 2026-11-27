@@ -1,0 +1,24 @@
+ interactive  true-colour gra    1% ⠐⠐⠐⠐ static  box, table, progress    1% ⠐⠐⠐⠐
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ┌─ t = 0.9 yr ───────────────────────┐ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ ┌─────────┬──────┬──────┬────────┐ │ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ body    │ r AU │ km/s │ gap AU │ │ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ ├─────────┼──────┼──────┼────────┤ │ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ comet   │ 0.63 │ 50.1 │      - │ │ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ earth   │ 1.00 │ 29.8 │   1.53 │ │ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ mars    │ 1.52 │ 24.1 │   1.86 │ │ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ jupiter │ 5.20 │ 13.1 │   4.85 │ │ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ └─────────┴──────┴──────┴────────┘ │ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ orbit   1% ⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐⠐ │ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ └────────────────────────────────────┘ 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                        
+ pipe  machine log lines    Progress: 1% accessible  spoken  1 percent complete.
+ t=0.24 comet r=3.00AU v=17.4km/s neare                                         
+ ┌────────────────────────────────┐eare  The comet crosses the orbit of Mars,   
+ │  ***  FOUR WAYS TO SEE  ***    │eare  falling inward at 30 kilometres a      
+ │────────────────────────────────│eare  second.                                
+ │  comet a 3.07 AU, e 0.82       │1.52  The comet crosses the orbit of Earth,  
+ │  time x2 (0.60 yr/s)           │eare  falling inward at 39 kilometres a      
+ │  - + / - : Time speed          │=1.0  second.                                
+ │  - R     : New comet           │eare  Perihelion. The comet whips round the  
+ │  - H     : Hide panel          │=54.  sun 0.5 astronomical units out, at its 
+ └────────────────────────────────┘eare  fastest: 55 kilometres a second.       

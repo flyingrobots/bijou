@@ -48,13 +48,12 @@ export function createPackedSurfaceState(
     renderDirtyWords: new Uint32Array(Math.ceil(size / 32)),
     cells: Array.from({ length: size }, () => cloneCell(state.defaultCell)),
   };
-  for (let index = 0; index < size; index++) {
-    encodeCellIntoBuffer(
-      initialized.buffer,
-      index,
-      initialized.defaultCell,
-      initialized.sideTable,
-    );
+  if (size === 0) return initialized;
+  // Every cell starts as the same fill: encode it once, then double the copied run until the buffer is full.
+  encodeCellIntoBuffer(initialized.buffer, 0, initialized.defaultCell, initialized.sideTable);
+  const total = size * CELL_STRIDE;
+  for (let filled = CELL_STRIDE; filled < total; filled *= 2) {
+    initialized.buffer.copyWithin(filled, 0, Math.min(filled, total - filled));
   }
   return initialized;
 }

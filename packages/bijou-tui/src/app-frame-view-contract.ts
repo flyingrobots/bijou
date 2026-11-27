@@ -1,5 +1,7 @@
 import type { Surface } from '@flyingrobots/bijou';
 import type { FramePage } from './app-frame-page-contract.js';
+import type { FrameAction } from './app-frame-action-types.js';
+import type { KeyMap } from './keybindings.js';
 import type { CreateFramedAppOptions } from './app-frame-options.js';
 import type { ResolvedFrameNotificationOptions } from './app-frame-notification-runtime.js';
 import type { FrameThemeRuntime } from './app-frame-theme-runtime.js';
@@ -16,6 +18,8 @@ export interface FrameViewScratch {
 export interface FrameViewDependencies<PageModel, Msg> {
   readonly options: CreateFramedAppOptions<PageModel, Msg>;
   readonly pagesById: Map<string, FramePage<PageModel, Msg>>;
+  /** The frame's own key map, which the key inspector lists. */
+  readonly frameKeys: KeyMap<FrameAction>;
   readonly notificationOptions: ResolvedFrameNotificationOptions;
   readonly themeRuntime: FrameThemeRuntime<PageModel, Msg>;
   readonly presentation: FramePresentationDependencies<PageModel, Msg>;

@@ -7,6 +7,7 @@ export type FrameNotificationSpec = Omit<NotificationSpec<never>, 'action'>;
 export type FrameAction =
   | { type: 'toggle-help' }
   | { type: 'toggle-perf-hud' }
+  | { type: 'toggle-key-inspector' }
   | { type: 'toggle-footer' }
   | { type: 'toggle-settings' }
   | { type: 'toggle-shell-theme-mode' }

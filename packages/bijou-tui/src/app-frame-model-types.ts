@@ -4,6 +4,8 @@ import type {
   CommandPaletteState,
 } from './command-palette.js';
 import type { FrameAction } from './app-frame-action-types.js';
+import type { FrameKeyLogEntry } from './app-frame-key-inspector.js';
+import type { FrameShadowAlert } from './app-frame-shadow-alert.js';
 import type { PanelDockState } from './panel-dock.js';
 import type { PanelVisibilityState } from './panel-state.js';
 import type { PageTransition } from './app-frame-transition-contract.js';
@@ -33,6 +35,14 @@ export interface FrameModel<PageModel> {
   readonly frameBudgetMs?: number | undefined;
   readonly frameOverBudget: boolean;
   readonly perfHudOpen: boolean;
+  /** The key inspector overlay (F9): live key sources, shadowed bindings and recent routes. */
+  readonly keyInspectorOpen: boolean;
+  /** The last keys the frame routed, newest last, for the key inspector. */
+  readonly keyLog: readonly FrameKeyLogEntry[];
+  /** Debug mode: the open shadowed-bindings dialog, which halts the app until acknowledged. */
+  readonly shadowAlert?: FrameShadowAlert | undefined;
+  /** Debug mode: per page and layer, the conflicts already acknowledged. */
+  readonly shadowAcknowledged?: Readonly<Record<string, string>> | undefined;
   readonly helpOpen: boolean;
   readonly footerVisible?: boolean | undefined;
   readonly footerTranslateY?: number | undefined;

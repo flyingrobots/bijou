@@ -36,6 +36,8 @@ export function applyFrameAction<PageModel, Msg>(
       return [{ ...model, helpOpen: !model.helpOpen }, []];
     case 'toggle-perf-hud':
       return [{ ...model, perfHudOpen: !model.perfHudOpen }, []];
+    case 'toggle-key-inspector':
+      return [{ ...model, keyInspectorOpen: !model.keyInspectorOpen }, []];
     case 'toggle-footer':
       return toggleFooter(model);
     case 'toggle-settings':

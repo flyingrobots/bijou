@@ -54,6 +54,8 @@ function frameModel<PageModel>(
     diffTimeMs: 0,
     frameOverBudget: false,
     perfHudOpen: false,
+    keyInspectorOpen: false,
+    keyLog: [],
     helpOpen: false,
     helpScrollY: 0,
     settingsOpen: false,

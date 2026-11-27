@@ -59,6 +59,11 @@ export interface CreateFramedAppOptions<PageModel, Msg> {
   ) => Msg | undefined;
   /** Enable frame-level command palette (`ctrl+p` / `:`). */
   readonly enableCommandPalette?: boolean;
+  /**
+   * Debug mode. When the active page and layer have key bindings that can never fire (another source takes their key
+   * first), the frame halts with a modal dialog listing them: keys, mouse and pulses are held until Enter or Esc.
+   */
+  readonly debug?: boolean;
   /** Optional stock shell-theme choices surfaced by the frame settings drawer. */
   readonly shellThemes?: readonly FrameShellThemeSpec[];
   /** Optional callback for syncing app-owned rendering with the stock shell theme. */

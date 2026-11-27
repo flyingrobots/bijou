@@ -18,6 +18,8 @@
     "markdown-font": "node --import tsx examples/markdown-font/main.ts",
     "counter": "node --import tsx examples/counter/main.ts",
     "fun": "node --import tsx examples/fun/main.ts",
+    "fun:app": "node --import tsx examples/fun/main.ts --app",
+    "fun:web": "vite --config examples/web-gpu/vite.config.ts --open /landing.html",
     "data-viz": "node --import tsx examples/plot/showcase.ts",
     "plot": "node --import tsx examples/plot/showcase.ts",
     "btop": "node --import tsx examples/plot/main.ts",

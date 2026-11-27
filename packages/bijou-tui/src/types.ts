@@ -12,6 +12,7 @@ import type {
   ResizeMsg,
 } from './runtime-messages.js';
 import type { Cmd, RuntimeIssue } from './runtime-commands.js';
+import type { RuntimeLifecycleHooks } from './runtime-contract.js';
 
 // --- App definition ---
 
@@ -59,6 +60,13 @@ export interface App<Model, M = never> {
    * while the framework still writes them to stderr as usual.
    */
   routeRuntimeIssue?(issue: RuntimeIssue): M | undefined;
+
+  /**
+   * Optionally supply render lifecycle hooks for a run of this app. `run()` asks for them once per run with the
+   * run's context, so a host that drives the app through `run()` (a browser canvas, a test driver) gets the same
+   * behaviour as the app's own runner. A framed app uses this to feed measured frame timings to its perf HUD.
+   */
+  runtimeHooks?(ctx: BijouContext): RuntimeLifecycleHooks<Model> | undefined;
 }
 
 // --- Runtime options ---

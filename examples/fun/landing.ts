@@ -1,98 +1,113 @@
 // Licensed under the Apache License, Version 2.0, like the rest of this repository.
-// The landing page of the published site, as a Bijou app: one fun demo, chosen
-// by the page, runs behind the Bijou wordmark in Jacquard 12, and a grid of
-// cards opens each demo.
+// The landing page of the published site, as a framed Bijou app: one page shows
+// a demo chosen by the page (the 3D wave surface) behind the Bijou wordmark in
+// Jacquard 12. The frame brings the usual chrome: key hints in the footer, `?`
+// help, `F2` settings, and `q` to quit with confirmation.
 import { createSurface, type BijouContext, type Surface } from '@flyingrobots/bijou';
-import { isKeyMsg, isMouseMsg, isPulseMsg, isResizeMsg, rasterTextSurface, type App, type Cmd } from '@flyingrobots/bijou-tui';
+import {
+  createKeyMap, isPulseMsg, placeSurface, rasterTextSurface, wrapFrameMsg,
+  type Cmd, type FramePage, type FrameScopedMsg, type FrameSettings,
+} from '@flyingrobots/bijou-tui';
 import { CYLINDER_FONT } from '../docs/app-cylinder-font.js';
-import type { DemoEntry, Session } from './contract.js';
-import { cardAt, cardGrid, firstRow, paintCards, type LandingCard } from './landing-cards.js';
-
-export interface LandingModel {
-  /** The background demo. It hears pulses and the pane size, never the pointer or the keys. */
-  readonly background: Session;
-  readonly columns: number;
-  readonly rows: number;
-  readonly selected: number;
-}
+import type { DemoEntry } from './contract.js';
+import type { FunModel, FunMsg, LandingModel } from './fun-app-types.js';
 
 export interface LandingOptions {
   readonly ctx: BijouContext;
-  readonly cards: readonly LandingCard[];
-  /** The demo that runs behind the page; the page picks it. */
+  /** The demo that runs behind the page; the host picks it. */
   readonly background: DemoEntry;
-  /** Open the demo with this id: the page decides how (a browser navigates to its address). */
-  readonly open: (id: string) => void;
   readonly seed: number;
 }
 
-const WORDMARK_FG: readonly [number, number, number] = [255, 215, 110];
-/** Rows above the wordmark. */
-const WORDMARK_TOP = 2;
+/** The wordmark colour: dark blue, read on the wave surface's white ground. */
+const WORDMARK = '#14286e';
 
 function wordmarkRows(rows: number): number {
   return Math.max(4, Math.min(16, Math.floor(rows * 0.35)));
 }
 
-/** Lay the wordmark over the background: only cells the glyphs cover change. */
-function paintWordmark(screen: Surface, rows: number): void {
-  const mark = rasterTextSurface('Bijou', CYLINDER_FONT, { columns: screen.width, rows, renderer: { kind: 'braille' } });
-  for (let y = 0; y < mark.height && y + WORDMARK_TOP < screen.height; y += 1) {
-    for (let x = 0; x < mark.width; x += 1) {
-      const { char } = mark.get(x, y);
-      if (char === ' ' || char === '⠀') continue;
-      screen.setRGB(x, y + WORDMARK_TOP, char, WORDMARK_FG[0], WORDMARK_FG[1], WORDMARK_FG[2], 0, 0, 0);
-    }
+/**
+ * The wordmark stamped onto `picture`, which the background painted for this frame alone: Jacquard 12 glyphs in
+ * braille, centred by `placeSurface`. Only glyph cells are written, so the picture shows between them, and
+ * each glyph keeps the background of the picture cell under it. Rasterizing the glyphs is the slow part, so the placed
+ * glyph cells are kept for the last screen size and only their backgrounds are taken afresh each frame.
+ */
+function stampWordmark(picture: Surface): Surface {
+  for (const { x, y, cell } of wordmarkGlyphs(picture.width, picture.height)) {
+    const under = picture.get(x, y);
+    picture.set(x, y, { ...cell, bg: under.bg, bgRGB: under.bgRGB, empty: false });
   }
+  return picture;
 }
 
-export function createLandingApp({ ctx, cards, background, open, seed }: LandingOptions): App<LandingModel> {
-  const top = (rows: number): number => WORDMARK_TOP + wordmarkRows(rows) + 1;
-  // `h` hides a demo's own card or panel, so the page shows the picture alone.
-  const mounted = (columns: number, rows: number): Session =>
-    background.mount(seed).update({ type: 'resize', width: columns, height: rows }).update({ type: 'key', key: 'h' });
-  const opening = (index: number): Cmd<never>[] => {
-    const card = cards[index];
-    return card === undefined ? [] : [() => { open(card.id); return undefined; }];
-  };
-  const move = (model: LandingModel, by: number): [LandingModel, []] =>
-    [{ ...model, selected: Math.max(0, Math.min(cards.length - 1, model.selected + by)) }, []];
+interface GlyphCell { readonly x: number; readonly y: number; readonly cell: ReturnType<Surface['get']> }
+let glyphCache: { readonly key: string; readonly glyphs: readonly GlyphCell[] } | undefined;
+
+/** The wordmark's non-blank cells, centred in a `width` by `height` picture, rasterized once per size. */
+function wordmarkGlyphs(width: number, height: number): readonly GlyphCell[] {
+  const key = `${String(width)}x${String(height)}`;
+  if (glyphCache?.key === key) return glyphCache.glyphs;
+  const mark = rasterTextSurface('Bijou', CYLINDER_FONT, { columns: width, rows: wordmarkRows(height), renderer: { kind: 'braille' }, fg: WORDMARK });
+  const placed = placeSurface(mark, { width, height, hAlign: 'center', vAlign: 'middle' });
+  const glyphs: GlyphCell[] = [];
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const cell = placed.get(x, y);
+      if (cell.empty !== true && cell.char !== ' ' && cell.char !== '⠀') glyphs.push({ x, y, cell });
+    }
+  }
+  glyphCache = { key, glyphs };
+  return glyphs;
+}
+
+/** The page's picture: the background demo at the pane's size, with the wordmark over it when it is on. */
+export function landingPicture(model: LandingModel, width: number, height: number, ctx: BijouContext): Surface {
+  const picture = model.background.view(width, height, ctx);
+  return model.wordmark ? stampWordmark(picture) : picture;
+}
+
+/** The one page of the landing app. */
+export function landingPage({ ctx, background, seed }: LandingOptions): FramePage<FunModel, FunMsg> {
+  // The Demos page is the next tab: the frame's own tab action takes the app there.
+  const going: Cmd<FunMsg | FrameScopedMsg>[] = [(emit) => { emit(wrapFrameMsg({ type: 'next-tab' })); return undefined; }];
   return {
-    init: () => {
-      const { columns, rows } = ctx.runtime;
-      return [{ background: mounted(columns, rows), columns, rows, selected: 0 }, []];
-    },
+    id: 'home',
+    title: 'Home',
+    // `h` hides a demo's own card or panel, so the page shows the picture alone.
+    init: () => [{ kind: 'home', background: background.mount(seed).update({ type: 'key', key: 'h' }), wordmark: true }, []],
     update(msg, model) {
+      if (model.kind !== 'home') return [model, []];
       if (isPulseMsg(msg)) return [{ ...model, background: model.background.update({ type: 'pulse', dt: msg.dt }) }, []];
-      if (isResizeMsg(msg)) {
-        const resized = model.background.update({ type: 'resize', width: msg.columns, height: msg.rows });
-        return [{ ...model, columns: msg.columns, rows: msg.rows, background: resized }, []];
-      }
-      if (isMouseMsg(msg)) {
-        const grid = cardGrid(model.columns, model.rows, top(model.rows));
-        const hit = cardAt(grid, firstRow(grid, model.selected, cards.length), cards.length, msg.col, msg.row);
-        if (hit !== null && msg.action === 'press') return [{ ...model, selected: hit }, opening(hit)];
-        return [{ ...model, selected: hit ?? model.selected }, []];
-      }
-      if (!isKeyMsg(msg)) return [model, []];
-      const across = cardGrid(model.columns, model.rows, top(model.rows)).columns;
-      if (msg.key === 'right' || msg.key === 'l') return move(model, 1);
-      if (msg.key === 'left' || msg.key === 'h') return move(model, -1);
-      if (msg.key === 'down' || msg.key === 'j') return move(model, across);
-      if (msg.key === 'up' || msg.key === 'k') return move(model, -across);
-      if (msg.key === 'enter' || msg.key === 'space') return [model, opening(model.selected)];
+      if (msg.type === 'open') return [model, going];
+      if (msg.type === 'toggle-wordmark') return [{ ...model, wordmark: !model.wordmark }, []];
+      // `space` pauses and resumes a demo session.
+      if (msg.type === 'toggle-motion') return [{ ...model, background: model.background.update({ type: 'key', key: 'space' }) }, []];
       return [model, []];
     },
-    view(model): Surface {
-      const { columns, rows } = model;
-      const screen = createSurface(columns, rows);
-      screen.blit(model.background.view(columns, rows, ctx), 0, 0);
-      paintWordmark(screen, wordmarkRows(rows));
-      paintCards(screen, cardGrid(columns, rows, top(rows)), cards, model.selected, ctx);
-      const hint = ' ←↑↓→ choose · Enter or click opens · github.com/flyingrobots/bijou ';
-      const x = Math.max(0, Math.floor((columns - hint.length) / 2));
-      for (let i = 0; i < hint.length && x + i < columns; i += 1) screen.setRGB(x + i, rows - 1, hint[i] ?? ' ', 150, 160, 180, 0, 0, 0);
-      return screen;
-    },
+    keyMap: createKeyMap<FunMsg>()
+      .bind('enter', 'Open the demos', { type: 'open' })
+      .bind('w', 'Show or hide the wordmark', { type: 'toggle-wordmark' })
+      .bind('m', 'Pause or resume the motion', { type: 'toggle-motion' }),
+    layout: (model) => ({
+      kind: 'pane', paneId: 'home',
+      render: (width, height) => (model.kind === 'home' ? landingPicture(model, width, height, ctx) : createSurface(width, height)),
+    }),
   };
 }
+
+/** The F2 settings: show the wordmark, run the motion, open the demos. */
+export function landingSettings({ pageModel }: { readonly pageModel: LandingModel }): FrameSettings<FunMsg> {
+  return {
+    title: 'Settings',
+    sections: [{
+      id: 'display',
+      title: 'Display',
+      rows: [
+        { id: 'wordmark', label: 'Wordmark', kind: 'toggle', checked: pageModel.wordmark, action: { type: 'toggle-wordmark' } },
+        { id: 'motion', label: 'Motion', kind: 'toggle', checked: !pageModel.background.paused, action: { type: 'toggle-motion' } },
+        { id: 'open', label: 'Open the demos', kind: 'action', action: { type: 'open' } },
+      ],
+    }],
+  };
+}
+

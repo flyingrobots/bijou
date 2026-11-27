@@ -10,6 +10,9 @@ import {
 import { renderShellQuitOverlay } from './shell-quit.js';
 import { renderFramePerfHudOverlay } from './app-frame-performance.js';
 import { collectFrameModalOverlays } from './app-frame-view-modals.js';
+import { frameKeyInspectorReport, renderFrameKeyInspectorOverlay } from './app-frame-key-inspector.js';
+import { resolveFrameLayerContext } from './app-frame-layer-context.js';
+import { renderFrameShadowAlertOverlay } from './app-frame-shadow-alert.js';
 
 export function collectFrameOverlays<PageModel, Msg>(
   model: InternalFrameModel<PageModel, Msg>,
@@ -108,5 +111,16 @@ export function collectFrameOverlays<PageModel, Msg>(
       ),
     );
   }
+  if (model.keyInspectorOpen) {
+    const report = frameKeyInspectorReport({
+      context: resolveFrameLayerContext(model, pagesById),
+      frameKeys: dependencies.frameKeys,
+      globalKeys: options.globalKeys,
+      keyPriority: options.keyPriority,
+      recent: model.keyLog,
+    });
+    overlays.push(renderFrameKeyInspectorOverlay(report, model, themedContext));
+  }
+  if (model.shadowAlert !== undefined) overlays.push(renderFrameShadowAlertOverlay(model.shadowAlert, model, themedContext));
   return overlays;
 }
