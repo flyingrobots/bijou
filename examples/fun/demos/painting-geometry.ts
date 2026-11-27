@@ -3,6 +3,7 @@
 // watercolour technique: each edge of a shape grows a random "ear" triangle, each ear grows two
 // more, and past the core depth the ears are drawn again and again at a falling opacity.
 import { nextRandom } from '../random.js';
+import { detCos, detLog, detPow15, detSin } from './det-math.js';
 import type { Point } from './painting-raster.js';
 
 /** The original's sliders: total steps, core depth, and the layer default. */
@@ -28,7 +29,7 @@ export function brush(start: number): Brush {
     return value;
   };
   const random = (): number => {
-    const z = Math.sqrt(-2 * Math.log(1 - uniform())) * Math.cos(2 * Math.PI * uniform());
+    const z = Math.sqrt(-2 * detLog(1 - uniform())) * detCos(2 * Math.PI * uniform());
     return Math.min(1, Math.max(0, 0.5 + 0.4 * z));
   };
   return { uniform, random, seed: () => seed };
@@ -49,8 +50,8 @@ export interface CoreEar {
 function thirdPoint(a: Point, c: Point, b: number, length: number, angle: number): Point {
   const ux = (c[0] - a[0]) / b;
   const uy = (c[1] - a[1]) / b;
-  const rx = ux * Math.cos(angle) - uy * Math.sin(angle);
-  const ry = ux * Math.sin(angle) + uy * Math.cos(angle);
+  const rx = ux * detCos(angle) - uy * detSin(angle);
+  const ry = ux * detSin(angle) + uy * detCos(angle);
   return [a[0] + length * rx, a[1] + length * ry];
 }
 
@@ -60,10 +61,12 @@ export function drawEar(rng: Brush, p1: Point, p2: Point, depth: number, lengthF
   const t = rng.random();
   const start: Point = [p1[0] + (p2[0] - p1[0]) * t, p1[1] + (p2[1] - p1[1]) * t];
   const angle = rng.uniform() > 0.5 ? Math.PI * rng.random() : Math.PI - Math.PI * rng.random();
-  const distance = Math.hypot(p1[0] - p2[0], p1[1] - p2[1]);
+  const dx = p1[0] - p2[0];
+  const dy = p1[1] - p2[1];
+  const distance = Math.sqrt(dx * dx + dy * dy);
   if (distance === 0) return;
   const tip = thirdPoint(start, p2, distance, distance * lengthFactor * rng.random(), angle);
-  stroke([p1, p2, tip], depth <= CORE_DEPTH ? 1 : 1 / depth ** 1.5);
+  stroke([p1, p2, tip], depth <= CORE_DEPTH ? 1 : 1 / detPow15(depth));
   if (depth === CORE_DEPTH && !noRecursion) {
     core({ p1, tip, p2, lengthFactor });
     return;
@@ -103,7 +106,7 @@ const edgesOf = (points: readonly Point[], closed: boolean): readonly (readonly 
 export function blobPasses(colour: string, w: number, h: number): readonly Pass[] {
   const radius = Math.min(w, h) * 0.2;
   const angle = (Math.PI * 2) / 10;
-  const points = Array.from({ length: 10 }, (_, i): Point => [w / 2 + radius * Math.sin(angle * i), h / 2 + radius * Math.cos(angle * i)]);
+  const points = Array.from({ length: 10 }, (_, i): Point => [w / 2 + radius * detSin(angle * i), h / 2 + radius * detCos(angle * i)]);
   return [{ colour, base: points, edges: edgesOf(points, true) }];
 }
 
@@ -114,7 +117,7 @@ export function bandPasses(palette: readonly string[], w: number, h: number): re
     const index = palette.length - i - 1;
     const points = Array.from({ length: count }, (_, j): Point => [
       (w / (count - 1)) * (count - 1 - j),
-      h - (h / (palette.length - 1)) * (0.5 + index + Math.sin(Math.PI * 2 * (j / count)) / 2),
+      h - (h / (palette.length - 1)) * (0.5 + index + detSin(Math.PI * 2 * (j / count)) / 2),
     ]);
     return { colour, base: [...points, [0, h], [w, h]], edges: edgesOf(points, false) };
   });

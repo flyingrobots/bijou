@@ -15,13 +15,6 @@ export interface Canvas {
   readonly rgb: Float32Array;
 }
 
-/**
- * A coordinate or opacity on a 1/4096 grid. The shapes come from sin, cos, log and pow, whose last bit V8 may compute
- * differently on x64 and arm64; on the grid every later step is exact arithmetic, so the pixels match on both.
- */
-const snap = (v: number): number => Math.round(v * 4096) / 4096;
-const snapPoint = (p: Point): Point => [snap(p[0]), snap(p[1])];
-
 /** A canvas of the ground colour. */
 export function blankCanvas(width: number, height: number, scale: number, ground: Rgb): Canvas {
   const rgb = new Float32Array(width * scale * height * scale * 3);
@@ -48,9 +41,7 @@ function blend(canvas: Canvas, index: number, colour: Rgb, alpha: number): void 
 }
 
 /** Fill a triangle over the samples whose centres it covers. Changes `canvas`: call it on a copy. */
-export function fillTriangle(canvas: Canvas, triangle: readonly [Point, Point, Point], colour: Rgb, opacity: number): void {
-  const [a, b, c] = [snapPoint(triangle[0]), snapPoint(triangle[1]), snapPoint(triangle[2])];
-  const alpha = snap(opacity);
+export function fillTriangle(canvas: Canvas, [a, b, c]: readonly [Point, Point, Point], colour: Rgb, alpha: number): void {
   const s = canvas.scale;
   const sw = canvas.width * s;
   const sh = canvas.height * s;
@@ -79,9 +70,7 @@ export function fillTriangle(canvas: Canvas, triangle: readonly [Point, Point, P
 }
 
 /** Fill a polygon, even-odd, row by row of samples. Changes `canvas`: call it on a copy. */
-export function fillPolygon(canvas: Canvas, shape: readonly Point[], colour: Rgb, opacity: number): void {
-  const points = shape.map(snapPoint);
-  const alpha = snap(opacity);
+export function fillPolygon(canvas: Canvas, points: readonly Point[], colour: Rgb, alpha: number): void {
   const s = canvas.scale;
   const sw = canvas.width * s;
   const sh = canvas.height * s;
