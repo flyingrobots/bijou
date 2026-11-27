@@ -272,16 +272,21 @@ jobs:
 
   # The one test job outside the seal besides the browser suite: see
   # "Windows, outside the seal" in docs/guides/sealed-tests.md. Each GitHub
-  # Windows runner is a fresh virtual machine, so the job installs, builds and
-  # runs the Linux lane's focused tests there, and nothing else.
+  # Windows runner is a fresh virtual machine, so the job installs, builds,
+  # typechecks and runs the Linux lane's focused tests there, and nothing else.
   # tests/ci-windows-job.test.ts holds it to these steps and that list.
   unit_windows:
     name: Focused Unit Tests (windows, Node 22, outside the seal)
     runs-on: windows-2022
+    # The seal's own session limit (LIMITS.deadline in scripts/docker-seal/constants.mjs).
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
+      # The tests run with network access, so the job token is not left on disk.
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
@@ -289,6 +294,8 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --fund=false
       - name: Build
         run: npm run build
+      - name: Typecheck the tests
+        run: npm run typecheck:test
       - name: Focused portable unit tests
         run: node node_modules/vitest/vitest.mjs run --config scripts/vitest-windows.config.ts
 

@@ -18,7 +18,7 @@ export function execute(argv, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(argv[0], argv.slice(1), {
       cwd: options.cwd, env: options.env ?? cleanEnvironment(),
-      stdio: ['pipe', 'pipe', 'pipe'], detached: process.platform !== 'win32',
+      stdio: ['pipe', 'pipe', 'pipe'], detached: true,
     });
     const chunks = []; let bytes = 0; let diagnosticBytes = 0; let failure; let settled = false;
     let diagnosticTail = Buffer.alloc(0);
@@ -26,8 +26,7 @@ export function execute(argv, options = {}) {
       if (settled) return;
       failure ??= error;
       try {
-        if (process.platform === 'win32') child.kill('SIGKILL');
-        else process.kill(-child.pid, 'SIGKILL');
+        process.kill(-child.pid, 'SIGKILL');
       } catch { /* Already reaped. */ }
     };
     const aborted = () => stop(new Error('Operation aborted'));

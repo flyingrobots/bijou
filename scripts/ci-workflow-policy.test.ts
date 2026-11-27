@@ -25,6 +25,13 @@ describe('CI isolation policy', () => {
     expect(() => ciWorkflowPolicyFromYaml(sealedWindows)).toThrow('Windows runs in job unit_windows');
   });
 
+  it('requires the Windows job', () => {
+    const withoutWindows = workflow.replace('  unit_windows:\n', '  unit_windows_removed:\n');
+    expect(withoutWindows).not.toBe(workflow);
+
+    expect(() => ciWorkflowPolicyFromYaml(withoutWindows)).toThrow('CI workflow must keep job unit_windows');
+  });
+
   it('admits the maintained platform matrix', () => {
     expect(ciWorkflowPolicyFromYaml(workflow).focusedPlatforms).toContain('ubuntu-latest');
   });

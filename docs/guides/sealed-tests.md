@@ -218,11 +218,13 @@ In practice, that means the following rules:
   outside the seal)" (`unit_windows`) runs on a GitHub-hosted `windows-2022`
   runner. Each job gets a fresh virtual machine, and GitHub discards it when the
   job ends. That is the isolation the job gets in place of the seal.
-  `scripts/vitest-windows.config.ts` refuses to load anywhere except on a
-  Windows GitHub Actions runner. Never run tests on a developer's Windows
+  `scripts/vitest-windows.config.ts` refuses to load anywhere except in a
+  GitHub-hosted Windows job (`scripts/docker-seal/github-hosted.mjs`, the same
+  check the seal's CI bootstrap uses). Never run tests on a developer's Windows
   machine outside the seal.
-- **It runs three commands.** It installs the locked dependencies, builds, and
-  runs Vitest with `scripts/vitest-windows.config.ts`.
+- **It runs four commands.** It installs the locked dependencies, builds,
+  typechecks the tests, and runs Vitest with `scripts/vitest-windows.config.ts`.
+  It stops after 30 minutes, the seal's own session limit.
   `tests/ci-windows-job.test.ts` holds the job to those commands and holds that
   config to this one job.
 - **It runs the Linux focused lane's tests.** The list is in
@@ -230,7 +232,8 @@ In practice, that means the following rules:
   `unit_cross_platform`, less the tests in `SEAL_ONLY_TESTS`, which need the
   seal itself. The same test fails when the two lists drift apart.
 - **It has no network or Git isolation.** The tests in the job can reach the
-  network, and the checkout keeps its remote. A test that needs either
+  network, and the checkout keeps its remote. The checkout does not keep the
+  job's token (`persist-credentials: false`). A test that needs either
   restriction belongs in the seal, not in the Windows list.
 - **A Windows-only failure is a real failure.** Do not retry it until it passes.
   Do not skip it or mark the job optional. Reproduce it in the job, fix the

@@ -31,6 +31,9 @@ export function ciWorkflowPolicyFromYaml(source: string): CiWorkflowPolicy {
   const workflow = asRecord(parse(source), 'workflow');
   const jobs = asRecord(workflow['jobs'], 'workflow.jobs');
   const testJob = asRecord(jobs['test'], 'workflow.jobs.test');
+  if (jobs['unit_windows'] == null) {
+    throw new Error('CI workflow must keep job unit_windows: it is the only Windows coverage');
+  }
   const focusedUnitTestsJob = asRecord(jobs['unit_cross_platform'], 'workflow.jobs.unit_cross_platform');
   const focusedUnitTestsPermissions = focusedUnitTestsJob['permissions'] == null
     ? undefined

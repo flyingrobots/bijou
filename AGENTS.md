@@ -35,8 +35,8 @@ This guide is for AI agents and human operators recovering context in the Bijou 
   before any test started, so the job runs the focused tests directly on a fresh
   GitHub-hosted Windows virtual machine. It runs only in CI:
   `scripts/vitest-windows.config.ts` refuses to load anywhere else, and
-  `tests/ci-windows-job.test.ts` holds the job to its install, its build and
-  that config. Windows is cursed. Handle it with extreme caution: never breathe
+  `tests/ci-windows-job.test.ts` holds the job to its install, build, test
+  typecheck and that config. Windows is cursed. Handle it with extreme caution: never breathe
   near it, hold it at arm's length, cross your fingers, and swear under your
   breath whenever it is the only build that fails. Then fix the failure; never
   retry it until it passes. See `docs/guides/sealed-tests.md`.
