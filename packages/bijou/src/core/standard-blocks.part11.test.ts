@@ -31,7 +31,6 @@ describe('navigation blocks draw themselves in interactive mode (flyingrobots/bi
 
   it('marks the PathProgress step named by current', () => {
     const rows = drawFrame(pathProgressBlock, { ...PATH, current: 'Preview', step: 3 }).rows;
-
     expect(rows[0]).toBe(at60('✓ Setup ── ✓ Blocks ── ● Preview'));
   });
 
@@ -44,7 +43,6 @@ describe('navigation blocks draw themselves in interactive mode (flyingrobots/bi
 
   it('puts PathProgress steps one per row when the stepper row does not fit', () => {
     const rows = drawFrame(pathProgressBlock, PATH, 30).rows;
-
     expect(rows.slice(0, 3).map((row) => row.trimEnd())).toEqual(['✓ Setup', '● Blocks', '○ Preview']);
   });
 
@@ -63,6 +61,10 @@ describe('navigation blocks draw themselves in interactive mode (flyingrobots/bi
     ]);
   });
 
+  it('draws an unknown ProgressiveDisclosure state token as closed', () => {
+    expect(drawFrame(progressiveDisclosureBlock, { ...DISCLOSURE, state: 'fermé' }).rows[0]).toBe(at60('▶ Advanced options · 6 hidden'));
+  });
+
   it('puts the ProgressiveDisclosure marker after the label and mirrors it under right-to-left', () => {
     expect(underRightToLeft(() => drawFrame(progressiveDisclosureBlock, DISCLOSURE)).rows).toEqual([
       endAt60('6 hidden · Advanced options ◀'),
@@ -79,7 +81,6 @@ describe('navigation blocks draw themselves in interactive mode (flyingrobots/bi
 
   it('moves the LinkDestination destination to its own row when the link row does not fit', () => {
     const rows = drawFrame(linkDestinationBlock, { ...LINK, destination: 'docs/guides/a-long-destination.md' }, 30).rows;
-
     expect(rows.map((row) => row.trimEnd())).toEqual(['↗ DOGFOOD.md', '  (docs/guides/a-long-destina…', 'docs · available']);
   });
 });
@@ -91,9 +92,12 @@ describe.each(NAVIGATION_CASES)('$block.metadata.blockName drawn-output contract
     expect(framedSlotTitles(block, drawFrame(block, slots))).toEqual([]);
   });
 
+  it('draws the same frame in static mode as in interactive mode', () => {
+    expect(drawFrame(block, slots, 60, 'static').rows).toEqual(drawFrame(block, slots).rows);
+  });
+
   it.each([30, 120])('fits width %i exactly on every row', (width) => {
     const frame = drawFrame(block, slots, width);
-
     expect(frame.width).toBe(width);
     expect(frame.rows.every((row) => row.length === width)).toBe(true);
     expect(framedSlotTitles(block, frame)).toEqual([]);

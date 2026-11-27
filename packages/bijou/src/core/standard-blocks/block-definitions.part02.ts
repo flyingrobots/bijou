@@ -8,6 +8,7 @@ import { binaryDecisionData, binaryDecisionSections, dividerData, dividerSection
 
 import { renderStandardSectionBlock } from './render.js';
 import { drawDivider } from './draw-divider.js';
+import { drawLinkDestination } from './draw-link-destination.js';
 export const framedGroupBlock: BlockDefinition = defineBlock({
   metadata: framedGroupMetadata(),
   data: framedGroupData,
@@ -46,6 +47,7 @@ export const linkDestinationBlock: BlockDefinition = defineBlock({
     input,
     'LinkDestinationBlock',
     linkDestinationSections,
+    drawLinkDestination,
   ),
 });
 export const dividerBlock: BlockDefinition = defineBlock({

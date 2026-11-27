@@ -53,9 +53,9 @@ const NAVIGATION_CASES: readonly NavigationCase[] = [
   },
 ];
 
-/** The `interactive` frame of `block` drawn from `slots` at `width`. */
-function drawFrame(block: BlockDefinition, slots: Slots, width = 60): DrawnFrame {
-  return drawnFrame(renderBlockTree(blockRenderNode(block, { mode: 'interactive', slots, config: { width } })));
+/** The `interactive` (or `static`) frame of `block` drawn from `slots` at `width`. */
+function drawFrame(block: BlockDefinition, slots: Slots, width = 60, mode: 'interactive' | 'static' = 'interactive'): DrawnFrame {
+  return drawnFrame(renderBlockTree(blockRenderNode(block, { mode, slots, config: { width } })));
 }
 
 /** `slots` without the named keys. */
