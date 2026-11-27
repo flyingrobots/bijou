@@ -47,6 +47,12 @@ describe('DividerBlock interactive drawing (flyingrobots/bijou#935)', () => {
     expect(row).toMatch(/^═+ Release Evidence ═+$/u);
   });
 
+  it('restyles only the rule, never a rule glyph inside the label', () => {
+    const row = drawDivider({ label: 'A ─ B', style: 'double' }).rows[0] ?? '';
+
+    expect(row).toMatch(/^═+ A ─ B ═+$/u);
+  });
+
   it('draws the missing-label text inside the rule when the required label is absent', () => {
     const frame = drawDivider({ style: 'rule' });
 
@@ -59,6 +65,12 @@ describe('DividerBlock interactive drawing (flyingrobots/bijou#935)', () => {
 
     expect(frame.width).toBe(30);
     expect(frame.rows[0]).toHaveLength(30);
+  });
+
+  it('draws the same rule in static mode, which shows the interactive frame without motion', () => {
+    const staticFrame = drawnFrame(dividerBlock.render({ mode: 'static', slots: RELEASE_SLOTS, config: { width: 60 } }));
+
+    expect(staticFrame.rows).toEqual(drawDivider(RELEASE_SLOTS).rows);
   });
 
   it('keeps pipe and accessible output as labelled slot lines', () => {

@@ -11,7 +11,10 @@ export interface StandardDrawInput {
   readonly bounds: RenderSurfaceBounds;
 }
 
-/** Draws a standard block's `interactive` Surface from its sections. */
+/**
+ * Draws a standard block's `interactive` Surface from its sections. `static` mode
+ * uses the same drawing, because it shows the interactive frame without motion.
+ */
 export type StandardInteractiveDrawer = (input: StandardDrawInput) => Surface;
 
 /** The text of section `id`, or undefined when the block omits that optional slot. */
