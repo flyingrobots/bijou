@@ -26,8 +26,10 @@ function seeded(seed: number): () => number {
 }
 
 describe.each(DOCUMENT_BLOCK_CASES)('$name interactive drawing (flyingrobots/bijou#939)', (entry) => {
-  it('shows no framed box titled with a slot label', () => {
-    expect(framedSlotTitles(entry.block, drawBlock(entry.block, entry.slots))).toEqual([]);
+  it('shows no framed box titled with a slot label, and no generic frame titled with the block name', () => {
+    const frame = drawBlock(entry.block, entry.slots);
+    expect(framedSlotTitles(entry.block, frame)).toEqual([]);
+    expect(frame.rows[0]).not.toContain(`─ ${entry.name} ─`);
   });
 
   it.each([30, 60, 120])('fits width %i exactly on every row', (width) => {
