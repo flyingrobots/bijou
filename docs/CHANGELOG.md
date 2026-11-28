@@ -14,6 +14,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   output and its facts are unchanged. `renderStandardSectionBlock` takes an optional drawing function for
   `interactive` and `static` mode, which the other standard blocks will use to draw themselves
   (flyingrobots/bijou#934).
+- The document blocks draw formatted content. In `interactive` and `static` mode, `FormattedDocumentBlock` draws its
+  heading, wrapped body, callout as an info alert and code as an indented code block; `ExplainabilityWalkthroughBlock`
+  draws its title, numbered steps and labelled evidence, decision and next step; `FramedGroupBlock` draws one frame
+  titled with its `title`, marking the selected item; and `BrandEmphasisBlock` draws the brand, an accent rule and the
+  tagline (flyingrobots/bijou#939). Slot text wraps to the width, a nested Surface slot keeps its own cells, and
+  their `pipe` and `accessible` output and facts are unchanged.
 - Shatter's debris settles. A falling glyph now lands in its own cell when the cell under it is the floor or the
   pile, where it used to land one cell above. That jump made settling glyphs climb in a column forever, which looked
   like cells left behind. A glyph that the pile grew around, or whose cell was taken while it fell, moves to the

@@ -1,16 +1,23 @@
 import type { Surface } from '../../ports/surface.js';
-import { sectionContent, type StandardDrawInput } from './draw-input.js';
-import { emphasisStyle, linesSurface, stackBlocks, wrappedLines } from './draw-text.js';
+import type { StandardDrawInput } from './draw-input.js';
+import { findSection, pieceSurface, sectionPiece } from './draw-slot.js';
+import { emphasisStyle, linesSurface, stackBlocks } from './draw-text.js';
 
 const ACCENT_GLYPH = '━';
 const RULE_LEAD = 2;
 
-/** The accent rule; a missing decoration shows its missing-slot text inside the rule. */
-function accentRule(input: StandardDrawInput, width: number): Surface {
-  const decoration = input.sections.find((section) => section.id === 'decoration');
-  const label = decoration === undefined || decoration.present ? '' : ` ${decoration.content} `;
+/**
+ * The accent rule. A missing decoration shows its missing-slot text inside
+ * the rule when it fits, and wrapped on the rows under a plain rule when not.
+ */
+function accentRule(input: StandardDrawInput, width: number): readonly Surface[] {
+  const decoration = findSection(input.sections, 'decoration');
+  const plain = linesSurface([ACCENT_GLYPH.repeat(width)], width, emphasisStyle('accent'));
+  if (decoration === undefined || decoration.present) return [plain];
+  const label = ` ${decoration.content} `;
+  if (RULE_LEAD * 2 + label.length > width) return [plain, pieceSurface(decoration.content, width)];
   const rule = `${ACCENT_GLYPH.repeat(RULE_LEAD)}${label}`.padEnd(width, ACCENT_GLYPH);
-  return linesSurface([label === '' ? ACCENT_GLYPH.repeat(width) : rule], width, emphasisStyle('accent'));
+  return [linesSurface([rule], width, emphasisStyle('accent'))];
 }
 
 /**
@@ -20,8 +27,8 @@ function accentRule(input: StandardDrawInput, width: number): Surface {
 export function drawBrandEmphasis(input: StandardDrawInput): Surface {
   const width = input.bounds.width;
   return stackBlocks([
-    linesSurface(wrappedLines(sectionContent(input.sections, 'brand') ?? '', width), width, emphasisStyle('accent')),
-    accentRule(input, width),
-    linesSurface(wrappedLines(sectionContent(input.sections, 'tagline') ?? '', width), width),
+    pieceSurface(sectionPiece(findSection(input.sections, 'brand')), width, emphasisStyle('accent')),
+    ...accentRule(input, width),
+    pieceSurface(sectionPiece(findSection(input.sections, 'tagline')), width),
   ], width, 0);
 }
