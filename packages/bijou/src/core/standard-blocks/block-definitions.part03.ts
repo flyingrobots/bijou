@@ -8,6 +8,11 @@ import { brandEmphasisData, brandEmphasisSections, denseComparisonData, denseCom
 
 import { renderStandardSectionBlock } from './render.js';
 import { drawBrandEmphasis } from './draw-brand.js';
+import { drawDenseComparison } from './draw-dense-comparison.js';
+import { drawExplorationList } from './draw-exploration-list.js';
+import { drawHierarchy } from './draw-hierarchy.js';
+import { drawModeAwarePrimitive } from './draw-mode-aware-primitive.js';
+import { drawTemporalDependency } from './draw-temporal-dependency.js';
 export const peerNavigationBlock: BlockDefinition = defineBlock({
   metadata: peerNavigationMetadata(),
   data: peerNavigationData,
@@ -57,6 +62,7 @@ export const modeAwarePrimitiveBlock: BlockDefinition = defineBlock({
     input,
     'ModeAwarePrimitiveBlock',
     modeAwarePrimitiveSections,
+    drawModeAwarePrimitive,
   ),
 });
 export const denseComparisonBlock: BlockDefinition = defineBlock({
@@ -67,6 +73,7 @@ export const denseComparisonBlock: BlockDefinition = defineBlock({
     input,
     'DenseComparisonBlock',
     denseComparisonSections,
+    drawDenseComparison,
   ),
 });
 export const hierarchyBlock: BlockDefinition = defineBlock({
@@ -77,6 +84,7 @@ export const hierarchyBlock: BlockDefinition = defineBlock({
     input,
     'HierarchyBlock',
     hierarchySections,
+    drawHierarchy,
   ),
 });
 export const explorationListBlock: BlockDefinition = defineBlock({
@@ -87,6 +95,7 @@ export const explorationListBlock: BlockDefinition = defineBlock({
     input,
     'ExplorationListBlock',
     explorationListSections,
+    drawExplorationList,
   ),
 });
 export const temporalDependencyBlock: BlockDefinition = defineBlock({
@@ -97,5 +106,6 @@ export const temporalDependencyBlock: BlockDefinition = defineBlock({
     input,
     'TemporalDependencyBlock',
     temporalDependencySections,
+    drawTemporalDependency,
   ),
 });
