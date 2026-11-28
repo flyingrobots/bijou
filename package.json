@@ -51,6 +51,7 @@
     "perf": "node --import tsx examples/perf-gradient/main.ts",
     "soak": "node scripts/docker-seal/dispatch.mjs -- node --import tsx bench/src/soak-runner.ts",
     "release:preflight": "tsx scripts/release-metadata.ts --current-version --notes-tag-run-id local",
+    "verify:sealed": "node scripts/docker-seal/run.mjs --full-push -- sh -c 'sh scripts/docker-seal/precommit.sh && sh scripts/docker-seal/prepush.sh' < /dev/null",
     "release:readiness": "node scripts/docker-seal/dispatch.mjs -- tsx scripts/release-readiness.ts",
     "release:witnesses": "node scripts/docker-seal/dispatch.mjs -- tsx scripts/release-product-witnesses.ts",
     "docs:inventory": "tsx scripts/docs-inventory.ts",

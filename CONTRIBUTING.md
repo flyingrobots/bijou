@@ -36,7 +36,8 @@ Common validation commands:
 
 Tests require Docker. The launcher copies source and independent Git state into
 a disposable container; test processes cannot write into the original checkout.
-Git hooks use that same boundary. Direct test runners refuse host execution.
+Git hooks run no tests; the pre-commit hook runs only fast Code Dojo checks. Run
+`npm run verify:sealed` before a release. Direct test runners refuse host execution.
 See [Running tests](docs/guides/sealed-tests.md) for setup and evidence limits.
 
 CI retains the full Node-version matrix on Linux and a focused Node 22 Windows

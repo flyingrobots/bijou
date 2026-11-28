@@ -1,7 +1,11 @@
 # Run tests in a disposable Docker copy
 
-Bijou tests must run inside Docker, including tests launched by Git hooks, CI,
-smoke harnesses and release witnesses. The launcher copies the input files and
+Bijou tests must run inside Docker, including tests launched by CI, release
+gates, smoke harnesses and release witnesses. Git hooks run no tests: the
+pre-commit hook runs four dependency-free Code Dojo checks on the host, and there
+is no pre-push hook. GitHub CI gates every merge, and `npm run verify:sealed`
+runs the former commit and push gates in the seal before a release
+(flyingrobots/bijou#956). The launcher copies the input files and
 independent Git objects into the container. It never mounts the host checkout.
 The copied repository has no remotes, external object store or linked-worktree
 pointer. Test fixtures may change that disposable repository without changing

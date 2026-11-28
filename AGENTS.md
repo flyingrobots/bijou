@@ -15,11 +15,18 @@ This guide is for AI agents and human operators recovering context in the Bijou 
 ## CODE_STANDARDS
 
 - **All tests run in sealed Docker copies**, including focused tests, smoke
-  harnesses, benchmarks, Git hooks and CI. Before executing validation, read
+  harnesses, benchmarks, release gates and CI. Before executing validation, read
   `docs/guides/sealed-tests.md`. Use the guarded launcher with copy-in source,
   independent Git storage and remotes removed. Host test execution, host source
   mounts, Docker-socket exposure and environment-only guard bypasses are forbidden.
   Report a refused run as blocked; preserve its evidence and fix the boundary.
+
+- **Tests are a merge gate and a release gate, not a commit gate.** Git hooks run
+  only the fast dependency-free Code Dojo checks on the host (`.githooks/pre-commit`);
+  there is no pre-push hook. GitHub CI on the exact head gates every merge. Before
+  a release, `npm run verify:sealed` runs the full former commit and push gates in
+  the seal, and the publish workflow runs the suite sealed on GitHub. Run the seal
+  locally whenever you want an answer before CI (flyingrobots/bijou#956).
 
 - **Two test jobs run outside the seal, on purpose. The first is the browser suite of
   `examples/web-gpu`** (`npm run test:browser:web-gpu`, CI job "Browser Suite

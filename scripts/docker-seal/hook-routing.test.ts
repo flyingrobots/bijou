@@ -59,11 +59,13 @@ describe('sealed Git hook routing', () => {
 
   it('pre-commit runs only the dependency-free Code Dojo checks on the host, with no container', () => {
     const hookShim = readFileSync(resolve(ROOT, '.githooks/pre-commit'), 'utf8');
+    // The commands the hook runs; its comments may name other commands.
+    const commands = hookShim.split('\n').filter((line) => !line.trimStart().startsWith('#')).join('\n');
 
-    expect(hookShim).not.toContain('docker-seal');
-    expect(hookShim).not.toMatch(/\bnpm\b|\bnpx\b/u);
+    expect(commands).not.toContain('docker-seal');
+    expect(commands).not.toMatch(/\bnpm\b|\bnpx\b/u);
     for (const check of HOST_CHECKS) {
-      expect(hookShim).toContain(`node scripts/code-dojo/${check}`);
+      expect(commands).toContain(`node scripts/code-dojo/${check}`);
       // A host check may import only Node built-ins and other local scripts, so a worktree without node_modules can run it.
       const source = readFileSync(resolve(ROOT, 'scripts/code-dojo', check), 'utf8');
       const specifiers = [...source.matchAll(/from\s+['"]([^'"]+)['"]/gu)].map((match) => match[1] ?? '');
