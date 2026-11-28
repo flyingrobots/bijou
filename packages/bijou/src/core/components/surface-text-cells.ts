@@ -26,7 +26,7 @@ export function surfaceCells(text: string): string[] {
  */
 export function clipSurfaceCells(cells: readonly string[], start: number, end: number): string[] {
   const from = Math.max(0, start);
-  const to = Math.min(cells.length, end);
+  const to = Math.max(from, Math.min(cells.length, end));
   const clipped = cells.slice(from, to);
   for (let index = 0; index < clipped.length && clipped[index] === CONTINUATION_CELL; index += 1) {
     clipped[index] = ' ';
