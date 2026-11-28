@@ -114,7 +114,9 @@ function lcg(seed: number): () => number {
   };
 }
 
-const FUZZ_PIECES = ['a', 'Z', '7', ' ', '-', '/', '%', '·', 'é', '│', '\u001b[31m', '\u0007', '\n', 'Esc', '60'];
+/** An SGR colour sequence, built from its byte so the source holds no raw escape. */
+const SGR_RED = `${String.fromCharCode(0x1b)}[31m`;
+const FUZZ_PIECES = ['a', 'Z', '7', ' ', '-', '/', '%', '·', 'é', '│', SGR_RED, '\u0007', '\n', 'Esc', '60'];
 
 function fuzzText(next: () => number): string {
   let text = '';
