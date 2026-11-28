@@ -70,6 +70,9 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- DL-039 records that machine-drafted translations enter the catalogs as `current`, as the French, Spanish and
+  German translations did, with an outstanding native-speaker review noted once per locale
+  (flyingrobots/bijou#960).
 - Git hooks no longer run the sealed suite. The pre-commit hook runs only the dependency-free Code Dojo checks
   (staged-file size, core purity, the mock ban and graft receipts) on the host, in seconds, and there is no pre-push
   hook (flyingrobots/bijou#956). GitHub CI on the exact head gates every merge. `npm run verify:sealed` runs the
