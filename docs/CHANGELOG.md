@@ -14,6 +14,34 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   output and its facts are unchanged. `renderStandardSectionBlock` takes an optional drawing function for
   `interactive` and `static` mode, which the other standard blocks will use to draw themselves
   (flyingrobots/bijou#934).
+- `TextEntryBlock`, `SingleChoiceBlock`, `MultipleChoiceBlock` and `BinaryDecisionBlock` draw form controls. In
+  `interactive` and `static` mode, instead of one framed box per slot, `TextEntryBlock` draws its field label, a
+  bordered input holding the value (or the dimmed placeholder when the value is empty) and its validation line;
+  `SingleChoiceBlock` draws one radio row per option with the selected option filled; `MultipleChoiceBlock` draws a
+  checkbox row for every checked and unchecked option; and `BinaryDecisionBlock` draws yes and no choices with the
+  selected one emphasised, then its consequence, confirmation and disabled reason (flyingrobots/bijou#937). Long slot
+  text wraps at the requested width, and a Surface slot value is drawn with its own styles. Their `pipe` and
+  `accessible` output and their facts are unchanged.
+- `AppShell`, `ReaderSurface` and `InspectorPanel` draw their regions. In `interactive` and `static` mode they now draw
+  one framed layout instead of one framed box per slot (flyingrobots/bijou#941). `AppShell` puts navigation beside the
+  content and the inspector on the trailing side, then lists the overlays and the status row below a rule.
+  `ReaderSurface` puts navigation and outline columns beside the content. `InspectorPanel` shows the selection as a
+  heading, the details one per row and the actions as one cue row. Below 44 columns the regions stack. A Surface slot
+  value, such as a nested block, is placed cell by cell. Text wraps at its words. Their `pipe` and `accessible` output
+  and their facts are unchanged.
+- The navigation standard blocks draw themselves. In `interactive` and `static` mode, instead of one framed box per
+  slot, `PeerNavigationBlock` draws previous, current and next on one row with direction marks, `PathProgressBlock`
+  draws a stepper that marks the step named by `current`, `ProgressiveDisclosureBlock` draws a disclosure that shows
+  `details` only when `state` is `open`, and `LinkDestinationBlock` draws a link with its destination, kind and
+  status (flyingrobots/bijou#938). Long slot text wraps instead of being cut, a slot that holds a nested block's
+  Surface is drawn cell by cell, and rows start at the logical start edge under right-to-left. Their `pipe` and
+  `accessible` output and their facts are unchanged.
+- The document blocks draw formatted content. In `interactive` and `static` mode, `FormattedDocumentBlock` draws its
+  heading, wrapped body, callout as an info alert and code as an indented code block; `ExplainabilityWalkthroughBlock`
+  draws its title, numbered steps and labelled evidence, decision and next step; `FramedGroupBlock` draws one frame
+  titled with its `title`, marking the selected item; and `BrandEmphasisBlock` draws the brand, an accent rule and the
+  tagline (flyingrobots/bijou#939). Slot text wraps to the width, a nested Surface slot keeps its own cells, and
+  their `pipe` and `accessible` output and facts are unchanged.
 - The six status standard blocks draw as status Components. In `interactive` and `static` mode, `InlineStatusBlock`
   draws a status badge with its label and message, `InFlowStatusBlock` an alert whose variant follows `severity`,
   `TransientOverlayBlock` a framed notice, `ActivityStreamBlock` one entry per event with the selected one marked,

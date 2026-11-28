@@ -56,7 +56,8 @@ describe('DX-031D DOGFOOD Blocks section', () => {
     }], { ctx });
     const text = frameText(must(result.frames.at(-1)));
     expect(text).toContain('ReaderSurface');
-    expect(text).toContain('ReaderSurface live content from DOGFOOD Blocks.');
+    expect(text).toMatch(/│ Blocks +│ ReaderSurface live content .*│ What are Blocks +│/u);
+    expect(text).toContain('DOGFOOD Blocks.');
     expect(text).toContain('lowering summary');
     expect(text).toContain('interactive mode');
     expect(text).toContain('static mode');

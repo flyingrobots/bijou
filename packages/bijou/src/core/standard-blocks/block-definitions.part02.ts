@@ -8,6 +8,13 @@ import { binaryDecisionData, binaryDecisionSections, dividerData, dividerSection
 
 import { renderStandardSectionBlock } from './render.js';
 import { drawDivider } from './draw-divider.js';
+import { drawBinaryDecision } from './draw-binary-decision.js';
+import { drawMultipleChoice, drawSingleChoice } from './draw-choice.js';
+import { drawTextEntry } from './draw-text-entry.js';
+import { drawLinkDestination } from './draw-link-destination.js';
+import { drawFormattedDocument } from './draw-document.js';
+import { drawFramedGroup } from './draw-framed-group.js';
+import { drawExplainabilityWalkthrough } from './draw-walkthrough.js';
 export const framedGroupBlock: BlockDefinition = defineBlock({
   metadata: framedGroupMetadata(),
   data: framedGroupData,
@@ -16,6 +23,7 @@ export const framedGroupBlock: BlockDefinition = defineBlock({
     input,
     'FramedGroupBlock',
     framedGroupSections,
+    drawFramedGroup,
   ),
 });
 export const explainabilityWalkthroughBlock: BlockDefinition = defineBlock({
@@ -26,6 +34,7 @@ export const explainabilityWalkthroughBlock: BlockDefinition = defineBlock({
     input,
     'ExplainabilityWalkthroughBlock',
     explainabilityWalkthroughSections,
+    drawExplainabilityWalkthrough,
   ),
 });
 export const formattedDocumentBlock: BlockDefinition = defineBlock({
@@ -36,6 +45,7 @@ export const formattedDocumentBlock: BlockDefinition = defineBlock({
     input,
     'FormattedDocumentBlock',
     formattedDocumentSections,
+    drawFormattedDocument,
   ),
 });
 export const linkDestinationBlock: BlockDefinition = defineBlock({
@@ -46,6 +56,7 @@ export const linkDestinationBlock: BlockDefinition = defineBlock({
     input,
     'LinkDestinationBlock',
     linkDestinationSections,
+    drawLinkDestination,
   ),
 });
 export const dividerBlock: BlockDefinition = defineBlock({
@@ -67,6 +78,7 @@ export const textEntryBlock: BlockDefinition = defineBlock({
     input,
     'TextEntryBlock',
     textEntrySections,
+    drawTextEntry,
   ),
 });
 export const singleChoiceBlock: BlockDefinition = defineBlock({
@@ -77,6 +89,7 @@ export const singleChoiceBlock: BlockDefinition = defineBlock({
     input,
     'SingleChoiceBlock',
     singleChoiceSections,
+    drawSingleChoice,
   ),
 });
 export const multipleChoiceBlock: BlockDefinition = defineBlock({
@@ -87,6 +100,7 @@ export const multipleChoiceBlock: BlockDefinition = defineBlock({
     input,
     'MultipleChoiceBlock',
     multipleChoiceSections,
+    drawMultipleChoice,
   ),
 });
 export const binaryDecisionBlock: BlockDefinition = defineBlock({
@@ -97,5 +111,6 @@ export const binaryDecisionBlock: BlockDefinition = defineBlock({
     input,
     'BinaryDecisionBlock',
     binaryDecisionSections,
+    drawBinaryDecision,
   ),
 });

@@ -18,16 +18,18 @@ describe('first-party standard block definitions', () => {
   it('renders nested standard blocks through the explicit block tree renderer', () => {
     const rendered = renderBlockTree(blockRenderNode(appShellBlock, {
       mode: 'interactive',
-      config: { width: 72 },
+      config: { width: 120 },
       slots: {
         navigation: 'Blocks nav',
         content: blockRenderNode(readerSurfaceBlock, {
+          config: { width: 54 },
           slots: {
             content: 'Nested reader content from a child block.',
             outline: ['Overview', 'Lowering'],
           },
         }),
         inspector: blockRenderNode(inspectorPanelBlock, {
+          config: { width: 32 },
           slots: {
             selection: 'ReaderSurface',
             details: ['schema-bound', 'provider-ready'],
@@ -44,9 +46,10 @@ describe('first-party standard block definitions', () => {
     const text = surfaceText(rendered.output);
     expect(text).toContain('AppShell');
     expect(text).toContain('ReaderSurface');
-    expect(text).toContain('Nested reader content from a child block.');
+    expect(text).toContain('Nested reader content from a child');
     expect(text).toContain('InspectorPanel');
-    expect(text).toContain('schema-bound; provider-ready');
+    expect(text).toContain('schema-bound');
+    expect(text).toContain('provider-ready');
     expect(rendered.facts).toEqual(expect.arrayContaining([
       { kind: 'entity', key: 'block', value: 'AppShell' },
       { kind: 'entity', key: 'block', value: 'ReaderSurface' },

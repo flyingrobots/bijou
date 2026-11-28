@@ -7,6 +7,10 @@ import { brandEmphasisMetadata, denseComparisonMetadata, explorationListMetadata
 import { brandEmphasisData, brandEmphasisSections, denseComparisonData, denseComparisonSections, explorationListData, explorationListSections, hierarchyData, hierarchySections, modeAwarePrimitiveData, modeAwarePrimitiveSections, pathProgressData, pathProgressSections, peerNavigationData, peerNavigationSections, progressiveDisclosureData, progressiveDisclosureSections, standardSectionCommands, temporalDependencyData, temporalDependencySections } from './sections.js';
 
 import { renderStandardSectionBlock } from './render.js';
+import { drawProgressiveDisclosure } from './draw-disclosure.js';
+import { drawPathProgress } from './draw-path-progress.js';
+import { drawPeerNavigation } from './draw-peer-navigation.js';
+import { drawBrandEmphasis } from './draw-brand.js';
 import { drawDenseComparison } from './draw-dense-comparison.js';
 import { drawExplorationList } from './draw-exploration-list.js';
 import { drawHierarchy } from './draw-hierarchy.js';
@@ -20,6 +24,7 @@ export const peerNavigationBlock: BlockDefinition = defineBlock({
     input,
     'PeerNavigationBlock',
     peerNavigationSections,
+    drawPeerNavigation,
   ),
 });
 export const progressiveDisclosureBlock: BlockDefinition = defineBlock({
@@ -30,6 +35,7 @@ export const progressiveDisclosureBlock: BlockDefinition = defineBlock({
     input,
     'ProgressiveDisclosureBlock',
     progressiveDisclosureSections,
+    drawProgressiveDisclosure,
   ),
 });
 export const pathProgressBlock: BlockDefinition = defineBlock({
@@ -40,6 +46,7 @@ export const pathProgressBlock: BlockDefinition = defineBlock({
     input,
     'PathProgressBlock',
     pathProgressSections,
+    drawPathProgress,
   ),
 });
 export const brandEmphasisBlock: BlockDefinition = defineBlock({
@@ -50,6 +57,7 @@ export const brandEmphasisBlock: BlockDefinition = defineBlock({
     input,
     'BrandEmphasisBlock',
     brandEmphasisSections,
+    drawBrandEmphasis,
   ),
 });
 export const modeAwarePrimitiveBlock: BlockDefinition = defineBlock({
