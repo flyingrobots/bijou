@@ -57,6 +57,7 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
       ['InspectorPanel', [
         '│ ReaderSurface',
         '│ schema-bound',
+        '│ provider-ready',
         '│ command-aware',
         '▸ Reveal selection  ▸ Focus source',
       ]],

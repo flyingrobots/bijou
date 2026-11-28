@@ -21,17 +21,24 @@ function listedContent(
   return items.map((item) => `${prefix}${item}`).join('\n');
 }
 
-/** The slot's items when it is a list of text, read as an own data property (never through an accessor). */
+/**
+ * The slot's items when it is a list of text, blank items left out. The list
+ * and each item are read as own data properties, by index, so no accessor or
+ * iterator of the slot value runs.
+ */
 function textItems(slots: Readonly<Record<string, unknown>> | undefined, id: string): readonly string[] | undefined {
   if (!isPlainRecord(slots)) return undefined;
   const value = ownDataProperty(slots, id);
-  if (!Array.isArray(value) || value.length === 0) return undefined;
+  if (!Array.isArray(value)) return undefined;
   const items: string[] = [];
-  for (const item of value) {
+  for (let index = 0; index < value.length; index += 1) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, index);
+    const item: unknown = descriptor !== undefined && 'value' in descriptor ? descriptor.value : undefined;
+    if (item === undefined) continue;
     if (typeof item !== 'string' && typeof item !== 'number') return undefined;
-    items.push(String(item));
+    if (String(item).trim() !== '') items.push(String(item));
   }
-  return items;
+  return items.length === 0 ? undefined : items;
 }
 
 export { findSection, listedContent };
