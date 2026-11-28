@@ -8,6 +8,9 @@ import { binaryDecisionData, binaryDecisionSections, dividerData, dividerSection
 
 import { renderStandardSectionBlock } from './render.js';
 import { drawDivider } from './draw-divider.js';
+import { drawBinaryDecision } from './draw-binary-decision.js';
+import { drawMultipleChoice, drawSingleChoice } from './draw-choice.js';
+import { drawTextEntry } from './draw-text-entry.js';
 export const framedGroupBlock: BlockDefinition = defineBlock({
   metadata: framedGroupMetadata(),
   data: framedGroupData,
@@ -67,6 +70,7 @@ export const textEntryBlock: BlockDefinition = defineBlock({
     input,
     'TextEntryBlock',
     textEntrySections,
+    drawTextEntry,
   ),
 });
 export const singleChoiceBlock: BlockDefinition = defineBlock({
@@ -77,6 +81,7 @@ export const singleChoiceBlock: BlockDefinition = defineBlock({
     input,
     'SingleChoiceBlock',
     singleChoiceSections,
+    drawSingleChoice,
   ),
 });
 export const multipleChoiceBlock: BlockDefinition = defineBlock({
@@ -87,6 +92,7 @@ export const multipleChoiceBlock: BlockDefinition = defineBlock({
     input,
     'MultipleChoiceBlock',
     multipleChoiceSections,
+    drawMultipleChoice,
   ),
 });
 export const binaryDecisionBlock: BlockDefinition = defineBlock({
@@ -97,5 +103,6 @@ export const binaryDecisionBlock: BlockDefinition = defineBlock({
     input,
     'BinaryDecisionBlock',
     binaryDecisionSections,
+    drawBinaryDecision,
   ),
 });
