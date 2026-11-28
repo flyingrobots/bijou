@@ -33,7 +33,7 @@ export function validatePageSceneBounds(
       if (sanitizePlainTerminalText(line.text) !== line.text) {
         unsupported(path, 'terminal inspection lines must preserve input text exactly');
       }
-      const width = segmentSurfaceText(line.text, path).length;
+      const width = segmentSurfaceText(line.text).length;
       const availableWidth = isRoot ? cols : plan.region.width;
       if (width > availableWidth) {
         unsupported(

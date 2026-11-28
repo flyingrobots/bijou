@@ -4,7 +4,7 @@ import { sanitizeNonNegativeInt } from '../numeric.js';
 import { colorRgb } from '../theme/color.js';
 import { sanitizePlainTerminalText } from '../text/index.js';
 import type { SeparatorOptions } from './separator.js';
-import { segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
+import { clipSurfaceCells, segmentSurfaceText, tokenToCellStyle } from './surface-text.js';
 import { encodeModifiers } from '../render/packed-cell.js';
 
 /**
@@ -15,7 +15,7 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
   const label = sanitizePlainTerminalText(options.label ?? '');
   const token = options.borderToken ?? ctx?.border('muted');
   const borderStyle = tokenToCellStyle(token);
-  const labelGraphemes = label.length > 0 ? segmentSurfaceText(` ${label} `, 'separatorSurface label') : [];
+  const labelGraphemes = label.length > 0 ? segmentSurfaceText(` ${label} `) : [];
   const fallbackWidth = labelGraphemes.length > 0 ? labelGraphemes.length : 3;
   const width = sanitizeNonNegativeInt(options.width, ctx?.runtime.columns ?? fallbackWidth);
   const surface = createSurface(width, 1);
@@ -46,9 +46,10 @@ export function separatorSurface(options: SeparatorOptions = {}): Surface {
   }
 
   if (labelGraphemes.length >= width) {
+    const fitted = clipSurfaceCells(labelGraphemes, 0, width);
     for (let x = 0; x < width; x++) {
-      if (useRGB) (surface).setRGB(x, 0, labelGraphemes[x] ?? ' ', -1, 0, 0, -1, 0, 0);
-      else surface.set(x, 0, { char: labelGraphemes[x] ?? ' ', empty: false });
+      if (useRGB) (surface).setRGB(x, 0, fitted[x] ?? ' ', -1, 0, 0, -1, 0, 0);
+      else surface.set(x, 0, { char: fitted[x] ?? ' ', empty: false });
     }
     return surface;
   }

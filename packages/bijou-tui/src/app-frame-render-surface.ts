@@ -1,4 +1,5 @@
 import {
+  graphemeClusterWidth,
   parseAnsiToSurface,
   resolveSafeCtx,
   type BijouContext,
@@ -85,6 +86,11 @@ export function fillSurfaceBackground(
   );
 }
 
+/** A '' cell right after a wide lead is that lead's continuation, not a blank to fill (flyingrobots/bijou#859). */
+function isContinuation(surface: Surface, x: number, y: number): boolean {
+  return x > 0 && graphemeClusterWidth(surface.get(x - 1, y).char) > 1;
+}
+
 export function applySurfaceBackground(
   surface: Surface,
   token: TokenValue | undefined,
@@ -102,7 +108,7 @@ export function applySurfaceBackground(
       if (!needsBackground && !needsForeground) continue;
       surface.set(x, y, {
         ...cell,
-        char: cell.char.length > 0 ? cell.char : ' ',
+        char: cell.char.length > 0 || isContinuation(surface, x, y) ? cell.char : ' ',
         fg: needsForeground ? token.hex : cell.fg,
         bg: needsBackground ? token.bg : cell.bg,
         fgRGB: needsForeground ? token.fgRGB : cell.fgRGB,
