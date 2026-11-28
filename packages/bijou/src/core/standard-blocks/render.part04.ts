@@ -5,6 +5,7 @@ import { normalizeOutputMode, renderAccessibleSections, renderPipeSections, rend
 import type { RenderSection } from './render.part01.js';
 import { renderFacts } from './render.part02.js';
 import { ownSlotValue, renderSection, renderedBlockResult } from './render.part03.js';
+import type { StandardInteractiveDrawer } from './draw-input.js';
 
 export function renderReaderSurfaceBlock(input: BlockRenderInput): BlockRenderResult<string | Surface> {
   const mode = normalizeOutputMode(input.mode);
@@ -42,6 +43,7 @@ export function renderInspectorPanelBlock(input: BlockRenderInput): BlockRenderR
   });
 }
 
+/** One slot of a standard block, drawn as a section by the shared renderer. */
 interface StandardSectionSpec {
   readonly id: string;
   readonly label: string;
@@ -53,6 +55,7 @@ export function renderStandardSectionBlock(
   input: BlockRenderInput,
   blockName: StandardBlockName,
   sectionSpecs: readonly StandardSectionSpec[],
+  drawInteractive?: StandardInteractiveDrawer,
 ): BlockRenderResult<string | Surface> {
   const mode = normalizeOutputMode(input.mode);
   const sections = sectionSpecs
@@ -69,7 +72,9 @@ export function renderStandardSectionBlock(
       ? renderAccessibleSections(blockName, sections)
       : mode === 'pipe'
         ? renderPipeSections(blockName, sections)
-        : renderVisualSectionsSurface(blockName, sections, renderSurfaceBounds(input)),
+        : drawInteractive === undefined
+          ? renderVisualSectionsSurface(blockName, sections, renderSurfaceBounds(input))
+          : drawInteractive({ sections, slots: input.slots, bounds: renderSurfaceBounds(input) }),
     facts: renderFacts(blockName, sections, 'slot', mode),
   });
 }

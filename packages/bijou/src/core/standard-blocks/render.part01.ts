@@ -134,5 +134,5 @@ function renderSurfaceBounds(input: BlockRenderInput): RenderSurfaceBounds {
   return sectionHeight === undefined ? { width } : { width, sectionHeight };
 }
 
-export type { RenderSection };
+export type { RenderSection, RenderSurfaceBounds };
 export { normalizeOutputMode, renderAccessibleSections, renderPipeSections, renderSurfaceBounds, renderVisualSectionsSurface };
