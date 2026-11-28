@@ -81,7 +81,7 @@ describe('navigation blocks draw themselves in interactive mode (flyingrobots/bi
 
   it('moves the LinkDestination destination to its own row when the link row does not fit', () => {
     const rows = drawFrame(linkDestinationBlock, { ...LINK, destination: 'docs/guides/a-long-destination.md' }, 30).rows;
-    expect(rows.map((row) => row.trimEnd())).toEqual(['↗ DOGFOOD.md', '  (docs/guides/a-long-destina…', 'docs · available']);
+    expect(rows.map((row) => row.trimEnd())).toEqual(['↗ DOGFOOD.md', '  (docs/guides/a-long-destinat', '  ion.md)', 'docs · available']);
   });
 });
 

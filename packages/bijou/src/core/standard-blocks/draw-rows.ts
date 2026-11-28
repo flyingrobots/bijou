@@ -1,21 +1,57 @@
 import { createSurface, type Surface } from '../../ports/surface.js';
-import { graphemeClusterWidth, sanitizePlainTerminalText, segmentGraphemes } from '../text/index.js';
 import { writeSurfaceGrapheme } from '../render/differ-string.js';
 import { resolveSafeCtx } from '../resolve-ctx.js';
 import { orderForDirection, resolveDirection, type InlineDirection } from '../direction/direction.js';
+import { textWidth, wrapSpans, type DrawCell, type DrawSpan, type WrappedLine } from './draw-wrap.js';
 
-/** One run of text in a drawn row, with optional cell modifiers. */
-export interface DrawSpan {
-  readonly text: string;
-  readonly modifiers?: readonly string[];
+/** A slot as a drawing receives it: its text, or the Surface of a nested block. */
+export type SlotPart = string | Surface;
+
+/** A row of text spans that wraps to the width, every line starting `indent` columns in. */
+export interface TextLine {
+  readonly spans: readonly DrawSpan[];
+  readonly indent: number;
 }
 
-/** One row of a drawn block, as spans in reading (logical) order. */
-export type DrawRow = readonly DrawSpan[];
+/** A Surface-valued slot, blitted cell by cell `indent` columns in and clipped to the width. */
+export interface SurfaceLine {
+  readonly surface: Surface;
+  readonly indent: number;
+}
+
+export type DrawLine = TextLine | SurfaceLine;
 
 /** A span of `text` with optional cell modifiers such as `bold`. */
 export function span(text: string, ...modifiers: string[]): DrawSpan {
   return modifiers.length === 0 ? { text } : { text, modifiers };
+}
+
+export function textLine(spans: readonly DrawSpan[], indent = 0): TextLine {
+  return { spans, indent };
+}
+
+/** One slot part on its own line: wrapped text, or a blitted Surface. */
+export function partLine(part: SlotPart, indent = 0, ...modifiers: string[]): DrawLine {
+  return typeof part === 'string' ? textLine([span(part, ...modifiers)], indent) : { surface: part, indent };
+}
+
+/** The text parts of `parts` when none is a Surface; otherwise undefined. */
+export function textParts(parts: readonly (SlotPart | undefined)[]): string[] | undefined {
+  const present = parts.filter((part): part is SlotPart => part !== undefined && part !== '');
+  return present.every((part) => typeof part === 'string') ? present : undefined;
+}
+
+/**
+ * `parts` joined by `separator` on one wrapping row when all are text; when
+ * one is a Surface, each part gets its own line. Absent parts are left out.
+ */
+export function inlineLines(parts: readonly (SlotPart | undefined)[], separator: string, ...modifiers: string[]): DrawLine[] {
+  const texts = textParts(parts);
+  if (texts !== undefined) {
+    if (texts.length === 0) return [];
+    return [textLine(texts.flatMap((text, index) => (index === 0 ? [] : [span(separator, ...modifiers)]).concat(span(text, ...modifiers))))];
+  }
+  return parts.flatMap((part) => (part === undefined || part === '' ? [] : [partLine(part, 0, ...modifiers)]));
 }
 
 /**
@@ -26,80 +62,72 @@ export function drawDirection(): InlineDirection {
   return resolveDirection({ ctx: resolveSafeCtx() });
 }
 
-function graphemes(text: string): string[] {
-  return segmentGraphemes(sanitizePlainTerminalText(text));
+/** `text` centred in `width` columns with spaces; `text` must already fit. */
+export function centerText(text: string, width: number): string {
+  const room = Math.max(0, width - textWidth(text));
+  const before = Math.floor(room / 2);
+  return ' '.repeat(before) + text + ' '.repeat(room - before);
 }
 
-function cellWidth(grapheme: string): number {
-  return Math.max(1, graphemeClusterWidth(grapheme));
-}
-
-/** Display width of `text` after terminal-text sanitizing. */
-export function textWidth(text: string): number {
-  return graphemes(text).reduce((sum, grapheme) => sum + cellWidth(grapheme), 0);
-}
-
-/** `text` sanitized and cut to `width` columns, ending in `…` when cut. */
-export function fitText(text: string, width: number): string {
-  if (width <= 0) return '';
-  if (textWidth(text) <= width) return sanitizePlainTerminalText(text);
-  let used = 0;
-  let kept = '';
-  for (const grapheme of graphemes(text)) {
-    const next = cellWidth(grapheme);
-    if (used + next > width - 1) break;
-    kept += grapheme;
-    used += next;
+/** A wrapped line's cells in visual order: its spans' fragments reversed under `rtl`, each fragment kept as written. */
+function visualCells(line: WrappedLine, direction: InlineDirection): DrawCell[] {
+  const fragments: DrawCell[][] = [];
+  for (const cell of line) {
+    const last = fragments[fragments.length - 1];
+    if (last !== undefined && last[0]?.span === cell.span) last.push(cell);
+    else fragments.push([cell]);
   }
-  return `${kept}…`;
+  return orderForDirection(fragments, direction).flat();
+}
+
+type Placed = { readonly kind: 'text'; readonly cells: DrawCell[]; readonly indent: number } | { readonly kind: 'surface'; readonly line: SurfaceLine };
+
+function layout(lines: readonly DrawLine[], width: number, direction: InlineDirection): Placed[] {
+  return lines.flatMap((line): Placed[] => {
+    if ('surface' in line) return [{ kind: 'surface', line }];
+    const room = Math.max(1, width - line.indent);
+    return wrapSpans(line.spans, room).map((wrapped) => ({ kind: 'text', cells: visualCells(wrapped, direction), indent: line.indent }));
+  });
+}
+
+function placeCells(target: Surface, cells: readonly DrawCell[], indent: number, y: number, direction: InlineDirection): void {
+  const used = cells.reduce((sum, cell) => sum + cell.width, 0);
+  let x = direction === 'rtl' ? Math.max(0, target.width - indent - used) : Math.min(indent, target.width);
+  for (const cell of cells) {
+    if (x + cell.width > target.width) return;
+    const style = cell.modifiers === undefined ? undefined : { modifiers: [...cell.modifiers] };
+    x += writeSurfaceGrapheme(target, x, y, cell.grapheme, style);
+  }
+}
+
+function placeSurface(target: Surface, line: SurfaceLine, y: number, direction: InlineDirection): void {
+  const shown = Math.max(0, Math.min(line.surface.width, target.width - line.indent));
+  const x = direction === 'rtl' ? target.width - line.indent - shown : line.indent;
+  if (shown > 0) target.blit(line.surface, x, y, 0, 0, shown, line.surface.height);
 }
 
 /**
- * `text` fitted to `width` and padded with spaces so it meets the logical
- * `start` or `end` edge of its column (or sits in the centre) under `direction`.
+ * Draws `lines` into a Surface exactly `width` columns wide. Text wraps between
+ * words, so no slot text is lost; Surfaces are blitted clipped to the width.
+ * Each line starts at the logical start edge: the left under `ltr`, the right
+ * under `rtl`, where a line's spans also run right to left.
  */
-export function alignText(
-  text: string,
-  width: number,
-  align: 'start' | 'end' | 'center',
-  direction: InlineDirection,
-): string {
-  const fitted = fitText(text, width);
-  const room = Math.max(0, width - textWidth(fitted));
-  const leftEdge = (align === 'start') === (direction === 'ltr');
-  if (align !== 'center') return leftEdge ? fitted + ' '.repeat(room) : ' '.repeat(room) + fitted;
-  const before = Math.floor(room / 2);
-  return ' '.repeat(before) + fitted + ' '.repeat(room - before);
-}
-
-/** Short inline `parts` joined by `separator` in visual order for `direction`. Empty parts are left out. */
-export function joinInline(parts: readonly (string | undefined)[], direction: InlineDirection, separator = ' '): string {
-  const present = parts.filter((part): part is string => part !== undefined && part !== '');
-  return orderForDirection(present, direction).join(separator);
-}
-
-function drawRow(surface: Surface, row: DrawRow, y: number, direction: InlineDirection): void {
-  const visual = orderForDirection(row, direction);
-  const used = visual.reduce((sum, part) => sum + textWidth(part.text), 0);
-  let x = direction === 'rtl' ? Math.max(0, surface.width - used) : 0;
-  for (const part of visual) {
-    const style = part.modifiers === undefined ? undefined : { modifiers: [...part.modifiers] };
-    for (const grapheme of graphemes(part.text)) {
-      if (x + cellWidth(grapheme) > surface.width) return;
-      x += writeSurfaceGrapheme(surface, x, y, grapheme, style);
+export function drawLines(lines: readonly DrawLine[], width: number, direction: InlineDirection): Surface {
+  const placed = layout(lines, width, direction);
+  const height = placed.reduce((sum, item) => sum + (item.kind === 'text' ? 1 : item.line.surface.height), 0);
+  const target = createSurface(width, Math.max(1, height));
+  let y = 0;
+  for (const item of placed) {
+    if (item.kind === 'text') {
+      placeCells(target, item.cells, item.indent, y, direction);
+      y += 1;
+    } else {
+      placeSurface(target, item.line, y, direction);
+      y += item.line.surface.height;
     }
   }
+  return target;
 }
 
-/**
- * Draws `rows` into a Surface exactly `width` columns wide. Each row starts at
- * the logical start edge: the left under `ltr`, the right under `rtl`, where
- * the row's spans also run right to left. Text that would pass the edge is cut.
- */
-export function drawRows(rows: readonly DrawRow[], width: number, direction: InlineDirection): Surface {
-  const surface = createSurface(width, Math.max(1, rows.length));
-  rows.forEach((row, y) => {
-    drawRow(surface, row, y, direction);
-  });
-  return surface;
-}
+export { textWidth };
+export type { DrawSpan };

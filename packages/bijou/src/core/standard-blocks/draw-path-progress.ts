@@ -1,35 +1,37 @@
 import type { Surface } from '../../ports/surface.js';
-import { sectionContent, type StandardDrawInput } from './draw-input.js';
-import { slotValueText } from './render.part03.js';
-import { drawDirection, drawRows, fitText, joinInline, span, textWidth, type DrawRow, type DrawSpan } from './draw-rows.js';
+import type { StandardDrawInput } from './draw-input.js';
+import { drawDirection, drawLines, inlineLines, partLine, span, textLine, textParts, textWidth, type DrawLine, type DrawSpan, type SlotPart } from './draw-rows.js';
+import { listParts, partText, slotPart } from './draw-slots.js';
 
 const CONNECTOR = ' ── ';
 
-/** The path's step labels: each list item's text, or the whole slot text as one step. */
-function pathSteps(input: StandardDrawInput): readonly string[] {
-  const raw = input.slots?.['path'];
-  if (Array.isArray(raw)) {
-    const steps = raw
-      .map((item) => slotValueText(item))
-      .filter((item): item is string => item !== undefined && item.trim() !== '');
-    if (steps.length > 0) return steps;
-  }
-  return [sectionContent(input.sections, 'path') ?? ''];
+function markOf(index: number, current: number): string {
+  if (index === current) return '●';
+  return index < current ? '✓' : '○';
 }
 
-function stepSpan(label: string, index: number, current: number, width: number): DrawSpan {
-  if (index === current) return span(fitText(`● ${label}`, width), 'bold');
-  const mark = index < current ? '✓' : '○';
-  return span(fitText(`${mark} ${label}`, width), ...(index < current ? [] : ['dim']));
+/** A step's mark and label as one span, so the mark stays before the label under `rtl`, as in `stepper`. */
+function stepSpan(text: string, index: number, current: number): DrawSpan {
+  const modifiers = index === current ? ['bold'] : index < current ? [] : ['dim'];
+  return span(text === '' ? markOf(index, current) : `${markOf(index, current)} ${text}`, ...modifiers);
 }
 
-function stepperRows(steps: readonly string[], current: number, width: number): DrawRow[] {
-  const line = steps.map((label, index) => stepSpan(label, index, current, width));
-  const lineWidth = line.reduce((sum, part) => sum + textWidth(part.text), 0) + CONNECTOR.length * (line.length - 1);
-  if (lineWidth <= width) {
-    return [line.flatMap((part, index) => (index === 0 ? [part] : [span(CONNECTOR, 'dim'), part]))];
-  }
-  return line.map((part) => [part]);
+/** All steps on one row joined by `──`, when every step is text and the row fits. */
+function stepperRow(steps: readonly SlotPart[], current: number, width: number): DrawLine | undefined {
+  const texts = textParts(steps);
+  if (texts === undefined || texts.length !== steps.length) return undefined;
+  const spans = texts.flatMap((text, index) => [
+    ...(index === 0 ? [] : [span(CONNECTOR, 'dim')]),
+    stepSpan(text, index, current),
+  ]);
+  return spans.reduce((sum, part) => sum + textWidth(part.text), 0) <= width ? textLine(spans) : undefined;
+}
+
+/** One step per row: its mark and wrapping label, or its mark above a nested Surface. */
+function stepLines(steps: readonly SlotPart[], current: number): DrawLine[] {
+  return steps.flatMap((step, index) => (typeof step === 'string'
+    ? [textLine([stepSpan(step, index, current)])]
+    : [textLine([stepSpan('', index, current)]), partLine(step, 2)]));
 }
 
 /**
@@ -43,12 +45,13 @@ function stepperRows(steps: readonly string[], current: number, width: number): 
 export function drawPathProgress(input: StandardDrawInput): Surface {
   const width = input.bounds.width;
   const direction = drawDirection();
-  const text = (id: string): string => sectionContent(input.sections, id) ?? '';
-  const steps = pathSteps(input);
-  const current = steps.indexOf(text('current'));
+  const steps = listParts(input, 'path');
+  const named = slotPart(input.sections, 'current');
+  const current = steps.findIndex((step) => typeof step === 'string' && step === partText(named));
 
-  const position = `Step ${text('step')} of ${text('total')}`;
-  const unnamed = current === -1 ? text('current') : undefined;
-  const summary = joinInline([position, unnamed, sectionContent(input.sections, 'status')], direction, ' · ');
-  return drawRows([...stepperRows(steps, current, width), [span(fitText(summary, width), 'dim')]], width, direction);
+  const [step, total] = [slotPart(input.sections, 'step') ?? '', slotPart(input.sections, 'total') ?? ''];
+  const position = typeof step === 'string' && typeof total === 'string' ? [`Step ${step} of ${total}`] : ['Step', step, 'of', total];
+  const summary = inlineLines([...position, current === -1 ? named : undefined, slotPart(input.sections, 'status')], ' · ', 'dim');
+  const row = stepperRow(steps, current, width);
+  return drawLines([...(row === undefined ? stepLines(steps, current) : [row]), ...summary], width, direction);
 }

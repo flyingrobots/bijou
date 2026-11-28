@@ -1,22 +1,20 @@
 import type { Surface } from '../../ports/surface.js';
 import { mirrorGlyph } from '../direction/directional-glyph.js';
-import { sectionContent, type StandardDrawInput } from './draw-input.js';
-import { slotValueText } from './render.part03.js';
-import { drawDirection, drawRows, fitText, joinInline, span, type DrawRow } from './draw-rows.js';
+import type { StandardDrawInput } from './draw-input.js';
+import { drawDirection, drawLines, inlineLines, partLine, span, textLine, type DrawLine, type SlotPart } from './draw-rows.js';
+import { listParts, slotPart } from './draw-slots.js';
 
 const OPEN_STATES: ReadonlySet<string> = new Set(['open', 'expanded']);
-const INDENT = '  ';
+const INDENT = 2;
 
-/** The detail lines: each list item's text, or the whole slot text as one line. */
-function detailLines(input: StandardDrawInput): readonly string[] {
-  const raw = input.slots?.['details'];
-  if (Array.isArray(raw)) {
-    return raw
-      .map((item) => slotValueText(item))
-      .filter((item): item is string => item !== undefined && item.trim() !== '');
+function headingLines(marker: string, label: SlotPart, count: SlotPart, countWord: string, missingState: string | undefined): DrawLine[] {
+  if (typeof label === 'string' && typeof count === 'string') {
+    const state = missingState === undefined ? [] : [span(' · ', 'bold'), span(missingState, 'bold')];
+    return [textLine([
+      span(marker, 'bold'), span(' '), span(label, 'bold'), span(' · ', 'bold'), span(`${count} ${countWord}`, 'bold'), ...state,
+    ])];
   }
-  const details = sectionContent(input.sections, 'details');
-  return details === undefined ? [] : [details];
+  return inlineLines([marker, label, count, countWord, missingState], ' ', 'bold');
 }
 
 /**
@@ -25,29 +23,26 @@ function detailLines(input: StandardDrawInput): readonly string[] {
  * the `summary` below; open, it shows `▼ <label> · <count> shown` and each of
  * `details` on its own indented row. An unknown `state` token (a translated
  * one, for example) draws closed; a missing `state` shows its missing-slot text
- * in the heading. Under `rtl` the marker follows the label at the right
- * edge, `▶` becomes `◀`, and rows are indented from the right.
+ * in the heading. Text wraps to the width and nested Surfaces are blitted.
+ * Under `rtl` the marker follows the label at the right edge, `▶` becomes `◀`,
+ * and rows are indented from the right.
  */
 export function drawProgressiveDisclosure(input: StandardDrawInput): Surface {
   const width = input.bounds.width;
   const direction = drawDirection();
-  const text = (id: string): string => sectionContent(input.sections, id) ?? '';
-  const state = text('state');
-  const open = OPEN_STATES.has(state);
+  const state = input.sections.find((section) => section.id === 'state');
+  const open = state !== undefined && state.present && OPEN_STATES.has(state.content);
 
-  const marker = open ? '▼' : mirrorGlyph('▶', direction);
-  const count = `${text('hiddenCount')} ${open ? 'shown' : 'hidden'}`;
-  const heading = joinInline([
-    joinInline([marker, text('label')], direction),
-    count,
-    input.sections.some((section) => section.id === 'state' && !section.present) ? state : undefined,
-  ], direction, ' · ');
-
-  const body = open ? detailLines(input) : [sectionContent(input.sections, 'summary')];
-  const rows: DrawRow[] = [[span(fitText(heading, width), 'bold')]];
-  for (const line of body) {
-    if (line === undefined) continue;
-    rows.push([span(INDENT), span(fitText(line, width - INDENT.length), ...(open ? [] : ['dim']))]);
-  }
-  return drawRows(rows, width, direction);
+  const heading = headingLines(
+    open ? '▼' : mirrorGlyph('▶', direction),
+    slotPart(input.sections, 'label') ?? '',
+    slotPart(input.sections, 'hiddenCount') ?? '',
+    open ? 'shown' : 'hidden',
+    state !== undefined && !state.present ? state.content : undefined,
+  );
+  const summary = slotPart(input.sections, 'summary');
+  const body = open
+    ? listParts(input, 'details').map((detail) => partLine(detail, INDENT))
+    : summary === undefined ? [] : [partLine(summary, INDENT, 'dim')];
+  return drawLines([...heading, ...body], width, direction);
 }

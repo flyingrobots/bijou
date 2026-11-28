@@ -14,6 +14,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   output and its facts are unchanged. `renderStandardSectionBlock` takes an optional drawing function for
   `interactive` and `static` mode, which the other standard blocks will use to draw themselves
   (flyingrobots/bijou#934).
+- The navigation standard blocks draw themselves. In `interactive` and `static` mode, instead of one framed box per
+  slot, `PeerNavigationBlock` draws previous, current and next on one row with direction marks, `PathProgressBlock`
+  draws a stepper that marks the step named by `current`, `ProgressiveDisclosureBlock` draws a disclosure that shows
+  `details` only when `state` is `open`, and `LinkDestinationBlock` draws a link with its destination, kind and
+  status (flyingrobots/bijou#938). Long slot text wraps instead of being cut, a slot that holds a nested block's
+  Surface is drawn cell by cell, and rows start at the logical start edge under right-to-left. Their `pipe` and
+  `accessible` output and their facts are unchanged.
 - Shatter's debris settles. A falling glyph now lands in its own cell when the cell under it is the floor or the
   pile, where it used to land one cell above. That jump made settling glyphs climb in a column forever, which looked
   like cells left behind. A glyph that the pile grew around, or whose cell was taken while it fell, moves to the
