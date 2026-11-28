@@ -24,7 +24,8 @@ if (!['20', '22', '24'].includes(version) ||
   throw new Error('Bootstrap requires an immutable official Node bookworm image matching the requested version');
 }
 
-const probe = 'bijou-sealed-probe';
+// v2 with the sized worker (flyingrobots/bijou#953); older branches keep the old probe.
+const probe = 'bijou-sealed-probe-v2';
 const context = mkdtempSync(join(tmpdir(), 'bijou-seal-image-'));
 let started = false;
 const controller = new AbortController();

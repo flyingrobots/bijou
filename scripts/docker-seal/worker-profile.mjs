@@ -43,5 +43,11 @@ export async function dockerWorkerProfile(execute) {
   return workerProfile(cpus, memoryBytes);
 }
 
-/** Not implemented yet: the workers a run must find free before it starts. */
-export function admissionWorkers() { return []; }
+// The fixed-size workers of branches older than flyingrobots/bijou#953. Docker
+// has room for one sealed run at a time, so a v2 run waits while one is active.
+const LEGACY_WORKERS = Object.freeze(['bijou-sealed-tests-dependencies', 'bijou-sealed-tests']);
+
+/** The workers a run must find free before it starts: its own, then the older branches'. */
+export function admissionWorkers(worker) {
+  return Object.freeze([`${worker}-dependencies`, worker, ...LEGACY_WORKERS]);
+}
