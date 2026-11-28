@@ -1,10 +1,9 @@
 import type { Surface } from '../../ports/surface.js';
 import type { StandardDrawInput } from './draw-input.js';
+import { findSection, listedContent } from './draw-region-slots.js';
 import {
   blockFrame,
-  findSection,
   framedInnerWidth,
-  listedContent,
   regionSurface,
   ruleRow,
   stackRegions,

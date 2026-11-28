@@ -5,8 +5,6 @@ import type { CellTextStyle } from '../components/surface-text-style.js';
 import { sanitizePlainTerminalText } from '../text/grapheme.js';
 import { wrapToWidth } from '../text/wrap.js';
 import { createSurface, type Surface } from '../../ports/surface.js';
-import { isPlainRecord } from './schema-utils.js';
-import type { RenderSection } from './render.part01.js';
 
 /** The columns a region separator takes: a space, a rule and a space. */
 const SEPARATOR_WIDTH = 3;
@@ -81,51 +79,42 @@ function blockFrame(blockName: string, body: Surface, width: number): Surface {
   return boxSurface(body, { title: blockName, width, padding: { left: 1, right: 1 } });
 }
 
+/** Below this inner width, regions stack instead of standing side by side. */
+const STACK_BELOW = 40;
+
+/** One region of a band: its content and its width when the band stands side by side. */
+interface BandRegion {
+  readonly content: RegionContent;
+  readonly width: number;
+}
+
+/**
+ * Lays regions side by side on the same rows when the row is wide enough,
+ * or stacks them full width, divided by rules, when it is narrow, so text
+ * wraps at its words instead of in a column too thin for them.
+ */
+function regionBand(regions: readonly BandRegion[], inner: number, height?: number): Surface {
+  if (inner >= STACK_BELOW) {
+    return besideRegions(regions.map((region) => regionSurface(region.content, region.width, height)), height);
+  }
+  const stacked = regions.flatMap((region, index) => {
+    const surface = regionSurface(region.content, inner, height);
+    return index === 0 ? [surface] : [ruleRow(inner), surface];
+  });
+  return stackRegions(stacked, inner);
+}
+
 /** Side-column width: a share of the row, held between `min` and `max` columns. */
 function sideWidth(inner: number, share: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, Math.floor(inner / share)));
 }
 
-/** The section with `id`, when the block shows it. */
-function findSection(sections: readonly RenderSection[], id: string): RenderSection | undefined {
-  return sections.find((section) => section.id === id);
-}
-
-/**
- * The region content of section `id`: one line per item when its slot is a
- * list of text, otherwise the section's own visual content.
- */
-function listedContent(
-  section: RenderSection,
-  slots: Readonly<Record<string, unknown>> | undefined,
-  prefix = '',
-): RegionContent {
-  const items = textItems(slots, section.id);
-  if (items === undefined) return section.visualContent;
-  return items.map((item) => `${prefix}${item}`).join('\n');
-}
-
-function textItems(slots: Readonly<Record<string, unknown>> | undefined, id: string): readonly string[] | undefined {
-  if (!isPlainRecord(slots)) return undefined;
-  const descriptor = Object.getOwnPropertyDescriptor(slots, id);
-  const value: unknown = descriptor !== undefined && 'value' in descriptor ? descriptor.value : undefined;
-  if (!Array.isArray(value) || value.length === 0) return undefined;
-  const items: string[] = [];
-  for (const item of value) {
-    if (typeof item !== 'string' && typeof item !== 'number') return undefined;
-    items.push(String(item));
-  }
-  return items;
-}
-
-export type { RegionContent };
+export type { BandRegion, RegionContent };
 export {
   SEPARATOR_WIDTH,
-  besideRegions,
   blockFrame,
-  findSection,
   framedInnerWidth,
-  listedContent,
+  regionBand,
   regionSurface,
   ruleRow,
   sideWidth,

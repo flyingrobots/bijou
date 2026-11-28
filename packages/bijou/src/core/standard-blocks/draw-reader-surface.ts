@@ -1,20 +1,13 @@
 import type { Surface } from '../../ports/surface.js';
 import type { StandardDrawInput } from './draw-input.js';
-import {
-  SEPARATOR_WIDTH,
-  besideRegions,
-  blockFrame,
-  findSection,
-  framedInnerWidth,
-  listedContent,
-  regionSurface,
-  sideWidth,
-} from './draw-regions.js';
+import { findSection, listedContent } from './draw-region-slots.js';
+import { SEPARATOR_WIDTH, blockFrame, framedInnerWidth, regionBand, sideWidth, type BandRegion } from './draw-regions.js';
 
 /**
  * Draws `ReaderSurface` as one framed reading view: navigation in a leading
  * column, the content in the middle, and the outline, one heading per row,
- * in a trailing column. `bounds.sectionHeight` caps the rows.
+ * in a trailing column. Below 44 columns the regions stack, divided by
+ * rules, instead. `bounds.sectionHeight` caps the rows of each region.
  */
 export function drawReaderSurface(input: StandardDrawInput): Surface {
   const width = input.bounds.width;
@@ -29,14 +22,10 @@ export function drawReaderSurface(input: StandardDrawInput): Surface {
   const separators = (navigation === undefined ? 0 : 1) + (outline === undefined ? 0 : 1);
   const contentWidth = inner - navigationWidth - outlineWidth - (SEPARATOR_WIDTH * separators);
 
-  const columns: Surface[] = [];
-  if (navigation !== undefined) {
-    columns.push(regionSurface(navigation.visualContent, navigationWidth, height));
-  }
-  columns.push(regionSurface(content?.visualContent ?? '', contentWidth, height));
-  if (outline !== undefined) {
-    columns.push(regionSurface(listedContent(outline, input.slots), outlineWidth, height));
-  }
+  const band: BandRegion[] = [];
+  if (navigation !== undefined) band.push({ content: navigation.visualContent, width: navigationWidth });
+  band.push({ content: content?.visualContent ?? '', width: contentWidth });
+  if (outline !== undefined) band.push({ content: listedContent(outline, input.slots), width: outlineWidth });
 
-  return blockFrame('ReaderSurface', besideRegions(columns, height), width);
+  return blockFrame('ReaderSurface', regionBand(band, inner, height), width);
 }

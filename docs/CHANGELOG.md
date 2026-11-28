@@ -14,6 +14,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   output and its facts are unchanged. `renderStandardSectionBlock` takes an optional drawing function for
   `interactive` and `static` mode, which the other standard blocks will use to draw themselves
   (flyingrobots/bijou#934).
+- `AppShell`, `ReaderSurface` and `InspectorPanel` draw their regions. In `interactive` and `static` mode they now draw
+  one framed layout instead of one framed box per slot (flyingrobots/bijou#941). `AppShell` puts navigation beside the
+  content and the inspector on the trailing side, then lists the overlays and the status row below a rule.
+  `ReaderSurface` puts navigation and outline columns beside the content. `InspectorPanel` shows the selection as a
+  heading, the details one per row and the actions as one cue row. Below 44 columns the regions stack. A Surface slot
+  value, such as a nested block, is placed cell by cell. Text wraps at its words. Their `pipe` and `accessible` output
+  and their facts are unchanged.
 - Shatter's debris settles. A falling glyph now lands in its own cell when the cell under it is the floor or the
   pile, where it used to land one cell above. That jump made settling glyphs climb in a column forever, which looked
   like cells left behind. A glyph that the pile grew around, or whose cell was taken while it fell, moves to the
