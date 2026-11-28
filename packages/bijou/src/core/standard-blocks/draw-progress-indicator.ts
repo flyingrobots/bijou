@@ -62,11 +62,15 @@ function headingRows(
   return heading;
 }
 
-/** The bar for `percent`, with the slot's own text under it when it holds no number. */
+/**
+ * The bar for `percent`. A numeric text value draws the bar alone; a Surface,
+ * or text that holds no number, is also drawn under the bar.
+ */
 function percentRows(percent: RenderSection | undefined, width: number): readonly Surface[] {
   if (percent?.present !== true) return [flow(sectionAtoms(percent, width), width)];
   const bar = drawBar(parsePercent(percent.content), width);
-  return Number.isNaN(Number.parseFloat(percent.content)) ? [bar, flow(sectionAtoms(percent, width), width)] : [bar];
+  const numericText = typeof percent.visualContent === 'string' && !Number.isNaN(Number.parseFloat(percent.content));
+  return numericText ? [bar] : [bar, flow(sectionAtoms(percent, width), width)];
 }
 
 /**
