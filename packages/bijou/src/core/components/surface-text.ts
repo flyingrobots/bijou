@@ -147,3 +147,4 @@ export function createSegmentSurface(
 export { padSurface, wrapSurfaceToWidth } from './surface-text-layout.js';
 export { tokenToCellStyle } from './surface-text-style.js';
 export type { CellTextStyle } from './surface-text-style.js';
+export { clipSurfaceCells } from './surface-text-cells.js';

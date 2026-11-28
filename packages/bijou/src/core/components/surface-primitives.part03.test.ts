@@ -40,8 +40,8 @@ describe('surface-first primitives', () => {
       expect(rendered).toContain('┌');
     });
 
-  it('createTextSurface rejects wide graphemes until surface wide-cell support exists', () => {
-      expect(() => createTextSurface('漢')).toThrow(/does not yet support wide graphemes/);
+  it('createTextSurface accepts wide graphemes as two cells (flyingrobots/bijou#859)', () => {
+      expect(createTextSurface('漢').width).toBe(2);
     });
 
   it('createTextSurface accepts rgb-only styles without hex strings', () => {
@@ -71,10 +71,10 @@ describe('surface-first primitives', () => {
       expect(surface.get(1, 0).char).toBe('B');
     });
 
-  it('separatorSurface rejects wide labels until surface wide-cell support exists', () => {
+  it('separatorSurface accepts wide labels (flyingrobots/bijou#859)', () => {
       const ctx = createTestContext({ mode: 'interactive' });
 
-      expect(() => separatorSurface({ label: '漢', width: 8, ctx })).toThrow(/does not yet support wide graphemes/);
+      expect(stripAnsi(surfaceToString(separatorSurface({ label: '漢', width: 8, ctx }), ctx.style))).toContain(' 漢 ');
     });
 
   it('separatorSurface sanitizes destructive control sequences in labels', () => {
@@ -85,10 +85,10 @@ describe('surface-first primitives', () => {
       expect(stripAnsi(rendered)).toContain(' Test ');
     });
 
-  it('boxSurface rejects wide text until surface wide-cell support exists', () => {
+  it('boxSurface accepts wide text (flyingrobots/bijou#859)', () => {
       const ctx = createTestContext({ mode: 'interactive' });
 
-      expect(() => boxSurface('漢', { ctx })).toThrow(/does not yet support wide graphemes/);
+      expect(stripAnsi(surfaceToString(boxSurface('漢', { ctx }), ctx.style))).toContain('漢');
     });
 
   it('boxSurface sanitizes destructive control sequences in titles', () => {
