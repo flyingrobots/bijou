@@ -63,6 +63,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- Git hooks no longer run the sealed suite. The pre-commit hook runs only the dependency-free Code Dojo checks
+  (staged-file size, core purity, the mock ban and graft receipts) on the host, in seconds, and there is no pre-push
+  hook (flyingrobots/bijou#956). GitHub CI on the exact head gates every merge. `npm run verify:sealed` runs the
+  former commit and push gates in the seal and is the local release gate; the publish workflow runs the suite
+  sealed on GitHub. AGENTS.md, CONTRIBUTING.md and `docs/guides/sealed-tests.md` say so.
 - The local sealed test worker uses the CPUs and memory Docker has. It was fixed at 2 CPUs, 4 GiB and 2 Vitest
   workers. It now takes Docker's CPUs minus 2 (between 2 and 8) and its memory minus 2 GiB (between 4 and 8 GiB),
   and runs one Vitest worker per CPU, never more than one per GiB (flyingrobots/bijou#953). On a 10-CPU workstation
