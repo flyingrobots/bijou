@@ -1,8 +1,7 @@
 import { createTextSurface, type CellTextStyle } from '../components/surface-text.js';
 import { sanitizePlainTerminalText } from '../text/index.js';
+import { wrapToWidth } from '../text/wrap.js';
 import { createSurface, type Surface } from '../../ports/surface.js';
-import type { StandardDrawInput } from './draw-input.js';
-import { ownSlotValue, slotValueText } from './render.part03.js';
 
 /** One run of text in a drawn form row, with its cell style. */
 interface FormRowPart {
@@ -10,13 +9,15 @@ interface FormRowPart {
   readonly style?: CellTextStyle;
 }
 
+/** What a drawer shows for a slot: text, or the Surface a nested block drew. */
+type SlotVisual = string | Surface;
+
 const BOLD: CellTextStyle = Object.freeze({ modifiers: ['bold'] });
 const DIM: CellTextStyle = Object.freeze({ modifiers: ['dim'] });
 
 /**
- * One row exactly `width` columns wide. Each part is sanitized terminal text:
- * control bytes are dropped, line breaks become spaces, and text past the
- * right edge is clipped.
+ * One row exactly `width` columns wide, for short fixed text such as glyphs
+ * and the yes and no choices. Each part is sanitized terminal text.
  */
 function formRow(parts: readonly FormRowPart[], width: number): Surface {
   const row = createSurface(width, 1);
@@ -28,6 +29,42 @@ function formRow(parts: readonly FormRowPart[], width: number): Surface {
     x += text.width;
   }
   return row;
+}
+
+function contentLines(visual: SlotVisual, width: number, style: CellTextStyle): readonly Surface[] {
+  if (typeof visual !== 'string') return [visual];
+  return wrapToWidth(sanitizePlainTerminalText(visual), width).map((line) => createTextSurface(line, style));
+}
+
+/** Options for {@link slotBlock}. */
+interface SlotBlockOptions {
+  /** Fixed text, such as an indent and a mark, drawn on the first row only. */
+  readonly prefix?: readonly FormRowPart[];
+  /** The cell style for text content. A Surface keeps its own styles. */
+  readonly style?: CellTextStyle;
+}
+
+/**
+ * A slot's content, `width` columns wide, after an optional prefix. Text is
+ * sanitized and wrapped at words, hard-breaking a word longer than the row, so
+ * no word is lost. A Surface is blitted cell by cell, clipped to the width.
+ */
+function slotBlock(visual: SlotVisual, width: number, options: SlotBlockOptions = {}): Surface {
+  const prefix = formRow(options.prefix ?? [], width);
+  const prefixWidth = (options.prefix ?? [])
+    .reduce((sum, part) => sum + createTextSurface(sanitizePlainTerminalText(part.text)).width, 0);
+  const x = Math.min(prefixWidth, width - 1);
+  const contentWidth = width - x;
+  const lines = contentLines(visual, contentWidth, options.style ?? {});
+  const height = Math.max(1, lines.reduce((sum, line) => sum + line.height, 0));
+  const block = createSurface(width, height);
+  block.blit(prefix, 0, 0);
+  let y = 0;
+  for (const line of lines) {
+    block.blit(line, x, y, 0, 0, contentWidth, line.height);
+    y += line.height;
+  }
+  return block;
 }
 
 /** Stacks rows of the same width top to bottom. */
@@ -42,23 +79,5 @@ function stackRows(rows: readonly Surface[], width: number): Surface {
   return stacked;
 }
 
-/** The section's missing-slot text when a required slot is absent, else undefined. */
-function missingText(input: StandardDrawInput, id: string): string | undefined {
-  const section = input.sections.find((candidate) => candidate.id === id);
-  return section !== undefined && !section.present ? section.content : undefined;
-}
-
-/**
- * The items of a list slot: each array entry as text, or the whole value as
- * one item. Blank entries and absent slots give no items.
- */
-function slotItems(input: StandardDrawInput, id: string): readonly string[] {
-  const raw = ownSlotValue(input.slots, id);
-  const values: readonly unknown[] = Array.isArray(raw) ? raw : [raw];
-  return values
-    .map((value) => slotValueText(value))
-    .filter((text): text is string => text !== undefined && text.trim() !== '');
-}
-
-export type { FormRowPart };
-export { BOLD, DIM, formRow, missingText, slotItems, stackRows };
+export type { FormRowPart, SlotVisual };
+export { BOLD, DIM, formRow, slotBlock, stackRows };

@@ -14,6 +14,14 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   output and its facts are unchanged. `renderStandardSectionBlock` takes an optional drawing function for
   `interactive` and `static` mode, which the other standard blocks will use to draw themselves
   (flyingrobots/bijou#934).
+- `TextEntryBlock`, `SingleChoiceBlock`, `MultipleChoiceBlock` and `BinaryDecisionBlock` draw form controls. In
+  `interactive` and `static` mode, instead of one framed box per slot, `TextEntryBlock` draws its field label, a
+  bordered input holding the value (or the dimmed placeholder when the value is empty) and its validation line;
+  `SingleChoiceBlock` draws one radio row per option with the selected option filled; `MultipleChoiceBlock` draws a
+  checkbox row for every checked and unchecked option; and `BinaryDecisionBlock` draws yes and no choices with the
+  selected one emphasised, then its consequence, confirmation and disabled reason (flyingrobots/bijou#937). Long slot
+  text wraps at the requested width, and a Surface slot value is drawn with its own styles. Their `pipe` and
+  `accessible` output and their facts are unchanged.
 - Shatter's debris settles. A falling glyph now lands in its own cell when the cell under it is the floor or the
   pile, where it used to land one cell above. That jump made settling glyphs climb in a column forever, which looked
   like cells left behind. A glyph that the pile grew around, or whose cell was taken while it fell, moves to the
