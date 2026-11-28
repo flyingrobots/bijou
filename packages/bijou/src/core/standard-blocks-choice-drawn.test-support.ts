@@ -118,8 +118,11 @@ function seededRandom(seed: number): () => number {
   };
 }
 
+/** Untrusted slot text the drawers must sanitize: an SGR colour sequence. It is test data, not styling. */
+const SGR_RED = `${String.fromCharCode(0x1b)}[31m`;
+
 /** Narrow printable text, plus the control bytes and line breaks a slot value may carry. */
-const FUZZ_PIECES = ['a', 'Z', '7', ' ', '-', '─', '◉', '☑', 'é', '\n', '\t', '\u001b[31m', '\u0007', ';'];
+const FUZZ_PIECES = ['a', 'Z', '7', ' ', '-', '─', '◉', '☑', 'é', '\n', '\t', SGR_RED, '\u0007', ';'];
 
 function fuzzWord(next: () => number): () => string {
   return () => Array.from({ length: next() % 150 }, () => FUZZ_PIECES[next() % FUZZ_PIECES.length] ?? 'a').join('');
