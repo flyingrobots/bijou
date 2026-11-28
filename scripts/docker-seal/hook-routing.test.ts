@@ -47,9 +47,11 @@ describe('sealed Git hook routing', () => {
     const sealedCommit = readFileSync(resolve(ROOT, 'scripts/docker-seal/precommit.sh'), 'utf8');
     const sealedPush = readFileSync(resolve(ROOT, 'scripts/docker-seal/prepush.sh'), 'utf8');
 
-    expect(scripts['verify:sealed']).toBe(
-      "node scripts/docker-seal/run.mjs --full-push -- sh -c 'sh scripts/docker-seal/precommit.sh && sh scripts/docker-seal/prepush.sh' < /dev/null",
-    );
+    // One plain command, so any shell npm uses can run it; the chain lives in verify-sealed.sh, inside the seal.
+    expect(scripts['verify:sealed']).toBe('node scripts/docker-seal/run.mjs --full-push -- sh scripts/docker-seal/verify-sealed.sh');
+    const gate = readFileSync(resolve(ROOT, 'scripts/docker-seal/verify-sealed.sh'), 'utf8');
+    expect(gate.indexOf('sh scripts/docker-seal/precommit.sh')).toBeGreaterThan(0);
+    expect(gate.indexOf('sh scripts/docker-seal/prepush.sh')).toBeGreaterThan(gate.indexOf('precommit.sh'));
     expect(sealedCommit).toContain('npm run -s code-dojo:precommit');
     expect(sealedCommit).toContain('scripts/hooks/pre-commit');
     expect(sealedPush).toContain('npm run -s code-dojo:prepush');
