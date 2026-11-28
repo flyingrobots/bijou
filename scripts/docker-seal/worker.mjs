@@ -1,5 +1,6 @@
 import { execute } from './process.mjs';
 import { OWNER } from './constants.mjs';
+import { dockerWorkerProfile } from './worker-profile.mjs';
 import { mkdirSync, writeFileSync, existsSync, unlinkSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
@@ -22,10 +23,11 @@ export function markerRefusal(name, marker) {
   return alive ? `Worker already active: ${name} (process ${String(pid)}). ${BUSY}`
     : `Worker requires explicit recovery: ${marker}`;
 }
-export function workerArgs(name, image, network = 'none') {
+export function workerArgs(name, image, network, profile) {
   return ['create', '--name', name, '--label', `${OWNER}=v1`, '--init',
     '--network', network, '--read-only', '--ipc', 'private', '--shm-size', '16m',
-    '--cpus', '2', '--memory', '4g', '--memory-swap', '4g', '--pids-limit', '256',
+    '--cpus', String(profile.cpus), '--memory', `${String(profile.memoryGiB)}g`,
+    '--memory-swap', `${String(profile.memoryGiB)}g`, '--pids-limit', '256',
     '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges', '--user', '1000:1000',
     '--tmpfs', '/work:rw,exec,nosuid,nodev,size=2g,uid=1000,gid=1000',
     '--tmpfs', '/tmp:rw,exec,nosuid,nodev,size=512m,uid=1000,gid=1000',
@@ -33,7 +35,8 @@ export function workerArgs(name, image, network = 'none') {
     '--log-driver', 'local', '--log-opt', 'max-size=1m', '--log-opt', 'max-file=1', '--log-opt', 'compress=false',
     '--env', 'HOME=/home/test', '--env', 'TMPDIR=/tmp',
     '--env', 'GIT_CONFIG_NOSYSTEM=1', '--env', 'GIT_CONFIG_GLOBAL=/dev/null',
-    '--env', 'npm_config_cache=/home/test/.npm', '--workdir', '/work',
+    '--env', 'npm_config_cache=/home/test/.npm',
+    '--env', `BIJOU_VITEST_MAX_WORKERS=${String(profile.vitestWorkers)}`, '--workdir', '/work',
     image, 'sleep', 'infinity'];
 }
 export async function inspectWorker(name, cleanup = false) {
@@ -52,17 +55,28 @@ export async function assertWorkerFree(name) {
   if (existsSync(marker)) throw new Error(markerRefusal(name, marker));
   if ((await inspectWorker(name))?.State.Running) throw new Error(`Worker already active: ${name}. ${BUSY}`);
 }
+/** True when the worker has exactly this profile's CPUs, memory and Vitest pool. */
+function sizedFor(worker, profile) {
+  const c = worker.HostConfig;
+  return c.Memory === profile.memoryBytes && c.NanoCpus === profile.cpus * 1e9
+    && (worker.Config.Env ?? []).includes(`BIJOU_VITEST_MAX_WORKERS=${String(profile.vitestWorkers)}`);
+}
 export async function startWorker(name, image, network) {
   const marker = quarantine(name);
   if (existsSync(marker)) throw new Error(markerRefusal(name, marker));
+  const profile = await dockerWorkerProfile(execute);
   let worker = await inspectWorker(name);
   if (worker) {
     if (worker.Config.Labels?.[OWNER] !== 'v1') throw new Error(`Refusing unowned worker ${name}`);
     if (worker.State.Running) throw new Error(`Worker already active: ${name}. ${BUSY}`);
     const imageId = JSON.parse((await execute(['docker', 'image', 'inspect', image])).output)[0].Id;
     if (worker.Image !== imageId) throw new Error('Existing worker image changed; explicit owned-worker migration required');
-  } else {
-    await execute(['docker', ...workerArgs(name, image, network)]);
+    // A stopped owned worker sized for other Docker capacity is recreated, never reused.
+    // Remove it by the ID inspected here, so a racing launch cannot remove another's replacement.
+    if (!sizedFor(worker, profile)) { await execute(['docker', 'rm', worker.Id]); worker = null; }
+  }
+  if (!worker) {
+    await execute(['docker', ...workerArgs(name, image, network, profile)]);
     worker = await inspectWorker(name);
   }
   const c = worker.HostConfig;
@@ -73,7 +87,7 @@ export async function startWorker(name, image, network) {
   };
   if (worker.Mounts.length || c.Binds?.length || c.NetworkMode !== network || !c.ReadonlyRootfs
       || c.Privileged || !c.Init || c.PidMode || c.IpcMode !== 'private'
-      || c.Memory !== 4 * 1024 ** 3 || c.MemorySwap !== c.Memory || c.NanoCpus !== 2e9
+      || !sizedFor(worker, profile) || c.MemorySwap !== c.Memory
       || c.PidsLimit !== 256 || c.ShmSize !== 16 * 1024 ** 2
       || c.CapDrop?.join() !== 'ALL' || !c.SecurityOpt?.includes('no-new-privileges')
       || c.CapAdd?.length || c.Devices?.length || c.DeviceRequests?.length

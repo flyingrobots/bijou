@@ -24,6 +24,21 @@ workstation, wraps its own command in a lock of its choosing, for example
 `git locks with --job "seal-$$" --holder "${USER:-me}" --wait 600 <key> -- npm test` where
 [git-locks](https://github.com/git-stunts/locks) is installed. That is the
 caller's choice and never the repository's requirement.
+
+The worker's size comes from the Docker VM it runs in (`docker info`), less a
+reserve for the VM itself: CPUs are Docker's CPUs minus 2, between 2 and 8, and
+memory is Docker's memory minus 2 GiB, between 4 and 8 GiB. Vitest runs one
+worker per CPU, but never more than one per GiB (`BIJOU_VITEST_MAX_WORKERS`,
+set by the worker). A 4-CPU GitHub runner gets 2 CPUs, as it always did. A
+workstation with 10 CPUs and an 8 GB Docker VM gets 8 CPUs, 5 GiB and 5 Vitest
+workers; there the pre-push full suite took 271 s instead of 467 s
+(flyingrobots/bijou#953). A stopped worker sized for different Docker capacity
+is recreated, never reused. A 16 GB GitHub runner's worker gets 8 GiB, where it
+had 4. The worker is named `bijou-sealed-tests-v2`; branches older than this
+change keep the fixed-size `bijou-sealed-tests`. A v2 run also waits for that
+older worker, but an older branch's run cannot see the v2 worker: do not start
+sealed runs from an older branch while a v2 run is active.
+
 Bootstrap refuses an absent base image instead of downloading it without
 resource admission.
 

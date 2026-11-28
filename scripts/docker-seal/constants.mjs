@@ -1,4 +1,6 @@
-export const WORKER = 'bijou-sealed-tests';
+// v2: the worker is sized from Docker's capacity (worker-profile.mjs). Branches
+// that predate it keep the old fixed-size worker under the old name.
+export const WORKER = 'bijou-sealed-tests-v2';
 export const OWNER = 'org.bijou.sealed-tests';
 export const MARKER = 'bijou-test-seal-v1\n';
 export const BASE22 = 'node:22-bookworm@sha256:63538dfe497cc29dfafdda25ada09b46db68a3f4cc205abf1f5d6bf0913f3384';

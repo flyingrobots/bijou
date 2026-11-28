@@ -41,7 +41,10 @@ async function quiesce() {
 const env = { PATH: `/work/source/node_modules/.bin:${process.env.PATH}`, HOME: '/home/test', TMPDIR: '/tmp', LANG: 'C.UTF-8',
   GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null',
   npm_config_cache: '/home/test/.npm', npm_config_offline: 'true', CI: 'true',
-  ...(request.fullPush === true ? { BIJOU_FULL_PUSH: '1' } : {}) };
+  ...(request.fullPush === true ? { BIJOU_FULL_PUSH: '1' } : {}),
+  // The worker's Vitest pool, sized with its CPUs and memory (worker-profile.mjs).
+  ...(/^[1-9]\d?$/.test(process.env.BIJOU_VITEST_MAX_WORKERS ?? '')
+    ? { BIJOU_VITEST_MAX_WORKERS: process.env.BIJOU_VITEST_MAX_WORKERS } : {}) };
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => { failure ??= new Error(`Interrupted: ${signal}`); });
 const deadline = Date.now() + 1800_000;
 async function run(command, input) {
