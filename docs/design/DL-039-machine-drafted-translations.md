@@ -16,7 +16,7 @@ keywords:
 ## Linked Work
 
 - Decision issue: flyingrobots/bijou#960 (container flyingrobots/bijou#738)
-- Applied by: flyingrobots/bijou#963 (local LLM drafts), flyingrobots/bijou#965
+- Applied by: flyingrobots/bijou#965
   (DOGFOOD title screen in zh-Hans, ja and ko), flyingrobots/bijou#966
   (Components app in zh-Hans, ja and ko)
 - Precedent: [DL-035](./DL-035-translation-glossary.md), the French, Spanish
