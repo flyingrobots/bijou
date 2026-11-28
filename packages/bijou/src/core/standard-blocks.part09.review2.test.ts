@@ -11,6 +11,12 @@ function joined(rows: readonly string[]): string {
   return rows.join('\n');
 }
 
+function surfaceOutput(block: typeof progressIndicatorBlock, slots: Readonly<Record<string, unknown>>) {
+  const result = renderBlockTree(blockRenderNode(block, { mode: 'interactive', slots, config: { width: 60 } }));
+  if (!isSurfaceOutput(result)) throw new Error('interactive output is not a Surface');
+  return result.output;
+}
+
 describe('status drawing second review (flyingrobots/bijou#936)', () => {
   it('R1: blits Surface value and total with their cells and rows unchanged', () => {
     const value = createTextSurface('Q1\nQ2', { fg: '#ff8800' });
@@ -25,7 +31,31 @@ describe('status drawing second review (flyingrobots/bijou#936)', () => {
 
     expect(findCell(result.output, 'Q')).toMatchObject({ char: 'Q', fg: value.get(0, 0).fg });
     expect(findCell(result.output, 'Z')).toMatchObject({ char: 'Z', fg: total.get(0, 0).fg });
-    expect(rows.findIndex((row) => row.includes('Q1'))).toBeLessThan(rows.findIndex((row) => row.includes('Q2')));
+    const first = rows.findIndex((row) => row.includes('Q1'));
+    const second = rows.findIndex((row) => row.includes('Q2'));
+    expect(first).toBeGreaterThanOrEqual(0);
+    expect(second).toBeGreaterThanOrEqual(0);
+    expect(first).toBeLessThan(second);
+  });
+
+  it('R1: keeps a Surface percent whose text is a number, cells and extra rows, under the bar', () => {
+    const percent = createTextSurface('60%\nRemaining', { fg: '#3366ff' });
+    const slots = { ...PROGRESS, percent };
+    const output = surfaceOutput(progressIndicatorBlock, slots);
+    const rows = drawStatus(progressIndicatorBlock, slots).rows;
+
+    expect(rows[1]).toBe(` 60% ${'█'.repeat(33)}${'⠐'.repeat(22)}`);
+    expect(findCell(output, 'R')).toMatchObject({ char: 'R', fg: percent.get(0, 1).fg });
+    expect(joined(rows.slice(2))).toContain('Remaining');
+  });
+
+  it('R1: draws a Surface severity inside the alert while its word still picks the variant', () => {
+    const severity = createTextSurface('Warning', { fg: '#ffaa00' });
+    const slots = { severity, message: 'Disk check' };
+    const output = surfaceOutput(inFlowStatusBlock, slots);
+
+    expect(comparableRows(drawStatus(inFlowStatusBlock, slots))[1]?.startsWith('│⚠ Disk check')).toBe(true);
+    expect(findCell(output, 'W')).toMatchObject({ char: 'W', fg: severity.get(0, 0).fg });
   });
 
   it('shows the total when the value is absent', () => {
