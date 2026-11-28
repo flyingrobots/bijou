@@ -63,6 +63,11 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Changed
 
+- The local sealed test worker uses the CPUs and memory Docker has. It was fixed at 2 CPUs, 4 GiB and 2 Vitest
+  workers. It now takes Docker's CPUs minus 2 (between 2 and 8) and its memory minus 2 GiB (between 4 and 8 GiB),
+  and runs one Vitest worker per CPU, never more than one per GiB (flyingrobots/bijou#953). On a 10-CPU workstation
+  with an 8 GB Docker VM the pre-push full suite took 271 s instead of 467 s. A 4-CPU GitHub runner keeps 2 CPUs.
+  The worker is renamed `bijou-sealed-tests-v2`; `docs/guides/sealed-tests.md` records the sizing.
 - CI tests Windows again. The new job "Focused Unit Tests (windows, Node 22, outside the seal)" runs the Linux focused
   lane's tests on a fresh GitHub-hosted Windows runner, outside the sealed runner, because the sealed Windows worker
   ran out of storage before any test started (flyingrobots/bijou#932, flyingrobots/bijou#788). Its config, `scripts/vitest-windows.config.ts`,
