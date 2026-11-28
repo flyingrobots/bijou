@@ -49,4 +49,15 @@ describe('framedSlotTitles calibration (flyingrobots/bijou#935)', () => {
     expect(frame.rows[0]).toContain('─ Style ─');
     expect(framedSlotTitles(dividerBlock, frame)).toEqual([]);
   });
+
+  it('needs the generic frame borders, not only the block name text (review: PR 943)', () => {
+    const frame = drawnFrame(dividerBlock.render({
+      mode: 'interactive',
+      slots: { label: 'DividerBlock ─ Style' },
+      config: { width: 60 },
+    }));
+
+    expect(frame.rows[0]).toContain('─ DividerBlock ─ Style ─');
+    expect(framedSlotTitles(dividerBlock, frame)).toEqual([]);
+  });
 });
