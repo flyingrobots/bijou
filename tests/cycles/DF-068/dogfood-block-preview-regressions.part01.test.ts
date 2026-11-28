@@ -42,24 +42,23 @@ describe('DF-068 DOGFOOD block preview regressions', () => {
   it('renders selected standard block pages as visible preview surfaces before contract documentation', async () => {
     const expectedPreviewContent = new Map<string, readonly string[]>([
       ['AppShell', [
-        'Navigation',
-        'Content',
-        'Inspector',
-        'ReaderSurface live content from DOGFOOD Blocks.',
-        'schema-bound; provider-ready; command-aware',
+        'Guides /',
+        '┌─ ReaderSurface',
+        '│ ReaderSurface live',
+        'InspectorPanel',
+        '│ schema-bound',
       ]],
       ['ReaderSurface', [
-        'Navigation',
-        'Content',
-        'Outline',
-        'ReaderSurface live content from DOGFOOD Blocks.',
+        'ReaderSurface live content',
+        'DOGFOOD Blocks.',
+        'What are Blocks',
+        'How Blocks Lower',
       ]],
       ['InspectorPanel', [
-        'Selection',
-        'Details',
-        'Actions',
-        'ReaderSurface',
-        'Reveal selection; Focus source',
+        '│ ReaderSurface',
+        '│ schema-bound',
+        '│ command-aware',
+        '▸ Reveal selection  ▸ Focus source',
       ]],
     ]);
     for (const blockName of PREVIEW_SURFACE_SAMPLE_BLOCK_NAMES) {
