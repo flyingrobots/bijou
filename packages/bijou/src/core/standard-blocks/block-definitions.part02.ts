@@ -11,6 +11,7 @@ import { drawDivider } from './draw-divider.js';
 import { drawBinaryDecision } from './draw-binary-decision.js';
 import { drawMultipleChoice, drawSingleChoice } from './draw-choice.js';
 import { drawTextEntry } from './draw-text-entry.js';
+import { drawLinkDestination } from './draw-link-destination.js';
 export const framedGroupBlock: BlockDefinition = defineBlock({
   metadata: framedGroupMetadata(),
   data: framedGroupData,
@@ -49,6 +50,7 @@ export const linkDestinationBlock: BlockDefinition = defineBlock({
     input,
     'LinkDestinationBlock',
     linkDestinationSections,
+    drawLinkDestination,
   ),
 });
 export const dividerBlock: BlockDefinition = defineBlock({
