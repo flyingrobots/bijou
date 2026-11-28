@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GiB } from './constants.mjs';
-import { dockerWorkerProfile, parseDockerCapacity, workerProfile } from './worker-profile.mjs';
+import { admissionWorkers, dockerWorkerProfile, parseDockerCapacity, workerProfile } from './worker-profile.mjs';
 
 describe('sealed worker profile', () => {
   it('keeps a 4-CPU GitHub runner at the 2 CPUs and 2 Vitest workers it always had', () => {
@@ -41,5 +41,14 @@ describe('sealed worker profile', () => {
 
     expect(calls).toEqual([['docker', 'info', '--format', '{{.NCPU}} {{.MemTotal}}']]);
     expect(profile.cpus).toBe(8);
+  });
+
+  it('refuses a run while the fixed-size workers of older branches are active', () => {
+    expect(admissionWorkers('bijou-sealed-tests-v2')).toEqual([
+      'bijou-sealed-tests-v2-dependencies',
+      'bijou-sealed-tests-v2',
+      'bijou-sealed-tests-dependencies',
+      'bijou-sealed-tests',
+    ]);
   });
 });

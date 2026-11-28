@@ -42,3 +42,6 @@ export async function dockerWorkerProfile(execute) {
   const { cpus, memoryBytes } = parseDockerCapacity(output);
   return workerProfile(cpus, memoryBytes);
 }
+
+/** Not implemented yet: the workers a run must find free before it starts. */
+export function admissionWorkers() { return []; }

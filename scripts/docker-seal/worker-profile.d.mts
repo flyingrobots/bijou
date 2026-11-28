@@ -10,3 +10,4 @@ export function parseDockerCapacity(text: string): { cpus: number; memoryBytes: 
 export function dockerWorkerProfile(
   execute: (argv: readonly string[]) => Promise<{ output: { toString(): string } }>,
 ): Promise<WorkerProfile>;
+export function admissionWorkers(worker: string): readonly string[];
