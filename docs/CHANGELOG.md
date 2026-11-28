@@ -22,6 +22,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   selected one emphasised, then its consequence, confirmation and disabled reason (flyingrobots/bijou#937). Long slot
   text wraps at the requested width, and a Surface slot value is drawn with its own styles. Their `pipe` and
   `accessible` output and their facts are unchanged.
+- The data standard Blocks draw their data. In `interactive` and `static` mode `DenseComparisonBlock` draws its title
+  over a table with one header row and one data row, `HierarchyBlock` a tree with the selected node marked,
+  `ExplorationListBlock` its facet as a badge and its items with the selected one marked above the preview,
+  `TemporalDependencyBlock` a timeline of its events with the dependency below, and `ModeAwarePrimitiveBlock` its
+  primitive as a badge with its fact and value, instead of one framed box per slot (flyingrobots/bijou#940). Long slot
+  text wraps at words, and a slot that holds a Surface is drawn cell by cell. Their `pipe` and `accessible` output and
+  their facts are unchanged.
 - Shatter's debris settles. A falling glyph now lands in its own cell when the cell under it is the floor or the
   pile, where it used to land one cell above. That jump made settling glyphs climb in a column forever, which looked
   like cells left behind. A glyph that the pile grew around, or whose cell was taken while it fell, moves to the
