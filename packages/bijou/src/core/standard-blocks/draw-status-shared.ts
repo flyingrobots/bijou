@@ -60,10 +60,16 @@ function statusVariant(text: string): BadgeVariant {
 
 const ALERT_VARIANTS: readonly AlertVariant[] = ['info', 'warning', 'error', 'success'];
 
+/** The alert variant a severity word names (`critical` names `error`); undefined for other text. */
+function knownAlertVariant(severity: string | undefined): AlertVariant | undefined {
+  const key = severity?.trim().toLowerCase() ?? '';
+  const named = STATUS_VARIANTS.get(key) ?? key;
+  return ALERT_VARIANTS.find((variant) => variant === named);
+}
+
 /** The alert variant named by `severity`; `info` for any other text. */
 function alertVariant(severity: string | undefined): AlertVariant {
-  const key = severity?.trim().toLowerCase();
-  return ALERT_VARIANTS.find((variant) => variant === key) ?? 'info';
+  return knownAlertVariant(severity) ?? 'info';
 }
 
 /** Section `id` of a drawing's input, or undefined when the block omits that optional slot. */
@@ -82,6 +88,7 @@ export {
   componentRow,
   findSection,
   hasSlot,
+  knownAlertVariant,
   stackRows,
   statusVariant,
   textRow,

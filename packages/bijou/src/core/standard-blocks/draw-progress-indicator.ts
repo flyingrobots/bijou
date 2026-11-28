@@ -1,9 +1,8 @@
 import { progressBar } from '../components/progress.js';
 import { createSurface, type Surface } from '../../ports/surface.js';
-import { graphemeWidth, sanitizePlainTerminalText } from '../text/index.js';
 import type { StandardDrawInput } from './draw-input.js';
-import { flow, sectionAtoms, textAtoms } from './draw-status-flow.js';
-import { componentRow, findSection, hasSlot, stackRows, textRow, visualContext } from './draw-status-shared.js';
+import { concatPieces, flow, inlinePiece, sectionAtoms, textAtoms } from './draw-status-flow.js';
+import { componentRow, findSection, hasSlot, stackRows, visualContext } from './draw-status-shared.js';
 import type { RenderSection } from './render.part01.js';
 
 /** The percent label (`100%` at most, padded to four columns) and its gap. */
@@ -27,22 +26,47 @@ function drawBar(percent: number, width: number): Surface {
   return componentRow(`${label} ${'█'.repeat(filled)}${'⠐'.repeat(barWidth - filled)}`, width);
 }
 
+/** `value/total` as inline pieces (`/5` when only the total is set), and as flowing atoms for a narrow row. */
+function amountParts(value: RenderSection | undefined, total: RenderSection | undefined, width: number) {
+  const slash = textAtoms('/', width);
+  const pieces = [
+    ...(hasSlot(value) ? [inlinePiece(value)] : []),
+    ...(hasSlot(total) ? [...slash, inlinePiece(total)] : []),
+  ];
+  const atoms = [
+    ...sectionAtoms(hasSlot(value) ? value : undefined, width),
+    ...(hasSlot(total) ? [...slash, ...sectionAtoms(total, width)] : []),
+  ];
+  return { pieces, atoms };
+}
+
 /**
  * The label, wrapped, with `value/total` at the end of its first row. An
- * amount wider than half the row moves to a row of its own.
+ * amount wider than half the row moves to rows of its own.
  */
-function headingRows(label: RenderSection | undefined, amount: string, width: number): Surface {
-  const amountWidth = graphemeWidth(amount);
-  const beside = amountWidth > 0 && amountWidth * 2 <= width;
-  const labelWidth = beside ? width - amountWidth - 1 : width;
+function headingRows(
+  label: RenderSection | undefined,
+  amount: ReturnType<typeof amountParts>,
+  width: number,
+): Surface {
+  const inline = amount.pieces.length === 0 ? undefined : concatPieces(amount.pieces);
+  const beside = inline !== undefined && inline.width * 2 <= width;
+  const labelWidth = beside ? width - inline.width - 1 : width;
   const labelBlock = flow(sectionAtoms(label, labelWidth), labelWidth);
   if (!beside) {
-    return amountWidth === 0 ? labelBlock : stackRows([labelBlock, flow(textAtoms(amount, width), width)], width);
+    return inline === undefined ? labelBlock : stackRows([labelBlock, flow(amount.atoms, width)], width);
   }
-  const heading = createSurface(width, labelBlock.height);
+  const heading = createSurface(width, Math.max(labelBlock.height, inline.height));
   heading.blit(labelBlock, 0, 0);
-  heading.blit(textRow(amount, amountWidth), width - amountWidth, 0);
+  heading.blit(inline, width - inline.width, 0);
   return heading;
+}
+
+/** The bar for `percent`, with the slot's own text under it when it holds no number. */
+function percentRows(percent: RenderSection | undefined, width: number): readonly Surface[] {
+  if (percent?.present !== true) return [flow(sectionAtoms(percent, width), width)];
+  const bar = drawBar(parsePercent(percent.content), width);
+  return Number.isNaN(Number.parseFloat(percent.content)) ? [bar, flow(sectionAtoms(percent, width), width)] : [bar];
 }
 
 /**
@@ -51,16 +75,11 @@ function headingRows(label: RenderSection | undefined, amount: string, width: nu
  */
 function drawProgressIndicator(input: StandardDrawInput): Surface {
   const width = input.bounds.width;
-  const value = findSection(input.sections, 'value');
-  const total = findSection(input.sections, 'total');
-  const amount = hasSlot(value)
-    ? sanitizePlainTerminalText(hasSlot(total) ? `${value.content}/${total.content}` : value.content)
-    : '';
-  const percent = findSection(input.sections, 'percent');
-  const bar = percent?.present === true
-    ? drawBar(parsePercent(percent.content), width)
-    : flow(sectionAtoms(percent, width), width);
-  return stackRows([headingRows(findSection(input.sections, 'label'), amount, width), bar], width);
+  const amount = amountParts(findSection(input.sections, 'value'), findSection(input.sections, 'total'), width);
+  return stackRows([
+    headingRows(findSection(input.sections, 'label'), amount, width),
+    ...percentRows(findSection(input.sections, 'percent'), width),
+  ], width);
 }
 
 export { drawProgressIndicator };

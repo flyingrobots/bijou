@@ -46,6 +46,27 @@ function badgeAtoms(text: string, variant: BadgeVariant, width: number): readonl
   return wrapToWidth(sanitizePlainTerminalText(text), Math.max(1, width - 2)).map((piece) => badge(piece, { variant }));
 }
 
+/** A slot as one inline run: a Surface value as it is, text as one row of its cells. */
+function inlinePiece(section: RenderSection): Surface {
+  if (typeof section.visualContent !== 'string') return section.visualContent;
+  const text = sanitizePlainTerminalText(section.content);
+  return parseAnsiToSurface(text, graphemeWidth(text), 1);
+}
+
+/** Pieces side by side with no gap, as tall as the tallest. */
+function concatPieces(pieces: readonly Surface[]): Surface {
+  const joined = createSurface(
+    pieces.reduce((sum, piece) => sum + piece.width, 0),
+    Math.max(1, ...pieces.map((piece) => piece.height)),
+  );
+  let x = 0;
+  for (const piece of pieces) {
+    joined.blit(piece, x, 0);
+    x += piece.width;
+  }
+  return joined;
+}
+
 interface Placement {
   readonly atom: Surface;
   readonly x: number;
@@ -87,4 +108,4 @@ function flow(atoms: readonly FlowAtom[], width: number): Surface {
 }
 
 export type { FlowAtom };
-export { badgeAtoms, clipSurface, flow, sectionAtoms, styledAtoms, textAtoms };
+export { badgeAtoms, clipSurface, concatPieces, flow, inlinePiece, sectionAtoms, styledAtoms, textAtoms };

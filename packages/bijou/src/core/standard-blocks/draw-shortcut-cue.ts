@@ -21,11 +21,29 @@ function ownText(record: Record<string, unknown>, key: string): string | undefin
   return typeof value === 'string' ? value : undefined;
 }
 
-/** A `{ key, action }` record, or text whose first word is the key (`Esc Close`). */
+/** A record's own data fields other than `skip`, as text (`hint: go home`). */
+function otherFieldsText(record: Record<string, unknown>, skip: readonly string[]): string | undefined {
+  const descriptors = Object.entries(Object.getOwnPropertyDescriptors(record));
+  const rest = descriptors.flatMap(([name, descriptor]): [string, unknown][] => {
+    if (skip.includes(name) || !('value' in descriptor)) return [];
+    const value: unknown = descriptor.value;
+    return [[name, value]];
+  });
+  return slotValueText(Object.fromEntries(rest));
+}
+
+/**
+ * A `{ key, action }` record (its `action` or `label`, then any other field),
+ * or text whose first word is the key (`Esc Close`).
+ */
 function parseCue(item: unknown, text: string): Cue {
   if (isPlainRecord(item)) {
     const key = ownText(item, 'key');
-    if (key !== undefined) return { key, action: ownText(item, 'action') ?? ownText(item, 'label') ?? '' };
+    if (key !== undefined) {
+      const named = ['action', 'label'].find((field) => ownText(item, field) !== undefined) ?? '';
+      const parts = [ownText(item, named), otherFieldsText(item, ['key', named])];
+      return { key, action: parts.filter((part) => part !== undefined && part.trim() !== '').join(' ') };
+    }
   }
   const trimmed = text.trim();
   const gap = trimmed.search(/\s/u);
