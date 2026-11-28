@@ -1,9 +1,18 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+const HOST_CHECKS = ['check-staged-files.mjs', 'check-core-purity.mjs', 'check-no-mocks.mjs', 'check-graft-receipts.mjs'] as const;
+
+function packageScripts(): Readonly<Record<string, string>> {
+  const parsed: unknown = JSON.parse(readFileSync(resolve(ROOT, 'package.json'), 'utf8'));
+  if (typeof parsed !== 'object' || parsed === null || !('scripts' in parsed)) throw new Error('package.json has no scripts');
+  const scripts: unknown = parsed.scripts;
+  if (typeof scripts !== 'object' || scripts === null) throw new Error('package.json scripts is not an object');
+  return Object.fromEntries(Object.entries(scripts).filter((entry): entry is [string, string] => typeof entry[1] === 'string'));
+}
 
 describe('sealed Git hook routing', () => {
   it('pre-push runs DOGFOOD i18n gates only for DOGFOOD-relevant pushes', () => {
@@ -33,34 +42,36 @@ describe('sealed Git hook routing', () => {
     expect(interactiveSmokeIndex).toBeGreaterThan(testIndex);
   });
 
-  it('pre-push composes Code Dojo without running the full test suite twice', () => {
-    const hookShim = readFileSync(resolve(ROOT, '.githooks/pre-push'), 'utf8');
-    const packageJson = readFileSync(resolve(ROOT, 'package.json'), 'utf8');
+  it('verify:sealed runs the former pre-commit and pre-push gates in the seal, as the release gate', () => {
+    const scripts = packageScripts();
+    const sealedCommit = readFileSync(resolve(ROOT, 'scripts/docker-seal/precommit.sh'), 'utf8');
+    const sealedPush = readFileSync(resolve(ROOT, 'scripts/docker-seal/prepush.sh'), 'utf8');
 
-    expect(hookShim).toContain('docker-seal/dispatch.mjs -- sh scripts/docker-seal/prepush.sh');
-    const sealedHook = readFileSync(resolve(ROOT, 'scripts/docker-seal/prepush.sh'), 'utf8');
-    expect(sealedHook).toContain('npm run -s code-dojo:prepush');
-    expect(sealedHook).toContain('scripts/hooks/pre-push');
-    expect(packageJson).toMatch(/"test": "node scripts\/docker-seal\/dispatch\.mjs --build -- node scripts\/run-vitest\.mjs"/u);
-    expect(packageJson).toMatch(/"test:run": "node scripts\/docker-seal\/dispatch\.mjs --build -- node scripts\/run-vitest\.mjs"/u);
-    expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*npm test/u);
-    expect(packageJson).not.toMatch(/"code-dojo:prepush": "[^"]*test:run/u);
-    expect(packageJson).not.toMatch(/"test:run": "npm test"/u);
+    expect(scripts['verify:sealed']).toBe(
+      "node scripts/docker-seal/run.mjs --full-push -- sh -c 'sh scripts/docker-seal/precommit.sh && sh scripts/docker-seal/prepush.sh' < /dev/null",
+    );
+    expect(sealedCommit).toContain('npm run -s code-dojo:precommit');
+    expect(sealedCommit).toContain('scripts/hooks/pre-commit');
+    expect(sealedPush).toContain('npm run -s code-dojo:prepush');
+    expect(sealedPush).toContain('scripts/hooks/pre-push');
+    expect(scripts['test:run']).toBe('node scripts/docker-seal/dispatch.mjs --build -- node scripts/run-vitest.mjs');
   });
 
-  it('pre-commit delegates duplicate lint and code-size gates to Code Dojo', () => {
+  it('pre-commit runs only the dependency-free Code Dojo checks on the host, with no container', () => {
     const hookShim = readFileSync(resolve(ROOT, '.githooks/pre-commit'), 'utf8');
-    const localHook = readFileSync(resolve(ROOT, 'scripts/hooks/pre-commit'), 'utf8');
-    const packageJson = readFileSync(resolve(ROOT, 'package.json'), 'utf8');
 
-    expect(hookShim).toContain('docker-seal/dispatch.mjs -- sh scripts/docker-seal/precommit.sh');
-    const sealedHook = readFileSync(resolve(ROOT, 'scripts/docker-seal/precommit.sh'), 'utf8');
-    expect(sealedHook).toContain('npm run -s code-dojo:precommit');
-    expect(sealedHook).toContain('scripts/hooks/pre-commit');
-    expect(packageJson).toMatch(/"code-dojo:precommit": "[^"]*npm run code:size[^"]*npm run lint/u);
-    expect(localHook).not.toContain('npm run lint');
-    expect(localHook).not.toContain('npm run code:size');
-    expect(localHook).toContain('npm ls --all');
+    expect(hookShim).not.toContain('docker-seal');
+    expect(hookShim).not.toMatch(/\bnpm\b|\bnpx\b/u);
+    for (const check of HOST_CHECKS) {
+      expect(hookShim).toContain(`node scripts/code-dojo/${check}`);
+      // A host check may import only Node built-ins and other local scripts, so a worktree without node_modules can run it.
+      const source = readFileSync(resolve(ROOT, 'scripts/code-dojo', check), 'utf8');
+      const specifiers = [...source.matchAll(/from\s+['"]([^'"]+)['"]/gu)].map((match) => match[1] ?? '');
+      expect(specifiers.filter((specifier) => !specifier.startsWith('node:') && !specifier.startsWith('.'))).toEqual([]);
+    }
   });
 
+  it('pre-push is not a local gate: GitHub CI verifies every push', () => {
+    expect(existsSync(resolve(ROOT, '.githooks/pre-push'))).toBe(false);
+  });
 });
