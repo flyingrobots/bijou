@@ -9,6 +9,12 @@ import { activityStreamMetadata, inFlowStatusMetadata, inlineStatusMetadata, pro
 import { activityStreamData, activityStreamSections, inFlowStatusData, inFlowStatusSections, inlineStatusData, inlineStatusSections, inspectorFocusSource, inspectorPanelData, inspectorRevealSelection, progressIndicatorData, progressIndicatorSections, readerOpenReference, readerSelectHeading, readerSurfaceData, shellFocusRegion, shellOpenOverlay, shellToggleInspector, shortcutCueData, shortcutCueSections, standardSectionCommands, transientOverlayData, transientOverlaySections } from './sections.js';
 
 import { renderAppShellBlock, renderInspectorPanelBlock, renderReaderSurfaceBlock, renderStandardSectionBlock } from './render.js';
+import { drawActivityStream } from './draw-activity-stream.js';
+import { drawInFlowStatus } from './draw-in-flow-status.js';
+import { drawInlineStatus } from './draw-inline-status.js';
+import { drawProgressIndicator } from './draw-progress-indicator.js';
+import { drawShortcutCue } from './draw-shortcut-cue.js';
+import { drawTransientOverlay } from './draw-transient-overlay.js';
 export const appShellBlock: BlockDefinition = defineBlock({
   metadata: appShellMetadata(),
   commands: [
@@ -44,6 +50,7 @@ export const inlineStatusBlock: BlockDefinition = defineBlock({
     input,
     'InlineStatusBlock',
     inlineStatusSections,
+    drawInlineStatus,
   ),
 });
 export const inFlowStatusBlock: BlockDefinition = defineBlock({
@@ -54,6 +61,7 @@ export const inFlowStatusBlock: BlockDefinition = defineBlock({
     input,
     'InFlowStatusBlock',
     inFlowStatusSections,
+    drawInFlowStatus,
   ),
 });
 export const transientOverlayBlock: BlockDefinition = defineBlock({
@@ -64,6 +72,7 @@ export const transientOverlayBlock: BlockDefinition = defineBlock({
     input,
     'TransientOverlayBlock',
     transientOverlaySections,
+    drawTransientOverlay,
   ),
 });
 export const activityStreamBlock: BlockDefinition = defineBlock({
@@ -74,6 +83,7 @@ export const activityStreamBlock: BlockDefinition = defineBlock({
     input,
     'ActivityStreamBlock',
     activityStreamSections,
+    drawActivityStream,
   ),
 });
 export const shortcutCueBlock: BlockDefinition = defineBlock({
@@ -84,6 +94,7 @@ export const shortcutCueBlock: BlockDefinition = defineBlock({
     input,
     'ShortcutCueBlock',
     shortcutCueSections,
+    drawShortcutCue,
   ),
 });
 export const progressIndicatorBlock: BlockDefinition = defineBlock({
@@ -94,5 +105,6 @@ export const progressIndicatorBlock: BlockDefinition = defineBlock({
     input,
     'ProgressIndicatorBlock',
     progressIndicatorSections,
+    drawProgressIndicator,
   ),
 });
