@@ -14,6 +14,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   output and its facts are unchanged. `renderStandardSectionBlock` takes an optional drawing function for
   `interactive` and `static` mode, which the other standard blocks will use to draw themselves
   (flyingrobots/bijou#934).
+- The six status standard blocks draw as status Components. In `interactive` and `static` mode, `InlineStatusBlock`
+  draws a status badge with its label and message, `InFlowStatusBlock` an alert whose variant follows `severity`,
+  `TransientOverlayBlock` a framed notice, `ActivityStreamBlock` one entry per event with the selected one marked,
+  `ShortcutCueBlock` a row of key cues, and `ProgressIndicatorBlock` a progress bar whose filled length follows
+  `percent`, instead of one framed box per slot (flyingrobots/bijou#936, flyingrobots/bijou#934). Slot text wraps to
+  the width instead of being cut, and a Surface slot is drawn with its cells unchanged. Their `pipe` and `accessible`
+  output and their facts are unchanged.
 - The data standard Blocks draw their data. In `interactive` and `static` mode `DenseComparisonBlock` draws its title
   over a table with one header row and one data row, `HierarchyBlock` a tree with the selected node marked,
   `ExplorationListBlock` its facet as a badge and its items with the selected one marked above the preview,
