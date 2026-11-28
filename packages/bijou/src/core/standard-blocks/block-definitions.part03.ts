@@ -10,6 +10,7 @@ import { renderStandardSectionBlock } from './render.js';
 import { drawProgressiveDisclosure } from './draw-disclosure.js';
 import { drawPathProgress } from './draw-path-progress.js';
 import { drawPeerNavigation } from './draw-peer-navigation.js';
+import { drawBrandEmphasis } from './draw-brand.js';
 import { drawDenseComparison } from './draw-dense-comparison.js';
 import { drawExplorationList } from './draw-exploration-list.js';
 import { drawHierarchy } from './draw-hierarchy.js';
@@ -56,6 +57,7 @@ export const brandEmphasisBlock: BlockDefinition = defineBlock({
     input,
     'BrandEmphasisBlock',
     brandEmphasisSections,
+    drawBrandEmphasis,
   ),
 });
 export const modeAwarePrimitiveBlock: BlockDefinition = defineBlock({

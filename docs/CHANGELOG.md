@@ -36,6 +36,12 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   status (flyingrobots/bijou#938). Long slot text wraps instead of being cut, a slot that holds a nested block's
   Surface is drawn cell by cell, and rows start at the logical start edge under right-to-left. Their `pipe` and
   `accessible` output and their facts are unchanged.
+- The document blocks draw formatted content. In `interactive` and `static` mode, `FormattedDocumentBlock` draws its
+  heading, wrapped body, callout as an info alert and code as an indented code block; `ExplainabilityWalkthroughBlock`
+  draws its title, numbered steps and labelled evidence, decision and next step; `FramedGroupBlock` draws one frame
+  titled with its `title`, marking the selected item; and `BrandEmphasisBlock` draws the brand, an accent rule and the
+  tagline (flyingrobots/bijou#939). Slot text wraps to the width, a nested Surface slot keeps its own cells, and
+  their `pipe` and `accessible` output and facts are unchanged.
 - The six status standard blocks draw as status Components. In `interactive` and `static` mode, `InlineStatusBlock`
   draws a status badge with its label and message, `InFlowStatusBlock` an alert whose variant follows `severity`,
   `TransientOverlayBlock` a framed notice, `ActivityStreamBlock` one entry per event with the selected one marked,
