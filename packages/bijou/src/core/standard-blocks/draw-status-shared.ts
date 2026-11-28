@@ -5,10 +5,7 @@ import type { BadgeVariant } from '../components/badge.js';
 import { parseAnsiToSurface } from '../render/differ-ansi.js';
 import { resolveSafeCtx } from '../resolve-ctx.js';
 import { sanitizePlainTerminalText } from '../text/index.js';
-import { slotValueText } from './render.part03.js';
-
-/** Separator between joined facts on one drawn row. */
-const FACT_SEPARATOR = ' · ';
+import type { RenderSection } from './render.part01.js';
 
 /** One row of untrusted slot text: control bytes removed, then clipped or padded to `width`. */
 function textRow(text: string, width: number): Surface {
@@ -69,25 +66,22 @@ function alertVariant(severity: string | undefined): AlertVariant {
   return ALERT_VARIANTS.find((variant) => variant === key) ?? 'info';
 }
 
-/** The non-blank items of a list slot; a single value counts as one item. */
-function listItems(value: unknown): readonly string[] {
-  const items = Array.isArray(value) ? value : [value];
-  return items
-    .map((item) => slotValueText(item))
-    .filter((item): item is string => item !== undefined && item.trim() !== '');
+/** Section `id` of a drawing's input, or undefined when the block omits that optional slot. */
+function findSection(sections: readonly RenderSection[], id: string): RenderSection | undefined {
+  return sections.find((section) => section.id === id);
 }
 
-/** Whether optional slot text is present and not blank. */
-function hasText(text: string | undefined): text is string {
-  return text !== undefined && text.trim() !== '';
+/** Whether a section holds a Surface or text that is not blank. */
+function hasSlot(section: RenderSection | undefined): section is RenderSection {
+  return section !== undefined && section.present
+    && (typeof section.visualContent !== 'string' || section.content.trim() !== '');
 }
 
 export {
-  FACT_SEPARATOR,
   alertVariant,
   componentRow,
-  hasText,
-  listItems,
+  findSection,
+  hasSlot,
   stackRows,
   statusVariant,
   textRow,

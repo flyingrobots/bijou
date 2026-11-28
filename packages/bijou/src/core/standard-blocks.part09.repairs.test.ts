@@ -15,6 +15,9 @@ const SURFACE_SLOT: Readonly<Record<string, string>> = {
   ProgressIndicatorBlock: 'label',
 };
 
+/** Token slots drawn as a variant rather than as text: `severity` picks the alert's icon and border. */
+const TOKEN_SLOTS: ReadonlySet<string> = new Set(['severity']);
+
 function words(value: unknown): readonly string[] {
   const texts = Array.isArray(value) ? value.map(String) : [String(value)];
   return texts.flatMap((text) => text.split(/\s+/u)).filter((word) => word !== '');
@@ -36,7 +39,10 @@ describe.each(STATUS_CASES)('$block.metadata.blockName repairs (flyingrobots/bij
 
   it('R2: keeps every word of every DOGFOOD slot at width 30', () => {
     const joined = joinedRows(comparableRows(drawStatus(spec.block, spec.slots, 30)));
-    const lost = Object.values(spec.slots).flatMap(words).filter((word) => !joined.includes(word));
+    const lost = Object.entries(spec.slots)
+      .filter(([id]) => !TOKEN_SLOTS.has(id))
+      .flatMap(([, value]) => words(value))
+      .filter((word) => !joined.includes(word));
 
     expect(lost).toEqual([]);
   });
