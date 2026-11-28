@@ -2,7 +2,7 @@ import type { BadgeVariant } from '../components/badge.js';
 import { createTextSurface } from '../components/surface-text.js';
 import type { Surface } from '../../ports/surface.js';
 import type { StandardDrawInput } from './draw-input.js';
-import { SELECTED_MARK, factsRows, joinRow, presentText, sectionVisual, stackRows } from './draw-data-rows.js';
+import { SELECTED_MARK, factsRows, joinRow, presentText, sectionVisual, selectedText, stackRows } from './draw-data-rows.js';
 import { badgeRows, contentRows, prefixedRows, wrapLines } from './draw-data-wrap.js';
 
 const STATUS_VARIANTS: ReadonlyMap<string, BadgeVariant> = new Map<string, BadgeVariant>([
@@ -41,7 +41,7 @@ export function drawModeAwarePrimitive(input: StandardDrawInput): Surface {
   const primitive = sectionVisual(sections, 'primitive');
   const status = presentText(sections, 'status');
   const variant = (status === undefined ? undefined : STATUS_VARIANTS.get(status)) ?? 'info';
-  const marked = typeof primitive === 'string' && presentText(sections, 'selected') === primitive;
+  const marked = typeof primitive === 'string' && selectedText(sections) === primitive;
 
   const badgeLines = badgeRows(primitive, width - 2, variant);
   const badges = stackRows(badgeLines, Math.max(1, ...badgeLines.map((row) => row.width)));

@@ -70,15 +70,35 @@ function listEntries(
 }
 
 /**
- * The index of the text entry that `selected` names: an exact match first, then
- * the first entry that starts or ends with `selected` as a whole word. -1 when none does.
+ * The index of the text entry that `selected` names: an exact match first,
+ * then the one entry that starts or ends with `selected` as a whole word. -1
+ * when none does, or when that loose match is not unique.
  */
 function selectedIndex(entries: readonly SlotContent[], selected: string | undefined): number {
   if (selected === undefined || selected.trim() === '') return -1;
   const exact = entries.indexOf(selected);
   if (exact !== -1) return exact;
-  return entries.findIndex((entry) => typeof entry === 'string'
-    && (entry.startsWith(`${selected} `) || entry.endsWith(` ${selected}`)));
+  const loose = entries.flatMap((entry, index) => (typeof entry === 'string'
+    && (entry.startsWith(`${selected} `) || entry.endsWith(` ${selected}`)) ? [index] : []));
+  return loose.length === 1 ? (loose[0] ?? -1) : -1;
+}
+
+/** The text of the present `selected` slot, for matching; undefined when it is absent or holds a Surface. */
+function selectedText(sections: readonly RenderSection[]): string | undefined {
+  const section = presentSection(sections, 'selected');
+  return section === undefined || typeof section.visualContent !== 'string' ? undefined : section.content;
+}
+
+/**
+ * The `selected` slot as its own row when it marks no entry: `Label: value`
+ * (a Surface value blitted beside the label), or the missing-slot text when
+ * the required slot is absent. Nothing when an entry is marked.
+ */
+function unmatchedSelectionRows(sections: readonly RenderSection[], marked: number, width: number): readonly Surface[] {
+  const section = sections.find((candidate) => candidate.id === 'selected');
+  if (section === undefined || marked !== -1) return [];
+  if (!section.present) return contentRows(section.content, width);
+  return prefixedRows(`${section.label}: `, section.visualContent, width);
 }
 
 /**
@@ -94,13 +114,7 @@ function factsRows(sections: readonly RenderSection[], ids: readonly string[], w
   return [...(texts.length === 0 ? [] : contentRows(texts.join(' · '), width)), ...surfaces];
 }
 
-/** The missing-slot text of required section `id`, wrapped to `width`, when the slot is absent. */
-function missingRows(sections: readonly RenderSection[], id: string, width: number): readonly Surface[] {
-  const section = sections.find((candidate) => candidate.id === id);
-  return section === undefined || section.present ? [] : contentRows(section.content, width);
-}
-
 export {
-  SELECTED_MARK, factsRows, joinRow, listEntries, missingRows, presentSection, presentText,
-  sectionVisual, selectedIndex, stackRows,
+  SELECTED_MARK, factsRows, joinRow, listEntries, presentSection, presentText, sectionVisual,
+  selectedIndex, selectedText, stackRows, unmatchedSelectionRows,
 };

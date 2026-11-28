@@ -1,7 +1,7 @@
 import { createTextSurface } from '../components/surface-text.js';
 import type { Surface } from '../../ports/surface.js';
 import type { StandardDrawInput } from './draw-input.js';
-import { factsRows, listEntries, presentText, sectionVisual, selectedIndex, stackRows } from './draw-data-rows.js';
+import { factsRows, listEntries, selectedText, sectionVisual, selectedIndex, stackRows } from './draw-data-rows.js';
 import { contentRows, prefixedRows } from './draw-data-wrap.js';
 
 /** The `timeline()` glyphs: a filled and a hollow event dot, and the connector between events. */
@@ -20,7 +20,7 @@ export function drawTemporalDependency(input: StandardDrawInput): Surface {
   const { sections } = input;
   const width = input.bounds.width;
   const events = listEntries(input.slots, sections, 'events');
-  const selected = selectedIndex(events, presentText(sections, 'selected'));
+  const selected = selectedIndex(events, selectedText(sections));
 
   const timelineRows = events.flatMap((event, index) => {
     const last = index === events.length - 1;

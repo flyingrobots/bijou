@@ -4,7 +4,7 @@ import { sanitizePlainTerminalText } from '../text/index.js';
 import type { Surface } from '../../ports/surface.js';
 import type { RenderSection } from './render.part01.js';
 import type { StandardDrawInput } from './draw-input.js';
-import { SELECTED_MARK, presentText, sectionVisual, stackRows } from './draw-data-rows.js';
+import { SELECTED_MARK, selectedText, sectionVisual, stackRows } from './draw-data-rows.js';
 import { contentRows } from './draw-data-wrap.js';
 
 const COLUMN_IDS = ['metric', 'left', 'right', 'delta'] as const;
@@ -51,7 +51,7 @@ export function drawDenseComparison(input: StandardDrawInput): Surface {
   const width = input.bounds.width;
   const cells = COLUMN_IDS.map((id) => cell(sections, id));
   const metric = cells[0];
-  if (typeof metric === 'string' && presentText(sections, 'selected') === metric) {
+  if (typeof metric === 'string' && selectedText(sections) === metric) {
     cells[0] = `${SELECTED_MARK} ${metric}`;
   }
   const minimums = wordMinimums(cells, width);

@@ -1,7 +1,7 @@
 import type { Surface } from '../../ports/surface.js';
 import type { StandardDrawInput } from './draw-input.js';
 import {
-  SELECTED_MARK, factsRows, listEntries, missingRows, presentText, sectionVisual, selectedIndex, stackRows,
+  SELECTED_MARK, factsRows, listEntries, selectedText, sectionVisual, selectedIndex, stackRows, unmatchedSelectionRows,
 } from './draw-data-rows.js';
 import { prefixedRows } from './draw-data-wrap.js';
 
@@ -22,7 +22,7 @@ export function drawHierarchy(input: StandardDrawInput): Surface {
   const width = input.bounds.width;
   const root = sectionVisual(sections, 'root');
   const nodes = listEntries(input.slots, sections, 'nodes');
-  const marked = selectedIndex([root, ...nodes], presentText(sections, 'selected'));
+  const marked = selectedIndex([root, ...nodes], selectedText(sections));
   const gutter = (index: number) => (index === marked ? `${SELECTED_MARK} ` : '  ');
 
   const rows = [
@@ -33,7 +33,7 @@ export function drawHierarchy(input: StandardDrawInput): Surface {
       return prefixedRows(`${gutter(index + 1)}${connector}`, node, width, `  ${last ? LAST_GUIDE : MIDDLE_GUIDE}`);
     }),
     ...factsRows(sections, ['parent', 'depth', 'expanded'], width),
-    ...missingRows(sections, 'selected', width),
+    ...unmatchedSelectionRows(sections, marked, width),
   ];
   return stackRows(rows, width);
 }
