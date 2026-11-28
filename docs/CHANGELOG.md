@@ -22,6 +22,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   selected one emphasised, then its consequence, confirmation and disabled reason (flyingrobots/bijou#937). Long slot
   text wraps at the requested width, and a Surface slot value is drawn with its own styles. Their `pipe` and
   `accessible` output and their facts are unchanged.
+- `AppShell`, `ReaderSurface` and `InspectorPanel` draw their regions. In `interactive` and `static` mode they now draw
+  one framed layout instead of one framed box per slot (flyingrobots/bijou#941). `AppShell` puts navigation beside the
+  content and the inspector on the trailing side, then lists the overlays and the status row below a rule.
+  `ReaderSurface` puts navigation and outline columns beside the content. `InspectorPanel` shows the selection as a
+  heading, the details one per row and the actions as one cue row. Below 44 columns the regions stack. A Surface slot
+  value, such as a nested block, is placed cell by cell. Text wraps at its words. Their `pipe` and `accessible` output
+  and their facts are unchanged.
 - The six status standard blocks draw as status Components. In `interactive` and `static` mode, `InlineStatusBlock`
   draws a status badge with its label and message, `InFlowStatusBlock` an alert whose variant follows `severity`,
   `TransientOverlayBlock` a framed notice, `ActivityStreamBlock` one entry per event with the selected one marked,
