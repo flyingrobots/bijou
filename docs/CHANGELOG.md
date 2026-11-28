@@ -21,6 +21,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
   heading, the details one per row and the actions as one cue row. Below 44 columns the regions stack. A Surface slot
   value, such as a nested block, is placed cell by cell. Text wraps at its words. Their `pipe` and `accessible` output
   and their facts are unchanged.
+- The six status standard blocks draw as status Components. In `interactive` and `static` mode, `InlineStatusBlock`
+  draws a status badge with its label and message, `InFlowStatusBlock` an alert whose variant follows `severity`,
+  `TransientOverlayBlock` a framed notice, `ActivityStreamBlock` one entry per event with the selected one marked,
+  `ShortcutCueBlock` a row of key cues, and `ProgressIndicatorBlock` a progress bar whose filled length follows
+  `percent`, instead of one framed box per slot (flyingrobots/bijou#936, flyingrobots/bijou#934). Slot text wraps to
+  the width instead of being cut, and a Surface slot is drawn with its cells unchanged. Their `pipe` and `accessible`
+  output and their facts are unchanged.
 - The data standard Blocks draw their data. In `interactive` and `static` mode `DenseComparisonBlock` draws its title
   over a table with one header row and one data row, `HierarchyBlock` a tree with the selected node marked,
   `ExplorationListBlock` its facet as a badge and its items with the selected one marked above the preview,
