@@ -19,7 +19,7 @@ function stepSpan(text: string, index: number, current: number): DrawSpan {
 /** All steps on one row joined by `──`, when every step is text and the row fits. */
 function stepperRow(steps: readonly SlotPart[], current: number, width: number): DrawLine | undefined {
   const texts = textParts(steps);
-  if (texts === undefined || texts.length !== steps.length) return undefined;
+  if (texts?.length !== steps.length) return undefined;
   const spans = texts.flatMap((text, index) => [
     ...(index === 0 ? [] : [span(CONNECTOR, 'dim')]),
     stepSpan(text, index, current),

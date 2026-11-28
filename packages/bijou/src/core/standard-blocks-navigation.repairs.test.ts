@@ -47,8 +47,7 @@ function missingWords(blockName: string, slots: Slots, text: string): string[] {
 
 /** `slots` with `key` defined as an accessor that throws when read. */
 function withThrowingGetter(slots: Slots, key: string): Slots {
-  const copy: Record<string, unknown> = { ...slots };
-  delete copy[key];
+  const copy: Record<string, unknown> = Object.fromEntries(Object.entries(slots).filter(([name]) => name !== key));
   Object.defineProperty(copy, key, { enumerable: true, get: () => { throw new Error(`read ${key}`); } });
   return copy;
 }
