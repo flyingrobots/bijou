@@ -72,7 +72,8 @@ export async function startWorker(name, image, network) {
     const imageId = JSON.parse((await execute(['docker', 'image', 'inspect', image])).output)[0].Id;
     if (worker.Image !== imageId) throw new Error('Existing worker image changed; explicit owned-worker migration required');
     // A stopped owned worker sized for other Docker capacity is recreated, never reused.
-    if (!sizedFor(worker, profile)) { await execute(['docker', 'rm', name]); worker = null; }
+    // Remove it by the ID inspected here, so a racing launch cannot remove another's replacement.
+    if (!sizedFor(worker, profile)) { await execute(['docker', 'rm', worker.Id]); worker = null; }
   }
   if (!worker) {
     await execute(['docker', ...workerArgs(name, image, network, profile)]);
