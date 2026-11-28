@@ -21,6 +21,18 @@ function escapeForPattern(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+const TOP_ROW = /^[┌╭╔┏]─.*[┐╮╗┓]$/u;
+const BOTTOM_ROW = /^[└╰╚┗]─*[┘╯╝┛]$/u;
+
+/** True when `frame` is one box from corner to corner, titled with `blockName`. */
+function hasGenericOuterFrame(blockName: string, frame: DrawnFrame): boolean {
+  const top = frame.rows[0] ?? '';
+  const bottom = frame.rows[frame.rows.length - 1] ?? '';
+  return TOP_ROW.test(top)
+    && top.includes(`─ ${blockName} ─`)
+    && BOTTOM_ROW.test(bottom);
+}
+
 /**
  * Slots of `block` whose label or id appears as a framed box title in `frame`,
  * when `frame` has the generic section rendering's shape.
@@ -29,13 +41,14 @@ function escapeForPattern(text: string): string {
  * name (`┌─ DividerBlock ───`) holding one box per slot, titled with the slot's
  * label, or its capitalised id when the slot has no metadata label (AppShell,
  * ReaderSurface, InspectorPanel). The match takes the label and the id,
- * ignoring case. A frame without that outer title is a drawn block, so its own
- * text, such as a rule labelled "Style", is never reported. An empty result is
- * the oracle for "this block draws itself".
+ * ignoring case. A frame without that outer frame (a top row from corner to
+ * corner, titled with the block name, and a bottom row from corner to corner)
+ * is a drawn block, so its own text, such as a rule labelled
+ * "DividerBlock ─ Style", is never reported. An empty result is the oracle for
+ * "this block draws itself".
  */
 function framedSlotTitles(block: BlockDefinition, frame: DrawnFrame): readonly string[] {
-  const outerTitle = new RegExp(`─ ${escapeForPattern(block.metadata.blockName)} ─`, 'u');
-  if (!outerTitle.test(frame.rows[0] ?? '')) return [];
+  if (!hasGenericOuterFrame(block.metadata.blockName, frame)) return [];
   return block.metadata.slots
     .filter((slot) => [slot.label, slot.id].some((name) => {
       if (name === undefined) return false;
