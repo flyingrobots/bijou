@@ -67,4 +67,12 @@ describe('surface text places wide graphemes in two cells (flyingrobots/bijou#85
     expect(clipSurfaceCells(cells, 2, 4)).toEqual([' ', 'b']);
     expect(clipSurfaceCells(cells, 0, 4)).toEqual(['a', '漢', '', 'b']);
   });
+
+  it('clipSurfaceCells gives no cells for an empty or reversed range, negative ends included', () => {
+    const cells = segmentSurfaceText('abc');
+
+    expect(clipSurfaceCells(cells, 0, -1)).toEqual([]);
+    expect(clipSurfaceCells(cells, 2, 1)).toEqual([]);
+    expect(clipSurfaceCells(cells, -3, 1)).toEqual(['a']);
+  });
 });
