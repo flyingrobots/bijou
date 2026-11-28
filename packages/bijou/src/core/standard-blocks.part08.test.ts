@@ -55,6 +55,12 @@ describe('DividerBlock interactive drawing (flyingrobots/bijou#935)', () => {
     expect(row).toMatch(/^═+ A ─ B ═+$/u);
   });
 
+  it('keeps a clipped label intact when it fills the row (review: PR 943)', () => {
+    const row = drawDivider({ label: `${'A'.repeat(28)}─Z`, style: 'double' }, 30).rows[0] ?? '';
+
+    expect(row).toBe(` ${'A'.repeat(28)}─`);
+  });
+
   it('draws the missing-label text inside the rule when the required label is absent', () => {
     const frame = drawDivider({ style: 'rule' });
 
