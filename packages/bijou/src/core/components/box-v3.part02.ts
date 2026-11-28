@@ -5,7 +5,7 @@ import { sanitizePlainTerminalText } from '../text/index.js';
 import { wrapToWidth } from '../text/wrap.js';
 import { resolveFillChar, type BoxOptions } from './box.js';
 import { applyBCSSCellTextStyles } from './bcss-style.js';
-import { createTextSurface, segmentSurfaceText, wrapSurfaceToWidth } from './surface-text.js';
+import { clipSurfaceCells, createTextSurface, segmentSurfaceText, wrapSurfaceToWidth } from './surface-text.js';
 import { resolveOverflowBehavior } from './overflow.js';
 import { BORDER, mirrorsLayout, titleStartX, normalizeFixedWidth, parseStyleRGB, withInheritedBackground } from './box-v3.part01.js';
 
@@ -41,7 +41,7 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
   }
 
   const autoTitleWidth = normalizedFixedWidth === undefined && safeTitle.length > 0
-    ? segmentSurfaceText(` ${safeTitle} `, 'boxSurface title').length
+    ? segmentSurfaceText(` ${safeTitle} `).length
     : 0;
   const innerW = normalizedFixedWidth === undefined
     ? Math.max(contentSurf.width + pl + pr, autoTitleWidth)
@@ -97,9 +97,9 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
     if (safeTitle.length > 0 && outerW >= 4) {
       const available = Math.max(0, outerW - 4);
       const titleText = clipToWidth(` ${safeTitle} `, available);
-      const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
+      const titleGs = segmentSurfaceText(titleText);
       const titleLen = Math.min(titleGs.length, available);
-      for (const [i, char] of titleGs.slice(0, titleLen).entries()) {
+      for (const [i, char] of clipSurfaceCells(titleGs, 0, titleLen).entries()) {
         surface.setRGB(i + titleStartX(outerW, titleLen, mirrorTitle), 0, char, fgR, fgG, fgB, bgR, bgG, bgB, flags);
       }
     }
@@ -126,9 +126,9 @@ export function boxSurface(content: Surface | string, options: BoxOptions = {}):
     if (safeTitle.length > 0 && outerW >= 4) {
       const available = Math.max(0, outerW - 4);
       const titleText = clipToWidth(` ${safeTitle} `, available);
-      const titleGs = segmentSurfaceText(titleText, 'boxSurface title');
+      const titleGs = segmentSurfaceText(titleText);
       const titleLen = Math.min(titleGs.length, available);
-      for (const [i, char] of titleGs.slice(0, titleLen).entries()) {
+      for (const [i, char] of clipSurfaceCells(titleGs, 0, titleLen).entries()) {
         surface.set(i + titleStartX(outerW, titleLen, mirrorTitle), 0, { ...borderCell, char });
       }
     }

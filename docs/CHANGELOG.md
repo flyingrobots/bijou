@@ -8,6 +8,13 @@ All packages (`@flyingrobots/bijou`, `@flyingrobots/bijou-node`, `@flyingrobots/
 
 ### Fixed
 
+- Surface text accepts wide graphemes. `createTextSurface`, `createSegmentSurface` and `segmentSurfaceText` used to
+  throw on any grapheme wider than one cell, so every surface Component threw on East Asian or emoji text
+  (flyingrobots/bijou#859). A wide grapheme now takes its lead cell and an empty continuation cell, the convention
+  `writeSurfaceGrapheme` and the packed cell format already use, so `createTextSurface('漢字')` is four cells wide.
+  `segmentSurfaceText` returns one entry per cell and no longer takes a purpose argument. The new
+  `clipSurfaceCells` clips without cutting a wide grapheme in half, and the separator, box title, UI scene lowering
+  and its parity witness use it. Surfaces that rendered before are unchanged.
 - `DividerBlock` draws a divider. In `interactive` and `static` mode it now draws one labelled rule at the requested
   width, instead of one framed box per slot (flyingrobots/bijou#935). `style` picks the line (`rule`, `heavy`,
   `double` or `dashed`), and `density: 'spacious'` adds a blank row above and below it. Its `pipe` and `accessible`

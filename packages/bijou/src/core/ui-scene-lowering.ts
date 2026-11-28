@@ -1,5 +1,5 @@
 import { createSurface, type Surface } from '../ports/surface.js';
-import { segmentSurfaceText } from './components/surface-text.js';
+import { clipSurfaceCells, segmentSurfaceText } from './components/surface-text.js';
 import { hashUiSceneSurface, hashUiSceneValue } from './ui-scene-canonical.js';
 import type { UiSceneIr } from './ui-scene-contract.js';
 import {
@@ -84,15 +84,16 @@ export function lowerUiSceneToSurface(
   for (const node of scene.nodes) {
     if (node.kind !== 'text') continue;
     const text = nodeTextForMode(node, lowerMode);
-    const graphemes = segmentSurfaceText(text, 'lowerUiSceneToSurface');
+    const graphemes = segmentSurfaceText(text);
     const x = sanitizeLayoutCoordinate(node.layout?.x);
     const y = sanitizeLayoutCoordinate(node.layout?.y);
     const style = cellStyleForNode(node, options.tokenColors);
     const visible = visibleTextSpan(x, y, graphemes.length, targetProfile);
     if (visible == null) continue;
+    const cells = clipSurfaceCells(graphemes, visible.startOffset, visible.endOffset);
     for (let offset = visible.startOffset; offset < visible.endOffset; offset++) {
       surface.set(x + offset, y, {
-        char: graphemes[offset] ?? ' ',
+        char: cells[offset - visible.startOffset] ?? ' ',
         ...style,
         empty: false,
       });

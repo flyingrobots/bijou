@@ -21,7 +21,7 @@ function restyleRule(rule: Surface, label: string, glyph: string): void {
   if (glyph === RULE_GLYPH) return;
   const safeLabel = sanitizePlainTerminalText(label);
   const labelCells = safeLabel.length > 0
-    ? segmentSurfaceText(` ${safeLabel} `, 'drawDivider label').length
+    ? segmentSurfaceText(` ${safeLabel} `).length
     : 0;
   if (labelCells >= rule.width) return;
   const start = Math.floor((rule.width - labelCells) / 2);

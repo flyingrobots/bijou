@@ -1,4 +1,4 @@
-import { segmentSurfaceText } from './components/surface-text.js';
+import { clipSurfaceCells, segmentSurfaceText } from './components/surface-text.js';
 import {
   sanitizeLayoutCoordinate,
   visibleTextSpan,
@@ -50,7 +50,7 @@ export function expectedTerminalSpan(
   element: UiSceneParityBrowserNode,
   target: UiSceneSurfaceLowering['targetProfile'],
 ): UiSceneParityExpectedSpan | null {
-  const graphemes = segmentSurfaceText(element.text ?? '', 'parity witness');
+  const graphemes = segmentSurfaceText(element.text ?? '');
   const x = coordinate(element.style.get('--bijou-x'));
   const y = coordinate(element.style.get('--bijou-y'));
   const span = visibleTextSpan(x, y, graphemes.length, target);
@@ -58,7 +58,7 @@ export function expectedTerminalSpan(
   return {
     x: span.x,
     y,
-    text: graphemes.slice(span.startOffset, span.endOffset).join(''),
+    text: clipSurfaceCells(graphemes, span.startOffset, span.endOffset).join(''),
     clipped: span.width < graphemes.length,
   };
 }

@@ -32,7 +32,7 @@ export function badge(text: string, options: BadgeOptions = {}): Surface {
 
   const safeText = sanitizePlainTerminalText(text);
   const paddedText = ` ${safeText} `;
-  const graphemes = segmentSurfaceText(paddedText, 'badge');
+  const graphemes = segmentSurfaceText(paddedText);
   const width = graphemes.length;
   const surface = createSurface(width, 1);
 

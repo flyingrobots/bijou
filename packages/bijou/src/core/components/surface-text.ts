@@ -3,11 +3,8 @@ import {
   isPackedSurface,
   type Surface,
 } from '../../ports/surface.js';
-import {
-  graphemeClusterWidth,
-  sanitizePlainTerminalText,
-  segmentGraphemes,
-} from '../text/grapheme.js';
+import { sanitizePlainTerminalText } from '../text/grapheme.js';
+import { surfaceCells } from './surface-text-cells.js';
 import {
   parseNumericCellTextStyle,
   type CellTextStyle,
@@ -18,24 +15,9 @@ export interface SurfaceTextSegment {
   readonly style?: CellTextStyle;
 }
 
-// Previously overrode ✓/✗ as narrow when the Dingbats range was
-// blanket-classified as wide. Now isWideChar correctly excludes
-// Dingbats (they're Narrow per Unicode East Asian Width).
-const SURFACE_NARROW_OVERRIDES = new Set<string>();
-
-function segmentSanitizedSurfaceText(text: string, purpose: string): string[] {
-  const graphemes = segmentGraphemes(text);
-  const wide = graphemes.find(
-    (grapheme) =>
-      graphemeClusterWidth(grapheme) !== 1 &&
-      !SURFACE_NARROW_OVERRIDES.has(grapheme),
-  );
-  if (wide) {
-    throw new Error(
-      `${purpose} does not yet support wide graphemes like "${wide}" in surface rendering.`,
-    );
-  }
-  return graphemes;
+// Wide graphemes take a lead cell and a continuation cell (flyingrobots/bijou#859).
+function segmentSanitizedSurfaceText(text: string): string[] {
+  return surfaceCells(text);
 }
 
 /**
@@ -45,11 +27,8 @@ function segmentSanitizedSurfaceText(text: string, purpose: string): string[] {
  * graphemes for cell writes. Callers that intentionally preserve ANSI styling
  * should use `parseAnsiToSurface()` instead.
  */
-export function segmentSurfaceText(
-  text: string,
-  purpose = 'Surface text',
-): string[] {
-  return segmentSanitizedSurfaceText(sanitizePlainTerminalText(text), purpose);
+export function segmentSurfaceText(text: string): string[] {
+  return segmentSanitizedSurfaceText(sanitizePlainTerminalText(text));
 }
 
 export function createTextSurface(
@@ -59,7 +38,7 @@ export function createTextSurface(
   const safeText = sanitizePlainTerminalText(text, { preserveNewlines: true });
   const lines = safeText.split('\n');
   const lineGraphemes = lines.map((line) =>
-    segmentSanitizedSurfaceText(line, 'createTextSurface'),
+    segmentSanitizedSurfaceText(line),
   );
   const width = lineGraphemes.reduce(
     (max, graphemes) => Math.max(max, graphemes.length),
@@ -103,7 +82,7 @@ export function createSegmentSurface(
     numStyle: segment.style
       ? parseNumericCellTextStyle(segment.style)
       : undefined,
-    graphemes: segmentSurfaceText(segment.text, 'createSegmentSurface'),
+    graphemes: segmentSurfaceText(segment.text),
   }));
   const width = segmented.reduce(
     (sum, segment) => sum + segment.graphemes.length,
